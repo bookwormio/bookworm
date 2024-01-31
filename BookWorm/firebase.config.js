@@ -18,7 +18,7 @@ const firebaseConfig = {
     measurementId: "G-FBB1BW3BFM"
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+const FIREBASE = initializeApp(firebaseConfig);
+export const FIREBASE_AUTH = getAuth(FIREBASE);
 // For more information on how to access Firebase in your project,
 // see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase
