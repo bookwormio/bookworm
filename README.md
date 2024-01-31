@@ -24,6 +24,11 @@ Before running, you need to install homebrew, node, npx, and clone the repo
   npm install
   ```
 
+
+* Install the following extensions for visual studio code
+1. ESLint
+2. Prettier
+
 ### Running the Simulator
 Now that everything is installed, the simulator can be ran
 * Enter the BookWorm project folder inside the bookworm repo folder
