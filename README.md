@@ -19,6 +19,10 @@ Before running, you need to install homebrew, node, npx, and clone the repo
     ```
     git clone git@github.com:rilescode/bookworm.git
     ```
+* Install npm dependencies
+  ```
+  npm install
+  ```
 
 ### Running the Simulator
 Now that everything is installed, the simulator can be ran
