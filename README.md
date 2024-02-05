@@ -15,9 +15,9 @@ Before running, you need to install homebrew, node, npx, and clone the repo
     ```
     npm install -g npx
     ```
-* Clone Project:
+* Clone Project with SSH:
     ```
-    git clone git@github.com:rilescode/bookworm.git
+    git clone git@capstone-cs.eng.utah.edu:bookworm/bookworm.git
     ```
 * Install npm dependencies (from within ```/bookwork/BookWorm/``` )
   ```
