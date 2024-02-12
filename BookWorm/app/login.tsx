@@ -1,49 +1,48 @@
+import { FIREBASE_AUTH } from "../firebase.config";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { router } from "expo-router";
 import {
   View,
   StyleSheet,
   TextInput,
   ActivityIndicator,
   Button,
-  Text,
 } from "react-native";
-import React, { useState } from "react";
-import { FIREBASE_AUTH } from "../firebase.config";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import React, { useEffect, useState } from "react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [successfulUser, setMessage] = useState("");
-  const auth = FIREBASE_AUTH;
 
-  const signIn = async () => {
+  useEffect(() => {
+    const unsubscribe = FIREBASE_AUTH.onAuthStateChanged((user) => {
+      if (user != null) {
+        router.replace("/home");
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleSignIn = () => {
     setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setMessage("Successful sign in");
-    } catch (error) {
-      console.log(error);
-      setMessage("sign in error");
-    } finally {
-      setLoading(false);
-    }
+    signInWithEmailAndPassword(FIREBASE_AUTH, email, password)
+      .then(() => {})
+      .catch((error) => {
+        alert(error);
+      });
   };
 
-  const signUp = async () => {
+  const handleSignUp = () => {
     setLoading(true);
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      setMessage("Successful sign up");
-    } catch (error) {
-      console.log(error);
-      setMessage("sign up error");
-    } finally {
-      setLoading(false);
-    }
+    createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
+      .then(() => {})
+      .catch((error) => {
+        alert(error);
+      });
   };
 
   return (
@@ -72,25 +71,10 @@ const Login = () => {
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <>
-          <Button
-            title="Login"
-            onPress={() => {
-              void (async () => {
-                await signIn();
-              })();
-            }}
-          />
-          <Button
-            title="Create Account"
-            onPress={() => {
-              void (async () => {
-                await signUp();
-              })();
-            }}
-          />
+          <Button title="Login" onPress={handleSignIn} />
+          <Button title="Create Account" onPress={handleSignUp} />
         </>
       )}
-      <Text>{successfulUser}</Text>
     </View>
   );
 };

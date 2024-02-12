@@ -1,37 +1,26 @@
-import { Link } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import { FIREBASE_AUTH } from "../firebase.config";
+import { router, useRootNavigationState, useSegments } from "expo-router";
+import { View } from "react-native";
+import React, { useEffect } from "react";
 
-export default function Page() {
-  return (
-    <View style={styles.container}>
-      <View style={styles.main}>
-        <Text style={styles.title}>Hello World</Text>
-        <Text style={styles.subtitle}>This is the first page of your app.</Text>
-        <Link href="/login">Login</Link>
-      </View>
-    </View>
-  );
+export default function App() {
+  const segments = useSegments();
+  const navigationState = useRootNavigationState();
+  useEffect(() => {
+    if (navigationState?.key == null) {
+      return;
+    }
+    const user = FIREBASE_AUTH.currentUser;
+    // Your async logic to check user authentication can be placed here
+    // For simplicity, I'm using a synchronous check here
+    if (user === null) {
+      // Navigate to the 'login' route if the user is not authenticated
+      router.replace("/login");
+    } else {
+      // Navigate to the 'home' route if the user is authenticated
+      router.replace("/home");
+    }
+  }, [segments, navigationState?.key]);
+
+  return <View></View>;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    padding: 24,
-  },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
-  },
-  title: {
-    fontSize: 64,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
-  },
-});
