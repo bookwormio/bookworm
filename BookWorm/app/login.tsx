@@ -32,6 +32,7 @@ const Login = () => {
     signInWithEmailAndPassword(FIREBASE_AUTH, email, password)
       .then(() => {})
       .catch((error) => {
+        setLoading(false);
         alert(error);
       });
   };
@@ -41,6 +42,7 @@ const Login = () => {
     createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
       .then(() => {})
       .catch((error) => {
+        setLoading(false);
         alert(error);
       });
   };
