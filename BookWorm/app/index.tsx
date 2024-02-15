@@ -1,7 +1,7 @@
-import { FIREBASE_AUTH } from "../firebase.config";
 import { router, useRootNavigationState, useSegments } from "expo-router";
-import { View } from "react-native";
 import React, { useEffect } from "react";
+import { View } from "react-native";
+import { FIREBASE_AUTH } from "../firebase.config";
 
 export default function App() {
   const segments = useSegments();
