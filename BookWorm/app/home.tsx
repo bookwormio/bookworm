@@ -1,26 +1,12 @@
-import { FIREBASE_AUTH } from "../firebase.config";
-import { router } from "expo-router";
-import { Button, StyleSheet, Text, View } from "react-native";
 import React from "react";
+import { StyleSheet } from "react-native";
+import BottomTabs from "./components/ BottomTabs";
 
 export default function Home() {
-  const handleLogOut = () => {
-    FIREBASE_AUTH.signOut()
-      .then(() => {
-        router.replace("/login");
-      })
-      .catch((error) => {
-        alert(error);
-      });
-  };
-
   return (
-    <View style={styles.container}>
-      <View style={styles.main}>
-        <Text style={styles.title}>Home</Text>
-        <Button title="LogOut" onPress={handleLogOut} />
-      </View>
-    </View>
+    <>
+      <BottomTabs></BottomTabs>
+    </>
   );
 }
 
