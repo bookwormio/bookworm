@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import React from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
-import { FIREBASE_AUTH } from "../firebase.config";
+import { FIREBASE_AUTH } from "../../firebase.config";
 
 export default function Profile() {
   const user = FIREBASE_AUTH.currentUser;

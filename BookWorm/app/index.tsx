@@ -14,7 +14,7 @@ export default function App() {
     if (user === null) {
       router.replace("/login");
     } else {
-      router.replace("/home");
+      router.replace("/posts");
     }
   }, [segments, navigationState?.key]);
 

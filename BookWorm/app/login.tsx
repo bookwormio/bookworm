@@ -21,7 +21,7 @@ const Login = () => {
   useEffect(() => {
     const unsubscribe = FIREBASE_AUTH.onAuthStateChanged((user) => {
       if (user != null) {
-        router.replace("/home");
+        router.replace("/posts");
       }
     });
     return unsubscribe;
@@ -57,7 +57,7 @@ const Login = () => {
         onChangeText={(text) => {
           setEmail(text);
         }}
-      ></TextInput>
+      />
       <TextInput
         style={styles.input}
         value={password}
@@ -67,7 +67,7 @@ const Login = () => {
         onChangeText={(text) => {
           setPassword(text);
         }}
-      ></TextInput>
+      />
 
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
