@@ -5,7 +5,7 @@ import {
   type User,
 } from "firebase/auth";
 import { useStorageState } from "./useStorageState";
-import React from "react";
+import React, { useState } from "react";
 
 const AuthContext = React.createContext<{
   signIn: (email: string, password: string) => void;
@@ -36,40 +36,54 @@ export function useSession() {
 }
 
 export function SessionProvider(props: React.PropsWithChildren) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [[isLoading, session], setSession] = useStorageState("session");
+  const [loading, setLoading] = useState(false);
 
   return (
     <AuthContext.Provider
       value={{
         signIn: (email: string, password: string) => {
+          setLoading(true);
           signInWithEmailAndPassword(FIREBASE_AUTH, email, password)
             .then(() => {
               setSession("xxx");
             })
             .catch((error) => {
               alert(error);
+            })
+            .finally(() => {
+              setLoading(false);
             });
         },
         createAccount: (email: string, password: string) => {
+          setLoading(true);
           createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
             .then(() => {
               setSession("xxx");
             })
             .catch((error) => {
               alert(error);
+            })
+            .finally(() => {
+              setLoading(false);
             });
         },
         signOut: () => {
+          setLoading(true);
           FIREBASE_AUTH.signOut()
             .then(() => {
               setSession(null);
             })
             .catch((error) => {
               alert(error);
+            })
+            .finally(() => {
+              setLoading(false);
             });
         },
         session,
-        isLoading,
+        isLoading: loading,
         user: FIREBASE_AUTH.currentUser,
       }}
     >

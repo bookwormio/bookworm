@@ -3,7 +3,7 @@ import { useSession } from "../ctx";
 import { View, StyleSheet, TextInput, Button } from "react-native";
 import React, { useState } from "react";
 
-const Login = () => {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { signIn, createAccount } = useSession();
@@ -33,6 +33,7 @@ const Login = () => {
         title="Login"
         onPress={() => {
           signIn(email, password);
+          router.replace("/posts");
         }}
       />
       <Button
@@ -44,7 +45,7 @@ const Login = () => {
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -75,5 +76,3 @@ const styles = StyleSheet.create({
     color: "#38434D",
   },
 });
-
-export default Login;

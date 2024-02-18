@@ -2,14 +2,27 @@ import { useSession } from "../../ctx";
 import { Redirect } from "expo-router";
 import { Tabs } from "expo-router/tabs";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, View, StyleSheet } from "react-native";
 import React from "react";
 
 export default function AppLayout() {
   const { session, isLoading } = useSession();
 
   if (isLoading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    const styles = StyleSheet.create({
+      container: {
+        flex: 1,
+        alignItems: "center",
+        padding: 40,
+        justifyContent: "center",
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="black" />
+      </View>
+    );
   }
   // Only require authentication within the (app) group's layout as users
   // need to be able to access the (auth) group and sign in again.
