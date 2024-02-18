@@ -1,26 +1,16 @@
-import { router } from "expo-router";
+import { useSession } from "../../ctx";
 import React from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
-import { FIREBASE_AUTH } from "../../firebase.config";
 
 export default function Profile() {
-  const user = FIREBASE_AUTH.currentUser;
+  const { signOut, user } = useSession();
   const userStr: string = user?.email ?? "No email";
-  const handleLogOut = () => {
-    FIREBASE_AUTH.signOut()
-      .then(() => {
-        router.replace("/login");
-      })
-      .catch((error) => {
-        alert(error);
-      });
-  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Profile Page</Text>
       <Text>Current User email: {userStr}</Text>
-      <Button title="LogOut" onPress={handleLogOut} />
+      <Button title="LogOut" onPress={signOut} />
     </View>
   );
 }

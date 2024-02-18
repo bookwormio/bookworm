@@ -1,8 +1,24 @@
+import { useSession } from "../../ctx";
+import { Redirect } from "expo-router";
 import { Tabs } from "expo-router/tabs";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { ActivityIndicator } from "react-native";
 import React from "react";
 
-export default () => {
+export default function AppLayout() {
+  const { session, isLoading } = useSession();
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+  // Only require authentication within the (app) group's layout as users
+  // need to be able to access the (auth) group and sign in again.
+  if (session == null) {
+    // On web, static rendering will stop here as the user is not authenticated
+    // in the headless Node process that the pages are rendered in.
+    return <Redirect href="/" />;
+  }
+
   return (
     <Tabs>
       <Tabs.Screen
@@ -37,4 +53,4 @@ export default () => {
       />
     </Tabs>
   );
-};
+}
