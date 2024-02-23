@@ -4,17 +4,17 @@ import { StyleSheet, Text, View } from "react-native";
 import SearchBar from "../../components/SearchBar/SearchBar";
 import { db } from "../../firebase.config";
 
-interface User {
-  id: string;
-  name: string;
-}
-
 export default function Search() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserListItem[]>([]);
   const [searchClicked, setSearchClicked] = useState<boolean>(false);
   const [searchPhrase, setSearchPhrase] = useState<string>("");
 
-  const fetchUsers = async (mySearchValue: string): Promise<User[]> => {
+  // Function to fetch users based on the search phrase
+  // TODO: makes sense down the line to put this in a utilities file
+  const fetchUsers = async (mySearchValue: string): Promise<UserListItem[]> => {
+    // Firestore is weird:
+    // This is like a Select * from users where name LIKE "mySearchValue%"
+    // TODO: down the line potentially may have to implement a more search friendly db
     const q = query(
       collection(db, "user_collection"),
       where("isPublic", "==", true),
@@ -22,9 +22,9 @@ export default function Search() {
       where("name", "<=", mySearchValue + "\uf8ff")
     );
     const querySnapshot = await getDocs(q);
-    const usersData: User[] = [];
+    const usersData: UserListItem[] = [];
+    // Add each user data to the array
     querySnapshot.forEach((doc) => {
-      // Add each user data to the array
       usersData.push({ id: doc.id, name: doc.data().name });
       // Add more properties as needed
     });
@@ -32,15 +32,15 @@ export default function Search() {
   };
 
   useEffect(() => {
-    const mySearchValue = ""; // Provide your search value here
+    const mySearchValue = searchPhrase;
     fetchUsers(mySearchValue)
       .then((fetchedUsers) => {
-        setUsers(fetchedUsers);
+        setUsers(fetchedUsers); // Set the state with the fetched users
       })
       .catch((error) => {
         console.error("Error fetching users:", error);
       });
-  }, []);
+  }, [searchPhrase]); // Run this effect whenever searchPhrase changes
 
   return (
     <View style={styles.container}>
@@ -50,7 +50,6 @@ export default function Search() {
         setSearchPhrase={setSearchPhrase}
         setClicked={setSearchClicked}
       />
-      <Text>Search phrase: {searchPhrase}</Text>
       <View>
         {users.map((user) => (
           <View key={user.id}>
