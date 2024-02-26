@@ -1,12 +1,35 @@
 import { router } from "expo-router";
-import { useSession } from "../ctx";
-import { View, StyleSheet, TextInput, Button } from "react-native";
 import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
+import { useAuth } from "../../components/auth/context";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signIn, createAccount } = useSession();
+  const { signIn, createAccount, isLoading } = useAuth();
+
+  if (isLoading) {
+    const styles = StyleSheet.create({
+      container: {
+        flex: 1,
+        alignItems: "center",
+        padding: 40,
+        justifyContent: "center",
+      },
+    });
+
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="black" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

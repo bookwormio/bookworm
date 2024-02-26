@@ -1,8 +1,8 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import SearchBar from "../../components/SearchBar/SearchBar";
-import { db } from "../../firebase.config";
+import SearchBar from "../../components/searchbar/searchbar";
+import { DB } from "../../firebase.config";
 
 export default function Search() {
   const [users, setUsers] = useState<UserListItem[]>([]);
@@ -16,10 +16,10 @@ export default function Search() {
     // This is like a Select * from users where name LIKE "mySearchValue%"
     // TODO: down the line potentially may have to implement a more search friendly db
     const q = query(
-      collection(db, "user_collection"),
+      collection(DB, "user_collection"),
       where("isPublic", "==", true),
       where("name", ">=", mySearchValue),
-      where("name", "<=", mySearchValue + "\uf8ff")
+      where("name", "<=", mySearchValue + "\uf8ff"),
     );
     const querySnapshot = await getDocs(q);
     const usersData: UserListItem[] = [];
@@ -38,7 +38,7 @@ export default function Search() {
         setUsers(fetchedUsers); // Set the state with the fetched users
       })
       .catch((error) => {
-        console.error("Error fetching users:", error);
+        alert("Error fetching users: " + error);
       });
   }, [searchPhrase]); // Run this effect whenever searchPhrase changes
 

@@ -1,9 +1,9 @@
-import { useSession } from "../../ctx";
 import React from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
+import { useAuth } from "../../components/auth/context";
 
 export default function Profile() {
-  const { signOut, user } = useSession();
+  const { signOut, user } = useAuth();
   const userStr: string = user?.email ?? "No email";
 
   return (
