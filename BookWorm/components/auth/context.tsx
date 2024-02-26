@@ -4,8 +4,9 @@ import {
   signInWithEmailAndPassword,
   type User,
 } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { FIREBASE_AUTH } from "../../firebase.config";
+import { DB, FIREBASE_AUTH } from "../../firebase.config";
 
 const AuthContext = React.createContext<{
   signIn: (email: string, password: string) => void;
@@ -41,7 +42,6 @@ function useAuthenticatedRoute(user: User | null) {
 }
 
 export function AuthenticationProvider(props: React.PropsWithChildren) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(false);
   const [currentUser, setUser] = useState(FIREBASE_AUTH.currentUser);
   useEffect(() => {
@@ -73,8 +73,19 @@ export function AuthenticationProvider(props: React.PropsWithChildren) {
         createAccount: (email: string, password: string) => {
           setLoading(true);
           createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
-            .then(() => {
-              setUser(FIREBASE_AUTH.currentUser);
+            // createUserWithEmailAndPassword return userCredential object as promise resolution
+            // user contains info about user account created - uID, email, display Name
+            .then(async (userCredential) => {
+              const user = userCredential.user;
+              // https://firebase.google.com/docs/firestore/manage-data/add-data#web-modular-api
+              setUser(user);
+              try {
+                await setDoc(doc(DB, "user_collection", user.uid), {
+                  email: user.email,
+                });
+              } catch (error) {
+                alert(error);
+              }
             })
             .catch((error) => {
               alert(error);
