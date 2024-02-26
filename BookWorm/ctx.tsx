@@ -1,4 +1,4 @@
-import { FIREBASE_AUTH } from "./firebase.config";
+import { FIREBASE_AUTH, db } from "./firebase.config";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -6,6 +6,7 @@ import {
 } from "firebase/auth";
 import { useStorageState } from "./useStorageState";
 import React, { useState } from "react";
+import { doc, setDoc } from "firebase/firestore";
 
 const AuthContext = React.createContext<{
   signIn: (email: string, password: string) => void;
@@ -59,8 +60,19 @@ export function SessionProvider(props: React.PropsWithChildren) {
         createAccount: (email: string, password: string) => {
           setLoading(true);
           createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
-            .then(() => {
+            // createUserWithEmailAndPassword return userCredential object as promise resolution
+            // user contains info about user account created - uID, email, display Name
+            .then(async (userCredential) => {
+              const user = userCredential.user;
+              // https://firebase.google.com/docs/firestore/manage-data/add-data#web-modular-api
               setSession("xxx");
+              try {
+                await setDoc(doc(db, "user_collection", user.uid), {
+                  email: user.email,
+                });
+              } catch (error) {
+                alert(error);
+              }
             })
             .catch((error) => {
               alert(error);
