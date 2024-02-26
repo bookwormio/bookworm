@@ -38,7 +38,7 @@ export default function Search() {
         setUsers(fetchedUsers); // Set the state with the fetched users
       })
       .catch((error) => {
-        console.error("Error fetching users:", error);
+        alert("Error fetching users: " + error);
       });
   }, [searchPhrase]); // Run this effect whenever searchPhrase changes
 
