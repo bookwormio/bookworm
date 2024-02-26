@@ -1,44 +1,58 @@
-import { FIREBASE_AUTH } from "./firebase.config";
+import { useRouter, useSegments } from "expo-router";
 import {
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   type User,
 } from "firebase/auth";
-import { useStorageState } from "./useStorageState";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { FIREBASE_AUTH } from "../../firebase.config";
 
 const AuthContext = React.createContext<{
   signIn: (email: string, password: string) => void;
   createAccount: (email: string, password: string) => void;
   signOut: () => void;
-  session?: string | null;
   isLoading: boolean;
   user: User | null;
 }>({
   signIn: () => null,
   createAccount: () => null,
   signOut: () => null,
-  session: null,
   isLoading: false,
   user: null,
 });
 
-// This hook can be used to access the user info.
-export function useSession() {
-  const value = React.useContext(AuthContext);
-  if (process.env.NODE_ENV !== "production") {
-    if (value == null) {
-      throw new Error("useSession must be wrapped in a <SessionProvider />");
-    }
-  }
-
-  return value;
+export function useAuth() {
+  return React.useContext(AuthContext);
 }
 
-export function SessionProvider(props: React.PropsWithChildren) {
+// This hook can be used to access the user info.
+function useAuthenticatedRoute(user: User | null) {
+  const segments = useSegments();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    const inAuthGroup = segments[0] === "(auth)";
+    if (user == null && !inAuthGroup) {
+      router.replace("/sign-in");
+    } else if (user != null && inAuthGroup) {
+      router.replace("/posts");
+    }
+  }, [user, segments]);
+}
+
+export function AuthenticationProvider(props: React.PropsWithChildren) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [[isLoading, session], setSession] = useStorageState("session");
   const [loading, setLoading] = useState(false);
+  const [currentUser, setUser] = useState(FIREBASE_AUTH.currentUser);
+  useEffect(() => {
+    setLoading(true);
+    const unsubscribe = FIREBASE_AUTH.onAuthStateChanged((authUser) => {
+      setUser(authUser);
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
+  useAuthenticatedRoute(currentUser);
 
   return (
     <AuthContext.Provider
@@ -47,7 +61,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
           setLoading(true);
           signInWithEmailAndPassword(FIREBASE_AUTH, email, password)
             .then(() => {
-              setSession("xxx");
+              setUser(FIREBASE_AUTH.currentUser);
             })
             .catch((error) => {
               alert(error);
@@ -60,7 +74,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
           setLoading(true);
           createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
             .then(() => {
-              setSession("xxx");
+              setUser(FIREBASE_AUTH.currentUser);
             })
             .catch((error) => {
               alert(error);
@@ -73,7 +87,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
           setLoading(true);
           FIREBASE_AUTH.signOut()
             .then(() => {
-              setSession(null);
+              setUser(null);
             })
             .catch((error) => {
               alert(error);
@@ -82,9 +96,8 @@ export function SessionProvider(props: React.PropsWithChildren) {
               setLoading(false);
             });
         },
-        session,
         isLoading: loading,
-        user: FIREBASE_AUTH.currentUser,
+        user: currentUser,
       }}
     >
       {props.children}

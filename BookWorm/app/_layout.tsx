@@ -1,11 +1,11 @@
-import React from "react";
 import { Slot } from "expo-router";
-import { SessionProvider } from "../ctx";
+import React from "react";
+import { AuthenticationProvider } from "../components/auth/context";
 
 export default function AuthenticatedRoot() {
   return (
-    <SessionProvider>
+    <AuthenticationProvider>
       <Slot />
-    </SessionProvider>
+    </AuthenticationProvider>
   );
 }
