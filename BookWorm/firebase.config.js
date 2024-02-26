@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import {
   getAuth,
   getReactNativePersistence,
-  initializeAuth,
+  initializeAuth
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
