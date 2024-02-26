@@ -58,20 +58,6 @@ export default function Search() {
           </View>
         ))}
       </View>
-      <SearchBar
-        clicked={searchClicked}
-        searchPhrase={searchPhrase}
-        setSearchPhrase={setSearchPhrase}
-        setClicked={setSearchClicked}
-      />
-      <View>
-        {users.map((user) => (
-          <View key={user.id}>
-            <Text>{user.name}</Text>
-            {/* Add more user details to display */}
-          </View>
-        ))}
-      </View>
     </View>
   );
 }
