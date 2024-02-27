@@ -4,9 +4,9 @@ import {
   signInWithEmailAndPassword,
   type User,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { DB, FIREBASE_AUTH } from "../../firebase.config";
+import { FIREBASE_AUTH } from "../../firebase.config";
+import { addUserToCollection } from "../../functions";
 
 const AuthContext = React.createContext<{
   signIn: (email: string, password: string) => void;
@@ -79,13 +79,7 @@ export function AuthenticationProvider(props: React.PropsWithChildren) {
               const user = userCredential.user;
               // https://firebase.google.com/docs/firestore/manage-data/add-data#web-modular-api
               setUser(user);
-              try {
-                await setDoc(doc(DB, "user_collection", user.uid), {
-                  email: user.email,
-                });
-              } catch (error) {
-                alert(error);
-              }
+              await addUserToCollection(user)
             })
             .catch((error) => {
               alert(error);
