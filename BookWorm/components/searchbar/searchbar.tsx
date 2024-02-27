@@ -1,4 +1,3 @@
-// SearchBar.js
 import { Entypo, Feather } from "@expo/vector-icons";
 import React from "react";
 import { Button, Keyboard, StyleSheet, TextInput, View } from "react-native";
