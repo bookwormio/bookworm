@@ -3,7 +3,11 @@ import { Tabs } from "expo-router/tabs";
 import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useAuth } from "../../components/auth/context";
-
+/*
+For everything in a directory file is rendered with whatever file
+is being routed to. When we navigate to posts.tsx, its loading whatever is in the
+_layout file first and then loading the posts.tsx on top of it
+*/
 export default function AppLayout() {
   const { isLoading } = useAuth();
   if (isLoading) {
