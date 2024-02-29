@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import React from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../../components/auth/context";
@@ -11,6 +12,12 @@ export default function Profile() {
       <Text style={styles.title}>Profile Page</Text>
       <Text>Current User email: {userStr}</Text>
       <Button title="LogOut" onPress={signOut} />
+      <Button
+        title="Edit Profile"
+        onPress={() => {
+          router.replace("/update-profile");
+        }}
+      />
     </View>
   );
 }
