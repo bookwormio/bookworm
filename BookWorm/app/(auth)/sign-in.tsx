@@ -63,7 +63,7 @@ export default function Login() {
         title="Create Account"
         onPress={() => {
           createAccount(email, password);
-          router.replace("/update-profile");
+          router.replace("/posts");
         }}
       />
     </View>

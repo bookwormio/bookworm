@@ -1,5 +1,5 @@
 import { type User } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { DB } from "../../firebase.config";
 
 export async function updateUserInfo(
@@ -17,5 +17,56 @@ export async function updateUserInfo(
     });
   } catch (error) {
     alert(error);
+  }
+}
+
+export async function fetchFirstName(user: User) {
+  try {
+    const userDocRef = doc(DB, "user_collection", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      return userData.first;
+    } else {
+      console.log("User document DNE");
+      return "";
+    }
+  } catch (error) {
+    console.error("Error fetching first name:", error);
+    throw error;
+  }
+}
+
+export async function fetchLastName(user: User) {
+  try {
+    const userDocRef = doc(DB, "user_collection", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      return userData.last;
+    } else {
+      console.log("User document DNE");
+      return "";
+    }
+  } catch (error) {
+    console.error("Error fetching last name:", error);
+    throw error;
+  }
+}
+
+export async function fetchPhoneNumber(user: User) {
+  try {
+    const userDocRef = doc(DB, "user_collection", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      return userData.number;
+    } else {
+      console.log("User document DNE");
+      return "";
+    }
+  } catch (error) {
+    console.error("Error fetching phone number:", error);
+    throw error;
   }
 }
