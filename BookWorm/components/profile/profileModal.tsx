@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native";
 import { updateUserInfo } from "../../services/firebase-services/queries";
 
@@ -14,6 +14,9 @@ export default function EditProfileModal({
   setPhoneNumber,
   user,
 }) {
+  const [modalPhone, setModalPhone] = useState("");
+  const [modalFirst, setModalFirst] = useState("");
+  const [modalLast, setModalLast] = useState("");
   return (
     <Modal
       visible={isModalVisible}
@@ -26,6 +29,9 @@ export default function EditProfileModal({
         title="Close"
         color="midnightblue"
         onPress={() => {
+          setModalFirst(firstName);
+          setModalLast(lastName);
+          setModalPhone(phoneNumber);
           setIsModalVisible(false);
         }}
       />
@@ -33,11 +39,11 @@ export default function EditProfileModal({
         <Text>First Name</Text>
         <TextInput
           style={styles.input}
-          value={firstName}
-          placeholder={firstName === "" ? "first name" : firstName}
+          value={modalFirst}
+          placeholder={modalFirst === "" ? "first name" : modalFirst}
           autoCapitalize="none"
           onChangeText={(text) => {
-            setFirstName(text);
+            setModalFirst(text);
           }}
         />
       </View>
@@ -45,11 +51,11 @@ export default function EditProfileModal({
         <Text>Last Name</Text>
         <TextInput
           style={styles.input}
-          value={lastName}
-          placeholder={lastName === "" ? "last name" : lastName}
+          value={modalLast}
+          placeholder={modalLast === "" ? "last name" : modalLast}
           autoCapitalize="none"
           onChangeText={(text) => {
-            setLastName(text);
+            setModalLast(text);
           }}
         />
       </View>
@@ -57,11 +63,11 @@ export default function EditProfileModal({
         <Text>Phone Number</Text>
         <TextInput
           style={styles.input}
-          value={phoneNumber}
-          placeholder={phoneNumber === "" ? "phone number" : phoneNumber}
+          value={modalPhone}
+          placeholder={modalPhone === "" ? "phone number" : modalPhone}
           autoCapitalize="none"
           onChangeText={(text) => {
-            setPhoneNumber(text);
+            setModalPhone(text);
           }}
         />
       </View>
@@ -69,7 +75,10 @@ export default function EditProfileModal({
         title="Save"
         onPress={() => {
           if (user != null) {
-            updateUserInfo(user, firstName, lastName, phoneNumber)
+            setFirstName(modalFirst);
+            setLastName(modalLast);
+            setPhoneNumber(modalPhone);
+            updateUserInfo(user, modalFirst, modalLast, modalPhone)
               .then(() => {
                 setIsModalVisible(false);
                 router.replace("/profile");
