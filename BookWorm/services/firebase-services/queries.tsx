@@ -20,6 +20,7 @@ export async function updateUserInfo(
   }
 }
 
+// fetches user's first name
 export async function fetchFirstName(user: User) {
   try {
     const userDocRef = doc(DB, "user_collection", user.uid);
@@ -37,6 +38,7 @@ export async function fetchFirstName(user: User) {
   }
 }
 
+// fetches user's last name
 export async function fetchLastName(user: User) {
   try {
     const userDocRef = doc(DB, "user_collection", user.uid);
@@ -54,6 +56,7 @@ export async function fetchLastName(user: User) {
   }
 }
 
+// fetches user's phone number
 export async function fetchPhoneNumber(user: User) {
   try {
     const userDocRef = doc(DB, "user_collection", user.uid);

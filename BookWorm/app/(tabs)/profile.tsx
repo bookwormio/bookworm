@@ -17,6 +17,7 @@ export default function Profile() {
   const [lastName, setLastName] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  // if user logs in, this useEffect populates user profile info
   useEffect(() => {
     async function fetchData() {
       try {
