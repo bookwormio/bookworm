@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native";
 import { updateUserInfo } from "../../services/firebase-services/queries";
 
@@ -17,6 +17,13 @@ export default function EditProfileModal({
   const [modalPhone, setModalPhone] = useState("");
   const [modalFirst, setModalFirst] = useState("");
   const [modalLast, setModalLast] = useState("");
+
+  useEffect(() => {
+    setModalPhone(phoneNumber);
+    setModalFirst(firstName);
+    setModalLast(lastName);
+  }, [isModalVisible]);
+
   return (
     <Modal
       visible={isModalVisible}
