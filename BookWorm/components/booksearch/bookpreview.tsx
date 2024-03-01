@@ -10,6 +10,7 @@ const BookPreview: FC<BookPreviewProps> = ({
 }: BookPreviewProps) => {
   return (
     <View>
+      {/* TODO: correctly display information */}
       <Text>Title: {volumeInfo.title}</Text>
       {/* <Text>Subtitle: {volumeInfo.subtitle}</Text>
       <Text>Authors: {volumeInfo.authors?.join(", ") ?? "Unknown"}</Text>

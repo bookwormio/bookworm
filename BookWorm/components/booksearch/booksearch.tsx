@@ -22,6 +22,7 @@ async function fetchBooksByQuery(
         },
       }
     );
+    // TODO: remove
     console.log(response.data.items);
     return response.data.items.map((item) => ({
       kind: item.kind,
@@ -31,6 +32,7 @@ async function fetchBooksByQuery(
       volumeInfo: item.volumeInfo,
     }));
   } catch (error) {
+    // TODO: remove
     console.error("Error fetching books", error);
     throw error;
   }

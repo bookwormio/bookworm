@@ -3,6 +3,8 @@ interface UserListItem {
   name: string;
 }
 
+// TODO: separate book volume info from book preview info
+// (less information needed for a book preview)
 interface BookVolumeInfo {
   title: string;
   subtitle: string;

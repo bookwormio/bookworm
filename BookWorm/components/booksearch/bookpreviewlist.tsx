@@ -11,6 +11,7 @@ const BookPreviewList: FC<BookPreviewListProps> = ({
 }: BookPreviewListProps) => {
   return (
     <View>
+      {/* TODO: potentially need to modify this key assignment */}
       {volumes.map((value, index) => (
         <BookPreview key={index} volumeInfo={value.volumeInfo}></BookPreview>
       ))}
