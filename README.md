@@ -23,7 +23,10 @@ Before running, you need to install homebrew, node, npx, and clone the repo
   ```
   npm install
   ```
-
+* Install npm dependencies (from within ```/bookwork/BookWorm/functions``` )
+  ```
+  npm install
+  ```
 
 * Install the following extensions for visual studio code
 1. ESLint
