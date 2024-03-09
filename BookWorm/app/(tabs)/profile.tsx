@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../../components/auth/context";
-import EditProfileModal from "../../components/profile/profileModal";
+import EditProfileModal from "../../components/profile/profilemodal";
 import {
   fetchFirstName,
   fetchLastName,
