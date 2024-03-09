@@ -1,9 +1,22 @@
 import { router } from "expo-router";
+import { type User } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native";
 import { updateUserInfo } from "../../services/firebase-services/queries";
 
-export default function EditProfileModal({
+interface EditProfileModalProps {
+  isModalVisible: boolean;
+  setIsModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  firstName: string;
+  setFirstName: React.Dispatch<React.SetStateAction<string>>;
+  lastName: string;
+  setLastName: React.Dispatch<React.SetStateAction<string>>;
+  phoneNumber: string;
+  setPhoneNumber: React.Dispatch<React.SetStateAction<string>>;
+  user: User;
+}
+
+const EditProfileModal = ({
   isModalVisible,
   setIsModalVisible,
   firstName,
@@ -13,7 +26,7 @@ export default function EditProfileModal({
   phoneNumber,
   setPhoneNumber,
   user,
-}) {
+}: EditProfileModalProps) => {
   const [modalPhone, setModalPhone] = useState("");
   const [modalFirst, setModalFirst] = useState("");
   const [modalLast, setModalLast] = useState("");
@@ -101,7 +114,9 @@ export default function EditProfileModal({
       />
     </Modal>
   );
-}
+};
+
+export default EditProfileModal;
 
 const styles = StyleSheet.create({
   input: {

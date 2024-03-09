@@ -9,12 +9,12 @@ interface SearchBarProps {
   setClicked: (clicked: boolean) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({
+const SearchBar = ({
   clicked,
   searchPhrase,
   setSearchPhrase,
   setClicked,
-}) => {
+}: SearchBarProps) => {
   return (
     <View style={styles.container}>
       <View

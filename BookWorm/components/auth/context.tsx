@@ -40,7 +40,11 @@ function useAuthenticatedRoute(user: User | null) {
   }, [user, segments]);
 }
 
-export function AuthenticationProvider(props: React.PropsWithChildren) {
+interface AuthenticationProviderProps {
+  children: React.ReactNode;
+}
+
+const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
   const [loading, setLoading] = useState(false);
   const [currentUser, setUser] = useState(FIREBASE_AUTH.currentUser);
   useEffect(() => {
@@ -103,7 +107,9 @@ export function AuthenticationProvider(props: React.PropsWithChildren) {
         user: currentUser,
       }}
     >
-      {props.children}
+      {children}
     </AuthContext.Provider>
   );
-}
+};
+
+export { AuthenticationProvider };

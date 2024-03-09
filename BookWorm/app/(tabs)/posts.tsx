@@ -1,7 +1,7 @@
 import React from "react";
 import Post from "../../components/post/post";
 
-export default function Posts() {
+const Posts = () => {
   return (
     <>
       <Post
@@ -18,4 +18,6 @@ export default function Posts() {
       ></Post>
     </>
   );
-}
+};
+
+export default Posts;

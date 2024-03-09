@@ -1,4 +1,4 @@
-import React, { type FC } from "react";
+import React from "react";
 import { Text, View } from "react-native";
 
 interface PostProps {
@@ -8,7 +8,7 @@ interface PostProps {
   summary?: string;
 }
 
-const Post: FC<PostProps> = ({ user, title, rating, summary }: PostProps) => {
+const Post = ({ user, title, rating, summary }: PostProps) => {
   return (
     <View>
       <Text>user: {user}</Text>

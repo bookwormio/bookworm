@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 import SearchBar from "../../components/searchbar/searchbar";
 import { DB } from "../../firebase.config";
 
-export default function Search() {
+const Search = () => {
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [searchClicked, setSearchClicked] = useState<boolean>(false);
   const [searchPhrase, setSearchPhrase] = useState<string>("");
@@ -60,7 +60,9 @@ export default function Search() {
       </View>
     </View>
   );
-}
+};
+
+export default Search;
 
 const styles = StyleSheet.create({
   container: {
