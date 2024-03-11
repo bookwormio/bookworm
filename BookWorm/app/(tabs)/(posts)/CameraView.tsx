@@ -12,17 +12,15 @@ const CameraView = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
   useEffect(() => {
-    MediaLibrary.requestPermissionsAsync().catch((error) => {
-      alert(error);
-    });
-    handleCameraPermission().catch((error: string) => {
+    handlePermissions().catch((error: string) => {
       alert(error);
     });
   }, []);
 
-  const handleCameraPermission = async () => {
+  const handlePermissions = async () => {
     const { status } = await Camera.requestCameraPermissionsAsync();
     setHasPermission(status === "granted");
+    await MediaLibrary.requestPermissionsAsync();
   };
 
   const takePicture = async () => {
