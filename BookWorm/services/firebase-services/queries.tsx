@@ -1,5 +1,12 @@
 import { type User } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { DB } from "../../firebase.config";
 
 export async function updateUserInfo(
@@ -71,5 +78,22 @@ export async function fetchPhoneNumber(user: User) {
   } catch (error) {
     console.error("Error fetching phone number:", error);
     throw error;
+  }
+}
+
+export async function createPost(
+  user: User | null,
+  book: string,
+  text: string,
+) {
+  if (user != null) {
+    addDoc(collection(DB, "posts"), {
+      user: user.uid,
+      created: serverTimestamp(),
+      book,
+      text,
+    }).catch((error) => {
+      console.error("Error creating post", error);
+    });
   }
 }
