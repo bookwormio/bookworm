@@ -16,7 +16,7 @@ export default function PostsLayout() {
         name="CameraView"
         options={{
           presentation: "modal",
-          headerTitle: "Create a New Post",
+          headerTitle: "Take a Photo",
         }}
       />
     </Stack>
