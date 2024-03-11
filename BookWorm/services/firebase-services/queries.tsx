@@ -7,7 +7,8 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { DB } from "../../firebase.config";
+import { ref, uploadBytesResumable } from "firebase/storage";
+import { DB, STORAGE } from "../../firebase.config";
 
 export async function updateUserInfo(
   user: User,
@@ -85,6 +86,7 @@ export async function createPost(
   user: User | null,
   book: string,
   text: string,
+  imageURI: string,
 ) {
   if (user != null) {
     addDoc(collection(DB, "posts"), {
@@ -95,5 +97,14 @@ export async function createPost(
     }).catch((error) => {
       console.error("Error creating post", error);
     });
+    if (imageURI !== "") {
+      const response = await fetch(imageURI);
+      const blob = await response.blob();
+      const storageRef = ref(
+        STORAGE,
+        "posts/" + user.uid + new Date().getTime(),
+      );
+      await uploadBytesResumable(storageRef, blob);
+    }
   }
 }

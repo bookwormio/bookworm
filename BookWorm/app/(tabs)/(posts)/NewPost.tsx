@@ -56,7 +56,7 @@ export default function NewPost() {
       <Button
         title="Create Post"
         onPress={() => {
-          createPost(user, book, text)
+          createPost(user, book, text, image)
             .then(() => {
               router.back();
             })
