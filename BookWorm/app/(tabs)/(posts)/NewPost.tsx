@@ -18,8 +18,6 @@ export default function NewPost() {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
-    } else {
-      alert("You did not select any image.");
     }
   };
 
@@ -47,6 +45,12 @@ export default function NewPost() {
           pickImageAsync().catch((error) => {
             console.log(error);
           });
+        }}
+      />
+      <Button
+        title="Take a photo"
+        onPress={() => {
+          router.push("CameraView");
         }}
       />
       {image !== "" && (

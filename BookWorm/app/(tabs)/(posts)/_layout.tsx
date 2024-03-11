@@ -12,6 +12,13 @@ export default function PostsLayout() {
           headerTitle: "Create a New Post",
         }}
       />
+      <Stack.Screen
+        name="CameraView"
+        options={{
+          presentation: "modal",
+          headerTitle: "Create a New Post",
+        }}
+      />
     </Stack>
   );
 }
