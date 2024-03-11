@@ -18,7 +18,6 @@ export default function NewPost() {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
-      console.log(image);
     } else {
       alert("You did not select any image.");
     }

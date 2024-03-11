@@ -94,17 +94,20 @@ export async function createPost(
       created: serverTimestamp(),
       book,
       text,
-    }).catch((error) => {
-      console.error("Error creating post", error);
-    });
-    if (imageURI !== "") {
-      const response = await fetch(imageURI);
-      const blob = await response.blob();
-      const storageRef = ref(
-        STORAGE,
-        "posts/" + user.uid + new Date().getTime(),
-      );
-      await uploadBytesResumable(storageRef, blob);
-    }
+    })
+      .then(async (docRef) => {
+        if (imageURI !== "") {
+          const response = await fetch(imageURI);
+          const blob = await response.blob();
+          const storageRef = ref(
+            STORAGE,
+            "posts/" + user.uid + "/" + docRef.id,
+          );
+          await uploadBytesResumable(storageRef, blob);
+        }
+      })
+      .catch((error) => {
+        console.error("Error creating post", error);
+      });
   }
 }
