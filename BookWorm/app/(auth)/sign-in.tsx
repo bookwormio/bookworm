@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useAuth } from "../../components/auth/context";
 
-export default function Login() {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { signIn, createAccount, isLoading } = useAuth();
@@ -68,7 +68,9 @@ export default function Login() {
       />
     </View>
   );
-}
+};
+
+export default Login;
 
 const styles = StyleSheet.create({
   container: {

@@ -4,7 +4,7 @@ import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useAuth } from "../../components/auth/context";
 
-export default function AppLayout() {
+const AppLayout = () => {
   const { isLoading } = useAuth();
   if (isLoading) {
     const styles = StyleSheet.create({
@@ -57,4 +57,6 @@ export default function AppLayout() {
       />
     </Tabs>
   );
-}
+};
+
+export default AppLayout;

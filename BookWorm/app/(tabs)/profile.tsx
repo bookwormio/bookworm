@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../../components/auth/context";
-import EditProfileModal from "../../components/profile/profileModal";
+import EditProfileModal from "../../components/profile/profilemodal";
 import {
   fetchFirstName,
   fetchLastName,
   fetchPhoneNumber,
 } from "../../services/firebase-services/queries";
 
-export default function Profile() {
+const Profile = () => {
   const { signOut, user } = useAuth();
   const userStr: string = user?.email ?? "No email";
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -67,7 +67,9 @@ export default function Profile() {
       />
     </View>
   );
-}
+};
+
+export default Profile;
 
 const styles = StyleSheet.create({
   container: {
