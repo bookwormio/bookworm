@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { fetchUsersBySearch } from "../../services/firebase-services/queries";
-import SearchBar from "../searchbar/searchbar";
+import SearchBar from "../../../components/searchbar/searchbar";
+import { fetchUsersBySearch } from "../../../services/firebase-services/queries";
+
+const USER_SEARCH_PLACEHOLDER = "Search for users";
 
 const UserSearch = () => {
   const [users, setUsers] = useState<UserListItem[]>([]);
@@ -14,6 +16,7 @@ const UserSearch = () => {
     fetchUsersBySearch(userSearchValue)
       .then((fetchedUsers) => {
         setUsers(fetchedUsers); // Set the state with the fetched users
+        console.log(fetchedUsers);
       })
       .catch((error) => {
         alert("Error fetching users: " + error);
@@ -27,6 +30,7 @@ const UserSearch = () => {
         searchPhrase={searchPhrase}
         setSearchPhrase={setSearchPhrase}
         setClicked={setSearchClicked}
+        placeholderText={USER_SEARCH_PLACEHOLDER}
       />
       <View>
         {users.map((user) => (

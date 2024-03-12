@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { fetchBooksByTitleSearch } from "../../services/firebase-services/queries";
-import SearchBar from "../searchbar/searchbar";
-import BookPreviewList from "./bookpreviewlist";
+import BookPreviewList from "../../../components/bookpreview/bookpreviewlist";
+import SearchBar from "../../../components/searchbar/searchbar";
+import { fetchBooksByTitleSearch } from "../../../services/firebase-services/queries";
+
+const BOOK_SEARCH_PLACEHOLDER = "Search for books";
 
 const BookSearch = () => {
   const [books, setBooks] = useState<BookVolumeItem[]>([]);
@@ -32,6 +34,7 @@ const BookSearch = () => {
         searchPhrase={searchPhrase}
         setSearchPhrase={setSearchPhrase}
         setClicked={setSearchClicked}
+        placeholderText={BOOK_SEARCH_PLACEHOLDER}
       />
       <View>
         <BookPreviewList volumes={books}></BookPreviewList>

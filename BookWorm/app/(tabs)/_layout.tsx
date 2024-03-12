@@ -60,7 +60,7 @@ const AppLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="search"
+        name="(search)"
         options={{
           tabBarLabel: "Search",
           headerTitle: "Search",

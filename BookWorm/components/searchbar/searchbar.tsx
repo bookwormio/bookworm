@@ -7,6 +7,7 @@ interface SearchBarProps {
   searchPhrase: string;
   setSearchPhrase: (searchPhrase: string) => void;
   setClicked: (clicked: boolean) => void;
+  placeholderText: string | null;
 }
 
 const SearchBar = ({
@@ -14,6 +15,7 @@ const SearchBar = ({
   searchPhrase,
   setSearchPhrase,
   setClicked,
+  placeholderText,
 }: SearchBarProps) => {
   return (
     <View style={styles.container}>
@@ -32,7 +34,7 @@ const SearchBar = ({
         {/* Input field */}
         <TextInput
           style={styles.input}
-          placeholder="Search"
+          placeholder={placeholderText ?? "Search"}
           value={searchPhrase}
           onChangeText={setSearchPhrase}
           onFocus={() => {
