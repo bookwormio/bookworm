@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import React from "react";
 
-export default function PostsLayout() {
+const PostsLayout = () => {
   return (
     <Stack>
       <Stack.Screen name="posts" options={{ headerShown: false }} />
@@ -21,4 +21,6 @@ export default function PostsLayout() {
       />
     </Stack>
   );
-}
+};
+
+export default PostsLayout;

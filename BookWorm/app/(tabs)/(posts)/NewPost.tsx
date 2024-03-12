@@ -5,7 +5,7 @@ import { Button, Image, StyleSheet, TextInput, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import { createPost } from "../../../services/firebase-services/queries";
 
-export default function NewPost() {
+const NewPost = () => {
   const { user } = useAuth();
   const [book, setBook] = useState("");
   const [text, setText] = useState("");
@@ -70,7 +70,7 @@ export default function NewPost() {
       />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -101,3 +101,4 @@ const styles = StyleSheet.create({
     color: "#38434D",
   },
 });
+export default NewPost;

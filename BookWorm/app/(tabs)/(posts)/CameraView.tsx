@@ -6,10 +6,12 @@ import { Button, Image, StyleSheet, Text, View } from "react-native";
 
 const CameraView = () => {
   const cameraRef = useRef<Camera | null>(null);
-  const [image, setImage] = useState("");
-  const [type, setType] = useState(CameraType.back);
-  const [flash, setFlash] = useState(FlashMode.off);
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [imageURI, setImageURI] = useState("");
+  const [cameraType, setCameraType] = useState(CameraType.back);
+  const [flashMode, setFlashMode] = useState(FlashMode.off);
+  const [hasCameraPermission, setHasCameraPermission] = useState<
+    boolean | null
+  >(null);
 
   useEffect(() => {
     handlePermissions().catch((error: string) => {
@@ -19,7 +21,7 @@ const CameraView = () => {
 
   const handlePermissions = async () => {
     const { status } = await Camera.requestCameraPermissionsAsync();
-    setHasPermission(status === "granted");
+    setHasCameraPermission(status === "granted");
     await MediaLibrary.requestPermissionsAsync();
   };
 
@@ -27,7 +29,7 @@ const CameraView = () => {
     if (cameraRef.current != null) {
       try {
         const data = await cameraRef.current.takePictureAsync();
-        setImage(data.uri);
+        setImageURI(data.uri);
       } catch (error) {
         alert(error);
       }
@@ -35,28 +37,28 @@ const CameraView = () => {
   };
 
   const savePicture = async () => {
-    if (image !== "") {
+    if (imageURI !== "") {
       try {
-        await MediaLibrary.createAssetAsync(image);
-        setImage("");
+        await MediaLibrary.createAssetAsync(imageURI);
+        setImageURI("");
       } catch (error) {
         alert(error);
       }
     }
   };
 
-  if (hasPermission === false) {
+  if (hasCameraPermission === false) {
     return <Text>No access to camera</Text>;
   }
 
   return (
     <View style={styles.container}>
-      {image === "" ? (
+      {imageURI === "" ? (
         <Camera
           style={styles.camera}
-          type={type}
+          type={cameraType}
           ref={cameraRef}
-          flashMode={flash}
+          flashMode={flashMode}
         >
           <View
             style={{
@@ -68,28 +70,30 @@ const CameraView = () => {
             <Button
               title="Flip"
               onPress={() => {
-                setType(
-                  type === CameraType.back ? CameraType.front : CameraType.back,
+                setCameraType(
+                  cameraType === CameraType.back
+                    ? CameraType.front
+                    : CameraType.back,
                 );
               }}
             />
             <Button
               onPress={() => {
-                setFlash(
-                  flash === FlashMode.off ? FlashMode.on : FlashMode.off,
+                setFlashMode(
+                  flashMode === FlashMode.off ? FlashMode.on : FlashMode.off,
                 );
               }}
               title="Flash"
-              color={flash === FlashMode.off ? "gray" : "#fff"}
+              color={flashMode === FlashMode.off ? "gray" : "#fff"}
             />
           </View>
         </Camera>
       ) : (
-        <Image source={{ uri: image }} style={styles.camera} />
+        <Image source={{ uri: imageURI }} style={styles.camera} />
       )}
 
       <View style={styles.controls}>
-        {image !== "" ? (
+        {imageURI !== "" ? (
           <View
             style={{
               flexDirection: "row",
@@ -100,7 +104,7 @@ const CameraView = () => {
             <Button
               title="Re-take"
               onPress={() => {
-                setImage("");
+                setImageURI("");
               }}
             />
             <Button
