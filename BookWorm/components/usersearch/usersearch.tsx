@@ -1,42 +1,17 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { DB } from "../../firebase.config";
+import { fetchUsersBySearch } from "../../services/firebase-services/queries";
 import SearchBar from "../searchbar/searchbar";
 
-const UserSearch: React.FC = () => {
+const UserSearch = () => {
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [searchClicked, setSearchClicked] = useState<boolean>(false);
   const [searchPhrase, setSearchPhrase] = useState<string>("");
 
-  // Function to fetch users based on the search phrase
-  // TODO: makes sense down the line to put this in a utilities file
-  const fetchUsers = async (
-    userSearchValue: string
-  ): Promise<UserListItem[]> => {
-    // Firestore is weird:
-    // This is like a Select * from users where name LIKE "userSearchValue%"
-    // TODO: down the line potentially may have to implement a more search friendly db
-    const q = query(
-      collection(DB, "user_collection"),
-      where("isPublic", "==", true),
-      where("name", ">=", userSearchValue),
-      where("name", "<=", userSearchValue + "\uf8ff")
-    );
-    const querySnapshot = await getDocs(q);
-    const usersData: UserListItem[] = [];
-    // Add each user data to the array
-    querySnapshot.forEach((doc) => {
-      usersData.push({ id: doc.id, name: doc.data().name });
-      // Add more properties as needed
-    });
-    return usersData;
-  };
-
   useEffect(() => {
     const userSearchValue = searchPhrase;
-    fetchUsers(userSearchValue)
+    fetchUsersBySearch(userSearchValue)
       .then((fetchedUsers) => {
         setUsers(fetchedUsers); // Set the state with the fetched users
       })
@@ -56,7 +31,9 @@ const UserSearch: React.FC = () => {
       <View>
         {users.map((user) => (
           <View key={user.id}>
-            <Text>{user.name}</Text>
+            <Text>
+              {user.firstName} {user.lastName}
+            </Text>
             {/* Add more user details to display */}
           </View>
         ))}

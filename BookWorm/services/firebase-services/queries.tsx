@@ -1,13 +1,18 @@
+import axios from "axios";
 import { type User } from "firebase/auth";
 import {
   addDoc,
   collection,
   doc,
   getDoc,
+  getDocs,
+  query,
   serverTimestamp,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable } from "firebase/storage";
+import { BOOKS_API_KEY } from "../../constants/constants";
 import { DB, STORAGE } from "../../firebase.config";
 
 export async function updateUserInfo(
@@ -109,5 +114,75 @@ export async function createPost(
       .catch((error) => {
         console.error("Error creating post", error);
       });
+  }
+}
+
+// Function to fetch users based on the search phrase
+export async function fetchUsersBySearch(
+  searchValue: string,
+): Promise<UserListItem[]> {
+  if (searchValue === "") {
+    return []; // Return empty array if there's no searchValue
+  }
+  // Firestore is weird:
+  // This is like a Select * from users where name LIKE "userSearchValue%"
+  // TODO: down the line potentially may have to implement a more search friendly db
+  try {
+    const lowerName = searchValue;
+    const q = query(
+      collection(DB, "user_collection"),
+      // where("isPublic", "==", true),
+      where("first", ">=", lowerName),
+      where("first", "<=", lowerName + "\uf8ff"),
+    );
+    const querySnapshot = await getDocs(q);
+    const usersData: UserListItem[] = [];
+    // Add each user data to the array
+    querySnapshot.forEach((doc) => {
+      usersData.push({
+        id: doc.id,
+        firstName: doc.data().first,
+        lastName: doc.data().last,
+      });
+    });
+    return usersData;
+  } catch (error) {
+    console.error("Error searching for users: ", error);
+    return [];
+  }
+}
+
+// Query the Google Books API for book volumes based on the entered search phrase
+// TODO: down the line this should get moved out of the firebase queries file
+export async function fetchBooksByTitleSearch(
+  searchValue: string,
+): Promise<BookVolumeItem[]> {
+  if (searchValue === "") {
+    return []; // Return empty array if there's no searchValue
+  }
+  try {
+    const response = await axios.get<BooksResponse>(
+      "https://www.googleapis.com/books/v1/volumes",
+      {
+        params: {
+          q: searchValue,
+          key: BOOKS_API_KEY,
+          limit: 10,
+        },
+      },
+    );
+    // TODO: remove
+    console.log(response.data.items);
+    return response.data.items.map((item) => ({
+      kind: item.kind,
+      id: item.kind,
+      etag: item.etag,
+      selfLink: item.selfLink,
+      volumeInfo: item.volumeInfo,
+    }));
+  } catch (error) {
+    // TODO: remove
+    console.error("Error fetching books by title search", error);
+    return [];
   }
 }

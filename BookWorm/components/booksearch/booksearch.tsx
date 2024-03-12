@@ -1,44 +1,10 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { fetchBooksByTitleSearch } from "../../services/firebase-services/queries";
 import SearchBar from "../searchbar/searchbar";
 import BookPreviewList from "./bookpreviewlist";
 
-// TODO: put api key elsewhere
-const BOOKS_API_KEY = "AIzaSyDdLpV4nXjFf-Z62gCpNC9hqK6km6UB58s";
-
-// TODO: put this function elsewhere
-async function fetchBooksByQuery(
-  searchValue: string
-): Promise<BookVolumeItem[]> {
-  try {
-    const response = await axios.get<BooksResponse>(
-      "https://www.googleapis.com/books/v1/volumes",
-      {
-        params: {
-          q: searchValue,
-          key: BOOKS_API_KEY,
-          limit: 10,
-        },
-      }
-    );
-    // TODO: remove
-    console.log(response.data.items);
-    return response.data.items.map((item) => ({
-      kind: item.kind,
-      id: item.kind,
-      etag: item.etag,
-      selfLink: item.selfLink,
-      volumeInfo: item.volumeInfo,
-    }));
-  } catch (error) {
-    // TODO: remove
-    console.error("Error fetching books", error);
-    throw error;
-  }
-}
-
-const BookSearch: React.FC = () => {
+const BookSearch = () => {
   const [books, setBooks] = useState<BookVolumeItem[]>([]);
   const [searchClicked, setSearchClicked] = useState<boolean>(false);
   const [searchPhrase, setSearchPhrase] = useState<string>("");
@@ -46,7 +12,7 @@ const BookSearch: React.FC = () => {
   useEffect(() => {
     const bookSearchValue = searchPhrase;
     if (bookSearchValue.trim() !== "") {
-      fetchBooksByQuery(bookSearchValue)
+      fetchBooksByTitleSearch(bookSearchValue)
         .then((fetchedBooks) => {
           setBooks(fetchedBooks);
         })

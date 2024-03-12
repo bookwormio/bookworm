@@ -1,13 +1,11 @@
-import React, { type FC } from "react";
+import React from "react";
 import { Text, View } from "react-native";
 
 interface BookPreviewProps {
   volumeInfo: BookVolumeInfo;
 }
 
-const BookPreview: FC<BookPreviewProps> = ({
-  volumeInfo,
-}: BookPreviewProps) => {
+const BookPreview = ({ volumeInfo }: BookPreviewProps) => {
   return (
     <View>
       {/* TODO: correctly display information */}

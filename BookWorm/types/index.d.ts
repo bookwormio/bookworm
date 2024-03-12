@@ -1,6 +1,7 @@
 interface UserListItem {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
 }
 
 // TODO: separate book volume info from book preview info
