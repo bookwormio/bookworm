@@ -16,7 +16,6 @@ const UserSearch = () => {
     fetchUsersBySearch(userSearchValue)
       .then((fetchedUsers) => {
         setUsers(fetchedUsers); // Set the state with the fetched users
-        console.log(fetchedUsers);
       })
       .catch((error) => {
         alert("Error fetching users: " + error);
@@ -53,9 +52,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 24,
-  },
-  title: {
-    fontSize: 64,
-    fontWeight: "bold",
   },
 });

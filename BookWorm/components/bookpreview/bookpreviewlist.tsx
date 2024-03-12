@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import BookPreview from "./bookpreview";
 
 interface BookPreviewListProps {
@@ -16,14 +16,5 @@ const BookPreviewList = ({ volumes }: BookPreviewListProps) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    padding: 40,
-    justifyContent: "center",
-  },
-});
 
 export default BookPreviewList;
