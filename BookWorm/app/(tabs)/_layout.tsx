@@ -1,7 +1,13 @@
 import { FontAwesome5 } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { Tabs } from "expo-router/tabs";
 import React from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useAuth } from "../../components/auth/context";
 
 const AppLayout = () => {
@@ -23,13 +29,31 @@ const AppLayout = () => {
     );
   }
 
+  const styles = StyleSheet.create({
+    newPost: {
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 20,
+    },
+  });
+
   return (
     <Tabs>
       <Tabs.Screen
-        name="posts"
+        name="(posts)"
         options={{
           tabBarLabel: "Posts",
           headerTitle: "Posts",
+          headerRight: () => (
+            <TouchableOpacity
+              style={styles.newPost}
+              onPress={() => {
+                router.push("NewPost");
+              }}
+            >
+              <FontAwesome5 name="plus" size={20} />
+            </TouchableOpacity>
+          ),
           tabBarIcon: ({ color, size }) => (
             <FontAwesome5 name="book" size={size} color={color} />
           ),

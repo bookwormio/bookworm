@@ -56,7 +56,7 @@ const Login = () => {
         title="Login"
         onPress={() => {
           signIn(email, password);
-          router.replace("/posts");
+          router.replace("/post");
         }}
       />
       <Button

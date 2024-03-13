@@ -1,6 +1,14 @@
 import { type User } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { DB } from "../../firebase.config";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
+import { ref, uploadBytesResumable } from "firebase/storage";
+import { DB, STORAGE } from "../../firebase.config";
 
 export async function updateUserInfo(
   user: User,
@@ -71,5 +79,35 @@ export async function fetchPhoneNumber(user: User) {
   } catch (error) {
     console.error("Error fetching phone number:", error);
     throw error;
+  }
+}
+
+export async function createPost(
+  user: User | null,
+  book: string,
+  text: string,
+  imageURI: string,
+) {
+  if (user != null) {
+    addDoc(collection(DB, "posts"), {
+      user: user.uid,
+      created: serverTimestamp(),
+      book,
+      text,
+    })
+      .then(async (docRef) => {
+        if (imageURI !== "") {
+          const response = await fetch(imageURI);
+          const blob = await response.blob();
+          const storageRef = ref(
+            STORAGE,
+            "posts/" + user.uid + "/" + docRef.id,
+          );
+          await uploadBytesResumable(storageRef, blob);
+        }
+      })
+      .catch((error) => {
+        console.error("Error creating post", error);
+      });
   }
 }
