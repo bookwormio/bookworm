@@ -1,15 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import SearchBar from "../../../components/searchbar/searchbar";
-import { fetchUsersBySearch } from "../../../services/firebase-services/queries";
+import { fetchUsersBySearch } from "../../services/firebase-services/queries";
+import SearchBar from "./searchbar";
 
 const USER_SEARCH_PLACEHOLDER = "Search for users";
 
-const UserSearch = () => {
+interface UserSearchProps {
+  searchPhrase: string;
+  setSearchPhrase: (searchString: string) => void;
+}
+
+const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
   const [users, setUsers] = useState<UserListItem[]>([]);
-  const [searchClicked, setSearchClicked] = useState<boolean>(false);
-  const [searchPhrase, setSearchPhrase] = useState<string>("");
+  const [searchClicked, setSearchClicked] = useState<boolean>(
+    searchPhrase !== "",
+  );
 
   useEffect(() => {
     const userSearchValue = searchPhrase;
@@ -51,6 +57,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: 24,
   },
 });
