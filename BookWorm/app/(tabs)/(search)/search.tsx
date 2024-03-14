@@ -15,7 +15,6 @@ const Search = () => {
   const [underlinePosition] = useState(new Animated.Value(0));
   const setParentSearchPhrase = (search: string) => {
     setSearchPhrase(search);
-    console.log(search);
   };
 
   const animateUnderline = (toValue: number) => {
