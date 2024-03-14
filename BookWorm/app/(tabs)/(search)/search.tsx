@@ -11,7 +11,13 @@ import UserSearch from "./usersearch";
 
 const Search = () => {
   const [searchType, setSearchType] = useState("book"); // Default to book search
+  const [searchPhrase, setSearchPhrase] = useState("");
   const [underlinePosition] = useState(new Animated.Value(0));
+  const setParentSearchPhrase = (search: string) => {
+    setSearchPhrase(search);
+    console.log(search);
+  };
+
   const animateUnderline = (toValue: number) => {
     Animated.timing(underlinePosition, {
       toValue,
@@ -25,7 +31,11 @@ const Search = () => {
       {/* Toggle buttons */}
       <View style={styles.container}>
         <TouchableOpacity
-          style={[styles.button, searchType === "book" && styles.activeButton]}
+          style={[
+            styles.button,
+            styles.buttonLeft,
+            searchType === "book" && styles.activeButton,
+          ]}
           onPress={() => {
             setSearchType("book");
             animateUnderline(0);
@@ -59,7 +69,17 @@ const Search = () => {
       </View>
 
       {/* Render BookSearch or UserSearch based on searchType */}
-      {searchType === "book" ? <BookSearch /> : <UserSearch />}
+      {searchType === "book" ? (
+        <BookSearch
+          searchPhrase={searchPhrase}
+          setSearchPhrase={setParentSearchPhrase}
+        />
+      ) : (
+        <UserSearch
+          searchPhrase={searchPhrase}
+          setSearchPhrase={setParentSearchPhrase}
+        />
+      )}
     </View>
   );
 };
@@ -76,6 +96,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     width: "50%",
+  },
+  buttonLeft: {
+    borderRightWidth: 2,
+    borderRightColor: "black",
   },
   buttonText: {
     fontSize: 15,

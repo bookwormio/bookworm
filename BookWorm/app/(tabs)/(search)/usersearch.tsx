@@ -6,10 +6,16 @@ import { fetchUsersBySearch } from "../../../services/firebase-services/queries"
 
 const USER_SEARCH_PLACEHOLDER = "Search for users";
 
-const UserSearch = () => {
+interface UserSearchProps {
+  searchPhrase: string;
+  setSearchPhrase: (searchString: string) => void;
+}
+
+const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
   const [users, setUsers] = useState<UserListItem[]>([]);
-  const [searchClicked, setSearchClicked] = useState<boolean>(false);
-  const [searchPhrase, setSearchPhrase] = useState<string>("");
+  const [searchClicked, setSearchClicked] = useState<boolean>(
+    searchPhrase !== "",
+  );
 
   useEffect(() => {
     const userSearchValue = searchPhrase;
