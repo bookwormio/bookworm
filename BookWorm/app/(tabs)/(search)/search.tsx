@@ -30,11 +30,7 @@ const Search = () => {
       {/* Toggle buttons */}
       <View style={styles.container}>
         <TouchableOpacity
-          style={[
-            styles.button,
-            styles.buttonLeft,
-            searchType === "book" && styles.activeButton,
-          ]}
+          style={[styles.button, searchType === "book" && styles.activeButton]}
           onPress={() => {
             setSearchType("book");
             animateUnderline(0);
@@ -95,10 +91,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     width: "50%",
-  },
-  buttonLeft: {
-    borderRightWidth: 2,
-    borderRightColor: "black",
   },
   buttonText: {
     fontSize: 15,
