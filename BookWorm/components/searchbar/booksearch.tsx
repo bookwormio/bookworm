@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import BookPreviewList from "../../../components/bookpreview/bookpreviewlist";
-import SearchBar from "../../../components/searchbar/searchbar";
-import { fetchBooksByTitleSearch } from "../../../services/firebase-services/queries";
+import { fetchBooksByTitleSearch } from "../../services/firebase-services/queries";
+import BookPreviewList from "../bookpreview/bookpreviewlist";
+import SearchBar from "./searchbar";
 
 const BOOK_SEARCH_PLACEHOLDER = "Search for books";
 

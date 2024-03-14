@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import SearchBar from "../../../components/searchbar/searchbar";
-import { fetchUsersBySearch } from "../../../services/firebase-services/queries";
+import { fetchUsersBySearch } from "../../services/firebase-services/queries";
+import SearchBar from "./searchbar";
 
 const USER_SEARCH_PLACEHOLDER = "Search for users";
 

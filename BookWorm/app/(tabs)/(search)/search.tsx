@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import BookSearch from "./booksearch";
-import UserSearch from "./usersearch";
+import BookSearch from "../../../components/searchbar/booksearch";
+import UserSearch from "../../../components/searchbar/usersearch";
 
 const Search = () => {
   const [searchType, setSearchType] = useState("book"); // Default to book search
