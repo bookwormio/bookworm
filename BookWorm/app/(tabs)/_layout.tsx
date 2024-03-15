@@ -70,7 +70,7 @@ const AppLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="(profile)"
         options={{
           tabBarLabel: "Profile",
           headerTitle: "Profile",

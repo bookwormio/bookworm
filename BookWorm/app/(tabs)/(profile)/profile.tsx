@@ -1,12 +1,12 @@
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
-import { useAuth } from "../../components/auth/context";
-import EditProfileModal from "../../components/profile/profileModal";
+import { useAuth } from "../../../components/auth/context";
 import {
   fetchFirstName,
   fetchLastName,
   fetchPhoneNumber,
-} from "../../services/firebase-services/queries";
+} from "../../../services/firebase-services/queries";
 
 const Profile = () => {
   const { signOut, user } = useAuth();
@@ -14,7 +14,6 @@ const Profile = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [isModalVisible, setIsModalVisible] = useState(false);
 
   // if user logs in, this useEffect populates user profile info
   useEffect(() => {
@@ -51,19 +50,8 @@ const Profile = () => {
       <Button
         title="Edit Profile"
         onPress={() => {
-          setIsModalVisible(true);
+          router.push("EditProfile");
         }}
-      />
-      <EditProfileModal
-        isModalVisible={isModalVisible}
-        setIsModalVisible={setIsModalVisible}
-        firstName={firstName}
-        setFirstName={setFirstName}
-        lastName={lastName}
-        setLastName={setLastName}
-        phoneNumber={phoneNumber}
-        setPhoneNumber={setPhoneNumber}
-        user={user}
       />
     </View>
   );

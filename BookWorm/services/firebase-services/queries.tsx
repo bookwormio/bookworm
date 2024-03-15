@@ -172,7 +172,7 @@ export async function fetchBooksByTitleSearch(
       },
     );
     // TODO: remove
-    console.log(response.data.items);
+    // console.log(response.data.items);
     return response.data.items.map((item) => ({
       kind: item.kind,
       id: item.kind,
