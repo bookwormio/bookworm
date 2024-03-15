@@ -20,9 +20,9 @@ const Profile = () => {
     async function fetchData() {
       try {
         if (user != null) {
-          const firstName = await fetchFirstName(user);
-          const lastName = await fetchLastName(user);
-          const phoneNumber = await fetchPhoneNumber(user);
+          const firstName: string = await fetchFirstName(user);
+          const lastName: string = await fetchLastName(user);
+          const phoneNumber: string = await fetchPhoneNumber(user);
 
           setFirstName(firstName);
           setLastName(lastName);
@@ -50,7 +50,9 @@ const Profile = () => {
       <Button
         title="Edit Profile"
         onPress={() => {
-          router.push("EditProfile");
+          router.push(
+            `EditProfile?phoneNumber=${phoneNumber}&firstName=${firstName}&lastName=${lastName}&user=${user}`,
+          );
         }}
       />
     </View>
