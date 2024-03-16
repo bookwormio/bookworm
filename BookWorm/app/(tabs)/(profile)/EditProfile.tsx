@@ -1,10 +1,12 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { useAuth } from "../../../components/auth/context";
 import { updateUserInfo } from "../../../services/firebase-services/queries";
 
 const EditProfile = () => {
-  const { phoneNumber, firstName, lastName, user } = useLocalSearchParams();
+  const { user } = useAuth();
+  const { phoneNumber, firstName, lastName } = useLocalSearchParams();
   const [modalPhone, setModalPhone] = useState<string>(
     Array.isArray(phoneNumber) ? phoneNumber[0] ?? "" : phoneNumber ?? "",
   );
@@ -14,6 +16,14 @@ const EditProfile = () => {
   const [modalLast, setModalLast] = useState<string>(
     Array.isArray(lastName) ? lastName[0] ?? "" : lastName ?? "",
   );
+
+  console.log(`modal phone number: ${modalPhone}`);
+  console.log(`modal first name: ${modalFirst}`);
+  console.log(`modal last name: ${modalLast}`);
+  console.log(`phone number: ${modalPhone}`);
+  console.log(`first name: ${modalFirst}`);
+  console.log(`last name: ${modalLast}`);
+  console.log(`user: ${user.uid}`);
 
   return (
     <View>

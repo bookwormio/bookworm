@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
@@ -9,16 +9,19 @@ import {
 } from "../../../services/firebase-services/queries";
 
 const Profile = () => {
+  const navigation = useNavigation();
   const { signOut, user } = useAuth();
   const userStr: string = user?.email ?? "No email";
   const [phoneNumber, setPhoneNumber] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [pageRefresh, setPageRefresh] = useState(false);
 
   // if user logs in, this useEffect populates user profile info
   useEffect(() => {
     async function fetchData() {
       try {
+        console.log("IM FETCHING DATA");
         if (user != null) {
           const firstName: string = await fetchFirstName(user);
           const lastName: string = await fetchLastName(user);
@@ -27,6 +30,8 @@ const Profile = () => {
           setFirstName(firstName);
           setLastName(lastName);
           setPhoneNumber(phoneNumber);
+          setPageRefresh(false);
+          console.log("everything set");
         } else {
           alert("user DNE");
         }
@@ -37,7 +42,16 @@ const Profile = () => {
     fetchData().catch((error) => {
       console.error("Error fetching first name:", error);
     });
-  }, []);
+  }, [pageRefresh]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      // Refresh logic here
+      setPageRefresh(true);
+      console.log("Profile page is refreshed!");
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
@@ -51,7 +65,7 @@ const Profile = () => {
         title="Edit Profile"
         onPress={() => {
           router.push(
-            `EditProfile?phoneNumber=${phoneNumber}&firstName=${firstName}&lastName=${lastName}&user=${user}`,
+            `EditProfile?phoneNumber=${phoneNumber}&firstName=${firstName}&lastName=${lastName}`,
           );
         }}
       />
