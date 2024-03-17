@@ -17,7 +17,24 @@ const Profile = () => {
   const [lastName, setLastName] = useState("");
   const [pageRefresh, setPageRefresh] = useState(false);
 
-  // if user logs in, this useEffect populates user profile info
+  useEffect(() => {
+    console.log("in use effect for nav state 2");
+    const unsubscribe = navigation.addListener("state", (event) => {
+      const { data } = event;
+      console.log(data);
+      if (
+        data.state.routeNames[data.state.routeNames.length - 1] ===
+          "EditProfile" &&
+        data.state.index === 0
+      ) {
+        console.log(data.state.routeNames);
+        console.log("last edit profile");
+        setPageRefresh((pageRefresh) => !pageRefresh);
+      }
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -43,15 +60,6 @@ const Profile = () => {
       console.error("Error fetching first name:", error);
     });
   }, [pageRefresh]);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      // Refresh logic here
-      setPageRefresh((pageRefresh) => !pageRefresh);
-      console.log("Profile page is refreshed!");
-    });
-    return unsubscribe;
-  }, [navigation]);
 
   return (
     <View style={styles.container}>

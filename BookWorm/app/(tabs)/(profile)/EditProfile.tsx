@@ -17,14 +17,6 @@ const EditProfile = () => {
     Array.isArray(lastName) ? lastName[0] ?? "" : lastName ?? "",
   );
 
-  console.log(`modal phone number: ${modalPhone}`);
-  console.log(`modal first name: ${modalFirst}`);
-  console.log(`modal last name: ${modalLast}`);
-  console.log(`phone number: ${modalPhone}`);
-  console.log(`first name: ${modalFirst}`);
-  console.log(`last name: ${modalLast}`);
-  console.log(`user: ${user.uid}`);
-
   return (
     <View>
       <Button
