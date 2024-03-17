@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { router } from "expo-router";
 import { fetchUsersBySearch } from "../../services/firebase-services/queries";
 import SearchBar from "./searchbar";
 
@@ -16,6 +17,16 @@ const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
   const [searchClicked, setSearchClicked] = useState<boolean>(
     searchPhrase !== "",
   );
+
+  const handleUserClick = ({ user }) => {
+    router.push({
+      pathname: "FriendProfile",
+      params: {
+        firstname: user.firstName,
+        lastname: user.lastName,
+      },
+    });
+  };
 
   useEffect(() => {
     const userSearchValue = searchPhrase;
@@ -39,12 +50,17 @@ const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
       />
       <View>
         {users.map((user) => (
-          <View key={user.id}>
+          <TouchableOpacity
+            key={user.id}
+            onPress={() => {
+              handleUserClick({ user });
+            }}
+          >
             <Text>
               {user.firstName} {user.lastName}
             </Text>
             {/* Add more user details to display */}
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </View>
