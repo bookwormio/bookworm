@@ -5,13 +5,7 @@ const SearchLayout = () => {
   return (
     <Stack>
       <Stack.Screen name="search" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="FriendProfile"
-        options={{
-          presentation: "modal",
-          headerTitle: "Friend",
-        }}
-      />
+      <Stack.Screen name="FriendProfile" options={{ headerShown: false }} />
     </Stack>
   );
 };
