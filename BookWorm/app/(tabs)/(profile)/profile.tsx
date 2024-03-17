@@ -30,7 +30,7 @@ const Profile = () => {
           setFirstName(firstName);
           setLastName(lastName);
           setPhoneNumber(phoneNumber);
-          setPageRefresh(false);
+          // setPageRefresh(false);
           console.log("everything set");
         } else {
           alert("user DNE");
@@ -47,7 +47,7 @@ const Profile = () => {
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       // Refresh logic here
-      setPageRefresh(true);
+      setPageRefresh((pageRefresh) => !pageRefresh);
       console.log("Profile page is refreshed!");
     });
     return unsubscribe;
@@ -64,9 +64,14 @@ const Profile = () => {
       <Button
         title="Edit Profile"
         onPress={() => {
-          router.push(
-            `EditProfile?phoneNumber=${phoneNumber}&firstName=${firstName}&lastName=${lastName}`,
-          );
+          router.push({
+            pathname: "EditProfile",
+            params: {
+              phoneNumber,
+              firstName,
+              lastName,
+            },
+          });
         }}
       />
     </View>
