@@ -21,7 +21,6 @@ const Profile = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        console.log("IM FETCHING DATA");
         if (user != null) {
           const firstName: string = await fetchFirstName(user);
           const lastName: string = await fetchLastName(user);
@@ -30,10 +29,8 @@ const Profile = () => {
           setFirstName(firstName);
           setLastName(lastName);
           setPhoneNumber(phoneNumber);
-          // setPageRefresh(false);
-          console.log("everything set");
         } else {
-          alert("user DNE");
+          console.error("user DNE");
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -48,7 +45,6 @@ const Profile = () => {
     const unsubscribe = navigation.addListener("focus", () => {
       // Refresh logic here
       setPageRefresh((pageRefresh) => !pageRefresh);
-      console.log("Profile page is refreshed!");
     });
     return unsubscribe;
   }, [navigation]);
@@ -64,14 +60,18 @@ const Profile = () => {
       <Button
         title="Edit Profile"
         onPress={() => {
-          router.push({
-            pathname: "EditProfile",
-            params: {
-              phoneNumber,
-              firstName,
-              lastName,
-            },
-          });
+          if (user != null) {
+            router.push({
+              pathname: "EditProfile",
+              params: {
+                phoneNumber,
+                firstName,
+                lastName,
+              },
+            });
+          } else {
+            console.error("User DNE");
+          }
         }}
       />
     </View>

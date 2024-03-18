@@ -60,7 +60,7 @@ export async function fetchLastName(user: User) {
       const userData = userDocSnap.data();
       return userData.last;
     } else {
-      console.log("User document DNE");
+      console.error("User document DNE");
       return "";
     }
   } catch (error) {
@@ -78,7 +78,7 @@ export async function fetchPhoneNumber(user: User) {
       const userData = userDocSnap.data();
       return userData.number;
     } else {
-      console.log("User document DNE");
+      console.error("User document DNE");
       return "";
     }
   } catch (error) {

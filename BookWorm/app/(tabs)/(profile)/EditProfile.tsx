@@ -7,23 +7,15 @@ import { updateUserInfo } from "../../../services/firebase-services/queries";
 const EditProfile = () => {
   const { user } = useAuth();
   const { phoneNumber, firstName, lastName } = useLocalSearchParams();
-  const [modalPhone, setModalPhone] = useState<string>(
+  const [editPhone, setEditPhone] = useState<string>(
     Array.isArray(phoneNumber) ? phoneNumber[0] ?? "" : phoneNumber ?? "",
   );
-  const [modalFirst, setModalFirst] = useState<string>(
+  const [editFirst, setEditFirst] = useState<string>(
     Array.isArray(firstName) ? firstName[0] ?? "" : firstName ?? "",
   );
-  const [modalLast, setModalLast] = useState<string>(
+  const [editLast, setEditLast] = useState<string>(
     Array.isArray(lastName) ? lastName[0] ?? "" : lastName ?? "",
   );
-
-  console.log(`modal phone number: ${modalPhone}`);
-  console.log(`modal first name: ${modalFirst}`);
-  console.log(`modal last name: ${modalLast}`);
-  console.log(`phone number: ${modalPhone}`);
-  console.log(`first name: ${modalFirst}`);
-  console.log(`last name: ${modalLast}`);
-  console.log(`user: ${user.uid}`);
 
   return (
     <View>
@@ -38,11 +30,11 @@ const EditProfile = () => {
         <Text>First Name</Text>
         <TextInput
           style={styles.input}
-          value={modalFirst}
-          placeholder={modalFirst === "" ? "first name" : modalFirst}
+          value={editFirst}
+          placeholder={editFirst === "" ? "first name" : editFirst}
           autoCapitalize="none"
           onChangeText={(text) => {
-            setModalFirst(text);
+            setEditFirst(text);
           }}
         />
       </View>
@@ -50,11 +42,11 @@ const EditProfile = () => {
         <Text>Last Name</Text>
         <TextInput
           style={styles.input}
-          value={modalLast}
-          placeholder={modalLast === "" ? "last name" : modalLast}
+          value={editLast}
+          placeholder={editLast === "" ? "last name" : editLast}
           autoCapitalize="none"
           onChangeText={(text) => {
-            setModalLast(text);
+            setEditLast(text);
           }}
         />
       </View>
@@ -62,11 +54,11 @@ const EditProfile = () => {
         <Text>Phone Number</Text>
         <TextInput
           style={styles.input}
-          value={modalPhone}
-          placeholder={modalPhone === "" ? "phone number" : modalPhone}
+          value={editPhone}
+          placeholder={editPhone === "" ? "phone number" : editPhone}
           autoCapitalize="none"
           onChangeText={(text) => {
-            setModalPhone(text);
+            setEditPhone(text);
           }}
         />
       </View>
@@ -74,7 +66,7 @@ const EditProfile = () => {
         title="Save"
         onPress={() => {
           if (user != null) {
-            updateUserInfo(user, modalFirst, modalLast, modalPhone)
+            updateUserInfo(user, editFirst, editLast, editPhone)
               .then(() => {
                 router.back();
               })
@@ -83,7 +75,7 @@ const EditProfile = () => {
                 // Handle error here, e.g., show error message
               });
           } else {
-            alert("Error: user DNE");
+            console.error("User DNE");
           }
         }}
       />
