@@ -18,7 +18,7 @@ const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
     searchPhrase !== "",
   );
 
-  const handleUserClick = ({ user }) => {
+  const handleUserClick = ({ user }: { user: UserListItem }) => {
     router.push({
       pathname: "FriendProfile",
       params: {
