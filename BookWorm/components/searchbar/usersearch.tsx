@@ -19,6 +19,7 @@ const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
   );
 
   const handleUserClick = ({ user }: { user: UserListItem }) => {
+    // TODO: in the future we only want to pass in uID and query the data to view the friend.
     router.push({
       pathname: "FriendProfile",
       params: {
