@@ -18,17 +18,13 @@ const Profile = () => {
   const [pageRefresh, setPageRefresh] = useState(false);
 
   useEffect(() => {
-    console.log("in use effect for nav state 2");
     const unsubscribe = navigation.addListener("state", (event) => {
       const { data } = event;
-      console.log(data);
       if (
         data.state.routeNames[data.state.routeNames.length - 1] ===
           "EditProfile" &&
         data.state.index === 0
       ) {
-        console.log(data.state.routeNames);
-        console.log("last edit profile");
         setPageRefresh((pageRefresh) => !pageRefresh);
       }
     });
@@ -38,7 +34,6 @@ const Profile = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        console.log("IM FETCHING DATA");
         if (user != null) {
           const firstName: string = await fetchFirstName(user);
           const lastName: string = await fetchLastName(user);
@@ -48,9 +43,8 @@ const Profile = () => {
           setLastName(lastName);
           setPhoneNumber(phoneNumber);
           // setPageRefresh(false);
-          console.log("everything set");
         } else {
-          alert("user DNE");
+          console.error("user DNE");
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -72,14 +66,16 @@ const Profile = () => {
       <Button
         title="Edit Profile"
         onPress={() => {
-          router.push({
-            pathname: "EditProfile",
-            params: {
-              phoneNumber,
-              firstName,
-              lastName,
-            },
-          });
+          if (user != null) {
+            router.push({
+              pathname: "EditProfile",
+              params: {
+                phoneNumber,
+                firstName,
+                lastName,
+              },
+            });
+          }
         }}
       />
     </View>
