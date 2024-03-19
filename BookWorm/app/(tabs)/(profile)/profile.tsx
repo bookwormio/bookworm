@@ -44,7 +44,6 @@ const Profile = () => {
           setPhoneNumber(phoneNumber);
         } else {
           console.error("user DNE");
-          console.error("user DNE");
         }
       } catch (error) {
         console.error("Error fetching data:", error);
