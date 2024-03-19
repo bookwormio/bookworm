@@ -17,7 +17,20 @@ const Profile = () => {
   const [lastName, setLastName] = useState("");
   const [pageRefresh, setPageRefresh] = useState(false);
 
-  // if user logs in, this useEffect populates user profile info
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("state", (event) => {
+      const { data } = event;
+      if (
+        data.state.routeNames[data.state.routeNames.length - 1] ===
+          "EditProfile" &&
+        data.state.index === 0
+      ) {
+        setPageRefresh((pageRefresh) => !pageRefresh);
+      }
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -31,6 +44,7 @@ const Profile = () => {
           setPhoneNumber(phoneNumber);
         } else {
           console.error("user DNE");
+          console.error("user DNE");
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -40,14 +54,6 @@ const Profile = () => {
       console.error("Error fetching first name:", error);
     });
   }, [pageRefresh]);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      // Refresh logic here
-      setPageRefresh((pageRefresh) => !pageRefresh);
-    });
-    return unsubscribe;
-  }, [navigation]);
 
   return (
     <View style={styles.container}>
