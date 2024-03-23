@@ -25,10 +25,13 @@ const BookListItem = ({ bookID, volumeInfo }: BookListItemProps) => {
       }}
     >
       <View style={styles.imageContainer}>
-        <Image
-          source={require("../../assets/favicon.png")}
-          style={styles.image}
-        />
+        {volumeInfo.imageLinks?.smallThumbnail !== undefined && (
+          <Image
+            source={{ uri: volumeInfo.imageLinks.smallThumbnail }}
+            defaultSource={require("../../assets/default_book.png")}
+            style={styles.image}
+          />
+        )}
       </View>
 
       <View style={styles.infoContainer}>
@@ -48,11 +51,9 @@ const BookListItem = ({ bookID, volumeInfo }: BookListItemProps) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row", // Align items horizontally
-    borderWidth: 1, // Add border
-    borderColor: "#ccc", // Border color
-    borderRadius: 8, // Border radius
     padding: 10, // Padding
-    marginBottom: 10, // Margin bottom
+    borderBottomWidth: 1, // Add bottom border
+    borderBottomColor: "rgba(0, 0, 0, 0.1)", // Border color
   },
   imageContainer: {
     marginRight: 10, // Add some spacing between image and text
@@ -60,6 +61,7 @@ const styles = StyleSheet.create({
   image: {
     width: 40,
     height: 40,
+    resizeMode: "contain",
   },
   infoContainer: {
     flex: 1, // Take up remaining space

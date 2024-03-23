@@ -52,16 +52,10 @@ const BookViewPage = () => {
       />
 
       <View>
-        {bookData.mediumImageLink != null && (
+        {bookData.imageLinks?.medium !== undefined && (
           <Image
-            source={{ uri: bookData.mediumImageLink }}
-            style={{
-              width: 300,
-              height: 300,
-              resizeMode: "contain",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+            source={{ uri: bookData.imageLinks.medium }}
+            style={styles.image}
           />
         )}
       </View>
@@ -104,7 +98,14 @@ const styles = StyleSheet.create({
   scrollContent: {
     justifyContent: "center",
     alignItems: "center",
-    padding: 16, // Adjusted padding to accommodate scroll bar
+    padding: 16,
+  },
+  image: {
+    width: 300,
+    height: 300,
+    resizeMode: "contain",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

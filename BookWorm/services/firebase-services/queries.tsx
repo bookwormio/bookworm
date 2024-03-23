@@ -196,27 +196,17 @@ export async function fetchBookByVolumeID(
   if (volumeID === "") {
     return null; // Return null if there's no volumeID
   }
-
   try {
     const response = await axios.get<{
-      volumeInfo: Omit<BookVolumeInfo, "mediumImageLink"> & {
-        imageLinks?: { medium?: string };
-      };
-    }>(`https://www.googleapis.com/books/v1/volumes/${volumeID}`, {
+      volumeInfo: BookVolumeInfo;
+    }>("https://www.googleapis.com/books/v1/volumes/" + volumeID, {
       params: {
         key: BOOKS_API_KEY,
       },
     });
-    const { volumeInfo } = response.data;
-    const { imageLinks } = volumeInfo;
-    const mediumImageLink = imageLinks?.medium ?? null;
-
-    return {
-      ...volumeInfo,
-      mediumImageLink: mediumImageLink ?? undefined,
-    }; // Extract and return the volumeInfo object
+    return response.data.volumeInfo;
   } catch (error) {
-    console.error("Error fetching book by volume ID", error);
-    return null; // Return null if an error occurs
+    console.error("Error fetching book by volume id", error);
+    return null;
   }
 }
