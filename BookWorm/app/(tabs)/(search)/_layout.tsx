@@ -6,6 +6,7 @@ const SearchLayout = () => {
     <Stack>
       <Stack.Screen name="search" options={{ headerShown: false }} />
       <Stack.Screen name="FriendProfile" options={{ headerShown: false }} />
+      <Stack.Screen name="bookviewpage" options={{ headerShown: false }} />
     </Stack>
   );
 };

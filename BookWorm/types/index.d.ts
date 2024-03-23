@@ -16,6 +16,7 @@ interface BookVolumeInfo {
   pageCount?: number;
   categories?: string[];
   maturityRating?: string;
+  previewLink?: string;
   // TODO: Add more properties as needed
 }
 

@@ -166,6 +166,7 @@ export async function fetchBooksByTitleSearch(
       {
         params: {
           q: searchValue,
+          projection: "lite",
           key: BOOKS_API_KEY,
           limit: 10,
         },
@@ -175,7 +176,7 @@ export async function fetchBooksByTitleSearch(
     // console.log(response.data.items);
     return response.data.items.map((item) => ({
       kind: item.kind,
-      id: item.kind,
+      id: item.id,
       etag: item.etag,
       selfLink: item.selfLink,
       volumeInfo: item.volumeInfo,
@@ -186,3 +187,30 @@ export async function fetchBooksByTitleSearch(
     return [];
   }
 }
+
+// Query the Google Books API for book volume by id
+// TODO: down the line this should get moved out of the firebase queries file
+export async function fetchBookByVolumeID(
+  volumeID: string,
+): Promise<BooksResponse | null> {
+  if (volumeID === "") {
+    return null; // Return empty array if there's no searchValue
+  }
+  try {
+    const response = await axios.get<BooksResponse>(
+      "https://www.googleapis.com/books/v1/volumes/" + volumeID,
+      {
+        params: {
+          key: BOOKS_API_KEY,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    // TODO: remove
+    console.error("Error fetching book by volume id", error);
+    return null;
+  }
+}
+
+// export async function fetchBookImageByLink()
