@@ -41,4 +41,17 @@ Now that everything is installed, the simulator can be ran
 * To run the default iOS simulator, press i
 * To select a different iOS device, press Shift and i
 
-  
+### Error starting simulator
+If you encounter an error that looks like:
+```
+Error: xcrun exited with non-zero code: 60
+An error was encountered processing the command (domain=NSPOSIXErrorDomain, code=60):
+Unable to boot the Simulator.
+launchd failed to respond.
+Underlying error (domain=com.apple.SimLaunchHostService.RequestError, code=4):
+        Failed to start launchd_sim: could not bind to session, launchd_sim may have crashed or quit responding
+```
+
+* You can try this
+
+* Mac --- > System Settings --- > Storage --- > Developer --- > Delete Xcode Caches.
