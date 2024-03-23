@@ -42,7 +42,7 @@ const BookListItem = ({ bookID, volumeInfo }: BookListItemProps) => {
         <Text style={styles.author}>
           Author: {volumeInfo.authors?.join(", ")}
         </Text>
-        {/* Add more properties as needed */}
+        {/* TODO: Add more properties as needed */}
       </View>
     </TouchableOpacity>
   );

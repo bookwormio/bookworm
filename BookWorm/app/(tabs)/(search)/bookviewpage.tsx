@@ -31,7 +31,7 @@ const BookViewPage = () => {
     void fetchBook(); // Call the fetchBook function upon entry to the page
   }, [bookID]); // Dependency array to trigger the effect when bookID changes
 
-  if (bookData == null) {
+  if (bookData === null || bookData === undefined) {
     return (
       <View style={styles.container}>
         <Text>Loading...</Text>
@@ -62,7 +62,7 @@ const BookViewPage = () => {
       <Text style={styles.title}>{bookData.title}</Text>
       <Text style={styles.author}>Author: {bookData.authors?.join(", ")}</Text>
 
-      {bookData.description != null && (
+      {bookData.description !== null && (
         <Text style={styles.description}>
           Description: {bookData.description}
         </Text>
