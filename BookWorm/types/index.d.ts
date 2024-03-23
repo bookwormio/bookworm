@@ -17,6 +17,7 @@ interface BookVolumeInfo {
   categories?: string[];
   maturityRating?: string;
   previewLink?: string;
+  mediumImageLink?: string;
   // TODO: Add more properties as needed
 }
 
