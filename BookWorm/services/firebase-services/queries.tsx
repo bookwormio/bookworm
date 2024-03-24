@@ -117,6 +117,81 @@ export async function createPost(
   }
 }
 
+// TODO: implement
+// Follow or request to follow a user by their ID
+// Returns either "following", "not following", or "requested" based on what happens
+export async function followUserByID(
+  currentUserID: string,
+  followedUserID: string,
+): Promise<string> {
+  if (currentUserID === "") {
+    console.error("Current user ID is null");
+    return FollowStatus.NOT_FOLLOWING;
+  }
+  if (followedUserID === null) {
+    console.error("Attempting to follow null user");
+    return FollowStatus.NOT_FOLLOWING;
+  }
+  try {
+    // TODO: Implement the logic to follow or request to follow the user
+    // ...
+    // if visibility = public:
+    // follow the user, set firestore status to following
+    // send new follower notification to followed user
+    // return following
+
+    // else if visibility = private
+    // request to follow user, set firestore status to requested
+    // send new follower request notification to followed user
+    // return requested
+    return FollowStatus.FOLLOWING; // Return "following" if the user is successfully followed
+  } catch (error) {
+    console.error("Error following user:", error);
+    return FollowStatus.NOT_FOLLOWING;
+  }
+}
+
+// TODO: implement
+export async function unfollowUserByID(
+  currentUserID: string,
+  followedUserID: string,
+): Promise<string> {
+  try {
+    // TODO: remove follower relationship
+    return FollowStatus.NOT_FOLLOWING;
+  } catch (error) {
+    console.error("Error unfollowing following user:", error);
+    return FollowStatus.FOLLOWING;
+  }
+}
+
+// TODO: implement
+export async function getAllFollowers(userID: string) {
+  // TODO: return all followers of this user
+}
+
+// TODO: implement
+export async function getAllFollowing(userID: string) {
+  // TODO: return all users this user is following
+}
+
+// TODO: implement
+export async function respondToFollowRequest(
+  accepted: boolean,
+  fromUserID: string,
+  currentUserID: string,
+): Promise<void> {
+  // Function implementation
+  if (accepted) {
+    // change following status for fromUserID to following
+    // increment
+    // send notification to fromUserID
+  } else {
+    // change following status for
+  }
+}
+
+// TODO: sort this with following users at the top
 // Function to fetch users based on the search phrase
 export async function fetchUsersBySearch(
   searchValue: string,

@@ -47,3 +47,10 @@ interface BooksResponse {
   items: BookVolumeItem[];
   totalItems: number;
 }
+
+declare enum FollowStatus {
+  FOLLOWING = "following",
+  NOT_FOLLOWING = "not following",
+  REQUESTED = "requested",
+  DENIED = "denied",
+}
