@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import Post from "../../../components/post/post";
 import { fetchUsersFeed } from "../../../services/firebase-services/queries";
@@ -22,14 +22,34 @@ const Posts = () => {
   }, []);
 
   return (
-    <>
-      {posts.map((post: PostModel, index: number) => (
-        <View key={index}>
-          <Post user={post.user.first} title={post.book} rating={0} />
-        </View>
-      ))}
-    </>
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {posts.map((post: PostModel, index: number) => (
+          <View key={index}>
+            <Post post={post} created={post.created} />
+          </View>
+        ))}
+      </ScrollView>
+    </View>
   );
 };
 
 export default Posts;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    padding: 10,
+  },
+  scrollContainer: {
+    flex: 1,
+    width: "100%",
+  },
+  scrollContent: {
+    paddingRight: 16, // Adjusted padding to accommodate scroll bar
+  },
+});

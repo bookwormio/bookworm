@@ -407,8 +407,6 @@ export async function fetchPostsByUserID(userID: string): Promise<PostModel[]> {
         }
       }),
     );
-
-    console.log(postsData);
     return postsData;
   } catch (error) {
     console.error("Error fetching posts by User ID", error);
