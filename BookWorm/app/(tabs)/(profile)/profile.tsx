@@ -1,12 +1,9 @@
+import { useQuery } from "@tanstack/react-query";
 import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
-import {
-  fetchFirstName,
-  fetchLastName,
-  fetchPhoneNumber,
-} from "../../../services/firebase-services/queries";
+import { fetchFirstName } from "../../../services/firebase-services/queries";
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -16,6 +13,28 @@ const Profile = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [pageRefresh, setPageRefresh] = useState(false);
+  // const queryClient = useQueryClient();
+  let first: string | undefined;
+  // let last: string | undefined;
+  // let number: string | undefined;
+
+  const [isLoadingF, setIsLoadingF] = useState(false);
+  // const [isLoadingL, setIsLoadingL] = useState(false);
+  // const [isLoadingN, setIsLoadingN] = useState(false);
+
+  const { data } = useQuery({
+    queryKey: ["firstName"],
+    queryFn: async () => {
+      if (user != null) {
+        return await fetchFirstName(user);
+      } else {
+        // Return default value when user is null
+        return "";
+      }
+    },
+  });
+
+  console.log(data);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("state", (event) => {
@@ -35,13 +54,30 @@ const Profile = () => {
     async function fetchData() {
       try {
         if (user != null) {
-          const firstName: string = await fetchFirstName(user);
-          const lastName: string = await fetchLastName(user);
-          const phoneNumber: string = await fetchPhoneNumber(user);
-
-          setFirstName(firstName);
-          setLastName(lastName);
-          setPhoneNumber(phoneNumber);
+          // const { data: firstData } = useQuery({
+          //   queryKey: ["firstName"],
+          //   queryFn: async () => await fetchFirstName(user),
+          // });
+          // first = firstData;
+          // setIsLoadingF(isLoadingFirst);
+          // const { data: lastData, isLoading: isLoadingLast } = useQuery({
+          //   queryKey: ["lastName", user.uid],
+          //   queryFn: async () => await fetchLastName(user),
+          // });
+          // last = lastData;
+          // setIsLoadingL(isLoadingLast);
+          // const { data: numberData, isLoading: isLoadingNumber } = useQuery({
+          //   queryKey: ["phoneNumber", user.uid],
+          //   queryFn: async () => await fetchPhoneNumber(user),
+          // });
+          // number = numberData;
+          // setIsLoadingN(isLoadingNumber);
+          // const firstName: string = await fetchFirstName(user);
+          // const lastName: string = await fetchLastName(user);
+          // const phoneNumber: string = await fetchPhoneNumber(user);
+          // setFirstName(first ?? "");
+          // setLastName(last);
+          // setPhoneNumber(number);
         } else {
           console.error("user DNE");
         }
@@ -54,6 +90,9 @@ const Profile = () => {
     });
   }, [pageRefresh]);
 
+  // if (isLoadingF || isLoadingL || isLoadingN) {
+  //   return <ActivityIndicator size="large" color="#0000ff" />;
+  // }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Profile Page</Text>

@@ -34,7 +34,24 @@ export async function updateUserInfo(
 }
 
 // fetches user's first name
-export async function fetchFirstName(user: User) {
+// export async function fetchFirstName(user: User) {
+//   try {
+//     const userDocRef = doc(DB, "user_collection", user.uid);
+//     const userDocSnap = await getDoc(userDocRef);
+//     if (userDocSnap.exists()) {
+//       const userData = userDocSnap.data();
+//       return userData.first;
+//     } else {
+//       console.log("User document DNE");
+//       return "";
+//     }
+//   } catch (error) {
+//     console.error("Error fetching first name:", error);
+//     throw error;
+//   }
+// }
+
+export const fetchFirstName = async (user: User): Promise<string> => {
   try {
     const userDocRef = doc(DB, "user_collection", user.uid);
     const userDocSnap = await getDoc(userDocRef);
@@ -49,7 +66,7 @@ export async function fetchFirstName(user: User) {
     console.error("Error fetching first name:", error);
     throw error;
   }
-}
+};
 
 // fetches user's last name
 export async function fetchLastName(user: User) {
