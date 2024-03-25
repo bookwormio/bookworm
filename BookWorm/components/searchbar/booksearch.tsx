@@ -7,10 +7,16 @@ import SearchBar from "./searchbar";
 
 const BOOK_SEARCH_PLACEHOLDER = "Search for books";
 
-const BookSearch = () => {
+interface BookSearchProps {
+  searchPhrase: string;
+  setSearchPhrase: (searchString: string) => void;
+}
+
+const BookSearch = ({ searchPhrase, setSearchPhrase }: BookSearchProps) => {
   const [books, setBooks] = useState<BookVolumeItem[]>([]);
-  const [searchClicked, setSearchClicked] = useState<boolean>(false);
-  const [searchPhrase, setSearchPhrase] = useState<string>("");
+  const [searchClicked, setSearchClicked] = useState<boolean>(
+    searchPhrase !== "",
+  );
 
   useEffect(() => {
     const bookSearchValue = searchPhrase;
@@ -57,7 +63,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: 24,
+    padding: 10,
   },
   bookContainer: {
     marginBottom: 2,
