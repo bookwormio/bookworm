@@ -2,16 +2,25 @@ import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Button, Text, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
+
 import {
   followUserByID,
   getIsFollowing,
   unfollowUserByID,
 } from "../../../services/firebase-services/queries";
 
+enum LocalFollowStatus {
+  FOLLOWING = "following",
+  NOT_FOLLOWING = "not following",
+  LOADING = "loading",
+}
+
 const FriendProfile = () => {
   const { friendUserID } = useLocalSearchParams<{ friendUserID: string }>();
   const { user } = useAuth();
-  const [followStatus, setFollowStatus] = useState<string>("loading");
+  const [followStatus, setFollowStatus] = useState<string>(
+    LocalFollowStatus.LOADING,
+  );
   const [followStatusFetched, setFollowStatusFetched] =
     useState<boolean>(false);
 
@@ -19,9 +28,18 @@ const FriendProfile = () => {
     const fetchFollowStatus = async () => {
       try {
         const currentUserID = user?.uid;
-        if (currentUserID != null && friendUserID != null) {
+        // TODO: error if undefined
+        if (currentUserID === undefined || friendUserID === undefined) {
+          console.error(
+            "Either current user ID is undefined or friend user ID is undefined",
+          );
+        } else {
           const isFollowing = await getIsFollowing(currentUserID, friendUserID);
-          setFollowStatus(isFollowing ? "following" : "not following");
+          setFollowStatus(
+            isFollowing
+              ? LocalFollowStatus.FOLLOWING
+              : LocalFollowStatus.NOT_FOLLOWING,
+          );
           setFollowStatusFetched(true); // Set follow status fetched
         }
       } catch (error) {
@@ -32,13 +50,14 @@ const FriendProfile = () => {
     void fetchFollowStatus();
   }, [user, friendUserID]);
 
-  // TODO: consolidate these functions into one
   const handleFollowButtonPressed = () => {
-    if (followStatus === "loading") {
+    if (followStatus === LocalFollowStatus.LOADING) {
       // Do nothing if follow status is still loading
-    } else if (followStatus === "following") {
+    } else if (followStatus === LocalFollowStatus.FOLLOWING) {
+      // if following -> unfollow
       void handleUnfollow();
-    } else if (followStatus === "not following") {
+    } else if (followStatus === LocalFollowStatus.NOT_FOLLOWING) {
+      // if not following -> follow
       void handleFollow();
     }
   };
@@ -54,10 +73,15 @@ const FriendProfile = () => {
 
     try {
       // Immediately update the visual follow status before the db has been updated
-      setFollowStatus("loading");
-      const followStatus = await followUserByID(currentUserID, friendUserID);
-
-      console.log("Follow status:", followStatus);
+      setFollowStatus(LocalFollowStatus.LOADING);
+      setFollowStatusFetched(false);
+      const followSucceeded = await followUserByID(currentUserID, friendUserID);
+      setFollowStatus(
+        followSucceeded
+          ? LocalFollowStatus.FOLLOWING
+          : LocalFollowStatus.NOT_FOLLOWING,
+      );
+      setFollowStatusFetched(true);
     } catch (error) {
       setFollowStatus("not following");
       console.error("Error occurred while following user:", error);
@@ -74,14 +98,20 @@ const FriendProfile = () => {
     }
 
     try {
-      setFollowStatus("not following");
-      const unfollowStatus = await unfollowUserByID(
+      setFollowStatus(LocalFollowStatus.LOADING);
+      setFollowStatusFetched(false);
+      const unfollowSucceeded = await unfollowUserByID(
         currentUserID,
         friendUserID,
       );
-      console.log("Unfollow status:", unfollowStatus);
+      setFollowStatus(
+        unfollowSucceeded
+          ? LocalFollowStatus.NOT_FOLLOWING
+          : LocalFollowStatus.FOLLOWING,
+      );
+      setFollowStatusFetched(true);
     } catch (error) {
-      setFollowStatus("following");
+      setFollowStatus(LocalFollowStatus.FOLLOWING);
       console.error("Error occurred while unfollowing user:", error);
     }
   };
@@ -97,9 +127,9 @@ const FriendProfile = () => {
       <Text>User ID: {friendUserID}</Text>
       <Button
         title={
-          followStatus === "loading"
+          followStatus === LocalFollowStatus.LOADING
             ? "Loading..."
-            : followStatus === "following"
+            : followStatus === LocalFollowStatus.FOLLOWING
               ? "Following"
               : "Follow"
         }
