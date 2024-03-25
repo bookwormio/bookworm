@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
+
 import { fetchBooksByTitleSearch } from "../../services/firebase-services/queries";
-import BookPreviewList from "../bookpreview/bookpreviewlist";
+import BookList from "../booklist/BookList";
 import SearchBar from "./searchbar";
 
 const BOOK_SEARCH_PLACEHOLDER = "Search for books";
@@ -42,9 +43,16 @@ const BookSearch = ({ searchPhrase, setSearchPhrase }: BookSearchProps) => {
         setClicked={setSearchClicked}
         placeholderText={BOOK_SEARCH_PLACEHOLDER}
       />
-      <View>
-        <BookPreviewList volumes={books}></BookPreviewList>
-      </View>
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {books.map((book, index) => (
+          <View style={styles.bookContainer} key={index}>
+            <BookList volumes={[book]} />
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -55,9 +63,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    padding: 10,
   },
   bookContainer: {
-    marginBottom: 20,
+    marginBottom: 2,
   },
   title: {
     fontSize: 18,
@@ -69,5 +78,12 @@ const styles = StyleSheet.create({
   otherInfo: {
     fontSize: 14,
     fontStyle: "italic",
+  },
+  scrollContainer: {
+    flex: 1,
+    width: "100%",
+  },
+  scrollContent: {
+    paddingRight: 16, // Adjusted padding to accommodate scroll bar
   },
 });

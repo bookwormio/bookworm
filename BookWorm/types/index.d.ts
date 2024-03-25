@@ -16,6 +16,21 @@ interface BookVolumeInfo {
   pageCount?: number;
   categories?: string[];
   maturityRating?: string;
+  previewLink?: string;
+  averageRating?: string;
+  ratingsCount?: string;
+  language?: string;
+  mainCategory?: string;
+
+  imageLinks: {
+    smallThumbnail: string;
+    thumbnail: string;
+    small: string;
+    medium: string;
+    large: string;
+    extraLarge: string;
+  };
+
   // TODO: Add more properties as needed
 }
 
