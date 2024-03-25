@@ -8,11 +8,13 @@ import {
   getDocs,
   query,
   serverTimestamp,
+  setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable } from "firebase/storage";
 import { BOOKS_API_KEY } from "../../constants/constants";
+import { FollowStatus } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 
 export async function updateUserInfo(
@@ -117,78 +119,110 @@ export async function createPost(
   }
 }
 
-// TODO: implement
 // Follow or request to follow a user by their ID
-// Returns either "following", "not following", or "requested" based on what happens
+// Returns either "following", "not following" based on what happens
+// TODO: add private visibility down the line (follow request)
 export async function followUserByID(
   currentUserID: string,
-  followedUserID: string,
+  friendUserID: string,
 ): Promise<string> {
   if (currentUserID === "") {
     console.error("Current user ID is null");
     return FollowStatus.NOT_FOLLOWING;
   }
-  if (followedUserID === null) {
+  if (friendUserID === "") {
     console.error("Attempting to follow null user");
     return FollowStatus.NOT_FOLLOWING;
   }
   try {
-    // TODO: Implement the logic to follow or request to follow the user
-    // ...
-    // if visibility = public:
-    // follow the user, set firestore status to following
-    // send new follower notification to followed user
-    // return following
+    const docData = {
+      follower: currentUserID,
+      following: friendUserID,
+      created_at: serverTimestamp(),
+      follow_status: FollowStatus.FOLLOWING,
+    };
+    // TODO: only set created_at if this document doesn't already exist
+    // Otherwise set updated_at to the timestamp and keep created_at what it already is.
+    // Doc ID = currentUserID_followedUserID
+    await setDoc(
+      doc(DB, "relationships", `${currentUserID}_${friendUserID}`),
+      docData,
+    );
 
-    // else if visibility = private
-    // request to follow user, set firestore status to requested
-    // send new follower request notification to followed user
-    // return requested
-    return FollowStatus.FOLLOWING; // Return "following" if the user is successfully followed
+    return FollowStatus.FOLLOWING;
   } catch (error) {
     console.error("Error following user:", error);
     return FollowStatus.NOT_FOLLOWING;
   }
 }
 
-// TODO: implement
+/**
+ * Unfollows a user by updating the follow status in the Firestore database.
+ * @param {string} currentUserID - The ID of the current user.
+ * @param {string} friendUserID - The ID of the user to unfollow.
+ * @returns {Promise<string>} A promise that resolves to the follow status after unfollowing.
+ */
 export async function unfollowUserByID(
   currentUserID: string,
-  followedUserID: string,
+  friendUserID: string,
 ): Promise<string> {
+  if (currentUserID === "") {
+    console.error("Current user ID is empty string");
+    return FollowStatus.FOLLOWING; // Error: return still following
+  }
+  if (friendUserID === "") {
+    console.error("Attempting to unfollow empty user string");
+    return FollowStatus.FOLLOWING; // Error: return still following
+  }
   try {
-    // TODO: remove follower relationship
-    return FollowStatus.NOT_FOLLOWING;
+    const docRef = doc(DB, "relationships", `${currentUserID}_${friendUserID}`);
+    await updateDoc(docRef, {
+      follow_status: FollowStatus.UNFOLLOWED,
+      updated_at: serverTimestamp(), // Update the timestamp
+    });
+    return FollowStatus.UNFOLLOWED;
   } catch (error) {
-    console.error("Error unfollowing following user:", error);
-    return FollowStatus.FOLLOWING;
+    console.error("Error unfollowing user:", error);
+    return FollowStatus.FOLLOWING; // Error: return still following
   }
 }
 
-// TODO: implement
-export async function getAllFollowers(userID: string) {
-  // TODO: return all followers of this user
-}
-
-// TODO: implement
-export async function getAllFollowing(userID: string) {
-  // TODO: return all users this user is following
-}
-
-// TODO: implement
-export async function respondToFollowRequest(
-  accepted: boolean,
-  fromUserID: string,
+/**
+ * Checks if the current user is following a specific friend user.
+ * @param {string} currentUserID - The ID of the current user.
+ * @param {string} friendUserID - The ID of the friend user.
+ * @returns {Promise<boolean>} A promise that resolves to true if the current user is following the friend user, false otherwise.
+ */
+export async function getIsFollowing(
   currentUserID: string,
-): Promise<void> {
-  // Function implementation
-  if (accepted) {
-    // change following status for fromUserID to following
-    // increment
-    // send notification to fromUserID
-  } else {
-    // change following status for
+  friendUserID: string,
+): Promise<boolean> {
+  try {
+    const docRef = doc(DB, "relationships", `${currentUserID}_${friendUserID}`);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const followStatus = docSnap.data()?.follow_status;
+      return followStatus === FollowStatus.FOLLOWING;
+    } else {
+      return false; // Relationship document doesn't exist, not following
+    }
+  } catch (error) {
+    console.error("Error checking follow status:", error);
+    return false; // Assume not following in case of an error
   }
+}
+
+// TODO: implement
+export async function getAllFollowers(userID: string): Promise<UserListItem[]> {
+  // TODO: return all followers of this user
+  return [];
+}
+
+// TODO: implement
+export async function getAllFollowing(userID: string): Promise<UserListItem[]> {
+  // TODO: return all users this user is following
+  return [];
 }
 
 // TODO: sort this with following users at the top
