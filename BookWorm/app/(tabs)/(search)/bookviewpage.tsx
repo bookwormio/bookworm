@@ -7,8 +7,10 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { fetchBookByVolumeID } from "../../../services/firebase-services/queries";
+import RenderHtml from "react-native-render-html";
 
 const BookViewPage = () => {
   const [bookData, setBookData] = useState<BookVolumeInfo | null>(null);
@@ -30,6 +32,8 @@ const BookViewPage = () => {
 
     void fetchBook(); // Call the fetchBook function upon entry to the page
   }, [bookID]); // Dependency array to trigger the effect when bookID changes
+
+  const windowWidth = useWindowDimensions().width;
 
   if (bookData === null || bookData === undefined) {
     return (
@@ -64,7 +68,11 @@ const BookViewPage = () => {
 
       {bookData.description !== null && (
         <Text style={styles.description}>
-          Description: {bookData.description}
+          Description:{" "}
+          <RenderHtml
+            contentWidth={windowWidth}
+            source={{ html: bookData.description ?? "" }}
+          />
         </Text>
       )}
     </ScrollView>
