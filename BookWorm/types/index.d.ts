@@ -55,15 +55,24 @@ interface PostModel {
   book: string;
   created: Timestamp;
   text: string;
-  user: string;
+  user: UserModel;
   images: string[] | null;
 }
 
-interface Relationship {
+interface RelationshipModel {
   id: string;
   created_at: Timestamp;
   follow_status: string;
   follower: string;
   following: string;
   updated_at: Timestamp;
+}
+
+interface UserModel {
+  id: string;
+  email: string;
+  first: string;
+  isPublic: boolean;
+  last: string;
+  number: Timestamp;
 }

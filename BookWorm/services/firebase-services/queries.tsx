@@ -22,6 +22,7 @@ import {
   type BooksResponse,
   type PostModel,
   type UserListItem,
+  type UserModel,
 } from "../../types";
 
 export async function updateUserInfo(
@@ -39,6 +40,30 @@ export async function updateUserInfo(
     });
   } catch (error) {
     alert(error);
+  }
+}
+
+// fetches all user traits
+export async function fetchUser(userID: string): Promise<UserModel | null> {
+  try {
+    const userDocRef = doc(DB, "user_collection", userID);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const user: UserModel = {
+        id: userDocSnap.id,
+        email: userDocSnap.data().email,
+        first: userDocSnap.data().first,
+        isPublic: userDocSnap.data().isPublic,
+        last: userDocSnap.data().last,
+        number: userDocSnap.data().number,
+      };
+      return user;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching first name:", error);
+    throw error;
   }
 }
 
@@ -356,19 +381,34 @@ export async function fetchPostsByUserID(userID: string): Promise<PostModel[]> {
     );
     const postsData: PostModel[] = [];
     const postsSnapshot = await getDocs(postsQuery);
-    postsSnapshot.forEach((postDoc) => {
-      postsData.push({
-        id: postDoc.id,
-        book: postDoc.data().book,
-        created: postDoc.data().created,
-        text: postDoc.data().text,
-        user: postDoc.data().user,
-        images:
-          postDoc.data().image === true
-            ? ["posts/" + userID + "/" + postDoc.id]
-            : [],
-      });
-    });
+
+    // Use Promise.all to wait for all fetchUser promises to resolve
+    await Promise.all(
+      postsSnapshot.docs.map(async (postDoc) => {
+        const userID: string = postDoc.data().user;
+        try {
+          const user = await fetchUser(userID);
+          if (user != null) {
+            const post = {
+              id: postDoc.id,
+              book: postDoc.data().book,
+              created: postDoc.data().created,
+              text: postDoc.data().text,
+              user,
+              images:
+                postDoc.data().image === true
+                  ? ["posts/" + userID + "/" + postDoc.id]
+                  : [],
+            };
+            postsData.push(post);
+          }
+        } catch (error) {
+          console.error("Error fetching user", error);
+        }
+      }),
+    );
+
+    console.log(postsData);
     return postsData;
   } catch (error) {
     console.error("Error fetching posts by User ID", error);

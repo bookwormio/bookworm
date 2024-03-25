@@ -25,7 +25,7 @@ const Posts = () => {
     <>
       {posts.map((post: PostModel, index: number) => (
         <View key={index}>
-          <Post user={post.user} title={post.book} rating={0} />
+          <Post user={post.user.first} title={post.book} rating={0} />
         </View>
       ))}
     </>
