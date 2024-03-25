@@ -1,3 +1,5 @@
+import { type Timestamp } from "firebase/firestore";
+
 interface UserListItem {
   id: string;
   firstName: string;
@@ -46,4 +48,22 @@ interface BooksResponse {
   kind: string;
   items: BookVolumeItem[];
   totalItems: number;
+}
+
+interface PostModel {
+  id: string;
+  book: string;
+  created: Timestamp;
+  text: string;
+  user: string;
+  images: string[] | null;
+}
+
+interface Relationship {
+  id: string;
+  created_at: Timestamp;
+  follow_status: string;
+  follower: string;
+  following: string;
+  updated_at: Timestamp;
 }

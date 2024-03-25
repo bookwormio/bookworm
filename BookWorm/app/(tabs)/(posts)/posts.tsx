@@ -1,21 +1,33 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import { useAuth } from "../../../components/auth/context";
 import Post from "../../../components/post/post";
+import { fetchUsersFeed } from "../../../services/firebase-services/queries";
+import { type PostModel } from "../../../types";
 
 const Posts = () => {
+  const [posts, setPosts] = useState<PostModel[]>([]);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user != null) {
+      fetchUsersFeed(user?.uid)
+        .then((fetchedPosts) => {
+          setPosts(fetchedPosts);
+        })
+        .catch((error) => {
+          alert("Error fetching feed: " + error);
+        });
+    }
+  }, []);
+
   return (
     <>
-      <Post
-        user="user1"
-        title="dummy post"
-        rating={3.5}
-        summary="this is a summary of that post"
-      ></Post>
-      <Post
-        user="user2"
-        title="dummy post 2"
-        rating={4}
-        summary="anotha"
-      ></Post>
+      {posts.map((post: PostModel, index: number) => (
+        <View key={index}>
+          <Post user={post.user} title={post.book} rating={0} />
+        </View>
+      ))}
     </>
   );
 };

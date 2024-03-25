@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { fetchBooksByTitleSearch } from "../../services/firebase-services/queries";
 import BookList from "../booklist/BookList";
 import SearchBar from "./searchbar";
+import { type BookVolumeItem } from "../../types";
 
 const BOOK_SEARCH_PLACEHOLDER = "Search for books";
 

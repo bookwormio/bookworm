@@ -16,6 +16,13 @@ import { ref, uploadBytesResumable } from "firebase/storage";
 import { BOOKS_API_KEY } from "../../constants/constants";
 import { FollowStatus } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
+import {
+  type BookVolumeInfo,
+  type BookVolumeItem,
+  type BooksResponse,
+  type PostModel,
+  type UserListItem,
+} from "../../types";
 
 export async function updateUserInfo(
   user: User,
@@ -101,6 +108,7 @@ export async function createPost(
       created: serverTimestamp(),
       book,
       text,
+      image: imageURI !== "",
     })
       .then(async (docRef) => {
         if (imageURI !== "") {
@@ -221,8 +229,26 @@ export async function getAllFollowers(userID: string): Promise<UserListItem[]> {
 
 // TODO: implement
 export async function getAllFollowing(userID: string): Promise<UserListItem[]> {
-  // TODO: return all users this user is following
-  return [];
+  try {
+    const relationshipQuery = query(
+      collection(DB, "relationships"),
+      where("follower", "==", userID),
+      where("follow_status", "==", "following"),
+    );
+    const relationsData: UserListItem[] = [];
+    const relationshipSnapshot = await getDocs(relationshipQuery);
+    relationshipSnapshot.forEach((relationshipDoc) => {
+      relationsData.push({
+        id: relationshipDoc.data().following,
+        firstName: relationshipDoc.data().first,
+        lastName: relationshipDoc.data().last,
+      });
+    });
+    return relationsData;
+  } catch (error) {
+    console.error("Error searching for users you follow: ", error);
+    return [];
+  }
 }
 
 // TODO: sort this with following users at the top
@@ -318,5 +344,56 @@ export async function fetchBookByVolumeID(
   } catch (error) {
     console.error("Error fetching book by volume id", error);
     return null;
+  }
+}
+
+// fetches all posts for a user from their users id
+export async function fetchPostsByUserID(userID: string): Promise<PostModel[]> {
+  try {
+    const postsQuery = query(
+      collection(DB, "posts"),
+      where("user", "==", userID),
+    );
+    const postsData: PostModel[] = [];
+    const postsSnapshot = await getDocs(postsQuery);
+    postsSnapshot.forEach((postDoc) => {
+      postsData.push({
+        id: postDoc.id,
+        book: postDoc.data().book,
+        created: postDoc.data().created,
+        text: postDoc.data().text,
+        user: postDoc.data().user,
+        images:
+          postDoc.data().image === true
+            ? ["posts/" + userID + "/" + postDoc.id]
+            : [],
+      });
+    });
+    return postsData;
+  } catch (error) {
+    console.error("Error fetching posts by User ID", error);
+    return [];
+  }
+}
+
+// fetches all posts for every user a user is following
+export async function fetchUsersFeed(userID: string): Promise<PostModel[]> {
+  try {
+    const following = await getAllFollowing(userID);
+    const posts: PostModel[] = [];
+    const getPosts = following.map(async (userFollowing) => {
+      const currentPosts = await fetchPostsByUserID(userFollowing.id);
+      posts.push(...currentPosts);
+    });
+    await Promise.all(getPosts);
+    posts.sort((postA, postB) => {
+      const dateA = postA.created.toDate();
+      const dateB = postB.created.toDate();
+      return dateB.getTime() - dateA.getTime();
+    });
+    return posts;
+  } catch (error) {
+    console.error("Error fetching users feed", error);
+    return [];
   }
 }
