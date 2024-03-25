@@ -253,21 +253,18 @@ export async function getAllFollowers(userID: string): Promise<UserListItem[]> {
 }
 
 // TODO: implement
-export async function getAllFollowing(userID: string): Promise<UserListItem[]> {
+export async function getAllFollowing(userID: string): Promise<string[]> {
   try {
     const relationshipQuery = query(
       collection(DB, "relationships"),
       where("follower", "==", userID),
       where("follow_status", "==", "following"),
     );
-    const relationsData: UserListItem[] = [];
+    const relationsData: string[] = [];
     const relationshipSnapshot = await getDocs(relationshipQuery);
     relationshipSnapshot.forEach((relationshipDoc) => {
-      relationsData.push({
-        id: relationshipDoc.data().following,
-        firstName: relationshipDoc.data().first,
-        lastName: relationshipDoc.data().last,
-      });
+      const followingUserID: string = relationshipDoc.data().following;
+      relationsData.push(followingUserID);
     });
     return relationsData;
   } catch (error) {
@@ -420,7 +417,7 @@ export async function fetchUsersFeed(userID: string): Promise<PostModel[]> {
     const following = await getAllFollowing(userID);
     const posts: PostModel[] = [];
     const getPosts = following.map(async (userFollowing) => {
-      const currentPosts = await fetchPostsByUserID(userFollowing.id);
+      const currentPosts = await fetchPostsByUserID(userFollowing);
       posts.push(...currentPosts);
     });
     await Promise.all(getPosts);
