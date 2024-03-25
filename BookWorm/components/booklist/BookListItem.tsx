@@ -25,13 +25,11 @@ const BookListItem = ({ bookID, volumeInfo }: BookListItemProps) => {
       }}
     >
       <View style={styles.imageContainer}>
-        {volumeInfo.imageLinks?.smallThumbnail !== undefined && (
-          <Image
-            source={{ uri: volumeInfo.imageLinks.smallThumbnail }}
-            defaultSource={require("../../assets/default_book.png")}
-            style={styles.image}
-          />
-        )}
+        <Image
+          source={{ uri: volumeInfo.imageLinks.smallThumbnail }}
+          defaultSource={require("../../assets/default_book.png")}
+          style={styles.image}
+        />
       </View>
 
       <View style={styles.infoContainer}>

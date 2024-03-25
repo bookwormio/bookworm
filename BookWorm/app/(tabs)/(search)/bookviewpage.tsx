@@ -9,8 +9,8 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { fetchBookByVolumeID } from "../../../services/firebase-services/queries";
 import RenderHtml from "react-native-render-html";
+import { fetchBookByVolumeID } from "../../../services/firebase-services/queries";
 
 const BookViewPage = () => {
   const [bookData, setBookData] = useState<BookVolumeInfo | null>(null);
@@ -23,6 +23,7 @@ const BookViewPage = () => {
         try {
           const data = await fetchBookByVolumeID(bookID);
           setBookData(data); // Set bookData with fetched data
+          console.log(data?.imageLinks);
         } catch (error) {
           console.error("Error fetching book:", error);
           // Handle error if fetchBookByVolumeID fails
@@ -56,12 +57,11 @@ const BookViewPage = () => {
       />
 
       <View>
-        {bookData.imageLinks?.medium !== undefined && (
-          <Image
-            source={{ uri: bookData.imageLinks.medium }}
-            style={styles.image}
-          />
-        )}
+        <Image
+          // Using thumbnail here because the other image links (small / medium) may be different
+          source={{ uri: bookData.imageLinks?.thumbnail }}
+          style={styles.image}
+        />
       </View>
       <Text style={styles.title}>{bookData.title}</Text>
       <Text style={styles.author}>Author: {bookData.authors?.join(", ")}</Text>
@@ -109,8 +109,8 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   image: {
-    width: 300,
-    height: 300,
+    width: 128,
+    height: 192,
     resizeMode: "contain",
     justifyContent: "center",
     alignItems: "center",

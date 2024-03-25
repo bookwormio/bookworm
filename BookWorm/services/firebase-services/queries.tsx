@@ -202,6 +202,7 @@ export async function fetchBookByVolumeID(
     }>("https://www.googleapis.com/books/v1/volumes/" + volumeID, {
       params: {
         key: BOOKS_API_KEY,
+        projection: "full",
       },
     });
     return response.data.volumeInfo;
