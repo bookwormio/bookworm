@@ -61,16 +61,6 @@ const EditProfile = () => {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
-  const handleSave = async (userData: UserData) => {
-    await updateUserQuery(userData)
-      .then(() => {
-        router.back();
-      })
-      .catch((error) => {
-        console.error("Error updating user info:", error);
-        // Handle error here, e.g., show error message
-      });
-  };
   return (
     <View>
       <Button
@@ -119,9 +109,9 @@ const EditProfile = () => {
       <Button
         title="Save"
         onPress={async () => {
-          if (userData !== undefined) {
-            await handleSave(userData);
-          }
+          await updateUserQuery(userData).then(() => {
+            router.back();
+          });
         }}
       />
     </View>
