@@ -412,12 +412,15 @@ export async function fetchPostsByUserID(userID: string): Promise<PostModel[]> {
 }
 
 // fetches all posts for every user a user is following
-export async function fetchUsersFeed(userID: string): Promise<PostModel[]> {
+export async function fetchPostsForUserFeed(
+  userID: string,
+): Promise<PostModel[]> {
   try {
     const following = await getAllFollowing(userID);
     const posts: PostModel[] = [];
     const getPosts = following.map(async (userFollowing) => {
       const currentPosts = await fetchPostsByUserID(userFollowing);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       posts.push(...currentPosts);
     });
     await Promise.all(getPosts);

@@ -1,28 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Button, ScrollView, StyleSheet, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import Post from "../../../components/post/post";
-import { fetchUsersFeed } from "../../../services/firebase-services/queries";
+import { fetchPostsForUserFeed } from "../../../services/firebase-services/queries";
 import { type PostModel } from "../../../types";
 
 const Posts = () => {
   const [posts, setPosts] = useState<PostModel[]>([]);
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (user != null) {
-      fetchUsersFeed(user?.uid)
-        .then((fetchedPosts) => {
-          setPosts(fetchedPosts);
-        })
-        .catch((error) => {
-          alert("Error fetching feed: " + error);
-        });
+  const fetchPosts = async () => {
+    try {
+      if (user != null) {
+        const fetchedPosts = await fetchPostsForUserFeed(user.uid);
+        console.log(fetchedPosts);
+        setPosts(fetchedPosts);
+      }
+    } catch (error) {
+      console.error("Error fetching posts", error);
     }
+  };
+
+  const handleRefresh = () => {
+    void fetchPosts(); // Call fetchPosts to refresh posts
+  };
+
+  useEffect(() => {
+    void fetchPosts(); // Initial fetch of posts when component mounts
   }, []);
 
   return (
     <View style={styles.container}>
+      {/* TODO: Make this a swipe up to refresh */}
+      <Button title="Refresh" onPress={handleRefresh} />
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
