@@ -1,9 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useAuth } from "../../../components/auth/context";
-import { fetchFirstName } from "../../../services/firebase-services/queries";
+import {
+  fetchFirstName,
+  fetchLastName,
+  fetchPhoneNumber,
+} from "../../../services/firebase-services/queries";
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -13,17 +23,13 @@ const Profile = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [pageRefresh, setPageRefresh] = useState(false);
-  // const queryClient = useQueryClient();
-  let first: string | undefined;
-  // let last: string | undefined;
-  // let number: string | undefined;
 
   const [isLoadingF, setIsLoadingF] = useState(false);
-  // const [isLoadingL, setIsLoadingL] = useState(false);
-  // const [isLoadingN, setIsLoadingN] = useState(false);
+  const [isLoadingL, setIsLoadingL] = useState(false);
+  const [isLoadingN, setIsLoadingN] = useState(false);
 
-  const { data } = useQuery({
-    queryKey: ["firstName"],
+  const { data: firstNameData, isLoading: isLoadingFirst } = useQuery({
+    queryKey: user != null ? ["firstName", user.uid] : ["firstName"],
     queryFn: async () => {
       if (user != null) {
         return await fetchFirstName(user);
@@ -34,7 +40,63 @@ const Profile = () => {
     },
   });
 
-  console.log(data);
+  if (firstNameData !== undefined) console.log(firstNameData);
+
+  const { data: lastNameData, isLoading: isLoadingLast } = useQuery({
+    queryKey: user != null ? ["lastName", user.uid] : ["lastName"],
+    queryFn: async () => {
+      if (user != null) {
+        return await fetchLastName(user);
+      } else {
+        // Return default value when user is null
+        return "";
+      }
+    },
+  });
+
+  if (lastNameData !== undefined) console.log(lastNameData);
+
+  const { data: numberData, isLoading: isLoadingNumber } = useQuery({
+    queryKey: user != null ? ["number", user.uid] : ["number"],
+    queryFn: async () => {
+      if (user != null) {
+        return await fetchPhoneNumber(user);
+      } else {
+        // Return default value when user is null
+        return "";
+      }
+    },
+  });
+
+  if (numberData !== undefined) console.log(numberData);
+
+  useEffect(() => {
+    if (firstNameData !== undefined) {
+      setFirstName(firstNameData);
+    }
+
+    if (lastNameData !== undefined) {
+      setLastName(lastNameData);
+    }
+
+    if (numberData !== undefined) {
+      setPhoneNumber(numberData);
+    }
+  }, [firstNameData, lastNameData, numberData]);
+
+  useEffect(() => {
+    if (isLoadingFirst !== undefined) {
+      setIsLoadingF(isLoadingFirst);
+    }
+
+    if (isLoadingLast !== undefined) {
+      setIsLoadingL(isLoadingLast);
+    }
+
+    if (isLoadingNumber !== undefined) {
+      setIsLoadingN(isLoadingNumber);
+    }
+  }, [isLoadingFirst, isLoadingLast, isLoadingNumber]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("state", (event) => {
@@ -90,9 +152,9 @@ const Profile = () => {
     });
   }, [pageRefresh]);
 
-  // if (isLoadingF || isLoadingL || isLoadingN) {
-  //   return <ActivityIndicator size="large" color="#0000ff" />;
-  // }
+  if (isLoadingF || isLoadingL || isLoadingN) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Profile Page</Text>

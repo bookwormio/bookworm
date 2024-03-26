@@ -69,7 +69,7 @@ export const fetchFirstName = async (user: User): Promise<string> => {
 };
 
 // fetches user's last name
-export async function fetchLastName(user: User) {
+export const fetchLastName = async (user: User): Promise<string> => {
   try {
     const userDocRef = doc(DB, "user_collection", user.uid);
     const userDocSnap = await getDoc(userDocRef);
@@ -84,10 +84,10 @@ export async function fetchLastName(user: User) {
     console.error("Error fetching last name:", error);
     throw error;
   }
-}
+};
 
 // fetches user's phone number
-export async function fetchPhoneNumber(user: User) {
+export const fetchPhoneNumber = async (user: User): Promise<string> => {
   try {
     const userDocRef = doc(DB, "user_collection", user.uid);
     const userDocSnap = await getDoc(userDocRef);
@@ -102,7 +102,7 @@ export async function fetchPhoneNumber(user: User) {
     console.error("Error fetching phone number:", error);
     throw error;
   }
-}
+};
 
 export async function createPost(
   user: User | null,
