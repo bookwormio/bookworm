@@ -62,7 +62,7 @@ export async function fetchUser(userID: string): Promise<UserModel | null> {
       return null;
     }
   } catch (error) {
-    console.error("Error fetching first name:", error);
+    console.error("Error fetching user:", error);
     throw error;
   }
 }

@@ -13,7 +13,6 @@ const Posts = () => {
     try {
       if (user != null) {
         const fetchedPosts = await fetchPostsForUserFeed(user.uid);
-        console.log(fetchedPosts);
         setPosts(fetchedPosts);
       }
     } catch (error) {
