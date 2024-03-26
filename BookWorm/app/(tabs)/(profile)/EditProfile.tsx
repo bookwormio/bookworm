@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import {
-  fetchUserData,
-  updateUserInfo,
+  newFetchUserInfo,
+  newUpdateUserInfo,
 } from "../../../services/firebase-services/queries";
 
 const EditProfile = () => {
@@ -22,17 +22,27 @@ const EditProfile = () => {
   const [editLast, setEditLast] = useState("");
 
   const queryClient = useQueryClient();
+
   const { mutateAsync: updateUserQuery } = useMutation({
-    mutationFn: updateUserInfo,
+    // TODO: there must be a better way to pass params into this but I couldn't crack it
+    mutationFn: async () => {
+      return await newUpdateUserInfo(
+        user != null ? user.uid : "",
+        editFirst,
+        editLast,
+        editPhone,
+      );
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["userdata"] });
     },
   });
+
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
     queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
     queryFn: async () => {
       if (user != null) {
-        return await fetchUserData(user);
+        return await newFetchUserInfo(user.uid);
       } else {
         // Return default value when user is null
         return {};
@@ -56,6 +66,24 @@ const EditProfile = () => {
       }
     }
   }, [userData]);
+
+  const handeSaveClick = () => {
+    const userId = user?.uid;
+
+    if (userId === undefined) {
+      console.error("Current user undefined");
+    } else {
+      updateUserQuery()
+        .then(() => {
+          console.log("Updated user data: ", userId);
+          router.back();
+        })
+        .catch((error) => {
+          console.error("Error updating user data: ", error);
+          router.back();
+        });
+    }
+  };
 
   if (isLoadingUserData) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -106,14 +134,7 @@ const EditProfile = () => {
           }}
         />
       </View>
-      <Button
-        title="Save"
-        onPress={async () => {
-          await updateUserQuery(userData).then(() => {
-            router.back();
-          });
-        }}
-      />
+      <Button title="Save" onPress={handeSaveClick} />
     </View>
   );
 };

@@ -5,6 +5,7 @@ interface UserListItem {
 }
 
 interface UserData {
+  id: string;
   email: string;
   first: string;
   isPublic: boolean;
