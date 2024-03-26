@@ -300,8 +300,9 @@ export async function fetchBooksByTitleSearch(
         },
       },
     );
-    // TODO: remove
-    // console.log(response.data.items);
+    if (response?.data?.totalItems === 0) {
+      return [];
+    }
     return response.data.items.map((item) => ({
       kind: item.kind,
       id: item.id,
@@ -310,7 +311,6 @@ export async function fetchBooksByTitleSearch(
       volumeInfo: item.volumeInfo,
     }));
   } catch (error) {
-    // TODO: remove
     console.error("Error fetching books by title search", error);
     return [];
   }

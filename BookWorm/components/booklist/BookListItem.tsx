@@ -26,7 +26,7 @@ const BookListItem = ({ bookID, volumeInfo }: BookListItemProps) => {
     >
       <View style={styles.imageContainer}>
         <Image
-          source={{ uri: volumeInfo.imageLinks.smallThumbnail }}
+          source={{ uri: volumeInfo?.imageLinks?.smallThumbnail }}
           defaultSource={require("../../assets/default_book.png")}
           style={styles.image}
         />
@@ -34,11 +34,11 @@ const BookListItem = ({ bookID, volumeInfo }: BookListItemProps) => {
 
       <View style={styles.infoContainer}>
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-          {volumeInfo.title}
+          {volumeInfo?.title}
         </Text>
 
         <Text style={styles.author}>
-          Author: {volumeInfo.authors?.join(", ")}
+          Author: {volumeInfo?.authors?.join(", ")}
         </Text>
         {/* TODO: Add more properties as needed */}
       </View>
