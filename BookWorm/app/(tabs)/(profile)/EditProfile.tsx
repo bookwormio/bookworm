@@ -1,22 +1,76 @@
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useAuth } from "../../../components/auth/context";
-import { updateUserInfo } from "../../../services/firebase-services/queries";
+import {
+  fetchUserData,
+  updateUserInfo,
+} from "../../../services/firebase-services/queries";
 
 const EditProfile = () => {
   const { user } = useAuth();
-  const { phoneNumber, firstName, lastName } = useLocalSearchParams();
-  const [editPhone, setEditPhone] = useState<string>(
-    Array.isArray(phoneNumber) ? phoneNumber[0] ?? "" : phoneNumber ?? "",
-  );
-  const [editFirst, setEditFirst] = useState<string>(
-    Array.isArray(firstName) ? firstName[0] ?? "" : firstName ?? "",
-  );
-  const [editLast, setEditLast] = useState<string>(
-    Array.isArray(lastName) ? lastName[0] ?? "" : lastName ?? "",
-  );
+  const [editPhone, setEditPhone] = useState("");
+  const [editFirst, setEditFirst] = useState("");
+  const [editLast, setEditLast] = useState("");
 
+  const queryClient = useQueryClient();
+  const { mutateAsync: updateUserQuery } = useMutation({
+    mutationFn: updateUserInfo,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["userdata"] });
+    },
+  });
+  const { data: userData, isLoading: isLoadingUserData } = useQuery({
+    queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+    queryFn: async () => {
+      if (user != null) {
+        return await fetchUserData(user);
+      } else {
+        // Return default value when user is null
+        return {};
+      }
+    },
+  });
+
+  if (userData !== undefined) console.log(" wow ", userData);
+
+  useEffect(() => {
+    if (userData !== undefined) {
+      const userDataTyped = userData as UserData;
+      if (userDataTyped.first !== undefined) {
+        setEditFirst(userDataTyped.first);
+      }
+      if (userDataTyped.last !== undefined) {
+        setEditLast(userDataTyped.last);
+      }
+      if (userDataTyped.number !== undefined) {
+        setEditPhone(userDataTyped.number);
+      }
+    }
+  }, [userData]);
+
+  if (isLoadingUserData) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  const handleSave = async (userData: UserData) => {
+    await updateUserQuery(userData)
+      .then(() => {
+        router.back();
+      })
+      .catch((error) => {
+        console.error("Error updating user info:", error);
+        // Handle error here, e.g., show error message
+      });
+  };
   return (
     <View>
       <Button
@@ -64,18 +118,9 @@ const EditProfile = () => {
       </View>
       <Button
         title="Save"
-        onPress={() => {
-          if (user != null) {
-            updateUserInfo(user, editFirst, editLast, editPhone)
-              .then(() => {
-                router.back();
-              })
-              .catch((error) => {
-                console.error("Error updating user info:", error);
-                // Handle error here, e.g., show error message
-              });
-          } else {
-            console.error("User DNE");
+        onPress={async () => {
+          if (userData !== undefined) {
+            await handleSave(userData);
           }
         }}
       />

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { router, useNavigation } from "expo-router";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -9,152 +9,59 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
-import {
-  fetchFirstName,
-  fetchLastName,
-  fetchPhoneNumber,
-} from "../../../services/firebase-services/queries";
+import { fetchUserData } from "../../../services/firebase-services/queries";
 
 const Profile = () => {
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   const { signOut, user } = useAuth();
   const userStr: string = user?.email ?? "No email";
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [pageRefresh, setPageRefresh] = useState(false);
 
-  const [isLoadingF, setIsLoadingF] = useState(false);
-  const [isLoadingL, setIsLoadingL] = useState(false);
-  const [isLoadingN, setIsLoadingN] = useState(false);
-
-  const { data: firstNameData, isLoading: isLoadingFirst } = useQuery({
-    queryKey: user != null ? ["firstName", user.uid] : ["firstName"],
+  const { data: userData, isLoading: isLoadingUserData } = useQuery({
+    queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
     queryFn: async () => {
       if (user != null) {
-        return await fetchFirstName(user);
+        return await fetchUserData(user);
       } else {
         // Return default value when user is null
-        return "";
+        return {};
       }
     },
   });
 
-  if (firstNameData !== undefined) console.log(firstNameData);
-
-  const { data: lastNameData, isLoading: isLoadingLast } = useQuery({
-    queryKey: user != null ? ["lastName", user.uid] : ["lastName"],
-    queryFn: async () => {
-      if (user != null) {
-        return await fetchLastName(user);
-      } else {
-        // Return default value when user is null
-        return "";
-      }
-    },
-  });
-
-  if (lastNameData !== undefined) console.log(lastNameData);
-
-  const { data: numberData, isLoading: isLoadingNumber } = useQuery({
-    queryKey: user != null ? ["number", user.uid] : ["number"],
-    queryFn: async () => {
-      if (user != null) {
-        return await fetchPhoneNumber(user);
-      } else {
-        // Return default value when user is null
-        return "";
-      }
-    },
-  });
-
-  if (numberData !== undefined) console.log(numberData);
+  if (userData !== undefined) console.log(userData);
 
   useEffect(() => {
-    if (firstNameData !== undefined) {
-      setFirstName(firstNameData);
-    }
-
-    if (lastNameData !== undefined) {
-      setLastName(lastNameData);
-    }
-
-    if (numberData !== undefined) {
-      setPhoneNumber(numberData);
-    }
-  }, [firstNameData, lastNameData, numberData]);
-
-  useEffect(() => {
-    if (isLoadingFirst !== undefined) {
-      setIsLoadingF(isLoadingFirst);
-    }
-
-    if (isLoadingLast !== undefined) {
-      setIsLoadingL(isLoadingLast);
-    }
-
-    if (isLoadingNumber !== undefined) {
-      setIsLoadingN(isLoadingNumber);
-    }
-  }, [isLoadingFirst, isLoadingLast, isLoadingNumber]);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("state", (event) => {
-      const { data } = event;
-      if (
-        data.state.routeNames[data.state.routeNames.length - 1] ===
-          "EditProfile" &&
-        data.state.index === 0
-      ) {
-        setPageRefresh((pageRefresh) => !pageRefresh);
+    if (userData !== undefined) {
+      const userDataTyped = userData as UserData;
+      if (userDataTyped.first !== undefined) {
+        setFirstName(userDataTyped.first);
       }
-    });
-    return unsubscribe;
-  }, [navigation]);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        if (user != null) {
-          // const { data: firstData } = useQuery({
-          //   queryKey: ["firstName"],
-          //   queryFn: async () => await fetchFirstName(user),
-          // });
-          // first = firstData;
-          // setIsLoadingF(isLoadingFirst);
-          // const { data: lastData, isLoading: isLoadingLast } = useQuery({
-          //   queryKey: ["lastName", user.uid],
-          //   queryFn: async () => await fetchLastName(user),
-          // });
-          // last = lastData;
-          // setIsLoadingL(isLoadingLast);
-          // const { data: numberData, isLoading: isLoadingNumber } = useQuery({
-          //   queryKey: ["phoneNumber", user.uid],
-          //   queryFn: async () => await fetchPhoneNumber(user),
-          // });
-          // number = numberData;
-          // setIsLoadingN(isLoadingNumber);
-          // const firstName: string = await fetchFirstName(user);
-          // const lastName: string = await fetchLastName(user);
-          // const phoneNumber: string = await fetchPhoneNumber(user);
-          // setFirstName(first ?? "");
-          // setLastName(last);
-          // setPhoneNumber(number);
-        } else {
-          console.error("user DNE");
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      if (userDataTyped.last !== undefined) {
+        setLastName(userDataTyped.last);
       }
     }
-    fetchData().catch((error) => {
-      console.error("Error fetching first name:", error);
-    });
-  }, [pageRefresh]);
+  }, [userData]);
 
-  if (isLoadingF || isLoadingL || isLoadingN) {
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener("state", (event) => {
+  //     const { data } = event;
+  //     if (
+  //       data.state.routeNames[data.state.routeNames.length - 1] ===
+  //         "EditProfile" &&
+  //       data.state.index === 0
+  //     ) {
+  //       setPageRefresh((pageRefresh) => !pageRefresh);
+  //     }
+  //   });
+  //   return unsubscribe;
+  // }, [navigation]);
+
+  if (isLoadingUserData) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Profile Page</Text>
@@ -169,11 +76,6 @@ const Profile = () => {
           if (user != null) {
             router.push({
               pathname: "EditProfile",
-              params: {
-                phoneNumber,
-                firstName,
-                lastName,
-              },
             });
           } else {
             console.error("User DNE");

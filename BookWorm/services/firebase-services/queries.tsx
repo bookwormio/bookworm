@@ -12,94 +12,53 @@ import {
   where,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable } from "firebase/storage";
+import { useAuth } from "../../components/auth/context";
 import { BOOKS_API_KEY } from "../../constants/constants";
 import { DB, STORAGE } from "../../firebase.config";
 
-export async function updateUserInfo(
-  user: User,
-  firstName: string,
-  lastName: string,
-  phoneNumber: string,
-) {
-  try {
-    await updateDoc(doc(DB, "user_collection", user.uid), {
-      email: user.email,
-      first: firstName,
-      last: lastName,
-      number: phoneNumber,
-    });
-  } catch (error) {
-    alert(error);
-  }
-}
-
-// fetches user's first name
-// export async function fetchFirstName(user: User) {
+// export async function updateUserInfo(userData: UserData, user: User) {
 //   try {
-//     const userDocRef = doc(DB, "user_collection", user.uid);
-//     const userDocSnap = await getDoc(userDocRef);
-//     if (userDocSnap.exists()) {
-//       const userData = userDocSnap.data();
-//       return userData.first;
-//     } else {
-//       console.log("User document DNE");
-//       return "";
-//     }
+//     await updateDoc(doc(DB, "user_collection", user.uid), {
+//       email: userData.email,
+//       first: userData.first,
+//       last: userData.last,
+//       number: userData.number,
+//     });
 //   } catch (error) {
-//     console.error("Error fetching first name:", error);
-//     throw error;
+//     alert(error);
 //   }
 // }
 
-export const fetchFirstName = async (user: User): Promise<string> => {
+export const updateUserInfo = async (userData: UserData): Promise<void> => {
+  const { user } = useAuth();
   try {
-    const userDocRef = doc(DB, "user_collection", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData.first;
-    } else {
-      console.log("User document DNE");
-      return "";
+    if (user != null) {
+      await updateDoc(doc(DB, "user_collection", user.uid), {
+        email: userData.email,
+        first: userData.first,
+        last: userData.last,
+        number: userData.number,
+      });
     }
   } catch (error) {
-    console.error("Error fetching first name:", error);
+    alert(error);
     throw error;
   }
 };
 
-// fetches user's last name
-export const fetchLastName = async (user: User): Promise<string> => {
+export const fetchUserData = async (user: User): Promise<UserData> => {
   try {
     const userDocRef = doc(DB, "user_collection", user.uid);
     const userDocSnap = await getDoc(userDocRef);
     if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData.last;
+      const userData = userDocSnap.data() as UserData;
+      return userData;
     } else {
       console.error("User document DNE");
-      return "";
+      return { first: "", last: "", number: "", isPublic: false, email: "" };
     }
   } catch (error) {
-    console.error("Error fetching last name:", error);
-    throw error;
-  }
-};
-
-// fetches user's phone number
-export const fetchPhoneNumber = async (user: User): Promise<string> => {
-  try {
-    const userDocRef = doc(DB, "user_collection", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData.number;
-    } else {
-      console.error("User document DNE");
-      return "";
-    }
-  } catch (error) {
-    console.error("Error fetching phone number:", error);
+    console.error("Error fetching user data:", error);
     throw error;
   }
 };
