@@ -6,11 +6,12 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
   query,
   runTransaction,
   serverTimestamp,
   updateDoc,
-  where
+  where,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable } from "firebase/storage";
 import { BOOKS_API_KEY } from "../../constants/constants";
@@ -271,7 +272,11 @@ export async function getAllFollowers(userID: string): Promise<UserListItem[]> {
   return [];
 }
 
-// TODO: implement
+/**
+ * Retrieves a list of userIDs the current user is following.
+ * @param {string} userID - The ID of the user who's folowees are to be retrieved.
+ * @returns {Promise<string[]>} A promise that resolves to a list of strings storing the userID of each followee.
+ */
 export async function getAllFollowing(userID: string): Promise<string[]> {
   try {
     const relationshipQuery = query(
@@ -388,17 +393,24 @@ export async function fetchBookByVolumeID(
   }
 }
 
-// fetches all posts for a user from their users id
+/**
+ * Retrieves all posts for a user from their userID
+ * @param {string} userID - The ID of the user who's posts are to be retrieved.
+ * @returns {Promise<PostModel[]>} A promise that resolves to a list of PostModels,
+ * a typed entity for storing Firebase post documents.
+ */
 export async function fetchPostsByUserID(userID: string): Promise<PostModel[]> {
   try {
     const postsQuery = query(
       collection(DB, "posts"),
       where("user", "==", userID),
+      // TODO: unlock limit once we get insanely breaded and not worry about firebase fees
+      limit(10),
     );
     const postsData: PostModel[] = [];
     const postsSnapshot = await getDocs(postsQuery);
 
-    // Use Promise.all to wait for all fetchUser promises to resolve
+    // Uses Promise.all to wait for all fetchUser promises to resolve
     await Promise.all(
       postsSnapshot.docs.map(async (postDoc) => {
         const userID: string = postDoc.data().user;
@@ -430,27 +442,43 @@ export async function fetchPostsByUserID(userID: string): Promise<PostModel[]> {
   }
 }
 
-// fetches all posts for every user a user is following
+/**
+ * Retrieves posts for every user the provided user is following.
+ * Combines getAllFollowing(), fetchPostsByUserID(), and sortPostsByDate() functions.
+ * @param {string} userID - The ID of the user who's followees' posts are to be retrieved.
+ * @returns {Promise<PostModel[]>} A promise that resolves to a list of PostModels,
+ * a typed entity for storing Firebase post documents.
+ */
 export async function fetchPostsForUserFeed(
   userID: string,
 ): Promise<PostModel[]> {
   try {
-    const following = await getAllFollowing(userID);
     const posts: PostModel[] = [];
-    const getPosts = following.map(async (userFollowing) => {
-      const currentPosts = await fetchPostsByUserID(userFollowing);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      posts.push(...currentPosts);
-    });
-    await Promise.all(getPosts);
-    posts.sort((postA, postB) => {
-      const dateA = postA.created.toDate();
-      const dateB = postB.created.toDate();
-      return dateB.getTime() - dateA.getTime();
+    await runTransaction(DB, async () => {
+      const following = await getAllFollowing(userID);
+      const getPosts = following.map(async (userFollowing) => {
+        const currentPosts = await fetchPostsByUserID(userFollowing);
+        posts.push(...currentPosts);
+      });
+      await Promise.all(getPosts);
+      sortPostsByDate(posts);
     });
     return posts;
   } catch (error) {
     console.error("Error fetching users feed", error);
     return [];
   }
+}
+
+/**
+ * Sorts a list of PostModels by their dates descending.
+ * The sort() function mutates the posts list without needing to return a new list.
+ * @param {PostModel[]} posts - The list of posts to be sorted.
+ */
+function sortPostsByDate(posts: PostModel[]) {
+  posts.sort((postA, postB) => {
+    const dateA = postA.created.toDate();
+    const dateB = postB.created.toDate();
+    return dateB.getTime() - dateA.getTime();
+  });
 }
