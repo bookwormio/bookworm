@@ -395,15 +395,17 @@ export async function fetchBookByVolumeID(
 
 /**
  * Retrieves all posts for a user from their userID
- * @param {string} userID - The ID of the user who's posts are to be retrieved.
+ * @param {string} userIDs - The list of  userIDs who's posts are to be retrieved.
  * @returns {Promise<PostModel[]>} A promise that resolves to a list of PostModels,
  * a typed entity for storing Firebase post documents.
  */
-export async function fetchPostsByUserID(userID: string): Promise<PostModel[]> {
+export async function fetchPostsByUserIDs(
+  userIDs: string[],
+): Promise<PostModel[]> {
   try {
     const postsQuery = query(
       collection(DB, "posts"),
-      where("user", "==", userID),
+      where("user", "in", userIDs),
       // TODO: unlock limit once we get insanely breaded and not worry about firebase fees
       limit(10),
     );
@@ -453,13 +455,8 @@ export async function fetchPostsForUserFeed(
   userID: string,
 ): Promise<PostModel[]> {
   try {
-    const posts: PostModel[] = [];
     const following = await getAllFollowing(userID);
-    const getPosts = following.map(async (userFollowing) => {
-      const currentPosts = await fetchPostsByUserID(userFollowing);
-      posts.push(...currentPosts);
-    });
-    await Promise.all(getPosts);
+    const posts = await fetchPostsByUserIDs(following);
     sortPostsByDate(posts);
     return posts;
   } catch (error) {
