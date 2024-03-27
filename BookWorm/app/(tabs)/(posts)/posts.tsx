@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, ScrollView, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import Post from "../../../components/post/post";
 import { fetchPostsForUserFeed } from "../../../services/firebase-services/queries";
@@ -7,9 +13,12 @@ import { type PostModel } from "../../../types";
 
 const Posts = () => {
   const [posts, setPosts] = useState<PostModel[]>([]);
+  const [feedLoading, setFeedLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuth();
 
   const fetchPosts = async () => {
+    setFeedLoading(true);
     try {
       if (user != null) {
         const fetchedPosts = await fetchPostsForUserFeed(user.uid);
@@ -17,11 +26,20 @@ const Posts = () => {
       }
     } catch (error) {
       console.error("Error fetching posts", error);
+    } finally {
+      setFeedLoading(false);
     }
   };
 
-  const handleRefresh = () => {
-    void fetchPosts(); // Call fetchPosts to refresh posts
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchPosts()
+      .then(() => {
+        setRefreshing(false);
+      })
+      .catch((error) => {
+        console.log("Error refreshing posts" + error);
+      });
   };
 
   useEffect(() => {
@@ -30,11 +48,17 @@ const Posts = () => {
 
   return (
     <View style={styles.container}>
-      {/* TODO: Make this a swipe up to refresh */}
-      <Button title="Refresh" onPress={handleRefresh} />
+      {feedLoading && !refreshing && (
+        <View style={styles.feedLoading}>
+          <ActivityIndicator size="large" color="black" />
+        </View>
+      )}
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         {posts.map((post: PostModel, index: number) => (
           <View key={index}>
@@ -60,5 +84,11 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingRight: 16, // Adjusted padding to accommodate scroll bar
+  },
+  feedLoading: {
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: "50%",
   },
 });
