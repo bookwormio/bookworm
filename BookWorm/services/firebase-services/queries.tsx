@@ -454,15 +454,13 @@ export async function fetchPostsForUserFeed(
 ): Promise<PostModel[]> {
   try {
     const posts: PostModel[] = [];
-    await runTransaction(DB, async () => {
-      const following = await getAllFollowing(userID);
-      const getPosts = following.map(async (userFollowing) => {
-        const currentPosts = await fetchPostsByUserID(userFollowing);
-        posts.push(...currentPosts);
-      });
-      await Promise.all(getPosts);
-      sortPostsByDate(posts);
+    const following = await getAllFollowing(userID);
+    const getPosts = following.map(async (userFollowing) => {
+      const currentPosts = await fetchPostsByUserID(userFollowing);
+      posts.push(...currentPosts);
     });
+    await Promise.all(getPosts);
+    sortPostsByDate(posts);
     return posts;
   } catch (error) {
     console.error("Error fetching users feed", error);
