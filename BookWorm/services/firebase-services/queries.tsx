@@ -7,14 +7,14 @@ import {
   getDoc,
   getDocs,
   query,
+  runTransaction,
   serverTimestamp,
-  setDoc,
   updateDoc,
-  where,
+  where
 } from "firebase/firestore";
 import { ref, uploadBytesResumable } from "firebase/storage";
 import { BOOKS_API_KEY } from "../../constants/constants";
-import { FollowStatus } from "../../enums/Enums";
+import { ServerFollowStatus } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
   type BookVolumeInfo,
@@ -152,40 +152,59 @@ export async function createPost(
   }
 }
 
-// Follow or request to follow a user by their ID
-// Returns either "following", "not following" based on what happens
-// TODO: add private visibility down the line (follow request)
+/**
+ * Follows a user by updating the relationship document between the current user and the friend user.
+ * If the document doesn't exist, it creates a new one; otherwise, it updates the existing document.
+ * @param {string} currentUserID - The ID of the current user.
+ * @param {string} friendUserID - The ID of the user to follow.
+ * @returns {Promise<boolean>} A promise that resolves to true if the follow operation succeeds, false otherwise.
+ * @throws {Error} If there's an error during the operation.
+ * @TODO Add private visibility down the line (follow request).
+ */
 export async function followUserByID(
   currentUserID: string,
   friendUserID: string,
-): Promise<string> {
+): Promise<boolean> {
   if (currentUserID === "") {
     console.error("Current user ID is null");
-    return FollowStatus.NOT_FOLLOWING;
+    return false;
   }
   if (friendUserID === "") {
     console.error("Attempting to follow null user");
-    return FollowStatus.NOT_FOLLOWING;
+    return false;
   }
   try {
-    const docData = {
-      follower: currentUserID,
-      following: friendUserID,
-      created_at: serverTimestamp(),
-      follow_status: FollowStatus.FOLLOWING,
-    };
-    // TODO: only set created_at if this document doesn't already exist
-    // Otherwise set updated_at to the timestamp and keep created_at what it already is.
-    // Doc ID = currentUserID_followedUserID
-    await setDoc(
-      doc(DB, "relationships", `${currentUserID}_${friendUserID}`),
-      docData,
-    );
+    const docRef = doc(DB, "relationships", `${currentUserID}_${friendUserID}`);
 
-    return FollowStatus.FOLLOWING;
+    // A transaction is used to ensure data consistency
+    // and avoid race conditions by executing all operations on the server side.
+    await runTransaction(DB, async (transaction) => {
+      const docSnap = await transaction.get(docRef);
+      if (docSnap.exists()) {
+        // Document already exists, update it with merge
+        transaction.set(
+          docRef,
+          {
+            updated_at: serverTimestamp(),
+            follow_status: ServerFollowStatus.FOLLOWING,
+          },
+          { merge: true },
+        );
+      } else {
+        // Document doesn't exist, set it with created_at
+        transaction.set(docRef, {
+          follower: currentUserID,
+          following: friendUserID,
+          created_at: serverTimestamp(),
+          follow_status: ServerFollowStatus.FOLLOWING,
+        });
+      }
+    });
+
+    return true;
   } catch (error) {
     console.error("Error following user:", error);
-    return FollowStatus.NOT_FOLLOWING;
+    return false;
   }
 }
 
@@ -193,30 +212,30 @@ export async function followUserByID(
  * Unfollows a user by updating the follow status in the Firestore database.
  * @param {string} currentUserID - The ID of the current user.
  * @param {string} friendUserID - The ID of the user to unfollow.
- * @returns {Promise<string>} A promise that resolves to the follow status after unfollowing.
+ * @returns {Promise<boolean>} A promise that resolves to true if the unfollow operation succeeds, false otherwise.
  */
 export async function unfollowUserByID(
   currentUserID: string,
   friendUserID: string,
-): Promise<string> {
+): Promise<boolean> {
   if (currentUserID === "") {
     console.error("Current user ID is empty string");
-    return FollowStatus.FOLLOWING; // Error: return still following
+    return false;
   }
   if (friendUserID === "") {
     console.error("Attempting to unfollow empty user string");
-    return FollowStatus.FOLLOWING; // Error: return still following
+    return false;
   }
   try {
     const docRef = doc(DB, "relationships", `${currentUserID}_${friendUserID}`);
     await updateDoc(docRef, {
-      follow_status: FollowStatus.UNFOLLOWED,
+      follow_status: ServerFollowStatus.UNFOLLOWED,
       updated_at: serverTimestamp(), // Update the timestamp
     });
-    return FollowStatus.UNFOLLOWED;
+    return true;
   } catch (error) {
     console.error("Error unfollowing user:", error);
-    return FollowStatus.FOLLOWING; // Error: return still following
+    return false;
   }
 }
 
@@ -236,7 +255,7 @@ export async function getIsFollowing(
 
     if (docSnap.exists()) {
       const followStatus = docSnap.data()?.follow_status;
-      return followStatus === FollowStatus.FOLLOWING;
+      return followStatus === ServerFollowStatus.FOLLOWING;
     } else {
       return false; // Relationship document doesn't exist, not following
     }
@@ -329,8 +348,9 @@ export async function fetchBooksByTitleSearch(
         },
       },
     );
-    // TODO: remove
-    // console.log(response.data.items);
+    if (response?.data?.totalItems === 0) {
+      return [];
+    }
     return response.data.items.map((item) => ({
       kind: item.kind,
       id: item.id,
@@ -339,7 +359,6 @@ export async function fetchBooksByTitleSearch(
       volumeInfo: item.volumeInfo,
     }));
   } catch (error) {
-    // TODO: remove
     console.error("Error fetching books by title search", error);
     return [];
   }

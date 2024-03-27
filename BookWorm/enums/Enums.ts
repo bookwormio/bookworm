@@ -1,4 +1,4 @@
-export enum FollowStatus {
+export enum ServerFollowStatus {
   FOLLOWING = "following",
   NOT_FOLLOWING = "not following",
   REQUESTED = "requested",
