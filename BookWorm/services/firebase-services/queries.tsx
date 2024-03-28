@@ -445,6 +445,50 @@ export async function fetchPostsByUserIDs(
 }
 
 /**
+ * Retrieves a post by it's postID.
+ * @param {string} postID - The ID of the post to be retrieved.
+ * @returns {Promise<PostModel | null>} A promise that resolves to the PostModel if found.
+ */
+export async function fetchPostByPostID(
+  postID: string,
+): Promise<PostModel | null> {
+  try {
+    let post: PostModel | null = null;
+    const postRef = doc(DB, "posts", postID);
+    await runTransaction(DB, async (transaction) => {
+      const postSnap = await transaction.get(postRef);
+      if (postSnap.exists()) {
+        const userID: string = postSnap.data().user;
+        const userRef = doc(DB, "user_collection", userID);
+        const userSnap = await transaction.get(userRef);
+        if (userSnap.exists()) {
+          const user: UserModel = {
+            id: userSnap.id,
+            email: userSnap.data().email,
+            first: userSnap.data().first,
+            isPublic: userSnap.data().isPublic,
+            last: userSnap.data().last,
+            number: userSnap.data().number,
+          };
+          post = {
+            id: postSnap.id,
+            book: postSnap.data().book,
+            created: postSnap.data().created,
+            text: postSnap.data().text,
+            user,
+            images: null,
+          };
+        }
+      }
+    });
+    return post;
+  } catch (error) {
+    console.error("Error fetching users feed", error);
+    return null;
+  }
+}
+
+/**
  * Retrieves posts for every user the provided user is following.
  * Combines getAllFollowing(), fetchPostsByUserID(), and sortPostsByDate() functions.
  * @param {string} userID - The ID of the user who's followees' posts are to be retrieved.
