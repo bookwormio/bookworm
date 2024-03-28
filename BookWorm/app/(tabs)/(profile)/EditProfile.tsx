@@ -12,7 +12,7 @@ import {
 import { useAuth } from "../../../components/auth/context";
 import {
   newFetchUserInfo,
-  newUpdateUserInfo,
+  updateUser,
 } from "../../../services/firebase-services/queries";
 
 const EditProfile = () => {
@@ -23,18 +23,13 @@ const EditProfile = () => {
 
   const queryClient = useQueryClient();
 
-  const { mutateAsync: updateUserQuery } = useMutation({
+  const userMutation = useMutation({
     // TODO: there must be a better way to pass params into this but I couldn't crack it
-    mutationFn: async () => {
-      return await newUpdateUserInfo(
-        user != null ? user.uid : "",
-        editFirst,
-        editLast,
-        editPhone,
-      );
-    },
+    mutationFn: updateUser,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["userdata"] });
+      await queryClient.invalidateQueries({
+        queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+      });
     },
   });
 
@@ -49,8 +44,6 @@ const EditProfile = () => {
       }
     },
   });
-
-  if (userData !== undefined) console.log(" wow ", userData);
 
   useEffect(() => {
     if (userData !== undefined) {
@@ -70,18 +63,15 @@ const EditProfile = () => {
   const handeSaveClick = () => {
     const userId = user?.uid;
 
+    const newUserData = userData as UserData;
+    newUserData.first = editFirst;
+    newUserData.last = editLast;
+    newUserData.number = editPhone;
     if (userId === undefined) {
       console.error("Current user undefined");
     } else {
-      updateUserQuery()
-        .then(() => {
-          console.log("Updated user data: ", userId);
-          router.back();
-        })
-        .catch((error) => {
-          console.error("Error updating user data: ", error);
-          router.back();
-        });
+      userMutation.mutate(newUserData);
+      router.back();
     }
   };
 

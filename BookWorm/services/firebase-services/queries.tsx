@@ -12,7 +12,6 @@ import {
   where,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable } from "firebase/storage";
-import { useAuth } from "../../components/auth/context";
 import { BOOKS_API_KEY } from "../../constants/constants";
 import { DB, STORAGE } from "../../firebase.config";
 
@@ -41,36 +40,70 @@ import { DB, STORAGE } from "../../firebase.config";
  * If any of the fields are empty, the function does not update the corresponding fields in Firestore.
  * Otherwise, it updates the Firestore document with the provided user information.
  */
-export async function newUpdateUserInfo(
-  userID: string,
-  newFirst: string,
-  newLast: string,
-  newPhone: string,
-): Promise<boolean> {
-  console.log("in Update here: ", newFirst, newLast, newPhone);
+// export async function newUpdateUserInfo(
+//   userID: string,
+//   newFirst: string,
+//   newLast: string,
+//   newPhone: string,
+// ): Promise<boolean> {
+//   console.log("in Update here: ", newFirst, newLast, newPhone);
+//   try {
+//     // Check if any of the fields are empty
+//     if (newFirst === "" && newLast === "" && newPhone === "") {
+//       return false; // If all fields are empty, return false indicating no update
+//     }
+//     const dataToUpdate: Record<string, string> = {};
+//     if (newFirst !== "") {
+//       dataToUpdate.first = newFirst;
+//     }
+//     if (newLast !== "") {
+//       dataToUpdate.last = newLast;
+//     }
+//     if (newPhone !== "") {
+//       dataToUpdate.number = newPhone;
+//     }
+//     console.log("in Update: ", dataToUpdate);
+//     await updateDoc(doc(DB, "user_collection", userID), dataToUpdate);
+//     return true;
+//   } catch (error) {
+//     console.error("Error updating user", error);
+//     return false;
+//   }
+// }
+
+export const updateUser = async (userdata: UserData): Promise<void> => {
+  console.log(
+    "in Update here: ",
+    userdata.first,
+    userdata.last,
+    userdata.number,
+    userdata.id,
+    userdata.email,
+  );
   try {
-    // Check if any of the fields are empty
-    if (newFirst === "" && newLast === "" && newPhone === "") {
-      return false; // If all fields are empty, return false indicating no update
+    if (
+      userdata.first !== "" &&
+      userdata.last !== "" &&
+      userdata.number !== ""
+    ) {
+      // Check if any of the fields are empty
+      const dataToUpdate: Record<string, string> = {};
+      if (userdata.first !== "" && userdata.first !== undefined) {
+        dataToUpdate.first = userdata.first;
+      }
+      if (userdata.last !== "" && userdata.last !== undefined) {
+        dataToUpdate.last = userdata.last;
+      }
+      if (userdata.number !== "" && userdata.number !== undefined) {
+        dataToUpdate.number = userdata.number;
+      }
+      console.log("in Update: ", dataToUpdate);
+      await updateDoc(doc(DB, "user_collection", userdata.id), dataToUpdate);
     }
-    const dataToUpdate: Record<string, string> = {};
-    if (newFirst !== "") {
-      dataToUpdate.first = newFirst;
-    }
-    if (newLast !== "") {
-      dataToUpdate.last = newLast;
-    }
-    if (newPhone !== "") {
-      dataToUpdate.number = newPhone;
-    }
-    console.log("in Update: ", dataToUpdate);
-    await updateDoc(doc(DB, "user_collection", userID), dataToUpdate);
-    return true;
   } catch (error) {
     console.error("Error updating user", error);
-    return false;
   }
-}
+};
 
 /**
  * Fetches user information from the Firestore database.
@@ -86,12 +119,16 @@ export async function newFetchUserInfo(
   userID: string,
 ): Promise<UserData | undefined> {
   try {
+    console.log("fetching user info");
     const userDocRef = doc(DB, "user_collection", userID);
     const userDocSnapshot = await getDoc(userDocRef);
 
     if (userDocSnapshot.exists()) {
+      console.log("exists");
       const userData = userDocSnapshot.data();
       if (userData !== undefined) {
+        console.log("returning this data");
+        console.log(userData);
         return {
           id: userID,
           email: userData.email ?? "",
@@ -102,6 +139,7 @@ export async function newFetchUserInfo(
         };
       }
     }
+    console.log("doesnt exist");
 
     return undefined; // User document doesn't exist or data is missing
   } catch (error) {
@@ -109,23 +147,6 @@ export async function newFetchUserInfo(
     return undefined; // Return undefined on error
   }
 }
-
-export const updateUserInfo = async (userData: UserData): Promise<void> => {
-  const { user } = useAuth();
-  try {
-    if (user != null) {
-      await updateDoc(doc(DB, "user_collection", user.uid), {
-        email: userData.email,
-        first: userData.first,
-        last: userData.last,
-        number: userData.number,
-      });
-    }
-  } catch (error) {
-    alert(error);
-    throw error;
-  }
-};
 
 export const fetchUserData = async (user: User): Promise<UserData> => {
   try {
@@ -136,7 +157,14 @@ export const fetchUserData = async (user: User): Promise<UserData> => {
       return userData;
     } else {
       console.error("User document DNE");
-      return { first: "", last: "", number: "", isPublic: false, email: "" };
+      return {
+        id: user.uid,
+        first: "",
+        last: "",
+        number: "",
+        isPublic: false,
+        email: "",
+      };
     }
   } catch (error) {
     console.error("Error fetching user data:", error);

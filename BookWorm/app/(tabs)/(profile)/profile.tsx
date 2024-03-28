@@ -30,8 +30,6 @@ const Profile = () => {
     },
   });
 
-  if (userData !== undefined) console.log(userData);
-
   useEffect(() => {
     if (userData !== undefined) {
       const userDataTyped = userData as UserData;
