@@ -4,6 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
 import { fetchUsersBySearch } from "../../services/firebase-services/queries";
 import SearchBar from "./searchbar";
+import { type UserListItem } from "../../types";
 
 const USER_SEARCH_PLACEHOLDER = "Search for users";
 

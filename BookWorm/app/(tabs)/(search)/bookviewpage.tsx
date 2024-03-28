@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import RenderHtml from "react-native-render-html";
 import { fetchBookByVolumeID } from "../../../services/firebase-services/queries";
+import { type BookVolumeInfo } from "../../../types";
 
 const BookViewPage = () => {
   const [bookData, setBookData] = useState<BookVolumeInfo | null>(null);

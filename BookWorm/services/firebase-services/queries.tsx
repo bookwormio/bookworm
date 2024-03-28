@@ -6,6 +6,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
   query,
   runTransaction,
   serverTimestamp,
@@ -16,6 +17,14 @@ import { ref, uploadBytesResumable } from "firebase/storage";
 import { BOOKS_API_KEY } from "../../constants/constants";
 import { ServerFollowStatus } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
+import {
+  type BookVolumeInfo,
+  type BookVolumeItem,
+  type BooksResponse,
+  type PostModel,
+  type UserListItem,
+  type UserModel,
+} from "../../types";
 
 export async function updateUserInfo(
   user: User,
@@ -32,6 +41,30 @@ export async function updateUserInfo(
     });
   } catch (error) {
     alert(error);
+  }
+}
+
+// fetches all user traits
+export async function fetchUser(userID: string): Promise<UserModel | null> {
+  try {
+    const userDocRef = doc(DB, "user_collection", userID);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const user: UserModel = {
+        id: userDocSnap.id,
+        email: userDocSnap.data().email,
+        first: userDocSnap.data().first,
+        isPublic: userDocSnap.data().isPublic,
+        last: userDocSnap.data().last,
+        number: userDocSnap.data().number,
+      };
+      return user;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
   }
 }
 
@@ -101,6 +134,7 @@ export async function createPost(
       created: serverTimestamp(),
       book,
       text,
+      image: imageURI !== "",
     })
       .then(async (docRef) => {
         if (imageURI !== "") {
@@ -238,10 +272,29 @@ export async function getAllFollowers(userID: string): Promise<UserListItem[]> {
   return [];
 }
 
-// TODO: implement
-export async function getAllFollowing(userID: string): Promise<UserListItem[]> {
-  // TODO: return all users this user is following
-  return [];
+/**
+ * Retrieves a list of userIDs the current user is following.
+ * @param {string} userID - The ID of the user who's folowees are to be retrieved.
+ * @returns {Promise<string[]>} A promise that resolves to a list of strings storing the userID of each followee.
+ */
+export async function getAllFollowing(userID: string): Promise<string[]> {
+  try {
+    const relationshipQuery = query(
+      collection(DB, "relationships"),
+      where("follower", "==", userID),
+      where("follow_status", "==", "following"),
+    );
+    const relationsData: string[] = [];
+    const relationshipSnapshot = await getDocs(relationshipQuery);
+    relationshipSnapshot.forEach((relationshipDoc) => {
+      const followingUserID: string = relationshipDoc.data().following;
+      relationsData.push(followingUserID);
+    });
+    return relationsData;
+  } catch (error) {
+    console.error("Error searching for users you follow: ", error);
+    return [];
+  }
 }
 
 // TODO: sort this with following users at the top
@@ -338,4 +391,89 @@ export async function fetchBookByVolumeID(
     console.error("Error fetching book by volume id", error);
     return null;
   }
+}
+
+/**
+ * Retrieves all posts for a user from their userID
+ * @param {string} userIDs - The list of  userIDs who's posts are to be retrieved.
+ * @returns {Promise<PostModel[]>} A promise that resolves to a list of PostModels,
+ * a typed entity for storing Firebase post documents.
+ */
+export async function fetchPostsByUserIDs(
+  userIDs: string[],
+): Promise<PostModel[]> {
+  try {
+    const postsQuery = query(
+      collection(DB, "posts"),
+      where("user", "in", userIDs),
+      // TODO: unlock limit once we get insanely breaded and not worry about firebase fees
+      limit(10),
+    );
+    const postsData: PostModel[] = [];
+    const postsSnapshot = await getDocs(postsQuery);
+
+    // Uses Promise.all to wait for all fetchUser promises to resolve
+    await Promise.all(
+      postsSnapshot.docs.map(async (postDoc) => {
+        const userID: string = postDoc.data().user;
+        try {
+          const user = await fetchUser(userID);
+          if (user != null) {
+            const post = {
+              id: postDoc.id,
+              book: postDoc.data().book,
+              created: postDoc.data().created,
+              text: postDoc.data().text,
+              user,
+              images:
+                postDoc.data().image === true
+                  ? ["posts/" + userID + "/" + postDoc.id]
+                  : [],
+            };
+            postsData.push(post);
+          }
+        } catch (error) {
+          console.error("Error fetching user", error);
+        }
+      }),
+    );
+    return postsData;
+  } catch (error) {
+    console.error("Error fetching posts by User ID", error);
+    return [];
+  }
+}
+
+/**
+ * Retrieves posts for every user the provided user is following.
+ * Combines getAllFollowing(), fetchPostsByUserID(), and sortPostsByDate() functions.
+ * @param {string} userID - The ID of the user who's followees' posts are to be retrieved.
+ * @returns {Promise<PostModel[]>} A promise that resolves to a list of PostModels,
+ * a typed entity for storing Firebase post documents.
+ */
+export async function fetchPostsForUserFeed(
+  userID: string,
+): Promise<PostModel[]> {
+  try {
+    const following = await getAllFollowing(userID);
+    const posts = await fetchPostsByUserIDs(following);
+    sortPostsByDate(posts);
+    return posts;
+  } catch (error) {
+    console.error("Error fetching users feed", error);
+    return [];
+  }
+}
+
+/**
+ * Sorts a list of PostModels by their dates descending.
+ * The sort() function mutates the posts list without needing to return a new list.
+ * @param {PostModel[]} posts - The list of posts to be sorted.
+ */
+function sortPostsByDate(posts: PostModel[]) {
+  posts.sort((postA, postB) => {
+    const dateA = postA.created.toDate();
+    const dateB = postB.created.toDate();
+    return dateB.getTime() - dateA.getTime();
+  });
 }
