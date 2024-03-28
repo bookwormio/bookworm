@@ -15,6 +15,27 @@ import { ref, uploadBytesResumable } from "firebase/storage";
 import { BOOKS_API_KEY } from "../../constants/constants";
 import { DB, STORAGE } from "../../firebase.config";
 
+export async function addDataEntry(user: User, time: Date, pages: number) {
+  try {
+    await addDoc(
+      collection(
+        DB,
+        "user_collection",
+        user.uid,
+        "data",
+        "pages_read",
+        "entry",
+      ),
+      {
+        timestamp: time,
+        pages,
+      },
+    );
+  } catch (error) {
+    alert(error);
+  }
+}
+
 export async function updateUserInfo(
   user: User,
   firstName: string,

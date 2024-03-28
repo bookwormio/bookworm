@@ -1,8 +1,9 @@
 import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import {
+  addDataEntry,
   fetchFirstName,
   fetchLastName,
   fetchPhoneNumber,
@@ -15,7 +16,27 @@ const Profile = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [pageRefresh, setPageRefresh] = useState(false);
+  const [pageRefresh, setPageRefresh] = useState<boolean>(false);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [pages, setPages] = useState<string>("");
+
+  const handleAddEntry = () => {
+    const currentDate = new Date();
+    const pagesInt = parseInt(pages); // Get current date in YYYY-MM-DD format
+    if (user != null) {
+      addDataEntry(user, currentDate, pagesInt)
+        .then(() => {
+          router.back();
+        })
+        .catch((error) => {
+          console.error("Error adding entry:", error);
+          // Handle error here, e.g., show error message
+        });
+    } else {
+      console.error("User DNE");
+    }
+    setIsModalVisible(false);
+  };
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("state", (event) => {
@@ -79,6 +100,40 @@ const Profile = () => {
           }
         }}
       />
+      <Button
+        title="Add Entry"
+        onPress={() => {
+          setIsModalVisible(true);
+        }}
+      />
+      <Modal visible={isModalVisible} animationType="slide">
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text>Enter Pages:</Text>
+          <TextInput
+            style={{
+              borderWidth: 1,
+              borderColor: "gray",
+              padding: 10,
+              marginBottom: 20,
+            }}
+            placeholder="Enter pages"
+            onChangeText={(text) => {
+              setPages(text);
+            }}
+            value={pages}
+          />
+          <Button title="Add" onPress={handleAddEntry} />
+          <Button
+            title="Cancel"
+            onPress={() => {
+              setPages("");
+              setIsModalVisible(false);
+            }}
+          />
+        </View>
+      </Modal>
     </View>
   );
 };
