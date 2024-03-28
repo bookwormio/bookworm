@@ -6,7 +6,7 @@ import {
   addDataEntry,
   fetchFirstName,
   fetchLastName,
-  fetchPhoneNumber,
+  fetchPhoneNumber
 } from "../../../services/firebase-services/queries";
 
 const Profile = () => {

@@ -1,3 +1,4 @@
+import { type Timestamp } from "@google-cloud/firestore";
 import axios from "axios";
 import { type User } from "firebase/auth";
 import {
@@ -8,6 +9,7 @@ import {
   getDocs,
   query,
   serverTimestamp,
+  setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -17,20 +19,32 @@ import { DB, STORAGE } from "../../firebase.config";
 
 export async function addDataEntry(user: User, time: Date, pages: number) {
   try {
-    await addDoc(
-      collection(
-        DB,
-        "user_collection",
-        user.uid,
-        "data",
-        "pages_read",
-        "entry",
-      ),
-      {
-        timestamp: time,
-        pages,
-      },
+    const q = query(
+      collection(DB, "data_collection"),
+      where("user_id", "==", user.uid),
     );
+    const dataCol = await getDocs(q);
+
+    if (dataCol.empty) {
+      // The collection doesn't exist for the user, so create it
+      const userDataCollectionRef = collection(DB, "data_collection");
+      const userDataDocRef = doc(userDataCollectionRef);
+      await setDoc(userDataDocRef, { user_id: user.uid });
+      const newDocRef = await getDoc(userDataDocRef);
+      // console.log(newDocRef);
+      const subColRef = collection(newDocRef.ref, "pages_read");
+      await addDoc(subColRef, {
+        added_at: time,
+        pages,
+      });
+    } else {
+      // console.log(dataCol.docs[0].ref);
+      const subColRef = collection(dataCol.docs[0].ref, "pages_read");
+      await addDoc(subColRef, {
+        added_at: time,
+        pages,
+      });
+    }
   } catch (error) {
     alert(error);
   }
@@ -137,7 +151,34 @@ export async function createPost(
       });
   }
 }
+// fetches user's data
+export async function fetchPagesRead(user: User) {
+  try {
+    const q = query(
+      collection(DB, "data_collection"),
+      where("user_id", "==", user.uid),
+    );
+    const querySnapshot = await getDocs(q);
+    const dataPoints: Array<{ x: Timestamp; y: number }> = [];
+    // Add each user data to the array
+    for (const doc of querySnapshot.docs) {
+      const subcollectionRef = collection(doc.ref, "pages_read");
+      const subcollectionSnapshot = await getDocs(subcollectionRef);
 
+      // Iterate over each document in the subcollection
+      subcollectionSnapshot.forEach((subDoc) => {
+        dataPoints.push({
+          x: doc.data().added_at,
+          y: doc.data().pages,
+        });
+      });
+    }
+    return dataPoints;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
+  }
+}
 // Function to fetch users based on the search phrase
 export async function fetchUsersBySearch(
   searchValue: string,
