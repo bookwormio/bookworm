@@ -22,9 +22,109 @@ import {
   type BookVolumeItem,
   type BooksResponse,
   type PostModel,
+  type UserData,
   type UserListItem,
   type UserModel,
 } from "../../types";
+
+/**
+ * Updates user data in the database.
+ * @param {UserData} userdata - The user data to update.
+ * @returns {Promise<void>} A promise that resolves when the update is complete.
+ * @description
+ * If all fields are empty, the function does nothing.
+ * If any of the fields are empty, the function does not update the corresponding fields in Firestore.
+ * Otherwise, it updates the Firestore document with the provided user information.
+ */
+
+export const updateUser = async (userdata: UserData): Promise<void> => {
+  console.log(userdata);
+  try {
+    if (
+      userdata.first !== "" &&
+      userdata.last !== "" &&
+      userdata.number !== ""
+    ) {
+      // Check if any of the fields are empty
+      const dataToUpdate: Record<string, string> = {};
+      if (userdata.first !== "" && userdata.first !== undefined) {
+        dataToUpdate.first = userdata.first;
+      }
+      if (userdata.last !== "" && userdata.last !== undefined) {
+        dataToUpdate.last = userdata.last;
+      }
+      if (userdata.number !== "" && userdata.number !== undefined) {
+        dataToUpdate.number = userdata.number;
+      }
+      await updateDoc(doc(DB, "user_collection", userdata.id), dataToUpdate);
+    }
+  } catch (error) {
+    console.error("Error updating user", error);
+  }
+};
+
+/**
+ * Fetches user information from the Firestore database.
+ * @param {string} userID - The ID of the user to fetch information for.
+ * @returns {Promise<UserData | undefined>} A Promise that resolves to the user data if found, otherwise undefined.
+ * @throws {Error} If there is an error while fetching the user information.
+ * @description
+ * Retrieves user information from the Firestore database based on the provided user ID.
+ * If the user document exists, it returns an object containing the user data.
+ * If the user document doesn't exist or if data is missing, it returns undefined.
+ */
+export async function newFetchUserInfo(
+  userID: string,
+): Promise<UserData | undefined> {
+  try {
+    const userDocRef = doc(DB, "user_collection", userID);
+    const userDocSnapshot = await getDoc(userDocRef);
+
+    if (userDocSnapshot.exists()) {
+      const userData = userDocSnapshot.data();
+      if (userData !== undefined) {
+        return {
+          id: userID,
+          email: userData.email ?? "",
+          first: userData.first ?? "",
+          isPublic: userData.isPublic ?? false,
+          last: userData.last ?? "",
+          number: userData.number ?? "",
+        };
+      }
+    }
+    console.error("doesnt exist");
+
+    return undefined; // User document doesn't exist or data is missing
+  } catch (error) {
+    console.error("Error fetching user information:", error);
+    return undefined; // Return undefined on error
+  }
+}
+
+export const fetchUserData = async (user: User): Promise<UserData> => {
+  try {
+    const userDocRef = doc(DB, "user_collection", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data() as UserData;
+      return userData;
+    } else {
+      console.error("User document DNE");
+      return {
+        id: user.uid,
+        first: "",
+        last: "",
+        number: "",
+        isPublic: false,
+        email: "",
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    throw error;
+  }
+};
 
 export async function updateUserInfo(
   user: User,
@@ -77,7 +177,7 @@ export async function fetchFirstName(user: User) {
       const userData = userDocSnap.data();
       return userData.first;
     } else {
-      console.log("User document DNE");
+      console.error("User document DNE");
       return "";
     }
   } catch (error) {
