@@ -71,6 +71,7 @@ const EditProfile = () => {
     if (userId === undefined) {
       console.error("Current user undefined");
     } else {
+      newUserData.id = userId;
       userMutation.mutate(newUserData);
       router.back();
     }
