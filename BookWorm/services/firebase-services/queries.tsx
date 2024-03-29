@@ -15,19 +15,6 @@ import { ref, uploadBytesResumable } from "firebase/storage";
 import { BOOKS_API_KEY } from "../../constants/constants";
 import { DB, STORAGE } from "../../firebase.config";
 
-// export async function updateUserInfo(userData: UserData, user: User) {
-//   try {
-//     await updateDoc(doc(DB, "user_collection", user.uid), {
-//       email: userData.email,
-//       first: userData.first,
-//       last: userData.last,
-//       number: userData.number,
-//     });
-//   } catch (error) {
-//     alert(error);
-//   }
-// }
-
 /**
  * Updates user information in the Firestore database.
  * @param {string} userID - The ID of the user to update.
@@ -40,36 +27,6 @@ import { DB, STORAGE } from "../../firebase.config";
  * If any of the fields are empty, the function does not update the corresponding fields in Firestore.
  * Otherwise, it updates the Firestore document with the provided user information.
  */
-// export async function newUpdateUserInfo(
-//   userID: string,
-//   newFirst: string,
-//   newLast: string,
-//   newPhone: string,
-// ): Promise<boolean> {
-//   console.log("in Update here: ", newFirst, newLast, newPhone);
-//   try {
-//     // Check if any of the fields are empty
-//     if (newFirst === "" && newLast === "" && newPhone === "") {
-//       return false; // If all fields are empty, return false indicating no update
-//     }
-//     const dataToUpdate: Record<string, string> = {};
-//     if (newFirst !== "") {
-//       dataToUpdate.first = newFirst;
-//     }
-//     if (newLast !== "") {
-//       dataToUpdate.last = newLast;
-//     }
-//     if (newPhone !== "") {
-//       dataToUpdate.number = newPhone;
-//     }
-//     console.log("in Update: ", dataToUpdate);
-//     await updateDoc(doc(DB, "user_collection", userID), dataToUpdate);
-//     return true;
-//   } catch (error) {
-//     console.error("Error updating user", error);
-//     return false;
-//   }
-// }
 
 export const updateUser = async (userdata: UserData): Promise<void> => {
   console.log(
