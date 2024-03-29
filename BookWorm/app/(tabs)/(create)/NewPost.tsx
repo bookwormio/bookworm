@@ -1,34 +1,72 @@
+import { FontAwesome5 } from "@expo/vector-icons";
 import { Slider } from "@miblanchard/react-native-slider";
-import { type SliderOnChangeCallback } from "@miblanchard/react-native-slider/lib/types";
 import * as ImagePicker from "expo-image-picker";
-import { router } from "expo-router";
-import React, { useState } from "react";
-import { Button, Image, StyleSheet, TextInput, View } from "react-native";
+import React, { useRef, useState } from "react";
+import {
+  Animated,
+  Button,
+  Image,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import SliderThumb from "../../../components/createpost/SliderThumb";
-import { createPost } from "../../../services/firebase-services/queries";
 
 const NewPost = () => {
   const { user } = useAuth();
   const [book, setBook] = useState("");
+  const [minutesRead, setMinutesRead] = useState(0);
+  const [pagesRead, setPagesRead] = useState("");
   const [text, setText] = useState("");
   const [image, setImage] = useState("");
-  const [minutesRead, setMinutesRead] = useState(0);
-
-  // weird slider onChange notation
-  const onSliderChange: SliderOnChangeCallback = (value: number[]) => {
-    setMinutesRead(value[0]);
-  };
+  const [creatingPost, setCreatedPost] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
   const pickImageAsync = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       quality: 1,
     });
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
+  };
+
+  const onPostButtonPress = () => {
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        delay: 250,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    setCreatedPost(true);
+  };
+
+  const onRemovePostButtonPress = () => {
+    setCreatedPost(false);
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
 
   return (
@@ -41,52 +79,76 @@ const NewPost = () => {
           setBook(book);
         }}
       />
-      <Slider
-        containerStyle={styles.sliderContainer}
-        value={minutesRead}
-        onValueChange={onSliderChange}
-        minimumValue={0}
-        maximumValue={180}
-        renderThumbComponent={() => <SliderThumb minutesRead={minutesRead} />}
-        step={1}
-      />
-      <TextInput
-        style={styles.input}
-        value={text}
-        placeholder="Some post text"
-        onChangeText={(text) => {
-          setText(text);
-        }}
-      />
-      <Button
-        title="Choose a photo"
-        onPress={() => {
-          pickImageAsync().catch((error) => {
-            console.log(error);
-          });
-        }}
-      />
-      <Button
-        title="Take a photo"
-        onPress={() => {
-          router.push("CameraView");
-        }}
-      />
-      {image !== "" && (
-        <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
-      )}
-      <Button
-        title="Create Post"
-        onPress={() => {
-          createPost(user, book, text, image)
-            .then(() => {
-              router.back();
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        }}
-      />
+      <View style={styles.rowContainer}>
+        <Slider
+          containerStyle={styles.sliderContainer}
+          value={minutesRead}
+          onValueChange={(value) => {
+            setMinutesRead(value[0]);
+          }}
+          minimumValue={0}
+          maximumValue={240}
+          renderThumbComponent={() => <SliderThumb minutesRead={minutesRead} />}
+          step={5}
+        />
+        <TextInput
+          style={styles.pagesInput}
+          value={pagesRead}
+          keyboardType="numeric"
+          placeholder="Pages Read"
+          onChangeText={(pages) => {
+            setPagesRead(pages);
+          }}
+        />
+      </View>
+
+      <Animated.View
+        style={[
+          styles.rowContainer,
+          {
+            transform: [
+              {
+                translateY: slideAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 400],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
+        <Button
+          title={creatingPost ? "Remove Post" : "Add Tracking"}
+          onPress={() => {
+            if (creatingPost) {
+              onRemovePostButtonPress();
+            }
+          }}
+        />
+        <Button
+          title={creatingPost ? "Create Post + Tracking" : "Create Post"}
+          onPress={onPostButtonPress}
+        />
+      </Animated.View>
+      <Animated.View style={{ opacity: fadeAnim, width: "100%" }}>
+        <TextInput
+          style={[styles.input, { height: "25%" }]}
+          multiline={true}
+          value={text}
+          placeholder="Add some text to your post"
+          onChangeText={(text) => {
+            setText(text);
+          }}
+        />
+        <ScrollView horizontal={true} style={{ marginTop: 20 }}>
+          <TouchableOpacity style={styles.defaultImage}>
+            <FontAwesome5 name="image" size={20} />
+          </TouchableOpacity>
+        </ScrollView>
+        {image !== "" && (
+          <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
+        )}
+      </Animated.View>
     </View>
   );
 };
@@ -97,11 +159,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    paddingHorizontal: 40,
+    paddingHorizontal: 20,
     justifyContent: "center",
   },
   sliderContainer: {
-    width: "85%",
+    width: "70%",
     height: 20,
     alignSelf: "flex-start",
     paddingVertical: 30,
@@ -112,5 +174,28 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
+  },
+  rowContainer: {
+    flexDirection: "row",
+    alignItems: "center", // Align items vertically in the center
+    justifyContent: "space-between",
+  },
+  pagesInput: {
+    borderColor: "gray",
+    width: "27%",
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    marginLeft: "3%",
+  },
+  defaultImage: {
+    backgroundColor: "#d3d3d3",
+    height: 100,
+    width: 100,
+    borderColor: "black",
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

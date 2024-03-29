@@ -24,10 +24,11 @@ export default SliderThumb;
 export const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    backgroundColor: "grey",
+    backgroundColor: "white",
     justifyContent: "center",
-    height: 30,
-    paddingHorizontal: 10,
-    borderRadius: 5,
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    borderColor: "grey",
   },
 });
