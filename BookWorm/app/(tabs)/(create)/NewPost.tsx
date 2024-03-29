@@ -1,8 +1,11 @@
+import { Slider } from "@miblanchard/react-native-slider";
+import { type SliderOnChangeCallback } from "@miblanchard/react-native-slider/lib/types";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Button, Image, StyleSheet, TextInput, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
+import SliderThumb from "../../../components/createpost/SliderThumb";
 import { createPost } from "../../../services/firebase-services/queries";
 
 const NewPost = () => {
@@ -10,6 +13,13 @@ const NewPost = () => {
   const [book, setBook] = useState("");
   const [text, setText] = useState("");
   const [image, setImage] = useState("");
+  const [minutesRead, setMinutesRead] = useState(0);
+
+  // weird slider onChange notation
+  const onSliderChange: SliderOnChangeCallback = (value: number[]) => {
+    setMinutesRead(value[0]);
+  };
+
   const pickImageAsync = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -30,6 +40,15 @@ const NewPost = () => {
         onChangeText={(book) => {
           setBook(book);
         }}
+      />
+      <Slider
+        containerStyle={styles.sliderContainer}
+        value={minutesRead}
+        onValueChange={onSliderChange}
+        minimumValue={0}
+        maximumValue={180}
+        renderThumbComponent={() => <SliderThumb minutesRead={minutesRead} />}
+        step={1}
       />
       <TextInput
         style={styles.input}
@@ -72,18 +91,20 @@ const NewPost = () => {
   );
 };
 
+export default NewPost;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: 40,
+    paddingHorizontal: 40,
     justifyContent: "center",
   },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
+  sliderContainer: {
+    width: "85%",
+    height: 20,
+    alignSelf: "flex-start",
+    paddingVertical: 30,
   },
   input: {
     borderColor: "gray",
@@ -92,13 +113,4 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
   },
-  title: {
-    fontSize: 64,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
-  },
 });
-export default NewPost;
