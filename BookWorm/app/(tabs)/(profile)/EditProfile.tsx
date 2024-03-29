@@ -25,7 +25,6 @@ const EditProfile = () => {
   const queryClient = useQueryClient();
 
   const userMutation = useMutation({
-    // TODO: there must be a better way to pass params into this but I couldn't crack it
     mutationFn: updateUser,
     onSuccess: async () => {
       await queryClient.invalidateQueries({

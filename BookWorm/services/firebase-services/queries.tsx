@@ -28,12 +28,9 @@ import {
 } from "../../types";
 
 /**
- * Updates user information in the Firestore database.
- * @param {string} userID - The ID of the user to update.
- * @param {string} [newFirst] - The new first name of the user (optional).
- * @param {string} [newLast] - The new last name of the user (optional).
- * @param {string} [newPhone] - The new phone number of the user (optional).
- * @returns {Promise<boolean>} - A Promise that resolves to a boolean indicating whether the update succeeded.
+ * Updates user data in the database.
+ * @param {UserData} userdata - The user data to update.
+ * @returns {Promise<void>} A promise that resolves when the update is complete.
  * @description
  * If all fields are empty, the function does nothing.
  * If any of the fields are empty, the function does not update the corresponding fields in Firestore.
@@ -41,6 +38,7 @@ import {
  */
 
 export const updateUser = async (userdata: UserData): Promise<void> => {
+  console.log(userdata);
   try {
     if (
       userdata.first !== "" &&
