@@ -21,7 +21,7 @@ const NewPost = () => {
   const [minutesRead, setMinutesRead] = useState(0);
   const [pagesRead, setPagesRead] = useState("");
   const [text, setText] = useState("");
-  const [image, setImage] = useState("");
+  const [images, setImages] = useState<string[]>([]);
   const [creatingPost, setCreatedPost] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -32,8 +32,12 @@ const NewPost = () => {
       quality: 1,
     });
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setImages((oldArray) => [...oldArray, result.assets[0].uri]);
     }
+  };
+
+  const removeImageByIndex = (indexToRemove: number) => {
+    setImages((images) => images.filter((_, index) => index !== indexToRemove));
   };
 
   const onPostButtonPress = () => {
@@ -141,13 +145,30 @@ const NewPost = () => {
           }}
         />
         <ScrollView horizontal={true} style={{ marginTop: 20 }}>
-          <TouchableOpacity style={styles.defaultImage}>
+          {images.map((image: string, index: number) => (
+            <View key={index}>
+              <Image source={{ uri: image }} style={styles.image} />
+              <TouchableOpacity
+                style={styles.removeButton}
+                onPress={() => {
+                  removeImageByIndex(index);
+                }}
+              >
+                <FontAwesome5 name="times-circle" size={20} />
+              </TouchableOpacity>
+            </View>
+          ))}
+          <TouchableOpacity
+            style={styles.defaultImage}
+            onPress={() => {
+              pickImageAsync().catch((error) => {
+                console.error("Error selecting image. " + error);
+              });
+            }}
+          >
             <FontAwesome5 name="image" size={20} />
           </TouchableOpacity>
         </ScrollView>
-        {image !== "" && (
-          <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
-        )}
       </Animated.View>
     </View>
   );
@@ -195,6 +216,25 @@ const styles = StyleSheet.create({
     borderColor: "black",
     borderRadius: 10,
     borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  image: {
+    height: 100,
+    width: 100,
+    borderColor: "black",
+    borderRadius: 10,
+    borderWidth: 1,
+    marginRight: 10,
+  },
+  removeButton: {
+    position: "absolute",
+    top: 0,
+    right: 7,
+    backgroundColor: "white",
+    borderRadius: 50,
+    width: 20,
+    height: 20,
     alignItems: "center",
     justifyContent: "center",
   },
