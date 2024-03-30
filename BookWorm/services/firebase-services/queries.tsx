@@ -126,6 +126,35 @@ export const fetchUserData = async (user: User): Promise<UserData> => {
   }
 };
 
+export async function fetchFriendData(
+  userID: string,
+): Promise<UserData | undefined> {
+  try {
+    const userDocRef = doc(DB, "user_collection", userID);
+    const userDocSnapshot = await getDoc(userDocRef);
+
+    if (userDocSnapshot.exists()) {
+      const userData = userDocSnapshot.data();
+      if (userData !== undefined) {
+        return {
+          id: userID,
+          email: userData.email ?? "",
+          first: userData.first ?? "",
+          isPublic: userData.isPublic ?? false,
+          last: userData.last ?? "",
+          number: userData.number ?? "",
+        };
+      }
+    }
+    console.error("doesnt exist");
+
+    return undefined; // User document doesn't exist or data is missing
+  } catch (error) {
+    console.error("Error fetching user information:", error);
+    return undefined; // Return undefined on error
+  }
+}
+
 export async function updateUserInfo(
   user: User,
   firstName: string,
