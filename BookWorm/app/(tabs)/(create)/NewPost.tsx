@@ -92,20 +92,17 @@ const NewPost = () => {
         setMinutesRead(0);
         setText("");
         setImages([]);
-        setLoading(false);
       });
+    setLoading(false);
   };
-
-  if (loading) {
-    return (
-      <View style={styles.loading}>
-        <ActivityIndicator size="large" color="black" />
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
+      {loading && (
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color="black" />
+        </View>
+      )}
       <TextInput
         style={styles.input}
         value={book}

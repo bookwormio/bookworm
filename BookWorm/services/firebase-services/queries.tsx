@@ -122,6 +122,16 @@ export async function fetchPhoneNumber(user: User) {
   }
 }
 
+/**
+ * Follows a user by updating the relationship document between the current user and the friend user.
+ * If the document doesn't exist, it creates a new one; otherwise, it updates the existing document.
+ * @param {User | null} user - The current user.
+ * @param {string} book - The title of the book.
+ * @param {string} text - Any text the user wants to add to the post
+ * @param {string[]} imageURIs - A list of all image URIs of each image the user wants to upload (can be empty)
+ * @returns {Promise<void>} A void promise if successful or an error if the document creation fails
+ * @throws {Error} If there's an error during the operation.
+ */
 export async function createPost(
   user: User | null,
   book: string,
