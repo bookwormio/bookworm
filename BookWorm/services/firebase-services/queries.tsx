@@ -126,7 +126,7 @@ export async function createPost(
   user: User | null,
   book: string,
   text: string,
-  imageURI: string,
+  imageURIs: string[],
 ) {
   if (user != null) {
     addDoc(collection(DB, "posts"), {
@@ -134,17 +134,21 @@ export async function createPost(
       created: serverTimestamp(),
       book,
       text,
-      image: imageURI !== "",
+      image: imageURIs.length,
     })
       .then(async (docRef) => {
-        if (imageURI !== "") {
-          const response = await fetch(imageURI);
-          const blob = await response.blob();
-          const storageRef = ref(
-            STORAGE,
-            "posts/" + user.uid + "/" + docRef.id,
+        if (imageURIs.length > 0) {
+          await Promise.all(
+            imageURIs.map(async (imageURI: string, index: number) => {
+              const response = await fetch(imageURI);
+              const blob = await response.blob();
+              const storageRef = ref(
+                STORAGE,
+                "posts/" + docRef.id + "/" + index,
+              );
+              await uploadBytesResumable(storageRef, blob);
+            }),
           );
-          await uploadBytesResumable(storageRef, blob);
         }
       })
       .catch((error) => {

@@ -3,6 +3,7 @@ import { Slider } from "@miblanchard/react-native-slider";
 import * as ImagePicker from "expo-image-picker";
 import React, { useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Button,
   Image,
@@ -14,6 +15,7 @@ import {
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import SliderThumb from "../../../components/createpost/SliderThumb";
+import { createPost } from "../../../services/firebase-services/queries";
 
 const NewPost = () => {
   const { user } = useAuth();
@@ -23,8 +25,9 @@ const NewPost = () => {
   const [text, setText] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [creatingPost, setCreatedPost] = useState(false);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const [loading, setLoading] = useState(false);
+  const fadeAnimation = useRef(new Animated.Value(0)).current;
+  const slideAnimation = useRef(new Animated.Value(0)).current;
 
   const pickImageAsync = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -40,38 +43,66 @@ const NewPost = () => {
     setImages((images) => images.filter((_, index) => index !== indexToRemove));
   };
 
-  const onPostButtonPress = () => {
+  const addPostView = () => {
+    setCreatedPost(true);
     Animated.parallel([
-      Animated.timing(slideAnim, {
+      Animated.timing(slideAnimation, {
         toValue: 1,
         duration: 500,
         useNativeDriver: true,
       }),
-      Animated.timing(fadeAnim, {
+      Animated.timing(fadeAnimation, {
         toValue: 1,
         delay: 250,
         duration: 500,
         useNativeDriver: true,
       }),
     ]).start();
-    setCreatedPost(true);
   };
 
-  const onRemovePostButtonPress = () => {
+  const removePostView = () => {
     setCreatedPost(false);
     Animated.parallel([
-      Animated.timing(fadeAnim, {
+      Animated.timing(fadeAnimation, {
         toValue: 0,
         duration: 300,
         useNativeDriver: true,
       }),
-      Animated.timing(slideAnim, {
+      Animated.timing(slideAnimation, {
+        delay: 200,
         toValue: 0,
         duration: 500,
         useNativeDriver: true,
       }),
-    ]).start();
+    ]).start(() => {
+      setText("");
+      setImages([]);
+    });
   };
+
+  const createNewPost = () => {
+    setLoading(true);
+    createPost(user, book, text, images)
+      .catch((error) => {
+        console.error("Error creating post. " + error);
+      })
+      .finally(() => {
+        removePostView();
+        setBook("");
+        setMinutesRead(0);
+        setText("");
+        setImages([]);
+        setLoading(false);
+      });
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="black" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -112,9 +143,9 @@ const NewPost = () => {
           {
             transform: [
               {
-                translateY: slideAnim.interpolate({
+                translateY: slideAnimation.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [0, 400],
+                  outputRange: [0, 250],
                 }),
               },
             ],
@@ -125,16 +156,22 @@ const NewPost = () => {
           title={creatingPost ? "Remove Post" : "Add Tracking"}
           onPress={() => {
             if (creatingPost) {
-              onRemovePostButtonPress();
+              removePostView();
             }
           }}
         />
         <Button
           title={creatingPost ? "Create Post + Tracking" : "Create Post"}
-          onPress={onPostButtonPress}
+          onPress={() => {
+            if (!creatingPost) {
+              addPostView();
+            } else {
+              createNewPost();
+            }
+          }}
         />
       </Animated.View>
-      <Animated.View style={{ opacity: fadeAnim, width: "100%" }}>
+      <Animated.View style={{ opacity: fadeAnimation, width: "100%" }}>
         <TextInput
           style={[styles.input, { height: "25%" }]}
           multiline={true}
@@ -198,8 +235,9 @@ const styles = StyleSheet.create({
   },
   rowContainer: {
     flexDirection: "row",
-    alignItems: "center", // Align items vertically in the center
+    alignItems: "center",
     justifyContent: "space-between",
+    zIndex: 999,
   },
   pagesInput: {
     borderColor: "gray",
@@ -237,5 +275,11 @@ const styles = StyleSheet.create({
     height: 20,
     alignItems: "center",
     justifyContent: "center",
+  },
+  loading: {
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: "50%",
   },
 });
