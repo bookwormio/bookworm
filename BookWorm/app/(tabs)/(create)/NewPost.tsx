@@ -16,7 +16,10 @@ import {
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import SliderThumb from "../../../components/createpost/SliderThumb";
-import { createPost } from "../../../services/firebase-services/queries";
+import {
+  addDataEntry,
+  createPost,
+} from "../../../services/firebase-services/queries";
 
 const NewPost = () => {
   const { user } = useAuth();
@@ -99,6 +102,13 @@ const NewPost = () => {
           text1: "Post Created + Tracking Added",
         });
       });
+  };
+
+  const createNewTracking = () => {
+    setLoading(true);
+    addDataEntry(user, +pagesRead, minutesRead).catch((error) => {
+      console.error("Error adding tracking. " + error);
+    });
   };
 
   return (

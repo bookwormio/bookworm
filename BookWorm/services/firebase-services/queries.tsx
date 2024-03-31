@@ -10,6 +10,7 @@ import {
   query,
   runTransaction,
   serverTimestamp,
+  setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -534,4 +535,52 @@ function sortPostsByDate(posts: PostModel[]) {
     const dateB = postB.created.toDate();
     return dateB.getTime() - dateA.getTime();
   });
+}
+
+export async function addDataEntry(
+  user: User | null,
+  pages: number,
+  minutesRead: number,
+) {
+  try {
+    if (user !== null) {
+      const q = query(
+        collection(DB, "data_collection"),
+        where("user_id", "==", user.uid),
+      );
+      const dataCol = await getDocs(q);
+      if (dataCol.empty) {
+        // The collection doesn't exist for the user, so create it
+        const userDataCollectionRef = collection(DB, "data_collection");
+        const userDataDocRef = doc(userDataCollectionRef);
+        await setDoc(userDataDocRef, { user_id: user.uid });
+        const newDocRef = await getDoc(userDataDocRef);
+        // console.log(newDocRef);
+        const subColPageRef = collection(newDocRef.ref, "pages_read");
+        await addDoc(subColPageRef, {
+          added_at: serverTimestamp(),
+          pages,
+        });
+        const subColTimeRef = collection(dataCol.docs[0].ref, "time_read");
+        await addDoc(subColTimeRef, {
+          added_at: serverTimestamp(),
+          minutesRead,
+        });
+      } else {
+        // console.log(dataCol.docs[0].ref);
+        const subColPageRef = collection(dataCol.docs[0].ref, "pages_read");
+        await addDoc(subColPageRef, {
+          added_at: serverTimestamp(),
+          pages,
+        });
+        const subColTimeRef = collection(dataCol.docs[0].ref, "time_read");
+        await addDoc(subColTimeRef, {
+          added_at: serverTimestamp(),
+          minutesRead,
+        });
+      }
+    }
+  } catch (error) {
+    alert(error);
+  }
 }
