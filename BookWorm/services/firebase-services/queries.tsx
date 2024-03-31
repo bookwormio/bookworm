@@ -561,7 +561,7 @@ export async function addDataEntry(
           added_at: serverTimestamp(),
           pages,
         });
-        const subColTimeRef = collection(dataCol.docs[0].ref, "time_read");
+        const subColTimeRef = collection(newDocRef.ref, "time_read");
         await addDoc(subColTimeRef, {
           added_at: serverTimestamp(),
           minutesRead,
@@ -581,6 +581,6 @@ export async function addDataEntry(
       }
     }
   } catch (error) {
-    alert(error);
+    console.error(error);
   }
 }

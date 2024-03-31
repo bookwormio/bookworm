@@ -106,9 +106,50 @@ const NewPost = () => {
 
   const createNewTracking = () => {
     setLoading(true);
-    addDataEntry(user, +pagesRead, minutesRead).catch((error) => {
-      console.error("Error adding tracking. " + error);
-    });
+    addDataEntry(user, +pagesRead, minutesRead)
+      .catch((error) => {
+        console.error("Error adding tracking. " + error);
+      })
+      .finally(() => {
+        setBook("");
+        setMinutesRead(0);
+        setPagesRead("");
+        setLoading(false);
+        Toast.show({
+          type: "success",
+          text1: "Tracking Added",
+          text2: pagesRead + " pages of " + book,
+        });
+      });
+  };
+
+  const fieldsMissing = () => {
+    const missingFields: string[] = [];
+    if (book === "") {
+      missingFields.push("Book");
+    }
+    if (minutesRead === 0) {
+      missingFields.push("Minutes Read");
+    }
+    if (pagesRead === "") {
+      missingFields.push("Pages Read");
+    }
+    if (creatingPost) {
+      if (text === "") {
+        missingFields.push("Post Text");
+      }
+    }
+    if (missingFields.length > 0) {
+      Toast.show({
+        type: "error",
+        text1: "Missing Fields",
+        text2:
+          "Please enter values in the following fields: " +
+          missingFields.join(", "),
+      });
+      return true;
+    }
+    return false;
   };
 
   return (
@@ -153,7 +194,6 @@ const NewPost = () => {
               }}
             />
           </View>
-
           <Animated.View
             style={[
               styles.rowContainer,
@@ -175,14 +215,9 @@ const NewPost = () => {
                 if (creatingPost) {
                   removePostView();
                 } else {
-                  Toast.show({
-                    type: "success",
-                    text1: "Tracking Added",
-                    text2: pagesRead + " pages of " + book,
-                  });
-                  setBook("");
-                  setMinutesRead(0);
-                  setPagesRead("");
+                  if (!fieldsMissing()) {
+                    createNewTracking();
+                  }
                 }
               }}
             />
@@ -192,7 +227,10 @@ const NewPost = () => {
                 if (!creatingPost) {
                   addPostView();
                 } else {
-                  createNewPost();
+                  if (!fieldsMissing()) {
+                    createNewPost();
+                    createNewTracking();
+                  }
                 }
               }}
             />
