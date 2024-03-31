@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import SliderThumb from "../../../components/createpost/SliderThumb";
 import { createPost } from "../../../services/firebase-services/queries";
@@ -92,118 +93,138 @@ const NewPost = () => {
         setMinutesRead(0);
         setText("");
         setImages([]);
+        setLoading(false);
+        Toast.show({
+          type: "success",
+          text1: "Post Created + Tracking Added",
+        });
       });
-    setLoading(false);
   };
 
   return (
     <View style={styles.container}>
+      <Toast />
       {loading && (
         <View style={styles.loading}>
           <ActivityIndicator size="large" color="black" />
         </View>
       )}
-      <TextInput
-        style={styles.input}
-        value={book}
-        placeholder="Book"
-        onChangeText={(book) => {
-          setBook(book);
-        }}
-      />
-      <View style={styles.rowContainer}>
-        <Slider
-          containerStyle={styles.sliderContainer}
-          value={minutesRead}
-          onValueChange={(value) => {
-            setMinutesRead(value[0]);
-          }}
-          minimumValue={0}
-          maximumValue={240}
-          renderThumbComponent={() => <SliderThumb minutesRead={minutesRead} />}
-          step={5}
-        />
-        <TextInput
-          style={styles.pagesInput}
-          value={pagesRead}
-          keyboardType="numeric"
-          placeholder="Pages Read"
-          onChangeText={(pages) => {
-            setPagesRead(pages);
-          }}
-        />
-      </View>
+      {!loading && (
+        <>
+          <TextInput
+            style={styles.input}
+            value={book}
+            placeholder="Book"
+            onChangeText={(book) => {
+              setBook(book);
+            }}
+          />
+          <View style={styles.rowContainer}>
+            <Slider
+              containerStyle={styles.sliderContainer}
+              value={minutesRead}
+              onValueChange={(value) => {
+                setMinutesRead(value[0]);
+              }}
+              minimumValue={0}
+              maximumValue={240}
+              renderThumbComponent={() => (
+                <SliderThumb minutesRead={minutesRead} />
+              )}
+              step={5}
+            />
+            <TextInput
+              style={styles.pagesInput}
+              value={pagesRead}
+              keyboardType="numeric"
+              placeholder="Pages Read"
+              onChangeText={(pages) => {
+                setPagesRead(pages);
+              }}
+            />
+          </View>
 
-      <Animated.View
-        style={[
-          styles.rowContainer,
-          {
-            transform: [
+          <Animated.View
+            style={[
+              styles.rowContainer,
               {
-                translateY: slideAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0, 250],
-                }),
+                transform: [
+                  {
+                    translateY: slideAnimation.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, 250],
+                    }),
+                  },
+                ],
               },
-            ],
-          },
-        ]}
-      >
-        <Button
-          title={creatingPost ? "Remove Post" : "Add Tracking"}
-          onPress={() => {
-            if (creatingPost) {
-              removePostView();
-            }
-          }}
-        />
-        <Button
-          title={creatingPost ? "Create Post + Tracking" : "Create Post"}
-          onPress={() => {
-            if (!creatingPost) {
-              addPostView();
-            } else {
-              createNewPost();
-            }
-          }}
-        />
-      </Animated.View>
-      <Animated.View style={{ opacity: fadeAnimation, width: "100%" }}>
-        <TextInput
-          style={[styles.input, { height: "25%" }]}
-          multiline={true}
-          value={text}
-          placeholder="Add some text to your post"
-          onChangeText={(text) => {
-            setText(text);
-          }}
-        />
-        <ScrollView horizontal={true} style={{ marginTop: 20 }}>
-          {images.map((image: string, index: number) => (
-            <View key={index}>
-              <Image source={{ uri: image }} style={styles.image} />
+            ]}
+          >
+            <Button
+              title={creatingPost ? "Remove Post" : "Add Tracking"}
+              onPress={() => {
+                if (creatingPost) {
+                  removePostView();
+                } else {
+                  Toast.show({
+                    type: "success",
+                    text1: "Tracking Added",
+                    text2: pagesRead + " pages of " + book,
+                  });
+                  setBook("");
+                  setMinutesRead(0);
+                  setPagesRead("");
+                }
+              }}
+            />
+            <Button
+              title={creatingPost ? "Create Post + Tracking" : "Create Post"}
+              onPress={() => {
+                if (!creatingPost) {
+                  addPostView();
+                } else {
+                  createNewPost();
+                }
+              }}
+            />
+          </Animated.View>
+          <Animated.View style={{ opacity: fadeAnimation, width: "100%" }}>
+            <TextInput
+              style={[styles.input, { height: "25%" }]}
+              multiline={true}
+              value={text}
+              placeholder="Add some text to your post"
+              onChangeText={(text) => {
+                setText(text);
+              }}
+            />
+            <ScrollView horizontal={true} style={{ marginTop: 20 }}>
+              {images.map((image: string, index: number) => (
+                <View key={index}>
+                  <Image source={{ uri: image }} style={styles.image} />
+                  <TouchableOpacity
+                    style={styles.removeButton}
+                    onPress={() => {
+                      removeImageByIndex(index);
+                    }}
+                  >
+                    <FontAwesome5 name="times-circle" size={20} />
+                  </TouchableOpacity>
+                </View>
+              ))}
               <TouchableOpacity
-                style={styles.removeButton}
+                style={styles.defaultImage}
                 onPress={() => {
-                  removeImageByIndex(index);
+                  pickImageAsync().catch((error) => {
+                    console.error("Error selecting image. " + error);
+                  });
                 }}
               >
-                <FontAwesome5 name="times-circle" size={20} />
+                <FontAwesome5 name="image" size={20} />
               </TouchableOpacity>
-            </View>
-          ))}
-          <TouchableOpacity
-            style={styles.defaultImage}
-            onPress={() => {
-              pickImageAsync().catch((error) => {
-                console.error("Error selecting image. " + error);
-              });
-            }}
-          >
-            <FontAwesome5 name="image" size={20} />
-          </TouchableOpacity>
-        </ScrollView>
-      </Animated.View>
+            </ScrollView>
+          </Animated.View>
+        </>
+      )}
     </View>
   );
 };
