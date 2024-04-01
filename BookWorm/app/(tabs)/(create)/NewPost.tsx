@@ -172,7 +172,7 @@ const NewPost = () => {
             <Slider
               containerStyle={styles.sliderContainer}
               value={minutesRead}
-              onValueChange={(value) => {
+              onValueChange={(value: number[]) => {
                 setMinutesRead(value[0]);
               }}
               minimumValue={0}
