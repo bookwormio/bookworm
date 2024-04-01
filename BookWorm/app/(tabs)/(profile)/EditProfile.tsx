@@ -77,7 +77,7 @@ const EditProfile = () => {
   };
 
   if (isLoadingUserData) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <ActivityIndicator size="large" color="#000000" />;
   }
 
   return (

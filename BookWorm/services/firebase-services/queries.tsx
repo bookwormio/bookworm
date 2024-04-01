@@ -102,6 +102,16 @@ export async function newFetchUserInfo(
   }
 }
 
+/**
+ * Fetches user information from the Firestore database.
+ * @param {User} user - The user to fetch information for.
+ * @returns {Promise<UserData | undefined>} A Promise that resolves to the user data if found, otherwise undefined.
+ * @throws {Error} If there is an error while fetching the user information.
+ * @description
+ * Retrieves user information from the Firestore database based on the provided user ID.
+ * If the user document exists, it returns an object containing the user data.
+ * If the user document doesn't exist or if data is missing, it returns undefined.
+ */
 export const fetchUserData = async (user: User): Promise<UserData> => {
   try {
     const userDocRef = doc(DB, "user_collection", user.uid);
@@ -126,6 +136,16 @@ export const fetchUserData = async (user: User): Promise<UserData> => {
   }
 };
 
+/**
+ * Fetches user information for friend view page from the Firestore database.
+ * @param {string} userID - The ID of the friend to fetch information for.
+ * @returns {Promise<UserData | undefined>} A Promise that resolves to the user data if found, otherwise undefined.
+ * @throws {Error} If there is an error while fetching the user information.
+ * @description
+ * Retrieves friend information from the Firestore database based on the provided user ID.
+ * If the friend user document exists, it returns an object containing the user data.
+ * If the friend user document doesn't exist or if data is missing, it returns undefined.
+ */
 export async function fetchFriendData(
   userID: string,
 ): Promise<UserData | undefined> {
