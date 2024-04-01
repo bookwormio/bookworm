@@ -43,22 +43,12 @@ const Profile = () => {
     }
   }, [userData]);
 
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener("state", (event) => {
-  //     const { data } = event;
-  //     if (
-  //       data.state.routeNames[data.state.routeNames.length - 1] ===
-  //         "EditProfile" &&
-  //       data.state.index === 0
-  //     ) {
-  //       setPageRefresh((pageRefresh) => !pageRefresh);
-  //     }
-  //   });
-  //   return unsubscribe;
-  // }, [navigation]);
-
   if (isLoadingUserData) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#000000" />
+      </View>
+    );
   }
 
   return (
@@ -113,5 +103,15 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 36,
     color: "#38434D",
+  },
+  loading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });
