@@ -142,10 +142,8 @@ const NewPost = () => {
     if (missingFields.length > 0) {
       Toast.show({
         type: "error",
-        text1: "Missing Fields",
-        text2:
-          "Please enter values in the following fields: " +
-          missingFields.join(", "),
+        text1: "Please Complete the Following Fields:",
+        text2: missingFields.join(", "),
       });
       return true;
     }
