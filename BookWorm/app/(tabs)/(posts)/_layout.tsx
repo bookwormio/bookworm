@@ -5,6 +5,7 @@ const PostsLayout = () => {
   return (
     <Stack>
       <Stack.Screen name="posts" options={{ headerShown: false }} />
+      <Stack.Screen name="[postID]" options={{ headerShown: false }} />
       <Stack.Screen
         name="NewPost"
         options={{

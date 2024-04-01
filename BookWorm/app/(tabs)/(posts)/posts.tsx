@@ -1,9 +1,11 @@
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   RefreshControl,
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
@@ -62,7 +64,20 @@ const Posts = () => {
       >
         {posts.map((post: PostModel, index: number) => (
           <View key={index}>
-            <Post post={post} created={post.created} />
+            <TouchableOpacity
+              key={index}
+              onPress={() => {
+                router.push({
+                  pathname: `/${post.id}`,
+                  params: {
+                    post,
+                    created: post.created,
+                  },
+                });
+              }}
+            >
+              <Post post={post} created={post.created} />
+            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>

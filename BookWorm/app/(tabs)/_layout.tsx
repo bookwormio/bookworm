@@ -54,6 +54,21 @@ const AppLayout = () => {
               <FontAwesome5 name="plus" size={20} />
             </TouchableOpacity>
           ),
+          headerLeft: () => (
+            <View>
+              {router.canGoBack() && (
+                <TouchableOpacity
+                  style={{ paddingLeft: 20 }}
+                  disabled={!router.canGoBack()}
+                  onPress={() => {
+                    router.back();
+                  }}
+                >
+                  <FontAwesome5 name="arrow-left" size={20} />
+                </TouchableOpacity>
+              )}
+            </View>
+          ),
           tabBarIcon: ({ color, size }) => (
             <FontAwesome5 name="book" size={size} color={color} />
           ),
