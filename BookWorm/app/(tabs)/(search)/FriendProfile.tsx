@@ -27,7 +27,6 @@ const FriendProfile = () => {
   const { friendUserID } = useLocalSearchParams<{ friendUserID: string }>();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [status, setStatus] = useState("");
   const { user } = useAuth();
   const [followStatus, setFollowStatus] = useState<string>(
     LocalFollowStatus.LOADING,
@@ -82,11 +81,6 @@ const FriendProfile = () => {
       }
       if (setFriendData.last !== undefined) {
         setLastName(setFriendData.last);
-      }
-      if (setFriendData.isPublic) {
-        setStatus("Public Account");
-      } else {
-        setStatus("Private Account");
       }
     }
   }, [friendData]);
@@ -176,7 +170,6 @@ const FriendProfile = () => {
       <Text>User ID: {friendUserID}</Text>
       <Text>First: {firstName}</Text>
       <Text>Last: {lastName}</Text>
-      <Text>Status: {status}</Text>
       <Button
         title={
           followStatus === LocalFollowStatus.LOADING
