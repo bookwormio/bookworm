@@ -1,7 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Button, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import {
   fetchFriendData,
@@ -152,7 +158,11 @@ const FriendProfile = () => {
   };
 
   if (friendIsLoading) {
-    return <ActivityIndicator size="large" color="#000000" />;
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#000000" />
+      </View>
+    );
   }
 
   return (
@@ -182,3 +192,24 @@ const FriendProfile = () => {
   );
 };
 export default FriendProfile;
+
+const styles = StyleSheet.create({
+  input: {
+    borderColor: "gray",
+    width: "100%",
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+  },
+
+  loading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+});
