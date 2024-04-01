@@ -99,7 +99,7 @@ const NewPost = () => {
         setLoading(false);
         Toast.show({
           type: "success",
-          text1: "Post Created + Tracking Added",
+          text1: "Post Created",
         });
       });
   };
