@@ -27,7 +27,9 @@ const Posts = () => {
     queryKey: user != null ? ["userfeedposts", user.uid] : ["userfeedposts"],
     queryFn: async () => {
       if (user != null) {
-        return await fetchPostsForUserFeed(user.uid);
+        const posts = await fetchPostsForUserFeed(user.uid);
+        setRefreshing(false);
+        return posts;
       } else {
         return [];
       }
@@ -47,7 +49,6 @@ const Posts = () => {
         queryKey:
           user != null ? ["userfeedposts", user.uid] : ["userfeedposts"],
       });
-      setRefreshing(false);
     },
   });
 
