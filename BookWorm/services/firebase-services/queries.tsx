@@ -64,6 +64,10 @@ export const updateUser = async (userdata: UserData): Promise<void> => {
   }
 };
 
+/**
+ * Represents an asynchronous function that represents an empty query.
+ * @returns {Promise<void>} A Promise that resolves when the empty query is completed.
+ */
 export const emptyQuery = async (): Promise<void> => {};
 
 /**
@@ -178,7 +182,12 @@ export async function fetchFriendData(
   }
 }
 
-// fetches all user traits
+/**
+ * Fetches a user from the database based on the provided userID.
+ * @param {string} userID - The ID of the user to fetch.
+ * @returns {Promise<UserModel | null>} A Promise that resolves with the fetched user if it exists, or null if the user does not exist.
+ * @throws {Error} Throws an error if there's an issue fetching the user.
+ */
 export async function fetchUser(userID: string): Promise<UserModel | null> {
   try {
     const userDocRef = doc(DB, "user_collection", userID);
@@ -202,6 +211,11 @@ export async function fetchUser(userID: string): Promise<UserModel | null> {
   }
 }
 
+/**
+ * Creates a new post in the database based on the provided post object.
+ * @param {Post} post - The post object containing information about the post.
+ * @returns {Promise<void>} A Promise that resolves when the post creation process is completed.
+ */
 export async function createPost(post: Post) {
   if (post.userid != null) {
     addDoc(collection(DB, "posts"), {
