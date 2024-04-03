@@ -50,6 +50,37 @@ export async function addDataEntry(user: User, time: Date, pages: number) {
   }
 }
 
+export async function fetchStats(user: User) {
+  try {
+    const q = query(
+      collection(DB, "data_collection"),
+      where("user_id", "==", user.uid),
+    );
+    const querySnapshot = await getDocs(q);
+    const dataPoints: Array<{ x: number; y: number }> = [];
+    // Add each user data to the array
+    for (const doc of querySnapshot.docs) {
+      console.log("Document:", doc.id, doc.data());
+      const subcollectionRef = collection(doc.ref, "pages_read");
+      const subcollectionSnapshot = await getDocs(subcollectionRef);
+      // const timestamp = new Date().getTime();
+      // Iterate over each document in the subcollection
+      subcollectionSnapshot.forEach((subDoc) => {
+        console.log("Subdocument:", subDoc.id, subDoc.data());
+        dataPoints.push({
+          x: subDoc.data().added_at.seconds,
+          y: subDoc.data().pages,
+        });
+      });
+    }
+    console.log(dataPoints);
+    return dataPoints;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
+  }
+}
+
 export async function updateUserInfo(
   user: User,
   firstName: string,

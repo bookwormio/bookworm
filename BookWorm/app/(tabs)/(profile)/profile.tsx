@@ -1,12 +1,12 @@
 import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native";
+import { Button, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import {
-  addDataEntry,
   fetchFirstName,
   fetchLastName,
-  fetchPhoneNumber
+  fetchPhoneNumber,
+  fetchStats,
 } from "../../../services/firebase-services/queries";
 
 const Profile = () => {
@@ -17,25 +17,37 @@ const Profile = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [pageRefresh, setPageRefresh] = useState<boolean>(false);
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [pages, setPages] = useState<string>("");
 
-  const handleAddEntry = () => {
-    const currentDate = new Date();
-    const pagesInt = parseInt(pages); // Get current date in YYYY-MM-DD format
+  const [data, setData] = useState<Array<{ x: number; y: number }>>([]);
+
+  useEffect(() => {
+    // Fetch data from the database when the component mounts
     if (user != null) {
-      addDataEntry(user, currentDate, pagesInt)
-        .then(() => {
-          router.back();
+      fetchStats(user)
+        .then((stats) => {
+          // Process the fetched data and set it to state
+          const processedData = stats.map((stat) => ({
+            x: stat.x, // Assuming x is a number representing time or some other value
+            y: stat.y, // Assuming y is a number representing some metric
+          }));
+          setData(processedData);
         })
         .catch((error) => {
-          console.error("Error adding entry:", error);
-          // Handle error here, e.g., show error message
+          console.error("Error fetching stats:", error);
         });
-    } else {
-      console.error("User DNE");
     }
-    setIsModalVisible(false);
+  }, []);
+
+  const printData = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    if (user != null) {
+      // const stringifiedOutput: string[] = [];
+      const output = data;
+      // Iterate over each dictionary item and construct its string representation
+      console.log(output);
+    } else {
+      console.log("no user");
+    }
   };
 
   useEffect(() => {
@@ -101,39 +113,21 @@ const Profile = () => {
         }}
       />
       <Button
-        title="Add Entry"
+        title="show stats"
         onPress={() => {
-          setIsModalVisible(true);
+          printData();
         }}
       />
-      <Modal visible={isModalVisible} animationType="slide">
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <Text>Enter Pages:</Text>
-          <TextInput
-            style={{
-              borderWidth: 1,
-              borderColor: "gray",
-              padding: 10,
-              marginBottom: 20,
-            }}
-            placeholder="Enter pages"
-            onChangeText={(text) => {
-              setPages(text);
-            }}
-            value={pages}
-          />
-          <Button title="Add" onPress={handleAddEntry} />
-          <Button
-            title="Cancel"
-            onPress={() => {
-              setPages("");
-              setIsModalVisible(false);
-            }}
-          />
-        </View>
-      </Modal>
+      <Button
+        title="Add Entry"
+        onPress={() => {
+          if (user != null) {
+            router.push({ pathname: "AddData" });
+          } else {
+            console.error("User DNE");
+          }
+        }}
+      />
     </View>
   );
 };
