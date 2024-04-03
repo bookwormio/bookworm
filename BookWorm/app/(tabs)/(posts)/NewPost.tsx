@@ -1,9 +1,11 @@
+import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Button, Image, StyleSheet, TextInput, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import { createPost } from "../../../services/firebase-services/queries";
+import { type Post } from "../../../types";
 
 const NewPost = () => {
   const { user } = useAuth();
@@ -19,6 +21,30 @@ const NewPost = () => {
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
+  };
+
+  const postMutation = useMutation({
+    mutationFn: createPost,
+    // onSuccess: async () => {
+    //   await queryClient.invalidateQueries({
+    //     queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+    //   });
+    // },
+  });
+
+  const handleCreatePostClick = () => {
+    if (user !== undefined && user !== null) {
+      const post: Post = {
+        userid: user.uid,
+        book,
+        text,
+        imageURI: image,
+      };
+      postMutation.mutate(post);
+    } else {
+      console.error("Current user undefined");
+    }
+    router.back();
   };
 
   return (
@@ -56,18 +82,7 @@ const NewPost = () => {
       {image !== "" && (
         <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
       )}
-      <Button
-        title="Create Post"
-        onPress={() => {
-          createPost(user, book, text, image)
-            .then(() => {
-              router.back();
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        }}
-      />
+      <Button title="Create Post" onPress={handleCreatePostClick} />
     </View>
   );
 };

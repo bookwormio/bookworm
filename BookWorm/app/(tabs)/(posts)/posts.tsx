@@ -1,3 +1,4 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -10,47 +11,54 @@ import {
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import Post from "../../../components/post/post";
-import { fetchPostsForUserFeed } from "../../../services/firebase-services/queries";
+import {
+  emptyQuery,
+  fetchPostsForUserFeed,
+} from "../../../services/firebase-services/queries";
 import { type PostModel } from "../../../types";
 
 const Posts = () => {
   const [posts, setPosts] = useState<PostModel[]>([]);
-  const [feedLoading, setFeedLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const fetchPosts = async () => {
-    setFeedLoading(true);
-    try {
+  const { data: feedPostsData, isLoading: isLoadingFeedPosts } = useQuery({
+    queryKey: user != null ? ["userfeedposts", user.uid] : ["userfeedposts"],
+    queryFn: async () => {
       if (user != null) {
-        const fetchedPosts = await fetchPostsForUserFeed(user.uid);
-        setPosts(fetchedPosts);
+        return await fetchPostsForUserFeed(user.uid);
+      } else {
+        return [];
       }
-    } catch (error) {
-      console.error("Error fetching posts", error);
-    } finally {
-      setFeedLoading(false);
+    },
+  });
+
+  useEffect(() => {
+    if (feedPostsData !== undefined) {
+      setPosts(feedPostsData);
     }
-  };
+  }, [feedPostsData]);
+
+  const refreshMutation = useMutation({
+    mutationFn: emptyQuery,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey:
+          user != null ? ["userfeedposts", user.uid] : ["userfeedposts"],
+      });
+      setRefreshing(false);
+    },
+  });
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchPosts()
-      .then(() => {
-        setRefreshing(false);
-      })
-      .catch((error) => {
-        console.log("Error refreshing posts" + error);
-      });
+    refreshMutation.mutate();
   };
-
-  useEffect(() => {
-    void fetchPosts(); // Initial fetch of posts when component mounts
-  }, []);
 
   return (
     <View style={styles.container}>
-      {feedLoading && !refreshing && (
+      {isLoadingFeedPosts && !refreshing && (
         <View style={styles.feedLoading}>
           <ActivityIndicator size="large" color="black" />
         </View>

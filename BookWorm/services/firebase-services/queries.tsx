@@ -21,6 +21,7 @@ import {
   type BookVolumeInfo,
   type BookVolumeItem,
   type BooksResponse,
+  type Post,
   type PostModel,
   type UserData,
   type UserListItem,
@@ -62,6 +63,8 @@ export const updateUser = async (userdata: UserData): Promise<void> => {
     console.error("Error updating user", error);
   }
 };
+
+export const emptyQuery = async (): Promise<void> => {};
 
 /**
  * Fetches user information from the Firestore database.
@@ -175,24 +178,6 @@ export async function fetchFriendData(
   }
 }
 
-export async function updateUserInfo(
-  user: User,
-  firstName: string,
-  lastName: string,
-  phoneNumber: string,
-) {
-  try {
-    await updateDoc(doc(DB, "user_collection", user.uid), {
-      email: user.email,
-      first: firstName,
-      last: lastName,
-      number: phoneNumber,
-    });
-  } catch (error) {
-    alert(error);
-  }
-}
-
 // fetches all user traits
 export async function fetchUser(userID: string): Promise<UserModel | null> {
   try {
@@ -217,81 +202,22 @@ export async function fetchUser(userID: string): Promise<UserModel | null> {
   }
 }
 
-// fetches user's first name
-export async function fetchFirstName(user: User) {
-  try {
-    const userDocRef = doc(DB, "user_collection", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData.first;
-    } else {
-      console.error("User document DNE");
-      return "";
-    }
-  } catch (error) {
-    console.error("Error fetching first name:", error);
-    throw error;
-  }
-}
-
-// fetches user's last name
-export async function fetchLastName(user: User) {
-  try {
-    const userDocRef = doc(DB, "user_collection", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData.last;
-    } else {
-      console.error("User document DNE");
-      return "";
-    }
-  } catch (error) {
-    console.error("Error fetching last name:", error);
-    throw error;
-  }
-}
-
-// fetches user's phone number
-export async function fetchPhoneNumber(user: User) {
-  try {
-    const userDocRef = doc(DB, "user_collection", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData.number;
-    } else {
-      console.error("User document DNE");
-      return "";
-    }
-  } catch (error) {
-    console.error("Error fetching phone number:", error);
-    throw error;
-  }
-}
-
-export async function createPost(
-  user: User | null,
-  book: string,
-  text: string,
-  imageURI: string,
-) {
-  if (user != null) {
+export async function createPost(post: Post) {
+  if (post.userid != null) {
     addDoc(collection(DB, "posts"), {
-      user: user.uid,
+      user: post.userid,
       created: serverTimestamp(),
-      book,
-      text,
-      image: imageURI !== "",
+      book: post.book,
+      text: post.text,
+      image: post.imageURI !== "",
     })
       .then(async (docRef) => {
-        if (imageURI !== "") {
-          const response = await fetch(imageURI);
+        if (post.imageURI !== "") {
+          const response = await fetch(post.imageURI);
           const blob = await response.blob();
           const storageRef = ref(
             STORAGE,
-            "posts/" + user.uid + "/" + docRef.id,
+            "posts/" + post.userid + "/" + docRef.id,
           );
           await uploadBytesResumable(storageRef, blob);
         }

@@ -15,6 +15,13 @@ interface UserData {
   number: string;
 }
 
+interface Post {
+  userid: string;
+  book: stirng;
+  text: string;
+  imageURI: string;
+}
+
 // TODO: separate book volume info from book preview info
 // (less information needed for a book preview)
 interface BookVolumeInfo {
