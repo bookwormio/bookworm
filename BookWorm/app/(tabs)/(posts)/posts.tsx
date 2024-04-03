@@ -111,8 +111,8 @@ const Posts = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListFooterComponent={
-          fetchingMorePosts ? (
-            <View style={styles.feedLoading}>
+          fetchingMorePosts && !refreshing ? (
+            <View style={styles.loadingMore}>
               <ActivityIndicator size="large" color="black" />
             </View>
           ) : null
@@ -144,5 +144,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "absolute",
     top: "50%",
+  },
+  loadingMore: {
+    alignItems: "center",
+    justifyContent: "center",
+    bottom: 20, // Position the loading indicator 20 units from the bottom
+    width: "100%", // Ensure it stretches the full width
   },
 });
