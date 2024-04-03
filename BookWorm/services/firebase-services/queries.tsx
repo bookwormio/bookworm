@@ -567,7 +567,7 @@ export async function fetchPostsByUserIDs(
     let postsQuery = query(
       collection(DB, "posts"),
       where("user", "in", userIDs),
-      orderBy("created"),
+      orderBy("created", "desc"),
       limit(10),
     );
 
@@ -576,7 +576,7 @@ export async function fetchPostsByUserIDs(
       postsQuery = query(
         collection(DB, "posts"),
         where("user", "in", userIDs),
-        orderBy("created"),
+        orderBy("created", "desc"),
         startAfter(lastVisible),
         limit(10),
       );

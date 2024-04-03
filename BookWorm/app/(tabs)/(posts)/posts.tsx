@@ -33,7 +33,7 @@ const Posts = () => {
     try {
       if (user != null) {
         const { posts: fetchedPosts, newLastVisible: lastVisible } =
-          await fetchPostsForUserFeed(user.uid, lastVisiblePost);
+          await fetchPostsForUserFeed(user.uid, null);
         if (fetchedPosts.length > 0 && lastVisible != null) {
           setLastVisiblePost(lastVisible); // Update last visible post
           setPosts(fetchedPosts);
@@ -106,7 +106,7 @@ const Posts = () => {
             <Post post={post} created={post.created} />
           </TouchableOpacity>
         )}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
