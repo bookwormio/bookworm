@@ -1,9 +1,13 @@
 import { router } from "expo-router";
+import {
+  type DocumentData,
+  type QueryDocumentSnapshot,
+} from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  FlatList,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -17,14 +21,23 @@ const Posts = () => {
   const [posts, setPosts] = useState<PostModel[]>([]);
   const [feedLoading, setFeedLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [fetchingMorePosts, setFetchingMorePosts] = useState(false);
+  const [lastVisiblePost, setLastVisiblePost] = useState<QueryDocumentSnapshot<
+    DocumentData,
+    DocumentData
+  > | null>(null);
   const { user } = useAuth();
 
-  const fetchPosts = async () => {
+  const initialFetchPosts = async () => {
     setFeedLoading(true);
     try {
       if (user != null) {
-        const fetchedPosts = await fetchPostsForUserFeed(user.uid);
-        setPosts(fetchedPosts);
+        const { posts: fetchedPosts, newLastVisible: lastVisible } =
+          await fetchPostsForUserFeed(user.uid, lastVisiblePost);
+        if (fetchedPosts.length > 0 && lastVisible != null) {
+          setLastVisiblePost(lastVisible); // Update last visible post
+          setPosts(fetchedPosts);
+        }
       }
     } catch (error) {
       console.error("Error fetching posts", error);
@@ -33,9 +46,28 @@ const Posts = () => {
     }
   };
 
+  const loadMorePosts = async () => {
+    setFetchingMorePosts(true);
+    try {
+      if (user != null) {
+        const { posts: fetchedPosts, newLastVisible: lastVisible } =
+          await fetchPostsForUserFeed(user.uid, lastVisiblePost);
+        if (fetchedPosts.length > 0 && lastVisible != null) {
+          setLastVisiblePost(lastVisible); // Update last visible post
+          setPosts((prevPosts) => [...prevPosts, ...fetchedPosts]); // Append new posts to existing posts
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching posts", error);
+    } finally {
+      setFetchingMorePosts(false);
+    }
+  };
+
   const onRefresh = () => {
     setRefreshing(true);
-    fetchPosts()
+
+    initialFetchPosts()
       .then(() => {
         setRefreshing(false);
       })
@@ -45,7 +77,7 @@ const Posts = () => {
   };
 
   useEffect(() => {
-    void fetchPosts(); // Initial fetch of posts when component mounts
+    void initialFetchPosts(); // Initial fetch of posts when component mounts
   }, []);
 
   return (
@@ -55,32 +87,39 @@ const Posts = () => {
           <ActivityIndicator size="large" color="black" />
         </View>
       )}
-      <ScrollView
+      <FlatList
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
+        data={posts}
+        renderItem={({ item: post }) => (
+          <TouchableOpacity
+            onPress={() => {
+              router.push({
+                pathname: `/${post.id}`,
+                params: {
+                  post,
+                  created: post.created,
+                },
+              });
+            }}
+          >
+            <Post post={post} created={post.created} />
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item, index) => index.toString()}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-      >
-        {posts.map((post: PostModel, index: number) => (
-          <View key={index}>
-            <TouchableOpacity
-              key={index}
-              onPress={() => {
-                router.push({
-                  pathname: `/${post.id}`,
-                  params: {
-                    post,
-                    created: post.created,
-                  },
-                });
-              }}
-            >
-              <Post post={post} created={post.created} />
-            </TouchableOpacity>
-          </View>
-        ))}
-      </ScrollView>
+        ListFooterComponent={
+          fetchingMorePosts ? (
+            <View style={styles.feedLoading}>
+              <ActivityIndicator size="large" color="black" />
+            </View>
+          ) : null
+        }
+        onEndReached={loadMorePosts} // Fetch more data when end is reached
+        onEndReachedThreshold={0.1} // How close to the end to trigger
+      />
     </View>
   );
 };
