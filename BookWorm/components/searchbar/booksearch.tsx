@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
+import { useQuery } from "@tanstack/react-query";
 import { fetchBooksByTitleSearch } from "../../services/firebase-services/queries";
+import { type BookVolumeItem } from "../../types";
 import BookList from "../booklist/BookList";
 import SearchBar from "./searchbar";
-import { type BookVolumeItem } from "../../types";
 
 const BOOK_SEARCH_PLACEHOLDER = "Search for books";
 
@@ -19,21 +20,29 @@ const BookSearch = ({ searchPhrase, setSearchPhrase }: BookSearchProps) => {
     searchPhrase !== "",
   );
 
+  const { data: fetchBookData } = useQuery({
+    queryKey: ["searchbooks", searchPhrase],
+    queryFn: async () => {
+      if (searchPhrase.trim() === "") {
+        setBooks([]);
+      }
+      if (
+        searchPhrase != null &&
+        searchPhrase !== "" &&
+        searchPhrase.trim() !== ""
+      ) {
+        return await fetchBooksByTitleSearch(searchPhrase);
+      } else {
+        return null;
+      }
+    },
+  });
+
   useEffect(() => {
-    const bookSearchValue = searchPhrase;
-    if (bookSearchValue.trim() !== "") {
-      fetchBooksByTitleSearch(bookSearchValue)
-        .then((fetchedBooks) => {
-          setBooks(fetchedBooks);
-        })
-        .catch((error) => {
-          alert("Error fetching books: " + error);
-        });
-    } else {
-      // Clear books when search phrase is empty
-      setBooks([]);
+    if (fetchBookData !== undefined && fetchBookData !== null) {
+      setBooks(fetchBookData);
     }
-  }, [searchPhrase]);
+  }, [fetchBookData]);
 
   return (
     <View style={styles.container}>

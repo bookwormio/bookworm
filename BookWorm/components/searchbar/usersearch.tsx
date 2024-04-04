@@ -30,7 +30,7 @@ const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
   };
 
   const { data: fetchUsersData } = useQuery({
-    queryKey: ["users", searchPhrase],
+    queryKey: ["searchusers", searchPhrase],
     queryFn: async () => {
       if (searchPhrase != null && searchPhrase !== "") {
         return await fetchUsersBySearch(searchPhrase);
