@@ -1,5 +1,4 @@
 import { FontAwesome5 } from "@expo/vector-icons";
-import { Slider } from "@miblanchard/react-native-slider";
 import * as ImagePicker from "expo-image-picker";
 import React, { useRef, useState } from "react";
 import {
@@ -9,13 +8,15 @@ import {
   Image,
   ScrollView,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import RNPickerSelect from "react-native-picker-select";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
-import SliderThumb from "../../../components/createpost/SliderThumb";
+import { HOURS, MINUTES } from "../../../constants/constants";
 import {
   addDataEntry,
   createPost,
@@ -24,12 +25,13 @@ import {
 const NewPost = () => {
   const { user } = useAuth();
   const [book, setBook] = useState("");
-  const [minutesRead, setMinutesRead] = useState(0);
   const [pagesRead, setPagesRead] = useState("");
   const [text, setText] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [creatingPost, setCreatedPost] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedHours, setSelectedHours] = useState(0);
+  const [selectedMinutes, setSelectedMinutes] = useState(0);
   const fadeAnimation = useRef(new Animated.Value(0)).current;
   const slideAnimation = useRef(new Animated.Value(0)).current;
 
@@ -93,7 +95,8 @@ const NewPost = () => {
       .finally(() => {
         removePostView();
         setBook("");
-        setMinutesRead(0);
+        setSelectedHours(0);
+        setSelectedMinutes(0);
         setText("");
         setImages([]);
         setLoading(false);
@@ -106,13 +109,15 @@ const NewPost = () => {
 
   const createNewTracking = () => {
     setLoading(true);
-    addDataEntry(user, +pagesRead, minutesRead)
+    const totalMinutes = 60 * selectedHours + selectedMinutes;
+    addDataEntry(user, +pagesRead, totalMinutes)
       .catch((error) => {
         console.error("Error adding tracking. " + error);
       })
       .finally(() => {
         setBook("");
-        setMinutesRead(0);
+        setSelectedHours(0);
+        setSelectedMinutes(0);
         setPagesRead("");
         setLoading(false);
         Toast.show({
@@ -125,11 +130,12 @@ const NewPost = () => {
 
   const fieldsMissing = () => {
     const missingFields: string[] = [];
+    const totalMinutes = 60 * selectedHours + selectedMinutes;
     if (book === "") {
       missingFields.push("Book");
     }
-    if (minutesRead === 0) {
-      missingFields.push("Minutes Read");
+    if (totalMinutes === 0) {
+      missingFields.push("Time Read");
     }
     if (pagesRead === "") {
       missingFields.push("Pages Read");
@@ -150,127 +156,146 @@ const NewPost = () => {
     return false;
   };
 
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        {loading && (
+          <View style={styles.loading}>
+            <ActivityIndicator size="large" color="black" />
+          </View>
+        )}
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Toast />
-      {loading && (
-        <View style={styles.loading}>
-          <ActivityIndicator size="large" color="black" />
-        </View>
-      )}
-      {!loading && (
-        <>
-          <TextInput
-            style={styles.input}
-            value={book}
-            placeholder="Book"
-            onChangeText={(book) => {
-              setBook(book);
+      <TextInput
+        style={styles.input}
+        value={book}
+        placeholder="Book"
+        onChangeText={(book) => {
+          setBook(book);
+        }}
+      />
+      <View style={styles.pickerRow}>
+        <View style={styles.pickerContainer}>
+          <Text style={{ color: "#C7C7CD" }}>Time Read: </Text>
+          <RNPickerSelect
+            placeholder={{
+              label: "0",
+              value: "0",
             }}
+            items={HOURS}
+            value={selectedHours}
+            onValueChange={(hoursString: string) => {
+              setSelectedHours(+hoursString);
+            }}
+            style={pickerSelectStyles}
           />
-          <View style={styles.rowContainer}>
-            <Slider
-              containerStyle={styles.sliderContainer}
-              value={minutesRead}
-              onValueChange={(value: number[]) => {
-                setMinutesRead(value[0]);
-              }}
-              minimumValue={0}
-              maximumValue={240}
-              renderThumbComponent={() => (
-                <SliderThumb minutesRead={minutesRead} />
-              )}
-              step={5}
-            />
-            <TextInput
-              style={styles.pagesInput}
-              value={pagesRead}
-              keyboardType="numeric"
-              placeholder="Pages Read"
-              onChangeText={(pages) => {
-                setPagesRead(pages);
-              }}
-            />
-          </View>
-          <Animated.View
-            style={[
-              styles.rowContainer,
+          <Text> hrs </Text>
+          <RNPickerSelect
+            placeholder={{
+              label: "0",
+              value: "0",
+            }}
+            items={MINUTES}
+            value={selectedMinutes}
+            onValueChange={(minutesString: string) => {
+              setSelectedMinutes(+minutesString);
+            }}
+            style={pickerSelectStyles}
+          />
+          <Text> mins </Text>
+        </View>
+        <TextInput
+          style={styles.pagesInput}
+          value={pagesRead}
+          keyboardType="numeric"
+          placeholder="Pages Read"
+          onChangeText={(pages) => {
+            setPagesRead(pages);
+          }}
+        />
+      </View>
+      <Animated.View
+        style={[
+          styles.rowContainer,
+          {
+            transform: [
               {
-                transform: [
-                  {
-                    translateY: slideAnimation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, 250],
-                    }),
-                  },
-                ],
+                translateY: slideAnimation.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 250],
+                }),
               },
-            ]}
-          >
-            <Button
-              title={creatingPost ? "Remove Post" : "Add Tracking"}
-              onPress={() => {
-                if (creatingPost) {
-                  removePostView();
-                } else {
-                  if (!fieldsMissing()) {
-                    createNewTracking();
-                  }
-                }
-              }}
-            />
-            <Button
-              title={creatingPost ? "Create Post + Tracking" : "Create Post"}
-              onPress={() => {
-                if (!creatingPost) {
-                  addPostView();
-                } else {
-                  if (!fieldsMissing()) {
-                    createNewPost();
-                    createNewTracking();
-                  }
-                }
-              }}
-            />
-          </Animated.View>
-          <Animated.View style={{ opacity: fadeAnimation, width: "100%" }}>
-            <TextInput
-              style={[styles.input, { height: "25%" }]}
-              multiline={true}
-              value={text}
-              placeholder="Add some text to your post"
-              onChangeText={(text) => {
-                setText(text);
-              }}
-            />
-            <ScrollView horizontal={true} style={{ marginTop: 20 }}>
-              {images.map((image: string, index: number) => (
-                <View key={index}>
-                  <Image source={{ uri: image }} style={styles.image} />
-                  <TouchableOpacity
-                    style={styles.removeButton}
-                    onPress={() => {
-                      removeImageByIndex(index);
-                    }}
-                  >
-                    <FontAwesome5 name="times-circle" size={20} />
-                  </TouchableOpacity>
-                </View>
-              ))}
+            ],
+          },
+        ]}
+      >
+        <Button
+          title={creatingPost ? "Remove Post" : "Add Tracking"}
+          onPress={() => {
+            if (creatingPost) {
+              removePostView();
+            } else {
+              if (!fieldsMissing()) {
+                createNewTracking();
+              }
+            }
+          }}
+        />
+        <Button
+          title={creatingPost ? "Create Post + Tracking" : "Create Post"}
+          onPress={() => {
+            if (!creatingPost) {
+              addPostView();
+            } else {
+              if (!fieldsMissing()) {
+                createNewPost();
+                createNewTracking();
+              }
+            }
+          }}
+        />
+      </Animated.View>
+      <Animated.View style={{ opacity: fadeAnimation, width: "100%" }}>
+        <TextInput
+          style={[styles.input, { height: "25%" }]}
+          multiline={true}
+          value={text}
+          placeholder="Add some text to your post"
+          onChangeText={(text) => {
+            setText(text);
+          }}
+        />
+        <ScrollView horizontal={true} style={{ marginTop: 20 }}>
+          {images.map((image: string, index: number) => (
+            <View key={index}>
+              <Image source={{ uri: image }} style={styles.image} />
               <TouchableOpacity
-                style={styles.defaultImage}
+                style={styles.removeButton}
                 onPress={() => {
-                  pickImageAsync().catch((error) => {
-                    console.error("Error selecting image. " + error);
-                  });
+                  removeImageByIndex(index);
                 }}
               >
-                <FontAwesome5 name="image" size={20} />
+                <FontAwesome5 name="times-circle" size={20} />
               </TouchableOpacity>
-            </ScrollView>
-          </Animated.View>
-        </>
-      )}
+            </View>
+          ))}
+          <TouchableOpacity
+            style={styles.defaultImage}
+            onPress={() => {
+              pickImageAsync().catch((error) => {
+                console.error("Error selecting image. " + error);
+              });
+            }}
+          >
+            <FontAwesome5 name="image" size={20} />
+          </TouchableOpacity>
+        </ScrollView>
+      </Animated.View>
     </View>
   );
 };
@@ -283,12 +308,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     justifyContent: "center",
-  },
-  sliderContainer: {
-    width: "70%",
-    height: 20,
-    alignSelf: "flex-start",
-    paddingVertical: 30,
   },
   input: {
     borderColor: "gray",
@@ -303,13 +322,20 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     zIndex: 999,
   },
+  pickerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    zIndex: 999,
+    width: "100%",
+    marginTop: 10,
+  },
   pagesInput: {
     borderColor: "gray",
-    width: "27%",
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
-    marginLeft: "3%",
+    width: "27%",
   },
   defaultImage: {
     backgroundColor: "#d3d3d3",
@@ -345,5 +371,42 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "absolute",
     top: "50%",
+  },
+  pickerContainer: {
+    flexDirection: "row",
+    alignItems: "center", // Vertically center the items
+    backgroundColor: "#F2F2F2",
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "grey",
+    height: "100%",
+    paddingHorizontal: 10,
+    width: "55%",
+  },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  placeholder: {
+    color: "black",
+  },
+  inputIOS: {
+    fontSize: 16,
+    width: 30,
+    height: 30,
+    borderRadius: 5,
+    color: "black",
+    backgroundColor: "#c9ccd3",
+    textAlign: "center",
+    marginTop: "10%",
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: "purple",
+    borderRadius: 8,
+    color: "black",
+    paddingRight: 30, // to ensure the text is never behind the icon
   },
 });
