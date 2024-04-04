@@ -335,7 +335,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
-    width: "27%",
   },
   defaultImage: {
     backgroundColor: "#d3d3d3",
@@ -381,7 +380,6 @@ const styles = StyleSheet.create({
     borderColor: "grey",
     height: "100%",
     paddingHorizontal: 10,
-    width: "55%",
   },
 });
 
