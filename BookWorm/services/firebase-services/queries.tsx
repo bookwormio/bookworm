@@ -21,6 +21,7 @@ import {
   type BookVolumeInfo,
   type BookVolumeItem,
   type BooksResponse,
+  type Connection,
   type Post,
   type PostModel,
   type UserData,
@@ -251,20 +252,21 @@ export async function createPost(post: Post) {
  * @throws {Error} If there's an error during the operation.
  * @TODO Add private visibility down the line (follow request).
  */
-export async function followUserByID(
-  currentUserID: string,
-  friendUserID: string,
-): Promise<boolean> {
-  if (currentUserID === "") {
+export async function followUserByID(connection: Connection): Promise<boolean> {
+  if (connection.currentUserID === "") {
     console.error("Current user ID is null");
     return false;
   }
-  if (friendUserID === "") {
+  if (connection.friendUserID === "") {
     console.error("Attempting to follow null user");
     return false;
   }
   try {
-    const docRef = doc(DB, "relationships", `${currentUserID}_${friendUserID}`);
+    const docRef = doc(
+      DB,
+      "relationships",
+      `${connection.currentUserID}_${connection.friendUserID}`,
+    );
 
     // A transaction is used to ensure data consistency
     // and avoid race conditions by executing all operations on the server side.
@@ -283,8 +285,8 @@ export async function followUserByID(
       } else {
         // Document doesn't exist, set it with created_at
         transaction.set(docRef, {
-          follower: currentUserID,
-          following: friendUserID,
+          follower: connection.currentUserID,
+          following: connection.friendUserID,
           created_at: serverTimestamp(),
           follow_status: ServerFollowStatus.FOLLOWING,
         });
@@ -305,19 +307,22 @@ export async function followUserByID(
  * @returns {Promise<boolean>} A promise that resolves to true if the unfollow operation succeeds, false otherwise.
  */
 export async function unfollowUserByID(
-  currentUserID: string,
-  friendUserID: string,
+  connection: Connection,
 ): Promise<boolean> {
-  if (currentUserID === "") {
+  if (connection.currentUserID === "") {
     console.error("Current user ID is empty string");
     return false;
   }
-  if (friendUserID === "") {
+  if (connection.friendUserID === "") {
     console.error("Attempting to unfollow empty user string");
     return false;
   }
   try {
-    const docRef = doc(DB, "relationships", `${currentUserID}_${friendUserID}`);
+    const docRef = doc(
+      DB,
+      "relationships",
+      `${connection.currentUserID}_${connection.friendUserID}`,
+    );
     await updateDoc(docRef, {
       follow_status: ServerFollowStatus.UNFOLLOWED,
       updated_at: serverTimestamp(), // Update the timestamp

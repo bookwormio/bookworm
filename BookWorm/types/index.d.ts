@@ -22,6 +22,11 @@ interface Post {
   imageURI: string;
 }
 
+interface Connection {
+  currentUserID: string;
+  friendUserID: string;
+}
+
 // TODO: separate book volume info from book preview info
 // (less information needed for a book preview)
 interface BookVolumeInfo {
