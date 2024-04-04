@@ -335,6 +335,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
+    width: "30%",
   },
   defaultImage: {
     backgroundColor: "#d3d3d3",
