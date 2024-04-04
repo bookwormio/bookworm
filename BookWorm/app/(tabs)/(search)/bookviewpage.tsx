@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -17,27 +18,29 @@ const BookViewPage = () => {
   const [bookData, setBookData] = useState<BookVolumeInfo | null>(null);
   const { bookID } = useLocalSearchParams<{ bookID: string }>();
 
-  useEffect(() => {
-    const fetchBook = async () => {
-      if (bookID !== undefined && bookID !== null) {
-        // Check if bookID is not undefined or null
-        try {
-          const data = await fetchBookByVolumeID(bookID);
-          setBookData(data); // Set bookData with fetched data
-          console.log(data?.imageLinks);
-        } catch (error) {
-          console.error("Error fetching book:", error);
-          // Handle error if fetchBookByVolumeID fails
-        }
+  const { data: queryBookData, isLoading: isLoadingBook } = useQuery({
+    queryKey:
+      bookID !== undefined && bookID !== null
+        ? ["bookdata", bookID]
+        : ["bookdata"],
+    queryFn: async () => {
+      if (bookID != null && bookID !== undefined) {
+        return await fetchBookByVolumeID(bookID);
+      } else {
+        return null;
       }
-    };
+    },
+  });
 
-    void fetchBook(); // Call the fetchBook function upon entry to the page
-  }, [bookID]); // Dependency array to trigger the effect when bookID changes
+  useEffect(() => {
+    if (queryBookData !== null && queryBookData !== undefined) {
+      setBookData(queryBookData);
+    }
+  }, [queryBookData]);
 
   const windowWidth = useWindowDimensions().width;
 
-  if (bookData === null || bookData === undefined) {
+  if (bookData === null || bookData === undefined || isLoadingBook) {
     return (
       <View style={styles.container}>
         <Text>Loading...</Text>
