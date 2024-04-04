@@ -47,20 +47,22 @@ const Posts = () => {
   };
 
   const loadMorePosts = async () => {
-    setFetchingMorePosts(true);
-    try {
-      if (user != null) {
-        const { posts: fetchedPosts, newLastVisible: lastVisible } =
-          await fetchPostsForUserFeed(user.uid, lastVisiblePost);
-        if (fetchedPosts.length > 0 && lastVisible != null) {
-          setLastVisiblePost(lastVisible); // Update last visible post
-          setPosts((prevPosts) => [...prevPosts, ...fetchedPosts]); // Append new posts to existing posts
+    if (!fetchingMorePosts && !refreshing && !feedLoading) {
+      setFetchingMorePosts(true);
+      try {
+        if (user != null) {
+          const { posts: fetchedPosts, newLastVisible: lastVisible } =
+            await fetchPostsForUserFeed(user.uid, lastVisiblePost);
+          if (fetchedPosts.length > 0 && lastVisible != null) {
+            setLastVisiblePost(lastVisible); // Update last visible post
+            setPosts((prevPosts) => [...prevPosts, ...fetchedPosts]); // Append new posts to existing posts
+          }
         }
+      } catch (error) {
+        console.error("Error fetching posts", error);
+      } finally {
+        setFetchingMorePosts(false);
       }
-    } catch (error) {
-      console.error("Error fetching posts", error);
-    } finally {
-      setFetchingMorePosts(false);
     }
   };
 
@@ -72,7 +74,7 @@ const Posts = () => {
         setRefreshing(false);
       })
       .catch((error) => {
-        console.log("Error refreshing posts" + error);
+        console.error("Error refreshing posts" + error);
       });
   };
 
@@ -117,7 +119,7 @@ const Posts = () => {
             </View>
           ) : null
         }
-        onEndReached={loadMorePosts} // Fetch more data when end is reached
+        onEndReached={!fetchingMorePosts ? loadMorePosts : null} // Fetch more data when end is reached
         onEndReachedThreshold={0.1} // How close to the end to trigger
       />
     </View>
