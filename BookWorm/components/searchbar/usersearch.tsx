@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { fetchUsersBySearch } from "../../services/firebase-services/queries";
-import SearchBar from "./searchbar";
 import { type UserListItem } from "../../types";
+import SearchBar from "./searchbar";
 
 const USER_SEARCH_PLACEHOLDER = "Search for users";
 
@@ -28,16 +29,22 @@ const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
     });
   };
 
+  const { data: fetchUsersData } = useQuery({
+    queryKey: ["users", searchPhrase],
+    queryFn: async () => {
+      if (searchPhrase != null && searchPhrase !== "") {
+        return await fetchUsersBySearch(searchPhrase);
+      } else {
+        return null;
+      }
+    },
+  });
+
   useEffect(() => {
-    const userSearchValue = searchPhrase;
-    fetchUsersBySearch(userSearchValue)
-      .then((fetchedUsers) => {
-        setUsers(fetchedUsers); // Set the state with the fetched users
-      })
-      .catch((error) => {
-        alert("Error fetching users: " + error);
-      });
-  }, [searchPhrase]); // Run this effect whenever searchPhrase changes
+    if (fetchUsersData !== undefined && fetchUsersData !== null) {
+      setUsers(fetchUsersData);
+    }
+  }, [fetchUsersData]);
 
   return (
     <View style={styles.container}>
