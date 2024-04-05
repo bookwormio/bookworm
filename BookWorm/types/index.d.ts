@@ -19,7 +19,7 @@ interface CreatePostModel {
   userid: string;
   book: stirng;
   text: string;
-  imageURI: string;
+  images: string[];
 }
 
 interface ConnectionModel {
@@ -96,4 +96,10 @@ interface UserModel {
   isPublic: boolean;
   last: string;
   number: Timestamp;
+}
+
+interface CreateTrackingModel {
+  userid: string;
+  pagesRead: number;
+  minutesRead: number;
 }

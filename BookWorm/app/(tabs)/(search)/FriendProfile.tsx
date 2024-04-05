@@ -94,7 +94,7 @@ const FriendProfile = () => {
     if (user?.uid !== undefined && friendUserID !== undefined) {
       if (isFollowingData !== null && isFollowingData !== undefined) {
         setFollowStatus(
-          isFollowingData === true
+          isFollowingData
             ? LocalFollowStatus.FOLLOWING
             : LocalFollowStatus.NOT_FOLLOWING,
         );
@@ -174,7 +174,7 @@ const FriendProfile = () => {
     }
   };
 
-  if (friendIsLoading === true) {
+  if (friendIsLoading) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />

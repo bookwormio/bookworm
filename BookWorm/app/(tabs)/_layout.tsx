@@ -45,13 +45,8 @@ const AppLayout = () => {
           tabBarLabel: "Posts",
           headerTitle: "Posts",
           headerRight: () => (
-            <TouchableOpacity
-              style={styles.newPost}
-              onPress={() => {
-                router.push("NewPost");
-              }}
-            >
-              <FontAwesome5 name="plus" size={20} />
+            <TouchableOpacity style={styles.newPost} onPress={() => {}}>
+              <FontAwesome5 name="bell" size={20} />
             </TouchableOpacity>
           ),
           headerLeft: () => (
@@ -70,7 +65,7 @@ const AppLayout = () => {
             </View>
           ),
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome5 name="book" size={size} color={color} />
+            <FontAwesome5 name="stream" size={size} color={color} />
           ),
         }}
       />
@@ -81,6 +76,16 @@ const AppLayout = () => {
           headerTitle: "Search",
           tabBarIcon: ({ color, size }) => (
             <FontAwesome5 name="search" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="(create)"
+        options={{
+          tabBarLabel: "Create",
+          headerTitle: "Create",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome5 name="book-medical" size={size} color={color} />
           ),
         }}
       />

@@ -10,6 +10,7 @@ import {
   query,
   runTransaction,
   serverTimestamp,
+  setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -21,8 +22,9 @@ import {
   type BookVolumeInfo,
   type BookVolumeItem,
   type BooksResponse,
-  type Connection,
-  type Post,
+  type ConnectionModel,
+  type CreatePostModel,
+  type CreateTrackingModel,
   type PostModel,
   type UserData,
   type UserListItem,
@@ -212,29 +214,92 @@ export async function fetchUser(userID: string): Promise<UserModel | null> {
   }
 }
 
+// fetches user's first name
+export async function fetchFirstName(user: User) {
+  try {
+    const userDocRef = doc(DB, "user_collection", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      return userData.first;
+    } else {
+      console.log("User document DNE");
+      return "";
+    }
+  } catch (error) {
+    console.error("Error fetching first name:", error);
+    throw error;
+  }
+}
+
+// fetches user's last name
+export async function fetchLastName(user: User) {
+  try {
+    const userDocRef = doc(DB, "user_collection", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      return userData.last;
+    } else {
+      console.error("User document DNE");
+      return "";
+    }
+  } catch (error) {
+    console.error("Error fetching last name:", error);
+    throw error;
+  }
+}
+
+// fetches user's phone number
+export async function fetchPhoneNumber(user: User) {
+  try {
+    const userDocRef = doc(DB, "user_collection", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      return userData.number;
+    } else {
+      console.error("User document DNE");
+      return "";
+    }
+  } catch (error) {
+    console.error("Error fetching phone number:", error);
+    throw error;
+  }
+}
+
 /**
- * Creates a new post in the database based on the provided post object.
- * @param {Post} post - The post object containing information about the post.
- * @returns {Promise<void>} A Promise that resolves when the post creation process is completed.
+ * Follows a user by updating the relationship document between the current user and the friend user.
+ * If the document doesn't exist, it creates a new one; otherwise, it updates the existing document.
+ * @param {User | null} user - The current user.
+ * @param {string} book - The title of the book.
+ * @param {string} text - Any text the user wants to add to the post
+ * @param {string[]} imageURIs - A list of all image URIs of each image the user wants to upload (can be empty)
+ * @returns {Promise<void>} A void promise if successful or an error if the document creation fails
+ * @throws {Error} If there's an error during the operation.
  */
-export async function createPost(post: Post) {
+export async function createPost(post: CreatePostModel) {
   if (post.userid != null) {
     addDoc(collection(DB, "posts"), {
       user: post.userid,
       created: serverTimestamp(),
       book: post.book,
       text: post.text,
-      image: post.imageURI !== "",
+      image: post.images?.length,
     })
       .then(async (docRef) => {
-        if (post.imageURI !== "") {
-          const response = await fetch(post.imageURI);
-          const blob = await response.blob();
-          const storageRef = ref(
-            STORAGE,
-            "posts/" + post.userid + "/" + docRef.id,
+        if (post.images.length > 0) {
+          await Promise.all(
+            post.images.map(async (imageURI: string, index: number) => {
+              const response = await fetch(imageURI);
+              const blob = await response.blob();
+              const storageRef = ref(
+                STORAGE,
+                "posts/" + docRef.id + "/" + index,
+              );
+              await uploadBytesResumable(storageRef, blob);
+            }),
           );
-          await uploadBytesResumable(storageRef, blob);
         }
       })
       .catch((error) => {
@@ -252,7 +317,9 @@ export async function createPost(post: Post) {
  * @throws {Error} If there's an error during the operation.
  * @TODO Add private visibility down the line (follow request).
  */
-export async function followUserByID(connection: Connection): Promise<boolean> {
+export async function followUserByID(
+  connection: ConnectionModel,
+): Promise<boolean> {
   if (connection.currentUserID === "") {
     console.error("Current user ID is null");
     return false;
@@ -307,7 +374,7 @@ export async function followUserByID(connection: Connection): Promise<boolean> {
  * @returns {Promise<boolean>} A promise that resolves to true if the unfollow operation succeeds, false otherwise.
  */
 export async function unfollowUserByID(
-  connection: Connection,
+  connection: ConnectionModel,
 ): Promise<boolean> {
   if (connection.currentUserID === "") {
     console.error("Current user ID is empty string");
@@ -614,4 +681,59 @@ function sortPostsByDate(posts: PostModel[]) {
     const dateB = postB.created.toDate();
     return dateB.getTime() - dateA.getTime();
   });
+}
+
+/**
+ * Adds a data entry for a users time reading and number of pages
+ * Combines getAllFollowing(), fetchPostsByUserID(), and sortPostsByDate() functions.
+ * @param {CreateTrackingModel} tracking - A tracking object storing the userID, minutesRead, and pagesRead.
+ * @returns {Promise<boolean>} A boolean promise, true if successful, false if not.
+ */
+export async function addDataEntry(
+  tracking: CreateTrackingModel,
+): Promise<boolean> {
+  try {
+    if (tracking.userid !== null) {
+      const q = query(
+        collection(DB, "data_collection"),
+        where("user_id", "==", tracking.userid),
+      );
+      const dataCol = await getDocs(q);
+      if (dataCol.empty) {
+        // The collection doesn't exist for the user, so create it
+        const userDataCollectionRef = collection(DB, "data_collection");
+        const userDataDocRef = doc(userDataCollectionRef);
+        await setDoc(userDataDocRef, { user_id: tracking.userid });
+        const newDocRef = await getDoc(userDataDocRef);
+        // console.log(newDocRef);
+        const subColPageRef = collection(newDocRef.ref, "pages_read");
+        await addDoc(subColPageRef, {
+          added_at: serverTimestamp(),
+          pages: tracking.pagesRead,
+        });
+        const subColTimeRef = collection(newDocRef.ref, "time_read");
+        await addDoc(subColTimeRef, {
+          added_at: serverTimestamp(),
+          minutes: tracking.minutesRead,
+        });
+      } else {
+        // console.log(dataCol.docs[0].ref);
+        const subColPageRef = collection(dataCol.docs[0].ref, "pages_read");
+        await addDoc(subColPageRef, {
+          added_at: serverTimestamp(),
+          pages: tracking.pagesRead,
+        });
+        const subColTimeRef = collection(dataCol.docs[0].ref, "time_read");
+        await addDoc(subColTimeRef, {
+          added_at: serverTimestamp(),
+          minutes: tracking.minutesRead,
+        });
+      }
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 }

@@ -22,3 +22,13 @@ export const MONTHS_OF_YEAR = [
   "November",
   "December",
 ];
+
+export const HOURS = Array.from({ length: 23 }, (_, index) => ({
+  label: (index + 1).toString(),
+  value: (index + 1).toString(),
+}));
+
+export const MINUTES = Array.from({ length: 11 }, (_, index) => ({
+  label: ((index + 1) * 5).toString(),
+  value: ((index + 1) * 5).toString(),
+}));
