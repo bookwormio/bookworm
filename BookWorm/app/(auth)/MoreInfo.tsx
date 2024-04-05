@@ -61,6 +61,9 @@ const MoreInfo = () => {
         onChangeText={(text) => {
           setUsername(text);
         }}
+        autoCorrect={false}
+        autoComplete="off"
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}
@@ -69,6 +72,8 @@ const MoreInfo = () => {
         onChangeText={(text) => {
           setFirst(text);
         }}
+        autoCorrect={false}
+        autoComplete="off"
       />
       <TextInput
         style={styles.input}
@@ -77,6 +82,8 @@ const MoreInfo = () => {
         onChangeText={(text) => {
           setLast(text);
         }}
+        autoCorrect={false}
+        autoComplete="off"
       />
       <TextInput
         style={styles.input}
