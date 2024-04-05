@@ -21,6 +21,8 @@ import {
   type BookVolumeInfo,
   type BookVolumeItem,
   type BooksResponse,
+  type Connection,
+  type Post,
   type PostModel,
   type UserData,
   type UserListItem,
@@ -62,6 +64,12 @@ export const updateUser = async (userdata: UserData): Promise<void> => {
     console.error("Error updating user", error);
   }
 };
+
+/**
+ * Represents an asynchronous function that represents an empty query.
+ * @returns {Promise<void>} A Promise that resolves when the empty query is completed.
+ */
+export const emptyQuery = async (): Promise<void> => {};
 
 /**
  * Fetches user information from the Firestore database.
@@ -175,25 +183,12 @@ export async function fetchFriendData(
   }
 }
 
-export async function updateUserInfo(
-  user: User,
-  firstName: string,
-  lastName: string,
-  phoneNumber: string,
-) {
-  try {
-    await updateDoc(doc(DB, "user_collection", user.uid), {
-      email: user.email,
-      first: firstName,
-      last: lastName,
-      number: phoneNumber,
-    });
-  } catch (error) {
-    alert(error);
-  }
-}
-
-// fetches all user traits
+/**
+ * Fetches a user from the database based on the provided userID.
+ * @param {string} userID - The ID of the user to fetch.
+ * @returns {Promise<UserModel | null>} A Promise that resolves with the fetched user if it exists, or null if the user does not exist.
+ * @throws {Error} Throws an error if there's an issue fetching the user.
+ */
 export async function fetchUser(userID: string): Promise<UserModel | null> {
   try {
     const userDocRef = doc(DB, "user_collection", userID);
@@ -217,81 +212,27 @@ export async function fetchUser(userID: string): Promise<UserModel | null> {
   }
 }
 
-// fetches user's first name
-export async function fetchFirstName(user: User) {
-  try {
-    const userDocRef = doc(DB, "user_collection", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData.first;
-    } else {
-      console.error("User document DNE");
-      return "";
-    }
-  } catch (error) {
-    console.error("Error fetching first name:", error);
-    throw error;
-  }
-}
-
-// fetches user's last name
-export async function fetchLastName(user: User) {
-  try {
-    const userDocRef = doc(DB, "user_collection", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData.last;
-    } else {
-      console.error("User document DNE");
-      return "";
-    }
-  } catch (error) {
-    console.error("Error fetching last name:", error);
-    throw error;
-  }
-}
-
-// fetches user's phone number
-export async function fetchPhoneNumber(user: User) {
-  try {
-    const userDocRef = doc(DB, "user_collection", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData.number;
-    } else {
-      console.error("User document DNE");
-      return "";
-    }
-  } catch (error) {
-    console.error("Error fetching phone number:", error);
-    throw error;
-  }
-}
-
-export async function createPost(
-  user: User | null,
-  book: string,
-  text: string,
-  imageURI: string,
-) {
-  if (user != null) {
+/**
+ * Creates a new post in the database based on the provided post object.
+ * @param {Post} post - The post object containing information about the post.
+ * @returns {Promise<void>} A Promise that resolves when the post creation process is completed.
+ */
+export async function createPost(post: Post) {
+  if (post.userid != null) {
     addDoc(collection(DB, "posts"), {
-      user: user.uid,
+      user: post.userid,
       created: serverTimestamp(),
-      book,
-      text,
-      image: imageURI !== "",
+      book: post.book,
+      text: post.text,
+      image: post.imageURI !== "",
     })
       .then(async (docRef) => {
-        if (imageURI !== "") {
-          const response = await fetch(imageURI);
+        if (post.imageURI !== "") {
+          const response = await fetch(post.imageURI);
           const blob = await response.blob();
           const storageRef = ref(
             STORAGE,
-            "posts/" + user.uid + "/" + docRef.id,
+            "posts/" + post.userid + "/" + docRef.id,
           );
           await uploadBytesResumable(storageRef, blob);
         }
@@ -311,20 +252,21 @@ export async function createPost(
  * @throws {Error} If there's an error during the operation.
  * @TODO Add private visibility down the line (follow request).
  */
-export async function followUserByID(
-  currentUserID: string,
-  friendUserID: string,
-): Promise<boolean> {
-  if (currentUserID === "") {
+export async function followUserByID(connection: Connection): Promise<boolean> {
+  if (connection.currentUserID === "") {
     console.error("Current user ID is null");
     return false;
   }
-  if (friendUserID === "") {
+  if (connection.friendUserID === "") {
     console.error("Attempting to follow null user");
     return false;
   }
   try {
-    const docRef = doc(DB, "relationships", `${currentUserID}_${friendUserID}`);
+    const docRef = doc(
+      DB,
+      "relationships",
+      `${connection.currentUserID}_${connection.friendUserID}`,
+    );
 
     // A transaction is used to ensure data consistency
     // and avoid race conditions by executing all operations on the server side.
@@ -343,8 +285,8 @@ export async function followUserByID(
       } else {
         // Document doesn't exist, set it with created_at
         transaction.set(docRef, {
-          follower: currentUserID,
-          following: friendUserID,
+          follower: connection.currentUserID,
+          following: connection.friendUserID,
           created_at: serverTimestamp(),
           follow_status: ServerFollowStatus.FOLLOWING,
         });
@@ -365,19 +307,22 @@ export async function followUserByID(
  * @returns {Promise<boolean>} A promise that resolves to true if the unfollow operation succeeds, false otherwise.
  */
 export async function unfollowUserByID(
-  currentUserID: string,
-  friendUserID: string,
+  connection: Connection,
 ): Promise<boolean> {
-  if (currentUserID === "") {
+  if (connection.currentUserID === "") {
     console.error("Current user ID is empty string");
     return false;
   }
-  if (friendUserID === "") {
+  if (connection.friendUserID === "") {
     console.error("Attempting to unfollow empty user string");
     return false;
   }
   try {
-    const docRef = doc(DB, "relationships", `${currentUserID}_${friendUserID}`);
+    const docRef = doc(
+      DB,
+      "relationships",
+      `${connection.currentUserID}_${connection.friendUserID}`,
+    );
     await updateDoc(docRef, {
       follow_status: ServerFollowStatus.UNFOLLOWED,
       updated_at: serverTimestamp(), // Update the timestamp

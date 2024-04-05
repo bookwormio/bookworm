@@ -15,6 +15,18 @@ interface UserData {
   number: string;
 }
 
+interface CreatePostModel {
+  userid: string;
+  book: stirng;
+  text: string;
+  imageURI: string;
+}
+
+interface ConnectionModel {
+  currentUserID: string;
+  friendUserID: string;
+}
+
 // TODO: separate book volume info from book preview info
 // (less information needed for a book preview)
 interface BookVolumeInfo {

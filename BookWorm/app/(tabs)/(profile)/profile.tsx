@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -18,12 +18,16 @@ const Profile = () => {
   const userStr: string = user?.email ?? "No email";
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [profileLoading, setProfileLoading] = useState(false);
+  const navigation = useNavigation();
 
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
     queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
     queryFn: async () => {
       if (user != null) {
-        return await fetchUserData(user);
+        const userdata = await fetchUserData(user);
+        setProfileLoading(false);
+        return userdata;
       } else {
         // Return default value when user is null
         return {};
@@ -43,7 +47,11 @@ const Profile = () => {
     }
   }, [userData]);
 
-  if (isLoadingUserData) {
+  useEffect(() => {
+    setProfileLoading(true);
+  }, [navigation]);
+
+  if (isLoadingUserData || profileLoading) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />
@@ -69,6 +77,7 @@ const Profile = () => {
           } else {
             console.error("User DNE");
           }
+          setProfileLoading(true);
         }}
       />
     </View>

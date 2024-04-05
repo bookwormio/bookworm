@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -15,7 +15,7 @@ import {
   getIsFollowing,
   unfollowUserByID,
 } from "../../../services/firebase-services/queries";
-import { type UserData } from "../../../types";
+import { type ConnectionModel, type UserData } from "../../../types";
 
 enum LocalFollowStatus {
   FOLLOWING = "following",
@@ -34,6 +34,8 @@ const FriendProfile = () => {
   const [followStatusFetched, setFollowStatusFetched] =
     useState<boolean>(false);
 
+  const queryClient = useQueryClient();
+
   const { data: friendData, isLoading: friendIsLoading } = useQuery({
     queryKey:
       friendUserID != null ? ["frienddata", friendUserID] : ["frienddata"],
@@ -45,33 +47,61 @@ const FriendProfile = () => {
         return {};
       }
     },
+    staleTime: 60000, // Set stale time to 1 minute
+  });
+
+  const { data: isFollowingData } = useQuery({
+    queryKey:
+      user?.uid != null && friendUserID !== null
+        ? ["followingstatus", friendUserID, user?.uid]
+        : ["followingstatus"],
+    queryFn: async () => {
+      if (friendUserID != null && user?.uid != null) {
+        return await getIsFollowing(user?.uid, friendUserID);
+      } else {
+        return null;
+      }
+    },
+  });
+
+  const followMutation = useMutation({
+    mutationFn: followUserByID,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey:
+          user?.uid != null && friendUserID !== null
+            ? ["followingstatus", friendUserID, user?.uid]
+            : ["followingstatus"],
+      });
+      setFollowStatusFetched(true);
+    },
+  });
+
+  const unfollowMutation = useMutation({
+    mutationFn: unfollowUserByID,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey:
+          user?.uid != null && friendUserID !== null
+            ? ["followingstatus", friendUserID, user?.uid]
+            : ["followingstatus"],
+      });
+      setFollowStatusFetched(true);
+    },
   });
 
   useEffect(() => {
-    const fetchFollowStatus = async () => {
-      try {
-        const currentUserID = user?.uid;
-        // TODO: error if undefined
-        if (currentUserID === undefined || friendUserID === undefined) {
-          console.error(
-            "Either current user ID is undefined or friend user ID is undefined",
-          );
-        } else {
-          const isFollowing = await getIsFollowing(currentUserID, friendUserID);
-          setFollowStatus(
-            isFollowing
-              ? LocalFollowStatus.FOLLOWING
-              : LocalFollowStatus.NOT_FOLLOWING,
-          );
-          setFollowStatusFetched(true); // Set follow status fetched
-        }
-      } catch (error) {
-        console.error("Error fetching follow status:", error);
+    if (user?.uid !== undefined && friendUserID !== undefined) {
+      if (isFollowingData !== null && isFollowingData !== undefined) {
+        setFollowStatus(
+          isFollowingData === true
+            ? LocalFollowStatus.FOLLOWING
+            : LocalFollowStatus.NOT_FOLLOWING,
+        );
+        setFollowStatusFetched(true); // Set follow status fetched
       }
-    };
-
-    void fetchFollowStatus();
-  }, [user, friendUserID]);
+    }
+  }, [isFollowingData]);
 
   useEffect(() => {
     if (friendData !== undefined) {
@@ -110,13 +140,11 @@ const FriendProfile = () => {
       // Immediately update the visual follow status before the db has been updated
       setFollowStatus(LocalFollowStatus.LOADING);
       setFollowStatusFetched(false);
-      const followSucceeded = await followUserByID(currentUserID, friendUserID);
-      setFollowStatus(
-        followSucceeded
-          ? LocalFollowStatus.FOLLOWING
-          : LocalFollowStatus.NOT_FOLLOWING,
-      );
-      setFollowStatusFetched(true);
+      const connection: ConnectionModel = {
+        currentUserID,
+        friendUserID,
+      };
+      followMutation.mutate(connection);
     } catch (error) {
       setFollowStatus("not following");
       console.error("Error occurred while following user:", error);
@@ -135,23 +163,18 @@ const FriendProfile = () => {
     try {
       setFollowStatus(LocalFollowStatus.LOADING);
       setFollowStatusFetched(false);
-      const unfollowSucceeded = await unfollowUserByID(
+      const connection: ConnectionModel = {
         currentUserID,
         friendUserID,
-      );
-      setFollowStatus(
-        unfollowSucceeded
-          ? LocalFollowStatus.NOT_FOLLOWING
-          : LocalFollowStatus.FOLLOWING,
-      );
-      setFollowStatusFetched(true);
+      };
+      unfollowMutation.mutate(connection);
     } catch (error) {
       setFollowStatus(LocalFollowStatus.FOLLOWING);
       console.error("Error occurred while unfollowing user:", error);
     }
   };
 
-  if (friendIsLoading) {
+  if (friendIsLoading === true) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />

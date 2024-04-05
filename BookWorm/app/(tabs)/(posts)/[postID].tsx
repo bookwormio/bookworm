@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
@@ -8,16 +9,33 @@ import { type PostModel } from "../../../types";
 
 const ViewPost = () => {
   const { postID } = useLocalSearchParams();
-  const [loading, setLoading] = useState(false);
   const [post, setPost] = useState<PostModel | null>(null);
+  const [preLoad, setPreLoading] = useState(true);
 
-  const fetchPost = async () => {
-    setLoading(true);
-    try {
+  const { data: postData, isLoading: postLoading } = useQuery({
+    queryKey:
+      postID !== null && typeof postID === "string"
+        ? ["postdata", postID]
+        : ["postdata"],
+    queryFn: async () => {
       if (postID !== undefined && typeof postID === "string") {
-        const fetchedPost = await fetchPostByPostID(postID);
-        if (fetchedPost == null) {
-          setLoading(false);
+        return await fetchPostByPostID(postID);
+      } else {
+        // Return default value when user is null
+        return null;
+      }
+    },
+    staleTime: 60000, // Set stale time to 1 minute
+  });
+
+  useEffect(() => {
+    setPreLoading(postLoading);
+  }, [postLoading]);
+
+  useEffect(() => {
+    if (!preLoad) {
+      try {
+        if (postData == null) {
           Toast.show({
             type: "error",
             text1: "Error: Couldn't Find Post",
@@ -27,29 +45,26 @@ const ViewPost = () => {
               }, 1500);
             },
           });
+        } else {
+          setPost(postData);
         }
-        setPost(fetchedPost);
+      } catch (error) {
+        console.error("Error fetching post", error);
       }
-    } catch (error) {
-      console.error("Error fetching post", error);
-    } finally {
-      setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    void fetchPost();
-  }, []);
+  }, [preLoad]);
 
   return (
     <View style={styles.container}>
       <Toast />
-      {loading && (
+      {postLoading && (
         <View style={styles.feedLoading}>
           <ActivityIndicator size="large" color="black" />
         </View>
       )}
-      {post != null && !loading && <Post post={post} created={post.created} />}
+      {post != null && !postLoading && (
+        <Post post={post} created={post.created} />
+      )}
     </View>
   );
 };
