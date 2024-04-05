@@ -37,7 +37,13 @@ const AuthLayout = () => {
           ),
         }}
       />
-      <Stack.Screen name="MoreInfo" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="MoreInfo"
+        options={{
+          headerTitle: "Account Info",
+          headerBackVisible: false,
+        }}
+      />
     </Stack>
   );
 };
