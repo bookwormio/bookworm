@@ -580,7 +580,6 @@ export async function fetchPostsByUserIDs(
         startAfter(lastVisible),
         limit(10),
       );
-      console.log("querying next page");
     }
 
     const postsSnapshot = await getDocs(postsQuery);

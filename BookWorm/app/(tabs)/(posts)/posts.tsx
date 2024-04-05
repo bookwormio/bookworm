@@ -55,7 +55,8 @@ const Posts = () => {
             await fetchPostsForUserFeed(user.uid, lastVisiblePost);
           if (fetchedPosts.length > 0 && lastVisible != null) {
             setLastVisiblePost(lastVisible); // Update last visible post
-            setPosts((prevPosts) => [...prevPosts, ...fetchedPosts]); // Append new posts to existing posts
+            const newPosts = [...posts, ...fetchedPosts];
+            setPosts(newPosts); // Append new posts to existing posts
           }
         }
       } catch (error) {

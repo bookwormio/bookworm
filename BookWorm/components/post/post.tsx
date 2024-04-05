@@ -9,7 +9,7 @@ interface PostProps {
   created: Timestamp;
 }
 
-const Post = ({ post, created }: PostProps) => {
+const formatDate = (created: Timestamp) => {
   const date = created.toDate();
   const day = DAYS_OF_WEEK[date.getDay()];
   const month = MONTHS_OF_YEAR[date.getMonth()];
@@ -20,19 +20,24 @@ const Post = ({ post, created }: PostProps) => {
     date.getMonth() === currentDate.getMonth() &&
     date.getDate() === currentDate.getDate();
 
+  return isToday
+    ? "Today"
+    : `${day}, ${month} ${dayNumber} at ${date.toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      })}`;
+};
+
+const Post = ({ post, created }: PostProps) => {
+  const formattedDate = formatDate(created);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
         {post.user.first} {post.user.last} was reading {post.book}
       </Text>
-      <Text style={styles.time}>
-        {isToday ? "Today" : day + ", " + month + " " + dayNumber} at{" "}
-        {date.toLocaleString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          hour12: true,
-        })}
-      </Text>
+      <Text style={styles.time}>{formattedDate}</Text>
       <Text style={styles.body}>{post.text}</Text>
     </View>
   );
