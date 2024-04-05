@@ -49,7 +49,9 @@ const ViewPost = () => {
           <ActivityIndicator size="large" color="black" />
         </View>
       )}
-      {post != null && !loading && <Post post={post} created={post.created} />}
+      {post != null && !loading && (
+        <Post post={post} created={post.created} currentDate={new Date()} />
+      )}
     </View>
   );
 };
