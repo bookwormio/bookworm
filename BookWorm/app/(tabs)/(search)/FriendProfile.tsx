@@ -15,7 +15,7 @@ import {
   getIsFollowing,
   unfollowUserByID,
 } from "../../../services/firebase-services/queries";
-import { type ConnectionModel, type UserData } from "../../../types";
+import { type ConnectionModel, type UserDataModel } from "../../../types";
 
 enum LocalFollowStatus {
   FOLLOWING = "following",
@@ -105,7 +105,7 @@ const FriendProfile = () => {
 
   useEffect(() => {
     if (friendData !== undefined) {
-      const setFriendData = friendData as UserData;
+      const setFriendData = friendData as UserDataModel;
       if (setFriendData.first !== undefined) {
         setFirstName(setFriendData.first);
       }

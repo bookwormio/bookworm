@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import { fetchUserData } from "../../../services/firebase-services/queries";
-import { type UserData } from "../../../types";
+import { type UserDataModel } from "../../../types";
 
 const Profile = () => {
   // const navigation = useNavigation();
@@ -36,14 +36,16 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    if (userData !== undefined) {
-      const userDataTyped = userData as UserData;
+    if (userData !== undefined && userData != null) {
+      const userDataTyped = userData as UserDataModel;
       if (userDataTyped.first !== undefined) {
         setFirstName(userDataTyped.first);
       }
       if (userDataTyped.last !== undefined) {
         setLastName(userDataTyped.last);
       }
+    } else if (userData == null) {
+      signOut();
     }
   }, [userData]);
 

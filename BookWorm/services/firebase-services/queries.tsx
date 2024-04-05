@@ -85,7 +85,7 @@ export const emptyQuery = async (): Promise<void> => {};
  */
 export async function newFetchUserInfo(
   userID: string,
-): Promise<UserDataModel | undefined> {
+): Promise<UserDataModel | null> {
   try {
     const userDocRef = doc(DB, "user_collection", userID);
     const userDocSnapshot = await getDoc(userDocRef);
@@ -106,10 +106,10 @@ export async function newFetchUserInfo(
     }
     console.error("doesnt exist");
 
-    return undefined; // User document doesn't exist or data is missing
+    return null; // User document doesn't exist or data is missing
   } catch (error) {
     console.error("Error fetching user information:", error);
-    return undefined; // Return undefined on error
+    return null; // Return undefined on error
   }
 }
 
@@ -123,7 +123,9 @@ export async function newFetchUserInfo(
  * If the user document exists, it returns an object containing the user data.
  * If the user document doesn't exist or if data is missing, it returns undefined.
  */
-export const fetchUserData = async (user: User): Promise<UserDataModel> => {
+export const fetchUserData = async (
+  user: User,
+): Promise<UserDataModel | null> => {
   try {
     const userDocRef = doc(DB, "user_collection", user.uid);
     const userDocSnap = await getDoc(userDocRef);
@@ -131,20 +133,11 @@ export const fetchUserData = async (user: User): Promise<UserDataModel> => {
       const userData = userDocSnap.data() as UserDataModel;
       return userData;
     } else {
-      console.error("User document DNE");
-      return {
-        id: user.uid,
-        username: "",
-        first: "",
-        last: "",
-        number: "",
-        isPublic: false,
-        email: "",
-      };
+      return null;
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
-    throw error;
+    return null;
   }
 };
 

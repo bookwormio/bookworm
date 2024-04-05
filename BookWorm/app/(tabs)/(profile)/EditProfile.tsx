@@ -14,7 +14,7 @@ import {
   newFetchUserInfo,
   updateUser,
 } from "../../../services/firebase-services/queries";
-import { type UserData } from "../../../types";
+import { type UserDataModel } from "../../../types";
 
 const EditProfile = () => {
   const { user } = useAuth();
@@ -47,7 +47,7 @@ const EditProfile = () => {
 
   useEffect(() => {
     if (userData !== undefined) {
-      const userDataTyped = userData as UserData;
+      const userDataTyped = userData as UserDataModel;
       if (userDataTyped.first !== undefined) {
         setEditFirst(userDataTyped.first);
       }
@@ -63,7 +63,7 @@ const EditProfile = () => {
   const handeSaveClick = () => {
     const userId = user?.uid;
 
-    const newUserData = userData as UserData;
+    const newUserData = userData as UserDataModel;
     newUserData.first = editFirst;
     newUserData.last = editLast;
     newUserData.number = editPhone;

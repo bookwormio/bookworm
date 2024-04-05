@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSegments } from "expo-router";
 import {
   createUserWithEmailAndPassword,
@@ -6,6 +7,7 @@ import {
 } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { FIREBASE_AUTH } from "../../firebase.config";
+import { fetchUserData } from "../../services/firebase-services/queries";
 
 const AuthContext = React.createContext<{
   signIn: (email: string, password: string) => void;
@@ -31,6 +33,21 @@ export function useAuth() {
 function useAuthenticatedRoute(user: User | null, newUser: boolean) {
   const segments = useSegments();
   const router = useRouter();
+  const userExists = useQuery({
+    queryKey: [],
+    queryFn: async () => {
+      if (user != null) {
+        const userdata = await fetchUserData(user);
+        if (userdata != null) {
+          return true;
+        }
+      }
+      return false;
+    },
+  });
+  if (typeof userExists === "boolean" && userExists === false) {
+    router.replace("/sign-in");
+  }
 
   React.useEffect(() => {
     const inAuthGroup = segments[0] === "(auth)";
