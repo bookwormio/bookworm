@@ -269,6 +269,7 @@ const NewPost = () => {
           onChangeText={(text) => {
             setText(text);
           }}
+          editable={creatingPost}
         />
         <ScrollView horizontal={true} style={{ marginTop: 20 }}>
           {images.map((image: string, index: number) => (
