@@ -1,4 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
+import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import React, { useRef, useState } from "react";
 import {
@@ -21,6 +22,7 @@ import {
   addDataEntry,
   createPost,
 } from "../../../services/firebase-services/queries";
+import { type CreatePostModel, type CreateTrackingModel } from "../../../types";
 
 const NewPost = () => {
   const { user } = useAuth();
@@ -34,6 +36,98 @@ const NewPost = () => {
   const [selectedMinutes, setSelectedMinutes] = useState(0);
   const fadeAnimation = useRef(new Animated.Value(0)).current;
   const slideAnimation = useRef(new Animated.Value(0)).current;
+
+  const trackingMutation = useMutation({
+    mutationFn: addDataEntry,
+  });
+
+  const createNewTracking = () => {
+    if (user !== undefined && user !== null) {
+      setLoading(true);
+      const tracking: CreateTrackingModel = {
+        userid: user.uid,
+        pagesRead: +pagesRead,
+        minutesRead: 60 * selectedHours + selectedMinutes,
+      };
+      trackingMutation.mutate(tracking);
+      setBook("");
+      setSelectedHours(0);
+      setSelectedMinutes(0);
+      setPagesRead("");
+      setLoading(false);
+      Toast.show({
+        type: "success",
+        text1: "Tracking Added",
+        text2: pagesRead + " pages of " + book,
+      });
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Current user is undefined",
+      });
+    }
+  };
+
+  const postMutation = useMutation({
+    mutationFn: createPost,
+  });
+
+  const createNewPost = () => {
+    if (user !== undefined && user !== null) {
+      setLoading(true);
+      const post: CreatePostModel = {
+        userid: user.uid,
+        book,
+        text,
+        images,
+      };
+      postMutation.mutate(post);
+      removePostView();
+      setBook("");
+      setSelectedHours(0);
+      setSelectedMinutes(0);
+      setText("");
+      setImages([]);
+      setLoading(false);
+      Toast.show({
+        type: "success",
+        text1: "Post Created",
+      });
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Current user is undefined",
+      });
+    }
+  };
+
+  const fieldsMissing = () => {
+    const missingFields: string[] = [];
+    const totalMinutes = 60 * selectedHours + selectedMinutes;
+    if (book === "") {
+      missingFields.push("Book");
+    }
+    if (totalMinutes === 0) {
+      missingFields.push("Time Read");
+    }
+    if (pagesRead === "") {
+      missingFields.push("Pages Read");
+    }
+    if (creatingPost) {
+      if (text === "") {
+        missingFields.push("Post Text");
+      }
+    }
+    if (missingFields.length > 0) {
+      Toast.show({
+        type: "error",
+        text1: "Please Complete the Following Fields:",
+        text2: missingFields.join(", "),
+      });
+      return true;
+    }
+    return false;
+  };
 
   const pickImageAsync = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -84,76 +178,6 @@ const NewPost = () => {
       setText("");
       setImages([]);
     });
-  };
-
-  const createNewPost = () => {
-    setLoading(true);
-    createPost(user, book, text, images)
-      .catch((error) => {
-        console.error("Error creating post. " + error);
-      })
-      .finally(() => {
-        removePostView();
-        setBook("");
-        setSelectedHours(0);
-        setSelectedMinutes(0);
-        setText("");
-        setImages([]);
-        setLoading(false);
-        Toast.show({
-          type: "success",
-          text1: "Post Created",
-        });
-      });
-  };
-
-  const createNewTracking = () => {
-    setLoading(true);
-    const totalMinutes = 60 * selectedHours + selectedMinutes;
-    addDataEntry(user, +pagesRead, totalMinutes)
-      .catch((error) => {
-        console.error("Error adding tracking. " + error);
-      })
-      .finally(() => {
-        setBook("");
-        setSelectedHours(0);
-        setSelectedMinutes(0);
-        setPagesRead("");
-        setLoading(false);
-        Toast.show({
-          type: "success",
-          text1: "Tracking Added",
-          text2: pagesRead + " pages of " + book,
-        });
-      });
-  };
-
-  const fieldsMissing = () => {
-    const missingFields: string[] = [];
-    const totalMinutes = 60 * selectedHours + selectedMinutes;
-    if (book === "") {
-      missingFields.push("Book");
-    }
-    if (totalMinutes === 0) {
-      missingFields.push("Time Read");
-    }
-    if (pagesRead === "") {
-      missingFields.push("Pages Read");
-    }
-    if (creatingPost) {
-      if (text === "") {
-        missingFields.push("Post Text");
-      }
-    }
-    if (missingFields.length > 0) {
-      Toast.show({
-        type: "error",
-        text1: "Please Complete the Following Fields:",
-        text2: missingFields.join(", "),
-      });
-      return true;
-    }
-    return false;
   };
 
   if (loading) {
@@ -269,6 +293,7 @@ const NewPost = () => {
           onChangeText={(text) => {
             setText(text);
           }}
+          editable={creatingPost}
         />
         <ScrollView horizontal={true} style={{ marginTop: 20 }}>
           {images.map((image: string, index: number) => (
@@ -288,7 +313,11 @@ const NewPost = () => {
             style={styles.defaultImage}
             onPress={() => {
               pickImageAsync().catch((error) => {
-                console.error("Error selecting image. " + error);
+                Toast.show({
+                  type: "error",
+                  text1: "Error selecting image: " + error,
+                  text2: "Please adjust your media permissions",
+                });
               });
             }}
           >

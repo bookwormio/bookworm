@@ -1,21 +1,88 @@
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useAuth } from "../../../components/auth/context";
-import { updateUserInfo } from "../../../services/firebase-services/queries";
+import {
+  newFetchUserInfo,
+  updateUser,
+} from "../../../services/firebase-services/queries";
+import { type UserData } from "../../../types";
 
 const EditProfile = () => {
   const { user } = useAuth();
-  const { phoneNumber, firstName, lastName } = useLocalSearchParams();
-  const [editPhone, setEditPhone] = useState<string>(
-    Array.isArray(phoneNumber) ? phoneNumber[0] ?? "" : phoneNumber ?? "",
-  );
-  const [editFirst, setEditFirst] = useState<string>(
-    Array.isArray(firstName) ? firstName[0] ?? "" : firstName ?? "",
-  );
-  const [editLast, setEditLast] = useState<string>(
-    Array.isArray(lastName) ? lastName[0] ?? "" : lastName ?? "",
-  );
+  const [editPhone, setEditPhone] = useState("");
+  const [editFirst, setEditFirst] = useState("");
+  const [editLast, setEditLast] = useState("");
+
+  const queryClient = useQueryClient();
+
+  const userMutation = useMutation({
+    mutationFn: updateUser,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+      });
+    },
+  });
+
+  const { data: userData, isLoading: isLoadingUserData } = useQuery({
+    queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+    queryFn: async () => {
+      if (user != null) {
+        return await newFetchUserInfo(user.uid);
+      } else {
+        // Return default value when user is null
+        return {};
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (userData !== undefined) {
+      const userDataTyped = userData as UserData;
+      if (userDataTyped.first !== undefined) {
+        setEditFirst(userDataTyped.first);
+      }
+      if (userDataTyped.last !== undefined) {
+        setEditLast(userDataTyped.last);
+      }
+      if (userDataTyped.number !== undefined) {
+        setEditPhone(userDataTyped.number);
+      }
+    }
+  }, [userData]);
+
+  const handeSaveClick = () => {
+    const userId = user?.uid;
+
+    const newUserData = userData as UserData;
+    newUserData.first = editFirst;
+    newUserData.last = editLast;
+    newUserData.number = editPhone;
+    if (userId === undefined) {
+      console.error("Current user undefined");
+    } else {
+      newUserData.id = userId;
+      userMutation.mutate(newUserData);
+      router.back();
+    }
+  };
+
+  if (isLoadingUserData) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#000000" />
+      </View>
+    );
+  }
 
   return (
     <View>
@@ -62,23 +129,7 @@ const EditProfile = () => {
           }}
         />
       </View>
-      <Button
-        title="Save"
-        onPress={() => {
-          if (user != null) {
-            updateUserInfo(user, editFirst, editLast, editPhone)
-              .then(() => {
-                router.back();
-              })
-              .catch((error) => {
-                console.error("Error updating user info:", error);
-                // Handle error here, e.g., show error message
-              });
-          } else {
-            console.error("User DNE");
-          }
-        }}
-      />
+      <Button title="Save" onPress={handeSaveClick} />
     </View>
   );
 };
@@ -92,5 +143,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
+  },
+
+  loading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });

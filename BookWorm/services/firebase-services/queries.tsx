@@ -22,34 +22,178 @@ import {
   type BookVolumeInfo,
   type BookVolumeItem,
   type BooksResponse,
+  type ConnectionModel,
+  type CreatePostModel,
+  type CreateTrackingModel,
   type PostModel,
+  type UserDataModel,
   type UserListItem,
   type UserModel,
 } from "../../types";
 
-export async function updateUserInfo(
-  user: User | null,
-  username: string,
-  firstName: string,
-  lastName: string,
-  phoneNumber: string,
-) {
+/**
+ * Updates user data in the database.
+ * @param {UserDataModel} userdata - The user data to update.
+ * @returns {Promise<void>} A promise that resolves when the update is complete.
+ * @description
+ * If all fields are empty, the function does nothing.
+ * If any of the fields are empty, the function does not update the corresponding fields in Firestore.
+ * Otherwise, it updates the Firestore document with the provided user information.
+ */
+
+export const updateUser = async (userdata: UserDataModel): Promise<void> => {
+  console.log(userdata);
   try {
-    if (user != null) {
-      await updateDoc(doc(DB, "user_collection", user.uid), {
-        email: user.email,
-        username,
-        first: firstName,
-        last: lastName,
-        number: phoneNumber,
-      });
+    if (
+      userdata.first !== "" &&
+      userdata.last !== "" &&
+      userdata.number !== ""
+    ) {
+      // Check if any of the fields are empty
+      const dataToUpdate: Record<string, string> = {};
+      if (userdata.first !== "" && userdata.first !== undefined) {
+        dataToUpdate.first = userdata.first;
+      }
+      if (userdata.last !== "" && userdata.last !== undefined) {
+        dataToUpdate.last = userdata.last;
+      }
+      if (userdata.number !== "" && userdata.number !== undefined) {
+        dataToUpdate.number = userdata.number;
+      }
+      await updateDoc(doc(DB, "user_collection", userdata.id), dataToUpdate);
     }
   } catch (error) {
-    alert(error);
+    console.error("Error updating user", error);
+  }
+};
+
+/**
+ * Represents an asynchronous function that represents an empty query.
+ * @returns {Promise<void>} A Promise that resolves when the empty query is completed.
+ */
+export const emptyQuery = async (): Promise<void> => {};
+
+/**
+ * Fetches user information from the Firestore database.
+ * @param {string} userID - The ID of the user to fetch information for.
+ * @returns {Promise<UserData | undefined>} A Promise that resolves to the user data if found, otherwise undefined.
+ * @throws {Error} If there is an error while fetching the user information.
+ * @description
+ * Retrieves user information from the Firestore database based on the provided user ID.
+ * If the user document exists, it returns an object containing the user data.
+ * If the user document doesn't exist or if data is missing, it returns undefined.
+ */
+export async function newFetchUserInfo(
+  userID: string,
+): Promise<UserDataModel | undefined> {
+  try {
+    const userDocRef = doc(DB, "user_collection", userID);
+    const userDocSnapshot = await getDoc(userDocRef);
+
+    if (userDocSnapshot.exists()) {
+      const userData = userDocSnapshot.data();
+      if (userData !== undefined) {
+        return {
+          id: userID,
+          username: userData.username ?? "",
+          email: userData.email ?? "",
+          first: userData.first ?? "",
+          isPublic: userData.isPublic ?? false,
+          last: userData.last ?? "",
+          number: userData.number ?? "",
+        };
+      }
+    }
+    console.error("doesnt exist");
+
+    return undefined; // User document doesn't exist or data is missing
+  } catch (error) {
+    console.error("Error fetching user information:", error);
+    return undefined; // Return undefined on error
   }
 }
 
-// fetches all user traits
+/**
+ * Fetches user information from the Firestore database.
+ * @param {User} user - The user to fetch information for.
+ * @returns {Promise<UserDataModel | undefined>} A Promise that resolves to the user data if found, otherwise undefined.
+ * @throws {Error} If there is an error while fetching the user information.
+ * @description
+ * Retrieves user information from the Firestore database based on the provided user ID.
+ * If the user document exists, it returns an object containing the user data.
+ * If the user document doesn't exist or if data is missing, it returns undefined.
+ */
+export const fetchUserData = async (user: User): Promise<UserDataModel> => {
+  try {
+    const userDocRef = doc(DB, "user_collection", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data() as UserDataModel;
+      return userData;
+    } else {
+      console.error("User document DNE");
+      return {
+        id: user.uid,
+        username: "",
+        first: "",
+        last: "",
+        number: "",
+        isPublic: false,
+        email: "",
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    throw error;
+  }
+};
+
+/**
+ * Fetches user information for friend view page from the Firestore database.
+ * @param {string} userID - The ID of the friend to fetch information for.
+ * @returns {Promise<UserData | undefined>} A Promise that resolves to the user data if found, otherwise undefined.
+ * @throws {Error} If there is an error while fetching the user information.
+ * @description
+ * Retrieves friend information from the Firestore database based on the provided user ID.
+ * If the friend user document exists, it returns an object containing the user data.
+ * If the friend user document doesn't exist or if data is missing, it returns undefined.
+ */
+export async function fetchFriendData(
+  userID: string,
+): Promise<UserDataModel | undefined> {
+  try {
+    const userDocRef = doc(DB, "user_collection", userID);
+    const userDocSnapshot = await getDoc(userDocRef);
+
+    if (userDocSnapshot.exists()) {
+      const userData = userDocSnapshot.data();
+      if (userData !== undefined) {
+        return {
+          id: userID,
+          username: userData.username ?? "",
+          email: userData.email ?? "",
+          first: userData.first ?? "",
+          isPublic: userData.isPublic ?? false,
+          last: userData.last ?? "",
+          number: userData.number ?? "",
+        };
+      }
+    }
+    console.error("doesnt exist");
+
+    return undefined; // User document doesn't exist or data is missing
+  } catch (error) {
+    console.error("Error fetching user information:", error);
+    return undefined; // Return undefined on error
+  }
+}
+
+/**
+ * Fetches a user from the database based on the provided userID.
+ * @param {string} userID - The ID of the user to fetch.
+ * @returns {Promise<UserModel | null>} A Promise that resolves with the fetched user if it exists, or null if the user does not exist.
+ * @throws {Error} Throws an error if there's an issue fetching the user.
+ */
 export async function fetchUser(userID: string): Promise<UserModel | null> {
   try {
     const userDocRef = doc(DB, "user_collection", userID);
@@ -137,24 +281,19 @@ export async function fetchPhoneNumber(user: User) {
  * @returns {Promise<void>} A void promise if successful or an error if the document creation fails
  * @throws {Error} If there's an error during the operation.
  */
-export async function createPost(
-  user: User | null,
-  book: string,
-  text: string,
-  imageURIs: string[],
-) {
-  if (user != null) {
+export async function createPost(post: CreatePostModel) {
+  if (post.userid != null) {
     addDoc(collection(DB, "posts"), {
-      user: user.uid,
+      user: post.userid,
       created: serverTimestamp(),
-      book,
-      text,
-      image: imageURIs.length,
+      book: post.book,
+      text: post.text,
+      image: post.images?.length,
     })
       .then(async (docRef) => {
-        if (imageURIs.length > 0) {
+        if (post.images.length > 0) {
           await Promise.all(
-            imageURIs.map(async (imageURI: string, index: number) => {
+            post.images.map(async (imageURI: string, index: number) => {
               const response = await fetch(imageURI);
               const blob = await response.blob();
               const storageRef = ref(
@@ -182,19 +321,22 @@ export async function createPost(
  * @TODO Add private visibility down the line (follow request).
  */
 export async function followUserByID(
-  currentUserID: string,
-  friendUserID: string,
+  connection: ConnectionModel,
 ): Promise<boolean> {
-  if (currentUserID === "") {
+  if (connection.currentUserID === "") {
     console.error("Current user ID is null");
     return false;
   }
-  if (friendUserID === "") {
+  if (connection.friendUserID === "") {
     console.error("Attempting to follow null user");
     return false;
   }
   try {
-    const docRef = doc(DB, "relationships", `${currentUserID}_${friendUserID}`);
+    const docRef = doc(
+      DB,
+      "relationships",
+      `${connection.currentUserID}_${connection.friendUserID}`,
+    );
 
     // A transaction is used to ensure data consistency
     // and avoid race conditions by executing all operations on the server side.
@@ -213,8 +355,8 @@ export async function followUserByID(
       } else {
         // Document doesn't exist, set it with created_at
         transaction.set(docRef, {
-          follower: currentUserID,
-          following: friendUserID,
+          follower: connection.currentUserID,
+          following: connection.friendUserID,
           created_at: serverTimestamp(),
           follow_status: ServerFollowStatus.FOLLOWING,
         });
@@ -235,19 +377,22 @@ export async function followUserByID(
  * @returns {Promise<boolean>} A promise that resolves to true if the unfollow operation succeeds, false otherwise.
  */
 export async function unfollowUserByID(
-  currentUserID: string,
-  friendUserID: string,
+  connection: ConnectionModel,
 ): Promise<boolean> {
-  if (currentUserID === "") {
+  if (connection.currentUserID === "") {
     console.error("Current user ID is empty string");
     return false;
   }
-  if (friendUserID === "") {
+  if (connection.friendUserID === "") {
     console.error("Attempting to unfollow empty user string");
     return false;
   }
   try {
-    const docRef = doc(DB, "relationships", `${currentUserID}_${friendUserID}`);
+    const docRef = doc(
+      DB,
+      "relationships",
+      `${connection.currentUserID}_${connection.friendUserID}`,
+    );
     await updateDoc(docRef, {
       follow_status: ServerFollowStatus.UNFOLLOWED,
       updated_at: serverTimestamp(), // Update the timestamp
@@ -546,55 +691,54 @@ function sortPostsByDate(posts: PostModel[]) {
 /**
  * Adds a data entry for a users time reading and number of pages
  * Combines getAllFollowing(), fetchPostsByUserID(), and sortPostsByDate() functions.
- * @param {User | Null} user - The current user to add tracking to.
- * @param {number} pages - The number of pages a user has read.
- * @param {number} minutesRead - The number of minutes a user has read.
- * @returns {Promise<void>} A void promise if successful, otherwise a console error.
+ * @param {CreateTrackingModel} tracking - A tracking object storing the userID, minutesRead, and pagesRead.
+ * @returns {Promise<boolean>} A boolean promise, true if successful, false if not.
  */
 export async function addDataEntry(
-  user: User | null,
-  pages: number,
-  minutesRead: number,
-) {
+  tracking: CreateTrackingModel,
+): Promise<boolean> {
   try {
-    if (user !== null) {
+    if (tracking.userid !== null) {
       const q = query(
         collection(DB, "data_collection"),
-        where("user_id", "==", user.uid),
+        where("user_id", "==", tracking.userid),
       );
       const dataCol = await getDocs(q);
       if (dataCol.empty) {
         // The collection doesn't exist for the user, so create it
         const userDataCollectionRef = collection(DB, "data_collection");
         const userDataDocRef = doc(userDataCollectionRef);
-        await setDoc(userDataDocRef, { user_id: user.uid });
+        await setDoc(userDataDocRef, { user_id: tracking.userid });
         const newDocRef = await getDoc(userDataDocRef);
         // console.log(newDocRef);
         const subColPageRef = collection(newDocRef.ref, "pages_read");
         await addDoc(subColPageRef, {
           added_at: serverTimestamp(),
-          pages,
+          pages: tracking.pagesRead,
         });
         const subColTimeRef = collection(newDocRef.ref, "time_read");
         await addDoc(subColTimeRef, {
           added_at: serverTimestamp(),
-          minutesRead,
+          minutes: tracking.minutesRead,
         });
       } else {
         // console.log(dataCol.docs[0].ref);
         const subColPageRef = collection(dataCol.docs[0].ref, "pages_read");
         await addDoc(subColPageRef, {
           added_at: serverTimestamp(),
-          pages,
+          pages: tracking.pagesRead,
         });
         const subColTimeRef = collection(dataCol.docs[0].ref, "time_read");
         await addDoc(subColTimeRef, {
           added_at: serverTimestamp(),
-          minutesRead,
+          minutes: tracking.minutesRead,
         });
       }
+      return true;
     }
+    return false;
   } catch (error) {
     console.error(error);
+    return false;
   }
 }

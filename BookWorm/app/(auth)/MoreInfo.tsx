@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -8,7 +9,8 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
-import { updateUserInfo } from "../../services/firebase-services/queries";
+import { updateUser } from "../../services/firebase-services/queries";
+import { type UserDataModel } from "../../types";
 
 const MoreInfo = () => {
   const { user, setNewUser } = useAuth();
@@ -17,6 +19,33 @@ const MoreInfo = () => {
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [phone, setPhone] = useState("");
+
+  const accountInfoMutation = useMutation({
+    mutationFn: updateUser,
+  });
+
+  const createNewTracking = () => {
+    if (user !== undefined && user !== null) {
+      setLoading(true);
+      const accountInfo: UserDataModel = {
+        id: user.uid,
+        username,
+        email: user.email ?? "",
+        first,
+        last,
+        number: phone,
+        isPublic: true,
+      };
+      accountInfoMutation.mutate(accountInfo);
+      setNewUser(false);
+      setLoading(false);
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Current user is undefined",
+      });
+    }
+  };
 
   const validFields = () => {
     const missingFields: string[] = [];
@@ -90,19 +119,7 @@ const MoreInfo = () => {
         title="Confirm Account Information"
         onPress={() => {
           if (validFields()) {
-            setLoading(true);
-            updateUserInfo(user, username, first, last, phone)
-              .catch((error) => {
-                Toast.show({
-                  type: "error",
-                  text1: "Error Creating User Info",
-                  text2: error,
-                });
-              })
-              .finally(() => {
-                setNewUser(false);
-                setLoading(false);
-              });
+            createNewTracking();
           }
         }}
       />
