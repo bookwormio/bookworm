@@ -12,7 +12,7 @@ import { useAuth } from "../../components/auth/context";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signIn, createAccount, isLoading } = useAuth();
+  const { signIn, isLoading } = useAuth();
 
   if (isLoading) {
     const styles = StyleSheet.create({
@@ -36,7 +36,7 @@ const Login = () => {
       <TextInput
         style={styles.input}
         value={email}
-        placeholder="Email"
+        placeholder="email"
         autoCapitalize="none"
         onChangeText={(text) => {
           setEmail(text);
@@ -62,8 +62,7 @@ const Login = () => {
       <Button
         title="Create Account"
         onPress={() => {
-          createAccount(email, password);
-          router.replace("/posts");
+          router.push("/CreateAccount");
         }}
       />
     </View>

@@ -28,18 +28,22 @@ import {
 } from "../../types";
 
 export async function updateUserInfo(
-  user: User,
+  user: User | null,
+  username: string,
   firstName: string,
   lastName: string,
   phoneNumber: string,
 ) {
   try {
-    await updateDoc(doc(DB, "user_collection", user.uid), {
-      email: user.email,
-      first: firstName,
-      last: lastName,
-      number: phoneNumber,
-    });
+    if (user != null) {
+      await updateDoc(doc(DB, "user_collection", user.uid), {
+        email: user.email,
+        username,
+        first: firstName,
+        last: lastName,
+        number: phoneNumber,
+      });
+    }
   } catch (error) {
     alert(error);
   }
@@ -417,46 +421,48 @@ export async function fetchBookByVolumeID(
 export async function fetchPostsByUserIDs(
   userIDs: string[],
 ): Promise<PostModel[]> {
-  try {
-    const postsQuery = query(
-      collection(DB, "posts"),
-      where("user", "in", userIDs),
-      // TODO: unlock limit once we get insanely breaded and not worry about firebase fees
-      limit(10),
-    );
-    const postsData: PostModel[] = [];
-    const postsSnapshot = await getDocs(postsQuery);
+  if (userIDs.length > 0) {
+    try {
+      const postsQuery = query(
+        collection(DB, "posts"),
+        where("user", "in", userIDs),
+        // TODO: unlock limit once we get insanely breaded and not worry about firebase fees
+        limit(10),
+      );
+      const postsData: PostModel[] = [];
+      const postsSnapshot = await getDocs(postsQuery);
 
-    // Uses Promise.all to wait for all fetchUser promises to resolve
-    await Promise.all(
-      postsSnapshot.docs.map(async (postDoc) => {
-        const userID: string = postDoc.data().user;
-        try {
-          const user = await fetchUser(userID);
-          if (user != null) {
-            const post = {
-              id: postDoc.id,
-              book: postDoc.data().book,
-              created: postDoc.data().created,
-              text: postDoc.data().text,
-              user,
-              images:
-                postDoc.data().image === true
-                  ? ["posts/" + userID + "/" + postDoc.id]
-                  : [],
-            };
-            postsData.push(post);
+      // Uses Promise.all to wait for all fetchUser promises to resolve
+      await Promise.all(
+        postsSnapshot.docs.map(async (postDoc) => {
+          const userID: string = postDoc.data().user;
+          try {
+            const user = await fetchUser(userID);
+            if (user != null) {
+              const post = {
+                id: postDoc.id,
+                book: postDoc.data().book,
+                created: postDoc.data().created,
+                text: postDoc.data().text,
+                user,
+                images:
+                  postDoc.data().image === true
+                    ? ["posts/" + userID + "/" + postDoc.id]
+                    : [],
+              };
+              postsData.push(post);
+            }
+          } catch (error) {
+            console.error("Error fetching user", error);
           }
-        } catch (error) {
-          console.error("Error fetching user", error);
-        }
-      }),
-    );
-    return postsData;
-  } catch (error) {
-    console.error("Error fetching posts by User ID", error);
-    return [];
+        }),
+      );
+      return postsData;
+    } catch (error) {
+      console.error("Error fetching posts by User ID", error);
+    }
   }
+  return [];
 }
 
 /**

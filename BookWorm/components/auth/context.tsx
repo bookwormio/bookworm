@@ -13,12 +13,14 @@ const AuthContext = React.createContext<{
   signOut: () => void;
   isLoading: boolean;
   user: User | null;
+  setNewUser: (newUser: boolean) => void;
 }>({
   signIn: () => null,
   createAccount: () => null,
   signOut: () => null,
   isLoading: false,
   user: null,
+  setNewUser: () => null,
 });
 
 export function useAuth() {
@@ -26,7 +28,7 @@ export function useAuth() {
 }
 
 // This hook can be used to access the user info.
-function useAuthenticatedRoute(user: User | null) {
+function useAuthenticatedRoute(user: User | null, newUser: boolean) {
   const segments = useSegments();
   const router = useRouter();
 
@@ -34,10 +36,11 @@ function useAuthenticatedRoute(user: User | null) {
     const inAuthGroup = segments[0] === "(auth)";
     if (user == null && !inAuthGroup) {
       router.replace("/sign-in");
-    } else if (user != null && inAuthGroup) {
+    }
+    if (user != null && !newUser && inAuthGroup) {
       router.replace("/posts");
     }
-  }, [user, segments]);
+  }, [user, newUser, segments]);
 }
 
 interface AuthenticationProviderProps {
@@ -47,15 +50,18 @@ interface AuthenticationProviderProps {
 const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
   const [loading, setLoading] = useState(false);
   const [currentUser, setUser] = useState(FIREBASE_AUTH.currentUser);
+  const [createUser, setCreateUser] = useState<boolean>(false);
+
   useEffect(() => {
     setLoading(true);
     const unsubscribe = FIREBASE_AUTH.onAuthStateChanged((authUser) => {
       setUser(authUser);
       setLoading(false);
     });
+    setLoading(false);
     return unsubscribe;
   }, []);
-  useAuthenticatedRoute(currentUser);
+  useAuthenticatedRoute(currentUser, createUser);
 
   return (
     <AuthContext.Provider
@@ -75,13 +81,14 @@ const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
         },
         createAccount: (email: string, password: string) => {
           setLoading(true);
+          setCreateUser(true);
           createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
             // createUserWithEmailAndPassword return userCredential object as promise resolution
             // user contains info about user account created - uID, email, display Name
             .then(async (userCredential) => {
               const user = userCredential.user;
-              // https://firebase.google.com/docs/firestore/manage-data/add-data#web-modular-api
               setUser(user);
+              setLoading(false);
             })
             .catch((error) => {
               alert(error);
@@ -105,6 +112,9 @@ const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
         },
         isLoading: loading,
         user: currentUser,
+        setNewUser: (newUser: boolean) => {
+          setCreateUser(newUser);
+        },
       }}
     >
       {children}
