@@ -72,6 +72,7 @@ const Posts = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
+    setNoMorePosts(false);
 
     initialFetchPosts()
       .then(() => {
