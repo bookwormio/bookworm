@@ -15,14 +15,14 @@ interface UserData {
   number: string;
 }
 
-interface Post {
+interface CreatePostModel {
   userid: string;
   book: stirng;
   text: string;
   imageURI: string;
 }
 
-interface Connection {
+interface ConnectionModel {
   currentUserID: string;
   friendUserID: string;
 }

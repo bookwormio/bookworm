@@ -15,7 +15,7 @@ import {
   getIsFollowing,
   unfollowUserByID,
 } from "../../../services/firebase-services/queries";
-import { type Connection, type UserData } from "../../../types";
+import { type ConnectionModel, type UserData } from "../../../types";
 
 enum LocalFollowStatus {
   FOLLOWING = "following",
@@ -94,7 +94,7 @@ const FriendProfile = () => {
     if (user?.uid !== undefined && friendUserID !== undefined) {
       if (isFollowingData !== null && isFollowingData !== undefined) {
         setFollowStatus(
-          isFollowingData
+          isFollowingData === true
             ? LocalFollowStatus.FOLLOWING
             : LocalFollowStatus.NOT_FOLLOWING,
         );
@@ -140,7 +140,7 @@ const FriendProfile = () => {
       // Immediately update the visual follow status before the db has been updated
       setFollowStatus(LocalFollowStatus.LOADING);
       setFollowStatusFetched(false);
-      const connection: Connection = {
+      const connection: ConnectionModel = {
         currentUserID,
         friendUserID,
       };
@@ -163,7 +163,7 @@ const FriendProfile = () => {
     try {
       setFollowStatus(LocalFollowStatus.LOADING);
       setFollowStatusFetched(false);
-      const connection: Connection = {
+      const connection: ConnectionModel = {
         currentUserID,
         friendUserID,
       };
@@ -174,7 +174,7 @@ const FriendProfile = () => {
     }
   };
 
-  if (friendIsLoading) {
+  if (friendIsLoading === true) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />

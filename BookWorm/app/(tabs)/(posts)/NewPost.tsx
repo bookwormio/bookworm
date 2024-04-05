@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { Button, Image, StyleSheet, TextInput, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import { createPost } from "../../../services/firebase-services/queries";
-import { type Post } from "../../../types";
+import { type CreatePostModel } from "../../../types";
 
 const NewPost = () => {
   const { user } = useAuth();
@@ -25,16 +25,11 @@ const NewPost = () => {
 
   const postMutation = useMutation({
     mutationFn: createPost,
-    // onSuccess: async () => {
-    //   await queryClient.invalidateQueries({
-    //     queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
-    //   });
-    // },
   });
 
   const handleCreatePostClick = () => {
     if (user !== undefined && user !== null) {
-      const post: Post = {
+      const post: CreatePostModel = {
         userid: user.uid,
         book,
         text,
