@@ -686,12 +686,12 @@ function sortPostsByDate(posts: PostModel[]) {
 /**
  * Adds a data entry for a users time reading and number of pages
  * Combines getAllFollowing(), fetchPostsByUserID(), and sortPostsByDate() functions.
- * @param {User | Null} user - The current user to add tracking to.
- * @param {number} pages - The number of pages a user has read.
- * @param {number} minutesRead - The number of minutes a user has read.
- * @returns {Promise<void>} A void promise if successful, otherwise a console error.
+ * @param {CreateTrackingModel} tracking - A tracking object storing the userID, minutesRead, and pagesRead.
+ * @returns {Promise<boolean>} A boolean promise, true if successful, false if not.
  */
-export async function addDataEntry(tracking: CreateTrackingModel) {
+export async function addDataEntry(
+  tracking: CreateTrackingModel,
+): Promise<boolean> {
   try {
     if (tracking.userid !== null) {
       const q = query(
@@ -729,8 +729,11 @@ export async function addDataEntry(tracking: CreateTrackingModel) {
           minutes: tracking.minutesRead,
         });
       }
+      return true;
     }
+    return false;
   } catch (error) {
     console.error(error);
+    return false;
   }
 }
