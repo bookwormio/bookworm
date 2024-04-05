@@ -26,6 +26,7 @@ const Posts = () => {
     DocumentData,
     DocumentData
   > | null>(null);
+  const [noMorePosts, setNoMorePosts] = useState(false);
   const { user } = useAuth();
 
   const initialFetchPosts = async () => {
@@ -57,6 +58,8 @@ const Posts = () => {
             setLastVisiblePost(lastVisible); // Update last visible post
             const newPosts = [...posts, ...fetchedPosts];
             setPosts(newPosts); // Append new posts to existing posts
+          } else {
+            setNoMorePosts(true);
           }
         }
       } catch (error) {
@@ -83,6 +86,8 @@ const Posts = () => {
     void initialFetchPosts(); // Initial fetch of posts when component mounts
   }, []);
 
+  const currentDate = new Date();
+
   return (
     <View style={styles.container}>
       {feedLoading && !refreshing && (
@@ -106,9 +111,14 @@ const Posts = () => {
               });
             }}
           >
-            <Post post={post} created={post.created} />
+            <Post
+              post={post}
+              created={post.created}
+              currentDate={currentDate}
+            />
           </TouchableOpacity>
         )}
+        removeClippedSubviews={true}
         keyExtractor={(item) => item.id}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -120,7 +130,7 @@ const Posts = () => {
             </View>
           ) : null
         }
-        onEndReached={!fetchingMorePosts ? loadMorePosts : null} // Fetch more data when end is reached
+        onEndReached={!fetchingMorePosts && !noMorePosts ? loadMorePosts : null} // Fetch more data when end is reached
         onEndReachedThreshold={0.1} // How close to the end to trigger
       />
     </View>

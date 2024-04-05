@@ -1,5 +1,5 @@
 import { type Timestamp } from "firebase/firestore";
-import React from "react";
+import React, { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { DAYS_OF_WEEK, MONTHS_OF_YEAR } from "../../constants/constants";
 import { type PostModel } from "../../types";
@@ -7,14 +7,14 @@ import { type PostModel } from "../../types";
 interface PostProps {
   post: PostModel;
   created: Timestamp;
+  currentDate: Date;
 }
 
-const formatDate = (created: Timestamp) => {
+const formatDate = (created: Timestamp, currentDate: Date) => {
   const date = created.toDate();
   const day = DAYS_OF_WEEK[date.getDay()];
   const month = MONTHS_OF_YEAR[date.getMonth()];
   const dayNumber = date.getDate();
-  const currentDate = new Date();
   const isToday =
     date.getFullYear() === currentDate.getFullYear() &&
     date.getMonth() === currentDate.getMonth() &&
@@ -29,8 +29,9 @@ const formatDate = (created: Timestamp) => {
       })}`;
 };
 
-const Post = ({ post, created }: PostProps) => {
-  const formattedDate = formatDate(created);
+// Using memo here makes it so it re-renders only when the props passed to it change
+const Post = memo(({ post, created, currentDate }: PostProps) => {
+  const formattedDate = formatDate(created, currentDate);
 
   return (
     <View style={styles.container}>
@@ -41,7 +42,7 @@ const Post = ({ post, created }: PostProps) => {
       <Text style={styles.body}>{post.text}</Text>
     </View>
   );
-};
+});
 
 export default Post;
 
