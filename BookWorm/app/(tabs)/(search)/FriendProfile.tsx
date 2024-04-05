@@ -47,6 +47,7 @@ const FriendProfile = () => {
         return {};
       }
     },
+    staleTime: 60000, // Set stale time to 1 minute
   });
 
   const { data: isFollowingData } = useQuery({

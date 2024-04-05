@@ -38,6 +38,7 @@ const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
         return null;
       }
     },
+    staleTime: 60000, // Set stale time to 1 minute
   });
 
   useEffect(() => {
