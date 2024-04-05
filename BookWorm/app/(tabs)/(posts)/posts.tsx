@@ -160,6 +160,7 @@ const styles = StyleSheet.create({
     top: "50%",
   },
   loadingMore: {
+    marginTop: "10%",
     alignItems: "center",
     justifyContent: "center",
     bottom: 20, // Position the loading indicator 20 units from the bottom
