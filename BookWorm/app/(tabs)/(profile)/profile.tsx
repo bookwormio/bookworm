@@ -1,58 +1,63 @@
+import { useQuery } from "@tanstack/react-query";
 import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
-import { useAuth } from "../../../components/auth/context";
 import {
-  fetchFirstName,
-  fetchLastName,
-  fetchPhoneNumber,
-} from "../../../services/firebase-services/queries";
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useAuth } from "../../../components/auth/context";
+import { fetchUserData } from "../../../services/firebase-services/queries";
+import { type UserData } from "../../../types";
 
 const Profile = () => {
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   const { signOut, user } = useAuth();
   const userStr: string = user?.email ?? "No email";
-  const [phoneNumber, setPhoneNumber] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [pageRefresh, setPageRefresh] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const navigation = useNavigation();
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("state", (event) => {
-      const { data } = event;
-      if (
-        data.state.routeNames[data.state.routeNames.length - 1] ===
-          "EditProfile" &&
-        data.state.index === 0
-      ) {
-        setPageRefresh((pageRefresh) => !pageRefresh);
+  const { data: userData, isLoading: isLoadingUserData } = useQuery({
+    queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+    queryFn: async () => {
+      if (user != null) {
+        const userdata = await fetchUserData(user);
+        setProfileLoading(false);
+        return userdata;
+      } else {
+        // Return default value when user is null
+        return {};
       }
-    });
-    return unsubscribe;
-  }, [navigation]);
+    },
+  });
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        if (user != null) {
-          const firstName: string = await fetchFirstName(user);
-          const lastName: string = await fetchLastName(user);
-          const phoneNumber: string = await fetchPhoneNumber(user);
-
-          setFirstName(firstName);
-          setLastName(lastName);
-          setPhoneNumber(phoneNumber);
-        } else {
-          console.error("user DNE");
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+    if (userData !== undefined) {
+      const userDataTyped = userData as UserData;
+      if (userDataTyped.first !== undefined) {
+        setFirstName(userDataTyped.first);
+      }
+      if (userDataTyped.last !== undefined) {
+        setLastName(userDataTyped.last);
       }
     }
-    fetchData().catch((error) => {
-      console.error("Error fetching first name:", error);
-    });
-  }, [pageRefresh]);
+  }, [userData]);
+
+  useEffect(() => {
+    setProfileLoading(true);
+  }, [navigation]);
+
+  if (isLoadingUserData || profileLoading) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#000000" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -68,15 +73,11 @@ const Profile = () => {
           if (user != null) {
             router.push({
               pathname: "EditProfile",
-              params: {
-                phoneNumber,
-                firstName,
-                lastName,
-              },
             });
           } else {
             console.error("User DNE");
           }
+          setProfileLoading(true);
         }}
       />
     </View>
@@ -111,5 +112,15 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 36,
     color: "#38434D",
+  },
+  loading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });

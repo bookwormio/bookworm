@@ -6,6 +6,27 @@ interface UserListItem {
   lastName: string;
 }
 
+interface UserData {
+  id: string;
+  email: string;
+  first: string;
+  isPublic: boolean;
+  last: string;
+  number: string;
+}
+
+interface CreatePostModel {
+  userid: string;
+  book: stirng;
+  text: string;
+  images: string[];
+}
+
+interface ConnectionModel {
+  currentUserID: string;
+  friendUserID: string;
+}
+
 // TODO: separate book volume info from book preview info
 // (less information needed for a book preview)
 interface BookVolumeInfo {
@@ -75,4 +96,10 @@ interface UserModel {
   isPublic: boolean;
   last: string;
   number: Timestamp;
+}
+
+interface CreateTrackingModel {
+  userid: string;
+  pagesRead: number;
+  minutesRead: number;
 }
