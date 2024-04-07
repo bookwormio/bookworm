@@ -85,38 +85,6 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
   }
 };
 
-/*
-export async function createPost(post: CreatePostModel) {
-  if (post.userid != null) {
-    addDoc(collection(DB, "posts"), {
-      user: post.userid,
-      created: serverTimestamp(),
-      book: post.book,
-      text: post.text,
-      image: post.images?.length,
-    })
-      .then(async (docRef) => {
-        if (post.images.length > 0) {
-          await Promise.all(
-            post.images.map(async (imageURI: string, index: number) => {
-              const response = await fetch(imageURI);
-              const blob = await response.blob();
-              const storageRef = ref(
-                STORAGE,
-                "posts/" + docRef.id + "/" + index,
-              );
-              await uploadBytesResumable(storageRef, blob);
-            }),
-          );
-        }
-      })
-      .catch((error) => {
-        console.error("Error creating post", error);
-      });
-  }
-}
-*/
-
 /**
  * Represents an asynchronous function that represents an empty query.
  * @returns {Promise<void>} A Promise that resolves when the empty query is completed.
