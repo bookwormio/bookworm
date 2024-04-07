@@ -60,12 +60,62 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
       if (userdata.number !== "" && userdata.number !== undefined) {
         dataToUpdate.number = userdata.number;
       }
-      await updateDoc(doc(DB, "user_collection", userdata.id), dataToUpdate);
+      if (userdata.bio !== "" && userdata.bio !== undefined) {
+        dataToUpdate.bio = userdata.bio;
+      }
+      if (userdata.profilepic !== "" && userdata.bio !== undefined) {
+        dataToUpdate.profilepic = userdata.profilepic;
+      }
+      const docRef = doc(DB, "user_collection", userdata.id);
+      await updateDoc(docRef, dataToUpdate);
+      if (
+        userdata.profilepic.trim() !== "" &&
+        userdata.profilepic !== undefined &&
+        typeof userdata.profilepic === "string"
+      ) {
+        const profilePicUrl = new URL(userdata.profilepic);
+        const response = await fetch(profilePicUrl);
+        const blob = await response.blob();
+        const storageRef = ref(STORAGE, "profilepics/" + docRef.id);
+        await uploadBytesResumable(storageRef, blob);
+      }
     }
   } catch (error) {
     console.error("Error updating user", error);
   }
 };
+
+/*
+export async function createPost(post: CreatePostModel) {
+  if (post.userid != null) {
+    addDoc(collection(DB, "posts"), {
+      user: post.userid,
+      created: serverTimestamp(),
+      book: post.book,
+      text: post.text,
+      image: post.images?.length,
+    })
+      .then(async (docRef) => {
+        if (post.images.length > 0) {
+          await Promise.all(
+            post.images.map(async (imageURI: string, index: number) => {
+              const response = await fetch(imageURI);
+              const blob = await response.blob();
+              const storageRef = ref(
+                STORAGE,
+                "posts/" + docRef.id + "/" + index,
+              );
+              await uploadBytesResumable(storageRef, blob);
+            }),
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Error creating post", error);
+      });
+  }
+}
+*/
 
 /**
  * Represents an asynchronous function that represents an empty query.
@@ -101,6 +151,8 @@ export async function newFetchUserInfo(
           isPublic: userData.isPublic ?? false,
           last: userData.last ?? "",
           number: userData.number ?? "",
+          bio: userData.bio ?? "",
+          profilepic: userData.profilepic ?? "",
         };
       }
     }
@@ -169,6 +221,8 @@ export async function fetchFriendData(
           isPublic: userData.isPublic ?? false,
           last: userData.last ?? "",
           number: userData.number ?? "",
+          bio: userData.bio ?? "",
+          profilepic: userData.profilepic ?? "",
         };
       }
     }

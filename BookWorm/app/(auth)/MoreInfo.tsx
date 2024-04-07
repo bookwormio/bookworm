@@ -1,10 +1,14 @@
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
+import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
   Button,
+  Image,
   StyleSheet,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
@@ -19,6 +23,8 @@ const MoreInfo = () => {
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [phone, setPhone] = useState("");
+  const [bio, setBio] = useState("");
+  const [image, setImage] = useState("");
 
   const accountInfoMutation = useMutation({
     mutationFn: updateUser,
@@ -35,6 +41,8 @@ const MoreInfo = () => {
         last,
         number: phone,
         isPublic: true,
+        bio,
+        profilepic: image,
       };
       accountInfoMutation.mutate(accountInfo);
       setNewUser(false);
@@ -70,6 +78,16 @@ const MoreInfo = () => {
       return false;
     }
     return true;
+  };
+
+  const pickImageAsync = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
   };
 
   if (loading) {
@@ -122,6 +140,32 @@ const MoreInfo = () => {
           setPhone(text);
         }}
       />
+      <TextInput
+        style={styles.input}
+        value={bio}
+        placeholder="bio"
+        onChangeText={(text) => {
+          setBio(text);
+        }}
+      />
+      <TouchableOpacity
+        style={styles.defaultImage}
+        onPress={() => {
+          pickImageAsync().catch((error) => {
+            Toast.show({
+              type: "error",
+              text1: "Error selecting image: " + error,
+              text2: "Please adjust your media permissions",
+            });
+          });
+        }}
+      >
+        {image !== "" ? (
+          <Image source={{ uri: image }} style={styles.defaultImage} />
+        ) : (
+          <FontAwesome5 name="image" size={20} />
+        )}
+      </TouchableOpacity>
       <Button
         title="Confirm Account Information"
         onPress={() => {
@@ -152,5 +196,15 @@ const styles = StyleSheet.create({
   },
   loading: {
     top: "50%",
+  },
+  defaultImage: {
+    backgroundColor: "#d3d3d3",
+    height: 100,
+    width: 100,
+    borderColor: "black",
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

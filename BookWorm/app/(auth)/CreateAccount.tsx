@@ -1,8 +1,8 @@
+import { router } from "expo-router";
 import React, { useState } from "react";
 import { Button, StyleSheet, TextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
-import { router } from "expo-router";
 
 const CreateAccount = () => {
   const [email, setEmail] = useState("");
@@ -75,8 +75,12 @@ const CreateAccount = () => {
         title="Create Account"
         onPress={() => {
           if (validFields()) {
-            createAccount(email, password);
-            router.push("/MoreInfo");
+            try {
+              createAccount(email, password);
+              router.push("/MoreInfo");
+            } catch (error) {
+              console.error(error);
+            }
           }
         }}
       />
