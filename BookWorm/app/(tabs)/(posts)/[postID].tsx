@@ -63,7 +63,7 @@ const ViewPost = () => {
         </View>
       )}
       {post != null && !postLoading && (
-        <Post post={post} created={post.created} />
+        <Post post={post} created={post.created} currentDate={new Date()} />
       )}
     </View>
   );

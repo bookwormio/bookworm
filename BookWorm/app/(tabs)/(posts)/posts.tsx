@@ -1,10 +1,14 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  FlatList,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -23,38 +27,59 @@ const Posts = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: feedPostsData, isLoading: isLoadingFeedPosts } = useQuery({
+  const fetchPosts = async ({ pageParam = null }) => {
+    if (user != null) {
+      return await fetchPostsForUserFeed(user.uid, pageParam);
+    } else {
+      console.error("Error: User is null");
+      return [];
+    }
+  };
+
+  const {
+    data: feedPostsData,
+    isLoading: isLoadingFeedPosts,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: user != null ? ["userfeedposts", user.uid] : ["userfeedposts"],
-    queryFn: async () => {
-      if (user != null) {
-        const posts = await fetchPostsForUserFeed(user.uid);
-        setRefreshing(false);
-        return posts;
-      } else {
-        return [];
-      }
-    },
+    queryFn: fetchPosts,
+    getNextPageParam: (lastPage) => (lastPage ? lastPage.newLastVisible : null),
+    initialPageParam: null,
   });
 
+  const currentDate = new Date();
+
   useEffect(() => {
-    if (feedPostsData !== undefined) {
-      setPosts(feedPostsData);
+    if (feedPostsData) {
+      // Concatenate all pages of posts
+      const allPosts = feedPostsData.pages.reduce(
+        (acc, page) => [...acc, ...page.posts],
+        [],
+      );
+      setPosts(allPosts);
     }
   }, [feedPostsData]);
 
   const refreshMutation = useMutation({
     mutationFn: emptyQuery,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey:
-          user != null ? ["userfeedposts", user.uid] : ["userfeedposts"],
-      });
+      await queryClient
+        .invalidateQueries({
+          queryKey:
+            user != null ? ["userfeedposts", user.uid] : ["userfeedposts"],
+        })
+        .then(() => {
+          setRefreshing(false);
+        });
     },
   });
 
   const onRefresh = () => {
     setRefreshing(true);
     refreshMutation.mutate();
+    // setRefreshing(false); // Set refreshing to false after mutation
   };
 
   return (
@@ -64,32 +89,48 @@ const Posts = () => {
           <ActivityIndicator size="large" color="black" />
         </View>
       )}
-      <ScrollView
+      <FlatList
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
+        data={feedPostsData?.pages.flatMap((page) => page.posts) || []}
+        renderItem={({ item: post }) => (
+          <TouchableOpacity
+            onPress={() => {
+              router.push({
+                pathname: `/${post.id}`,
+                params: {
+                  post,
+                  created: post.created,
+                },
+              });
+            }}
+          >
+            <Post
+              post={post}
+              created={post.created}
+              currentDate={currentDate}
+            />
+          </TouchableOpacity>
+        )}
+        removeClippedSubviews={true}
+        keyExtractor={(item) => item.id}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-      >
-        {posts.map((post: PostModel, index: number) => (
-          <View key={index}>
-            <TouchableOpacity
-              key={index}
-              onPress={() => {
-                router.push({
-                  pathname: `/${post.id}`,
-                  params: {
-                    post,
-                    created: post.created,
-                  },
-                });
-              }}
-            >
-              <Post post={post} created={post.created} />
-            </TouchableOpacity>
-          </View>
-        ))}
-      </ScrollView>
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View style={styles.loadingMore}>
+              <ActivityIndicator size="large" color="black" />
+            </View>
+          ) : null
+        }
+        onEndReached={() => {
+          if (hasNextPage) {
+            fetchNextPage();
+          }
+        }}
+        onEndReachedThreshold={0.1} // How close to the end to trigger
+      />
     </View>
   );
 };
@@ -114,5 +155,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "absolute",
     top: "50%",
+  },
+  loadingMore: {
+    marginTop: "10%",
+    alignItems: "center",
+    justifyContent: "center",
+    bottom: 20, // Position the loading indicator 20 units from the bottom
+    width: "100%", // Ensure it stretches the full width
   },
 });
