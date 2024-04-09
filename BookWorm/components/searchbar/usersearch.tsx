@@ -4,7 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { fetchUsersBySearch } from "../../services/firebase-services/queries";
-import { type UserListItem } from "../../types";
+import { type UserSearchDisplayModel } from "../../types";
 import SearchBar from "./searchbar";
 
 const USER_SEARCH_PLACEHOLDER = "Search for users";
@@ -15,12 +15,12 @@ interface UserSearchProps {
 }
 
 const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
-  const [users, setUsers] = useState<UserListItem[]>([]);
+  const [users, setUsers] = useState<UserSearchDisplayModel[]>([]);
   const [searchClicked, setSearchClicked] = useState<boolean>(
     searchPhrase !== "",
   );
 
-  const handleUserClick = ({ user }: { user: UserListItem }) => {
+  const handleUserClick = ({ user }: { user: UserSearchDisplayModel }) => {
     router.push({
       pathname: "FriendProfile",
       params: {
