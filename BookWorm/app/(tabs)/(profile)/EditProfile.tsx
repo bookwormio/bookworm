@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import {
+  emptyQuery,
   newFetchUserInfo,
   updateUser,
 } from "../../../services/firebase-services/queries";
@@ -44,6 +45,19 @@ const EditProfile = () => {
       }
     },
   });
+
+  const refreshMutation = useMutation({
+    mutationFn: emptyQuery,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+      });
+    },
+  });
+
+  const onClose = () => {
+    refreshMutation.mutate();
+  };
 
   useEffect(() => {
     if (userData !== undefined) {
@@ -90,6 +104,7 @@ const EditProfile = () => {
         title="Close"
         color="midnightblue"
         onPress={() => {
+          onClose();
           router.back();
         }}
       />

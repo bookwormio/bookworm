@@ -44,8 +44,6 @@ const Profile = () => {
       if (userDataTyped.last !== undefined) {
         setLastName(userDataTyped.last);
       }
-    } else if (userData == null) {
-      signOut();
     }
   }, [userData]);
 
