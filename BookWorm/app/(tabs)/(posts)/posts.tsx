@@ -4,6 +4,10 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { router } from "expo-router";
+import {
+  type DocumentData,
+  type QueryDocumentSnapshot,
+} from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -27,12 +31,17 @@ const Posts = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const fetchPosts = async ({ pageParam = null }) => {
+  const fetchPosts = async ({
+    pageParam = null, // Accepts an optional parameter for pagination
+  }: {
+    pageParam?: QueryDocumentSnapshot<DocumentData, DocumentData> | null;
+  }) => {
     if (user != null) {
+      // Fetch posts for the provided user ID with pagination support
       return await fetchPostsForUserFeed(user.uid, pageParam);
     } else {
       console.error("Error: User is null");
-      return [];
+      return { posts: [], newLastVisible: null };
     }
   };
 
@@ -45,20 +54,23 @@ const Posts = () => {
   } = useInfiniteQuery({
     queryKey: user != null ? ["userfeedposts", user.uid] : ["userfeedposts"],
     queryFn: fetchPosts,
-    getNextPageParam: (lastPage) => (lastPage ? lastPage.newLastVisible : null),
+    getNextPageParam: (lastPage) =>
+      lastPage !== null ? lastPage.newLastVisible : null, // Function to get the parameter for fetching the next page
     initialPageParam: null,
   });
 
   const currentDate = new Date();
 
   useEffect(() => {
-    if (feedPostsData) {
-      // Concatenate all pages of posts
+    if (feedPostsData?.pages !== undefined) {
       const allPosts = feedPostsData.pages.reduce(
-        (acc, page) => [...acc, ...page.posts],
-        [],
+        (acc, page) => ({
+          posts: [...acc.posts, ...page.posts], // Concatenate all posts from different pages
+          newLastVisible: page.newLastVisible, // Update the new last visible document snapshot
+        }),
+        { posts: [], newLastVisible: null }, // Initial accumulator value
       );
-      setPosts(allPosts);
+      setPosts(allPosts.posts as PostModel[]);
     }
   }, [feedPostsData]);
 
@@ -79,7 +91,6 @@ const Posts = () => {
   const onRefresh = () => {
     setRefreshing(true);
     refreshMutation.mutate();
-    // setRefreshing(false); // Set refreshing to false after mutation
   };
 
   return (
@@ -92,7 +103,7 @@ const Posts = () => {
       <FlatList
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
-        data={feedPostsData?.pages.flatMap((page) => page.posts) || []}
+        data={posts}
         renderItem={({ item: post }) => (
           <TouchableOpacity
             onPress={() => {
