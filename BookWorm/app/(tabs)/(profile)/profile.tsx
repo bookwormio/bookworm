@@ -1,3 +1,4 @@
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -6,6 +7,7 @@ import {
   Button,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
@@ -15,9 +17,9 @@ import { type UserDataModel } from "../../../types";
 const Profile = () => {
   // const navigation = useNavigation();
   const { signOut, user } = useAuth();
-  const userStr: string = user?.email ?? "No email";
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [bio, setBio] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
   const navigation = useNavigation();
 
@@ -44,6 +46,9 @@ const Profile = () => {
       if (userDataTyped.last !== undefined) {
         setLastName(userDataTyped.last);
       }
+      if (userDataTyped.bio !== undefined) {
+        setBio(userDataTyped.bio);
+      }
     }
   }, [userData]);
 
@@ -60,14 +65,34 @@ const Profile = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Profile Page</Text>
-      <Text>Current User email: {userStr}</Text>
-      <Text>
-        Current User Name: {firstName} {lastName}
-      </Text>
-      <Button title="LogOut" onPress={signOut} />
+    <View>
+      <View style={styles.imageTextContainer}>
+        <TouchableOpacity style={styles.defaultImageContainer}>
+          <FontAwesome5 name="user" size={30} />
+        </TouchableOpacity>
+        <View>
+          <Text style={styles.nameText}>
+            {firstName} {lastName}
+          </Text>
+          <Text style={styles.locText}>Salt Lake City, UT</Text>
+        </View>
+      </View>
+      <View>
+        <Text style={styles.bioPad}>{bio}</Text>
+      </View>
+      <View style={styles.imageTextContainer}>
+        <View style={styles.locText}>
+          <Text>Following</Text>
+          <Text>0</Text>
+        </View>
+        <View style={styles.locText}>
+          <Text>Followers</Text>
+          <Text>0</Text>
+        </View>
+      </View>
+      <Button title="LogOut" onPress={signOut} color="black" />
       <Button
+        color="black"
         title="Edit Profile"
         onPress={() => {
           if (user != null) {
@@ -87,11 +112,6 @@ const Profile = () => {
 export default Profile;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    padding: 24,
-  },
   main: {
     flex: 1,
     justifyContent: "center",
@@ -104,10 +124,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
-  },
-  title: {
-    fontSize: 64,
-    fontWeight: "bold",
   },
   subtitle: {
     fontSize: 36,
@@ -122,5 +138,63 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  imageTextContainer: {
+    flexDirection: "row", // Arrange children horizontally
+    alignItems: "center", // Align children vertically in the center
+    marginLeft: 20, // Adjust as needed
+    marginTop: 20,
+  },
+  bioPad: {
+    paddingLeft: 40,
+  },
+  nameText: {
+    paddingLeft: 20,
+    fontSize: 30,
+    marginTop: -10,
+  },
+  locText: {
+    paddingLeft: 20,
+    paddingBottom: 20,
+  },
+  defaultImageContainer: {
+    backgroundColor: "#d3d3d3",
+    height: 60,
+    width: 60,
+    borderColor: "black",
+    borderRadius: 50,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    alignSelf: "flex-start",
+    marginLeft: 5,
+  },
+  buttoncontainer: {
+    alignItems: "flex-end",
+    justifyContent: "center",
+    paddingRight: 160,
+    width: "100%",
+  },
+  button: {
+    paddingVertical: 2,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "orange",
+  },
+  buttonText: {
+    color: "orange",
+  },
+  backButtonContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 1,
+    padding: 10,
+  },
+  buttonwrapper: {
+    marginBottom: 8,
+    alignItems: "flex-start",
   },
 });
