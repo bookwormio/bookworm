@@ -72,7 +72,9 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
       if (
         userdata.profilepic.trim() !== "" &&
         userdata.profilepic !== undefined &&
-        typeof userdata.profilepic === "string"
+        typeof userdata.profilepic === "string" &&
+        userdata.profilepic !== "true" &&
+        userdata.profilepic !== "false"
       ) {
         const profilePicUrl = new URL(userdata.profilepic);
         const response = await fetch(profilePicUrl);
