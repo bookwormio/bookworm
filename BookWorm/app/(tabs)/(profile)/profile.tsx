@@ -13,7 +13,7 @@ import {
 import { useAuth } from "../../../components/auth/context";
 import {
   fetchUserData,
-  getUserProfilePic,
+  getUserProfileURL,
 } from "../../../services/firebase-services/queries";
 import { type UserDataModel } from "../../../types";
 
@@ -45,7 +45,7 @@ const Profile = () => {
     queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
     queryFn: async () => {
       if (user != null) {
-        return await getUserProfilePic(user.uid);
+        return await getUserProfileURL(user.uid);
       } else {
         return null;
       }
@@ -89,11 +89,14 @@ const Profile = () => {
     <View>
       <View style={styles.imageTextContainer}>
         <View style={styles.defaultImageContainer}>
-          {image !== "" ? (
-            <Image style={styles.defaultImage} source={{ uri: image }} />
-          ) : (
-            <FontAwesome5 name="user" size={40} />
-          )}
+          {
+            // TODO: use a default profile pic
+            image !== "" ? (
+              <Image style={styles.defaultImage} source={{ uri: image }} />
+            ) : (
+              <FontAwesome5 name="user" size={40} />
+            )
+          }
         </View>
         <View>
           <Text style={styles.nameText}>

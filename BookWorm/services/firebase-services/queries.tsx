@@ -100,7 +100,7 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
   }
 };
 
-export async function getUserProfilePic(
+export async function getUserProfileURL(
   userID: string,
 ): Promise<string | null> {
   try {

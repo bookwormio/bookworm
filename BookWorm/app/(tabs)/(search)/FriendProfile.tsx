@@ -16,7 +16,7 @@ import {
   fetchFriendData,
   followUserByID,
   getIsFollowing,
-  getUserProfilePic,
+  getUserProfileURL,
   unfollowUserByID,
 } from "../../../services/firebase-services/queries";
 import { type ConnectionModel, type UserDataModel } from "../../../types";
@@ -128,7 +128,7 @@ const FriendProfile = () => {
     queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
     queryFn: async () => {
       if (friendUserID != null && friendUserID !== "") {
-        return await getUserProfilePic(friendUserID);
+        return await getUserProfileURL(friendUserID);
       } else {
         return null;
       }
@@ -221,11 +221,14 @@ const FriendProfile = () => {
       </View>
       <View style={styles.imageTextContainer}>
         <View style={styles.defaultImageContainer}>
-          {image !== "" ? (
-            <Image style={styles.defaultImage} source={{ uri: image }} />
-          ) : (
-            <FontAwesome5 name="user" size={40} />
-          )}
+          {
+            // TODO: use a default profile pic
+            image !== "" ? (
+              <Image style={styles.defaultImage} source={{ uri: image }} />
+            ) : (
+              <FontAwesome5 name="user" size={40} />
+            )
+          }
         </View>
         <View>
           <Text style={styles.nameText}>
