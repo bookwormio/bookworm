@@ -5,8 +5,8 @@ import { useAuth } from "../../../components/auth/context";
 import {
   fetchFirstName,
   fetchLastName,
+  fetchPagesReadData,
   fetchPhoneNumber,
-  fetchStats,
 } from "../../../services/firebase-services/queries";
 
 const Profile = () => {
@@ -17,13 +17,12 @@ const Profile = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [pageRefresh, setPageRefresh] = useState<boolean>(false);
-
   const [data, setData] = useState<Array<{ x: number; y: number }>>([]);
 
   useEffect(() => {
     // Fetch data from the database when the component mounts
     if (user != null) {
-      fetchStats(user)
+      fetchPagesReadData(user)
         .then((stats) => {
           // Process the fetched data and set it to state
           const processedData = stats.map((stat) => ({

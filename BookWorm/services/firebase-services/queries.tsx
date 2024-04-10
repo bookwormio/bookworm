@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { type Timestamp } from "@google-cloud/firestore";
 import axios from "axios";
 import { type User } from "firebase/auth";
@@ -16,41 +17,103 @@ import {
 import { ref, uploadBytesResumable } from "firebase/storage";
 import { BOOKS_API_KEY } from "../../constants/constants";
 import { DB, STORAGE } from "../../firebase.config";
+import {
+  type BookVolumeItem,
+  type BooksResponse,
+  type CreateTrackingModel,
+  type UserSearchDisplayModel,
+} from "../../types";
 
-export async function addDataEntry(user: User, time: Date, pages: number) {
+// export async function addDataEntry(user: User, time: Date, pages: number) {
+//   try {
+//     const q = query(
+//       collection(DB, "data_collection"),
+//       where("user_id", "==", user.uid),
+//     );
+//     const dataCol = await getDocs(q);
+
+//     if (dataCol.empty) {
+//       // The collection doesn't exist for the user, so create it
+//       const userDataCollectionRef = collection(DB, "data_collection");
+//       const userDataDocRef = doc(userDataCollectionRef);
+//       await setDoc(userDataDocRef, { user_id: user.uid });
+//       const newDocRef = await getDoc(userDataDocRef);
+//       // console.log(newDocRef);
+//       const subColRef = collection(newDocRef.ref, "pages_read");
+//       await addDoc(subColRef, {
+//         added_at: time,
+//         pages,
+//       });
+//     } else {
+//       // console.log(dataCol.docs[0].ref);
+//       const subColRef = collection(dataCol.docs[0].ref, "pages_read");
+//       await addDoc(subColRef, {
+//         added_at: time,
+//         pages,
+//       });
+//     }
+//   } catch (error) {
+//     alert(error);
+//   }
+// }
+/**
+ * Adds a data entry for a users time reading and number of pages
+ * Combines getAllFollowing(), fetchPostsByUserID(), and sortPostsByDate() functions.
+ * @param {CreateTrackingModel} tracking - A tracking object storing the userID, minutesRead, and pagesRead.
+ * @returns {Promise<boolean>} A boolean promise, true if successful, false if not.
+ */
+export async function addDataEntry(
+  tracking: CreateTrackingModel,
+): Promise<boolean> {
   try {
-    const q = query(
-      collection(DB, "data_collection"),
-      where("user_id", "==", user.uid),
-    );
-    const dataCol = await getDocs(q);
-
-    if (dataCol.empty) {
-      // The collection doesn't exist for the user, so create it
-      const userDataCollectionRef = collection(DB, "data_collection");
-      const userDataDocRef = doc(userDataCollectionRef);
-      await setDoc(userDataDocRef, { user_id: user.uid });
-      const newDocRef = await getDoc(userDataDocRef);
-      // console.log(newDocRef);
-      const subColRef = collection(newDocRef.ref, "pages_read");
-      await addDoc(subColRef, {
-        added_at: time,
-        pages,
-      });
-    } else {
-      // console.log(dataCol.docs[0].ref);
-      const subColRef = collection(dataCol.docs[0].ref, "pages_read");
-      await addDoc(subColRef, {
-        added_at: time,
-        pages,
-      });
+    if (tracking.userid !== null) {
+      const q = query(
+        collection(DB, "data_collection"),
+        where("user_id", "==", tracking.userid),
+      );
+      const dataCol = await getDocs(q);
+      if (dataCol.empty) {
+        // The collection doesn't exist for the user, so create it
+        const userDataCollectionRef = collection(DB, "data_collection");
+        const userDataDocRef = doc(userDataCollectionRef);
+        await setDoc(userDataDocRef, { user_id: tracking.userid });
+        const newDocRef = await getDoc(userDataDocRef);
+        // console.log(newDocRef);
+        const subColPageRef = collection(newDocRef.ref, "pages_read");
+        await addDoc(subColPageRef, {
+          added_at: serverTimestamp(),
+          pages: tracking.pagesRead,
+        });
+        const subColTimeRef = collection(newDocRef.ref, "time_read");
+        await addDoc(subColTimeRef, {
+          added_at: serverTimestamp(),
+          minutes: tracking.minutesRead,
+        });
+      } else {
+        // console.log(dataCol.docs[0].ref);
+        const subColPageRef = collection(dataCol.docs[0].ref, "pages_read");
+        await addDoc(subColPageRef, {
+          added_at: serverTimestamp(),
+          pages: tracking.pagesRead,
+        });
+        const subColTimeRef = collection(dataCol.docs[0].ref, "time_read");
+        await addDoc(subColTimeRef, {
+          added_at: serverTimestamp(),
+          minutes: tracking.minutesRead,
+        });
+      }
+      return true;
     }
+    return false;
   } catch (error) {
-    alert(error);
+    console.error(error);
+    return false;
   }
 }
 
-export async function fetchStats(user: User) {
+export async function fetchPagesReadData(
+  user: User,
+): Promise<Array<{ x: number; y: number }>> {
   try {
     const q = query(
       collection(DB, "data_collection"),
@@ -213,7 +276,7 @@ export async function fetchPagesRead(user: User) {
 // Function to fetch users based on the search phrase
 export async function fetchUsersBySearch(
   searchValue: string,
-): Promise<UserListItem[]> {
+): Promise<UserSearchDisplayModel[]> {
   if (searchValue === "") {
     return []; // Return empty array if there's no searchValue
   }
@@ -229,7 +292,7 @@ export async function fetchUsersBySearch(
       where("first", "<=", lowerName + "\uf8ff"),
     );
     const querySnapshot = await getDocs(q);
-    const usersData: UserListItem[] = [];
+    const usersData: UserSearchDisplayModel[] = [];
     // Add each user data to the array
     querySnapshot.forEach((doc) => {
       usersData.push({
