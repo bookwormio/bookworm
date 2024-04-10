@@ -5,29 +5,29 @@ import {
   and,
   collection,
   doc,
-  type DocumentData,
   getDoc,
   getDocs,
   limit,
   or,
   orderBy,
   query,
-  type QueryDocumentSnapshot,
   runTransaction,
   serverTimestamp,
   setDoc,
   startAfter,
   updateDoc,
   where,
+  type DocumentData,
+  type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import { ref, uploadBytesResumable } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { BOOKS_API_KEY } from "../../constants/constants";
 import { ServerFollowStatus } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
-  type BooksResponse,
   type BookVolumeInfo,
   type BookVolumeItem,
+  type BooksResponse,
   type ConnectionModel,
   type CreatePostModel,
   type CreateTrackingModel,
@@ -70,7 +70,11 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
       if (userdata.bio !== "" && userdata.bio !== undefined) {
         dataToUpdate.bio = userdata.bio;
       }
-      if (userdata.profilepic !== "" && userdata.profilepic !== undefined) {
+      if (
+        userdata.profilepic !== "" &&
+        userdata.profilepic !== undefined &&
+        userdata.profilepic !== "false"
+      ) {
         dataToUpdate.profilepic = "true";
       } else {
         dataToUpdate.profilepic = "false";
@@ -95,6 +99,27 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
     console.error("Error updating user", error);
   }
 };
+
+export async function getUserProfilePic(
+  userID: string,
+): Promise<string | null> {
+  try {
+    const userDocRef = doc(DB, "user_collection", userID);
+    const userDocSnapshot = await getDoc(userDocRef);
+
+    if (userDocSnapshot.exists()) {
+      const userData = userDocSnapshot.data();
+      if (userData.profilepic === "true") {
+        const storageRef = ref(STORAGE, "profilepics/" + userDocRef.id);
+        const url = await getDownloadURL(storageRef);
+        return url;
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching image ", error);
+  }
+  return null;
+}
 
 /**
  * Normalizes a string to Unicode Normalization Form KC (NFKC) and then converts it to lowercase.

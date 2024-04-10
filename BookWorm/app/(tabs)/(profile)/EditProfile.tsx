@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
@@ -22,6 +23,7 @@ const EditProfile = () => {
   const [editPhone, setEditPhone] = useState("");
   const [editFirst, setEditFirst] = useState("");
   const [editLast, setEditLast] = useState("");
+  const [editBio, setEditBio] = useState("");
 
   const queryClient = useQueryClient();
 
@@ -71,6 +73,9 @@ const EditProfile = () => {
       if (userDataTyped.number !== undefined) {
         setEditPhone(userDataTyped.number);
       }
+      if (userDataTyped.bio !== undefined) {
+        setEditBio(userDataTyped.bio);
+      }
     }
   }, [userData]);
 
@@ -102,14 +107,14 @@ const EditProfile = () => {
     <View>
       <Button
         title="Close"
-        color="midnightblue"
+        color="black"
         onPress={() => {
           onClose();
           router.back();
         }}
       />
       <View>
-        <Text>First Name</Text>
+        <Text style={styles.regtext}>First Name</Text>
         <TextInput
           style={styles.input}
           value={editFirst}
@@ -121,7 +126,7 @@ const EditProfile = () => {
         />
       </View>
       <View>
-        <Text>Last Name</Text>
+        <Text style={styles.regtext}>Last Name</Text>
         <TextInput
           style={styles.input}
           value={editLast}
@@ -133,7 +138,7 @@ const EditProfile = () => {
         />
       </View>
       <View>
-        <Text>Phone Number</Text>
+        <Text style={styles.regtext}>Phone Number</Text>
         <TextInput
           style={styles.input}
           value={editPhone}
@@ -144,7 +149,24 @@ const EditProfile = () => {
           }}
         />
       </View>
-      <Button title="Save" onPress={handeSaveClick} />
+      <View>
+        <Text style={styles.regtext}>Bio</Text>
+        <TextInput
+          style={styles.input}
+          value={editBio}
+          placeholder={editBio === "" ? "phone number" : editBio}
+          autoCapitalize="none"
+          multiline={true}
+          onChangeText={(text) => {
+            setEditBio(text);
+          }}
+        />
+      </View>
+      <View>
+        <TouchableOpacity style={styles.button} onPress={handeSaveClick}>
+          <Text style={styles.buttonText}>{"Let's Go"}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -155,11 +177,27 @@ const styles = StyleSheet.create({
   input: {
     borderColor: "gray",
     width: "100%",
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
+    borderBottomWidth: 1,
+    marginBottom: 20,
+    marginTop: 10,
+    paddingBottom: 5,
+    fontSize: 16,
+    marginLeft: 10,
   },
-
+  button: {
+    backgroundColor: "#FB6D0B",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginVertical: 10,
+    width: "30%",
+    alignSelf: "center",
+  },
+  buttonText: {
+    color: "white", // Ensure text color is white
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   loading: {
     flex: 1,
     alignItems: "center",
@@ -169,5 +207,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  regtext: {
+    marginLeft: 10,
   },
 });

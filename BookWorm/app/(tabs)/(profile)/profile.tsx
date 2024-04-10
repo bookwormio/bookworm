@@ -5,13 +5,17 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Button,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
-import { fetchUserData } from "../../../services/firebase-services/queries";
+import {
+  fetchUserData,
+  getUserProfilePic,
+} from "../../../services/firebase-services/queries";
 import { type UserDataModel } from "../../../types";
 
 const Profile = () => {
@@ -20,6 +24,7 @@ const Profile = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
+  const [image, setImage] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
   const navigation = useNavigation();
 
@@ -36,6 +41,23 @@ const Profile = () => {
       }
     },
   });
+
+  const { data: userIm } = useQuery({
+    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
+    queryFn: async () => {
+      if (user != null) {
+        return await getUserProfilePic(user.uid);
+      } else {
+        return null;
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (userIm !== undefined && userIm !== null) {
+      setImage(userIm);
+    }
+  }, [userIm]);
 
   useEffect(() => {
     if (userData !== undefined && userData != null) {
@@ -90,9 +112,8 @@ const Profile = () => {
           <Text>0</Text>
         </View>
       </View>
-      <Button title="LogOut" onPress={signOut} color="black" />
       <Button
-        color="black"
+        color="#FB6D0B"
         title="Edit Profile"
         onPress={() => {
           if (user != null) {
@@ -105,6 +126,12 @@ const Profile = () => {
           setProfileLoading(true);
         }}
       />
+      <Button title="LogOut" onPress={signOut} color="#FB6D0B" />
+      <View>
+        {image !== null && image !== "" && (
+          <Image source={{ uri: image }} style={styles.image} />
+        )}
+      </View>
     </View>
   );
 };
@@ -170,31 +197,10 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginLeft: 5,
   },
-  buttoncontainer: {
-    alignItems: "flex-end",
-    justifyContent: "center",
-    paddingRight: 160,
-    width: "100%",
-  },
-  button: {
-    paddingVertical: 2,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "orange",
-  },
-  buttonText: {
-    color: "orange",
-  },
-  backButtonContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    zIndex: 1,
-    padding: 10,
-  },
-  buttonwrapper: {
-    marginBottom: 8,
-    alignItems: "flex-start",
+  image: {
+    width: 200,
+    height: 200,
+    resizeMode: "cover",
+    borderRadius: 100, // Make it circular for profile picture
   },
 });
