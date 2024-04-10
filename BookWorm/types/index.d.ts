@@ -4,7 +4,7 @@ import {
   type Timestamp,
 } from "firebase/firestore";
 
-interface UserListItem {
+interface UserSearchDisplayModel {
   id: string;
   firstName: string;
   lastName: string;

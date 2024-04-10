@@ -2,12 +2,14 @@ import axios from "axios";
 import { type User } from "firebase/auth";
 import {
   addDoc,
+  and,
   collection,
   doc,
   type DocumentData,
   getDoc,
   getDocs,
   limit,
+  or,
   orderBy,
   query,
   type QueryDocumentSnapshot,
@@ -31,8 +33,8 @@ import {
   type CreateTrackingModel,
   type PostModel,
   type UserDataModel,
-  type UserListItem,
   type UserModel,
+  type UserSearchDisplayModel,
 } from "../../types";
 
 /**
@@ -56,9 +58,11 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
       const dataToUpdate: Record<string, string> = {};
       if (userdata.first !== "" && userdata.first !== undefined) {
         dataToUpdate.first = userdata.first;
+        dataToUpdate.first_casefold = caseFoldNormalize(userdata.first);
       }
       if (userdata.last !== "" && userdata.last !== undefined) {
         dataToUpdate.last = userdata.last;
+        dataToUpdate.last_casefold = caseFoldNormalize(userdata.last);
       }
       if (userdata.number !== "" && userdata.number !== undefined) {
         dataToUpdate.number = userdata.number;
@@ -91,6 +95,17 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
     console.error("Error updating user", error);
   }
 };
+
+/**
+ * Normalizes a string to Unicode Normalization Form KC (NFKC) and then converts it to lowercase.
+ * This function ensures case-folding of the input string.
+ *
+ * @param {string} s - The string to be normalized and case-folded.
+ * @returns {string} The case-folded string.
+ */
+function caseFoldNormalize(s: string): string {
+  return s.normalize("NFKC").toLowerCase().toUpperCase().toLowerCase();
+}
 
 /**
  * Represents an asynchronous function that represents an empty query.
@@ -453,7 +468,9 @@ export async function getIsFollowing(
 }
 
 // TODO: implement
-export async function getAllFollowers(userID: string): Promise<UserListItem[]> {
+export async function getAllFollowers(
+  userID: string,
+): Promise<UserSearchDisplayModel[]> {
   // TODO: return all followers of this user
   return [];
 }
@@ -487,23 +504,29 @@ export async function getAllFollowing(userID: string): Promise<string[]> {
 // Function to fetch users based on the search phrase
 export async function fetchUsersBySearch(
   searchValue: string,
-): Promise<UserListItem[]> {
+): Promise<UserSearchDisplayModel[]> {
   if (searchValue === "") {
     return []; // Return empty array if there's no searchValue
   }
-  // Firestore is weird:
-  // This is like a Select * from users where name LIKE "userSearchValue%"
-  // TODO: down the line potentially may have to implement a more search friendly db
   try {
-    const lowerName = searchValue;
+    const normalizedSearchValue = caseFoldNormalize(searchValue);
+    // search for users by their case-folded first or last names.
     const q = query(
       collection(DB, "user_collection"),
       // where("isPublic", "==", true),
-      where("first", ">=", lowerName),
-      where("first", "<=", lowerName + "\uf8ff"),
+      or(
+        and(
+          where("first_casefold", ">=", normalizedSearchValue),
+          where("first_casefold", "<=", normalizedSearchValue + "\uf8ff"),
+        ),
+        and(
+          where("last_casefold", ">=", normalizedSearchValue),
+          where("last_casefold", "<=", normalizedSearchValue + "\uf8ff"),
+        ),
+      ),
     );
     const querySnapshot = await getDocs(q);
-    const usersData: UserListItem[] = [];
+    const usersData: UserSearchDisplayModel[] = [];
     // Add each user data to the array
     querySnapshot.forEach((doc) => {
       usersData.push({
@@ -715,12 +738,16 @@ export async function fetchPostsForUserFeed(
 }> {
   try {
     const following = await getAllFollowing(userID);
-    const { posts, newLastVisible } = await fetchPostsByUserIDs(
-      following,
-      lastVisible,
-    );
-    // sortPostsByDate(posts);
-    return { posts, newLastVisible };
+    if (following.length === 0) {
+      return { posts: [], newLastVisible: null };
+    } else {
+      const { posts, newLastVisible } = await fetchPostsByUserIDs(
+        following,
+        lastVisible,
+      );
+      // sortPostsByDate(posts);
+      return { posts, newLastVisible };
+    }
   } catch (error) {
     console.error("Error fetching users feed", error);
     return { posts: [], newLastVisible: null };

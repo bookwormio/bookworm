@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 
 import { useQuery } from "@tanstack/react-query";
-import { router } from "expo-router";
 import { fetchUsersBySearch } from "../../services/firebase-services/queries";
-import { type UserListItem } from "../../types";
+import { type UserSearchDisplayModel } from "../../types";
+import UserList from "../UserList/UserList";
 import SearchBar from "./searchbar";
 
 const USER_SEARCH_PLACEHOLDER = "Search for users";
@@ -15,21 +15,12 @@ interface UserSearchProps {
 }
 
 const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
-  const [users, setUsers] = useState<UserListItem[]>([]);
+  const [users, setUsers] = useState<UserSearchDisplayModel[]>([]);
   const [searchClicked, setSearchClicked] = useState<boolean>(
     searchPhrase !== "",
   );
 
-  const handleUserClick = ({ user }: { user: UserListItem }) => {
-    router.push({
-      pathname: "FriendProfile",
-      params: {
-        friendUserID: user.id,
-      },
-    });
-  };
-
-  const { data: fetchUsersData } = useQuery({
+  const { data: fetchUsersData, isLoading } = useQuery({
     queryKey: ["searchusers", searchPhrase],
     queryFn: async () => {
       if (searchPhrase != null && searchPhrase !== "") {
@@ -56,21 +47,21 @@ const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
         setClicked={setSearchClicked}
         placeholderText={USER_SEARCH_PLACEHOLDER}
       />
-      <View>
-        {users.map((user) => (
-          <TouchableOpacity
-            key={user.id}
-            onPress={() => {
-              handleUserClick({ user });
-            }}
-          >
-            <Text>
-              {user.firstName} {user.lastName}
-            </Text>
-            {/* Add more user details to display */}
-          </TouchableOpacity>
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {users.map((user, index) => (
+          <View style={styles.userContainer} key={index}>
+            <UserList users={[user]} />
+          </View>
         ))}
-      </View>
+        {isLoading && (
+          <View style={styles.loading}>
+            <ActivityIndicator size="large" color="#000000" />
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -82,5 +73,22 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 10,
+  },
+  userContainer: {
+    marginBottom: 2,
+  },
+  scrollContainer: {
+    flex: 1,
+    width: "100%",
+  },
+  scrollContent: {
+    paddingRight: 16, // Adjusted padding to accommodate scroll bar
+  },
+  loading: {
+    marginTop: "10%",
+    alignItems: "center",
+    justifyContent: "center",
+    bottom: 20,
+    width: "100%",
   },
 });
