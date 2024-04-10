@@ -1,39 +1,53 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
 
-const Login = () => {
+const CreateAccount = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signIn, isLoading } = useAuth();
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const { createAccount } = useAuth();
 
-  if (isLoading) {
-    const styles = StyleSheet.create({
-      container: {
-        flex: 1,
-        alignItems: "center",
-        padding: 40,
-        justifyContent: "center",
-      },
-    });
-
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="black" />
-      </View>
-    );
-  }
+  const validFields = () => {
+    const missingFields: string[] = [];
+    if (email === "") {
+      missingFields.push("Email");
+    }
+    if (password === "") {
+      missingFields.push("Password");
+    }
+    if (confirmPassword === "") {
+      missingFields.push("Confirm Password");
+    }
+    if (missingFields.length > 0) {
+      Toast.show({
+        type: "error",
+        text1: "Please Complete the Following Fields:",
+        text2: missingFields.join(", "),
+      });
+      return false;
+    } else if (password !== confirmPassword) {
+      Toast.show({
+        type: "error",
+        text1: "Passwords Do Not Match",
+        text2: "Please ensure both passwords are the same",
+      });
+      return false;
+    }
+    return true;
+  };
 
   return (
     <View style={styles.container}>
+      <Toast />
       <TextInput
         style={styles.input}
         value={email}
@@ -53,63 +67,55 @@ const Login = () => {
           setPassword(text);
         }}
       />
+      <TextInput
+        style={styles.input}
+        value={confirmPassword}
+        secureTextEntry={true}
+        placeholder="confirm password"
+        autoCapitalize="none"
+        onChangeText={(text) => {
+          setConfirmPassword(text);
+        }}
+      />
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          signIn(email, password);
-          router.replace("/post");
+          if (validFields()) {
+            try {
+              createAccount(email, password);
+              router.push("/MoreInfo");
+            } catch (error) {
+              console.error(error);
+            }
+          }
         }}
       >
-        <Text style={styles.buttonText}>{"Login"}</Text>
+        <Text style={styles.buttonText}>{"Create Account"}</Text>
       </TouchableOpacity>
-      <View style={styles.accountContainer}>
-        <Text>{"Don't have an account?"}</Text>
-        <TouchableOpacity
-          onPress={() => {
-            router.push("/CreateAccount");
-          }}
-        >
-          <Text style={styles.createButtonText}>{"Create Account"}</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
 
-export default Login;
+export default CreateAccount;
 
 const styles = StyleSheet.create({
-  accountContainer: {
-    flexDirection: "row", // Horizontal layout
-    alignItems: "center", // Align items vertically
-    justifyContent: "space-between", // Space between the inputs
-    paddingHorizontal: 16, // Padding for the container
-  },
   button: {
     backgroundColor: "#FB6D0B",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
     marginVertical: 10,
-    marginTop: 15,
-    marginBottom: 8,
   },
   buttonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
   },
-  createButtonText: {
-    color: "#A0D34D",
-    fontSize: 16,
-    fontWeight: "bold",
-    marginLeft: 10,
-  },
   container: {
     flex: 1,
     alignItems: "center",
-    padding: 40,
     justifyContent: "center",
+    paddingHorizontal: 20,
   },
   main: {
     flex: 1,

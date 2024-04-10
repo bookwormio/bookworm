@@ -30,7 +30,7 @@ import {
   type CreatePostModel,
   type CreateTrackingModel,
   type PostModel,
-  type UserData,
+  type UserDataModel,
   type UserListItem,
   type UserModel,
 } from "../../types";
@@ -45,8 +45,7 @@ import {
  * Otherwise, it updates the Firestore document with the provided user information.
  */
 
-export const updateUser = async (userdata: UserData): Promise<void> => {
-  console.log(userdata);
+export const updateUser = async (userdata: UserDataModel): Promise<void> => {
   try {
     if (
       userdata.first !== "" &&
@@ -64,7 +63,29 @@ export const updateUser = async (userdata: UserData): Promise<void> => {
       if (userdata.number !== "" && userdata.number !== undefined) {
         dataToUpdate.number = userdata.number;
       }
-      await updateDoc(doc(DB, "user_collection", userdata.id), dataToUpdate);
+      if (userdata.bio !== "" && userdata.bio !== undefined) {
+        dataToUpdate.bio = userdata.bio;
+      }
+      if (userdata.profilepic !== "" && userdata.profilepic !== undefined) {
+        dataToUpdate.profilepic = "true";
+      } else {
+        dataToUpdate.profilepic = "false";
+      }
+      const docRef = doc(DB, "user_collection", userdata.id);
+      await updateDoc(docRef, dataToUpdate);
+      if (
+        userdata.profilepic.trim() !== "" &&
+        userdata.profilepic !== undefined &&
+        typeof userdata.profilepic === "string" &&
+        userdata.profilepic !== "true" &&
+        userdata.profilepic !== "false"
+      ) {
+        const profilePicUrl = new URL(userdata.profilepic);
+        const response = await fetch(profilePicUrl);
+        const blob = await response.blob();
+        const storageRef = ref(STORAGE, "profilepics/" + docRef.id);
+        await uploadBytesResumable(storageRef, blob);
+      }
     }
   } catch (error) {
     console.error("Error updating user", error);
@@ -89,7 +110,7 @@ export const emptyQuery = async (): Promise<void> => {};
  */
 export async function newFetchUserInfo(
   userID: string,
-): Promise<UserData | undefined> {
+): Promise<UserDataModel | null> {
   try {
     const userDocRef = doc(DB, "user_collection", userID);
     const userDocSnapshot = await getDoc(userDocRef);
@@ -99,20 +120,23 @@ export async function newFetchUserInfo(
       if (userData !== undefined) {
         return {
           id: userID,
+          username: userData.username ?? "",
           email: userData.email ?? "",
           first: userData.first ?? "",
           isPublic: userData.isPublic ?? false,
           last: userData.last ?? "",
           number: userData.number ?? "",
+          bio: userData.bio ?? "",
+          profilepic: userData.profilepic ?? "",
         };
       }
     }
     console.error("doesnt exist");
 
-    return undefined; // User document doesn't exist or data is missing
+    return null; // User document doesn't exist or data is missing
   } catch (error) {
     console.error("Error fetching user information:", error);
-    return undefined; // Return undefined on error
+    return null; // Return undefined on error
   }
 }
 
@@ -126,27 +150,21 @@ export async function newFetchUserInfo(
  * If the user document exists, it returns an object containing the user data.
  * If the user document doesn't exist or if data is missing, it returns undefined.
  */
-export const fetchUserData = async (user: User): Promise<UserData> => {
+export const fetchUserData = async (
+  user: User,
+): Promise<UserDataModel | null> => {
   try {
     const userDocRef = doc(DB, "user_collection", user.uid);
     const userDocSnap = await getDoc(userDocRef);
     if (userDocSnap.exists()) {
-      const userData = userDocSnap.data() as UserData;
+      const userData = userDocSnap.data() as UserDataModel;
       return userData;
     } else {
-      console.error("User document DNE");
-      return {
-        id: user.uid,
-        first: "",
-        last: "",
-        number: "",
-        isPublic: false,
-        email: "",
-      };
+      return null;
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
-    throw error;
+    return null;
   }
 };
 
@@ -162,7 +180,7 @@ export const fetchUserData = async (user: User): Promise<UserData> => {
  */
 export async function fetchFriendData(
   userID: string,
-): Promise<UserData | undefined> {
+): Promise<UserDataModel | undefined> {
   try {
     const userDocRef = doc(DB, "user_collection", userID);
     const userDocSnapshot = await getDoc(userDocRef);
@@ -172,11 +190,14 @@ export async function fetchFriendData(
       if (userData !== undefined) {
         return {
           id: userID,
+          username: userData.username ?? "",
           email: userData.email ?? "",
           first: userData.first ?? "",
           isPublic: userData.isPublic ?? false,
           last: userData.last ?? "",
           number: userData.number ?? "",
+          bio: userData.bio ?? "",
+          profilepic: userData.profilepic ?? "",
         };
       }
     }

@@ -10,13 +10,16 @@ interface UserListItem {
   lastName: string;
 }
 
-interface UserData {
+interface UserDataModel {
   id: string;
+  username: string;
   email: string;
   first: string;
-  isPublic: boolean;
   last: string;
   number: string;
+  isPublic: boolean;
+  bio: string;
+  profilepic: string;
 }
 
 interface CreatePostModel {
