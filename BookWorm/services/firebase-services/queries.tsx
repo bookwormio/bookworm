@@ -4,13 +4,17 @@ import {
   addDoc,
   collection,
   doc,
+  type DocumentData,
   getDoc,
   getDocs,
   limit,
+  orderBy,
   query,
+  type QueryDocumentSnapshot,
   runTransaction,
   serverTimestamp,
   setDoc,
+  startAfter,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -19,9 +23,9 @@ import { BOOKS_API_KEY } from "../../constants/constants";
 import { ServerFollowStatus } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
+  type BooksResponse,
   type BookVolumeInfo,
   type BookVolumeItem,
-  type BooksResponse,
   type ConnectionModel,
   type CreatePostModel,
   type CreateTrackingModel,
@@ -576,54 +580,73 @@ export async function fetchBookByVolumeID(
 }
 
 /**
- * Retrieves all posts for a user from their userID
- * @param {string} userIDs - The list of  userIDs who's posts are to be retrieved.
- * @returns {Promise<PostModel[]>} A promise that resolves to a list of PostModels,
- * a typed entity for storing Firebase post documents.
+ * Fetches posts for the specified user IDs with pagination support.
+ * If a last visible document snapshot is provided, it fetches the next page of posts.
+ * @param {string[]} userIDs - The user IDs for which to fetch posts.
+ * @param {QueryDocumentSnapshot<DocumentData, DocumentData> | null} [lastVisible=null] - The last visible document snapshot.
+ * @returns {Promise<{
+ *   posts: PostModel[]; // The array of fetched posts.
+ *   newLastVisible: QueryDocumentSnapshot<DocumentData, DocumentData> | null; // The new last visible document snapshot.
+ * }>} A promise that resolves to an object containing the fetched posts and the new last visible document snapshot.
  */
 export async function fetchPostsByUserIDs(
   userIDs: string[],
-): Promise<PostModel[]> {
-  if (userIDs.length > 0) {
-    try {
-      const postsQuery = query(
+  lastVisible?: QueryDocumentSnapshot<DocumentData, DocumentData> | null,
+): Promise<{
+  posts: PostModel[];
+  newLastVisible: QueryDocumentSnapshot<DocumentData, DocumentData> | null;
+}> {
+  try {
+    let postsQuery = query(
+      collection(DB, "posts"),
+      where("user", "in", userIDs),
+      orderBy("created", "desc"),
+      limit(10),
+    );
+
+    // if there is a last visible document, fetch the next visible
+    if (lastVisible != null) {
+      postsQuery = query(
         collection(DB, "posts"),
         where("user", "in", userIDs),
-        // TODO: unlock limit once we get insanely breaded and not worry about firebase fees
+        orderBy("created", "desc"),
+        startAfter(lastVisible),
         limit(10),
       );
-      const postsData: PostModel[] = [];
-      const postsSnapshot = await getDocs(postsQuery);
-
-      // Uses Promise.all to wait for all fetchUser promises to resolve
-      await Promise.all(
-        postsSnapshot.docs.map(async (postDoc) => {
-          const userID: string = postDoc.data().user;
-          try {
-            const user = await fetchUser(userID);
-            if (user != null) {
-              const post = {
-                id: postDoc.id,
-                book: postDoc.data().book,
-                created: postDoc.data().created,
-                text: postDoc.data().text,
-                user,
-                images:
-                  postDoc.data().image === true
-                    ? ["posts/" + userID + "/" + postDoc.id]
-                    : [],
-              };
-              postsData.push(post);
-            }
-          } catch (error) {
-            console.error("Error fetching user", error);
-          }
-        }),
-      );
-      return postsData;
-    } catch (error) {
-      console.error("Error fetching posts by User ID", error);
     }
+
+    const postsSnapshot = await getDocs(postsQuery);
+    const postsData: PostModel[] = [];
+
+    // Uses Promise.all to wait for all fetchUser promises to resolve
+    await Promise.all(
+      postsSnapshot.docs.map(async (postDoc) => {
+        const userID: string = postDoc.data().user;
+        try {
+          const user = await fetchUser(userID);
+          if (user != null) {
+            const post = {
+              id: postDoc.id,
+              book: postDoc.data().book,
+              created: postDoc.data().created,
+              text: postDoc.data().text,
+              user,
+              images:
+                postDoc.data().image === true
+                  ? ["posts/" + userID + "/" + postDoc.id]
+                  : [],
+            };
+            postsData.push(post);
+          }
+        } catch (error) {
+          console.error("Error fetching user", error);
+        }
+      }),
+    );
+    return postsData;
+  } catch (error) {
+    console.error("Error fetching posts by User ID", error);
+    return [];
   }
   return [];
 }
@@ -673,23 +696,34 @@ export async function fetchPostByPostID(
 }
 
 /**
- * Retrieves posts for every user the provided user is following.
+ * Retrieves posts for every user the provided user is following,
+ * including pagination support.
  * Combines getAllFollowing(), fetchPostsByUserID(), and sortPostsByDate() functions.
- * @param {string} userID - The ID of the user who's followees' posts are to be retrieved.
- * @returns {Promise<PostModel[]>} A promise that resolves to a list of PostModels,
- * a typed entity for storing Firebase post documents.
+ * @param {string} userID - The ID of the user for whom to retrieve posts.
+ * @param {QueryDocumentSnapshot<DocumentData, DocumentData> | null} [lastVisible=null] - The last visible document snapshot.
+ * @returns {Promise<{
+ *   posts: PostModel[]; // A list of fetched posts.
+ *   newLastVisible: QueryDocumentSnapshot<DocumentData, DocumentData> | null; // The new last visible document snapshot.
+ * }>} A promise that resolves to an object containing the fetched posts and the new last visible document snapshot.
  */
 export async function fetchPostsForUserFeed(
   userID: string,
-): Promise<PostModel[]> {
+  lastVisible?: QueryDocumentSnapshot<DocumentData, DocumentData> | null,
+): Promise<{
+  posts: PostModel[];
+  newLastVisible: QueryDocumentSnapshot<DocumentData, DocumentData> | null;
+}> {
   try {
     const following = await getAllFollowing(userID);
-    const posts = await fetchPostsByUserIDs(following);
-    sortPostsByDate(posts);
-    return posts;
+    const { posts, newLastVisible } = await fetchPostsByUserIDs(
+      following,
+      lastVisible,
+    );
+    // sortPostsByDate(posts);
+    return { posts, newLastVisible };
   } catch (error) {
     console.error("Error fetching users feed", error);
-    return [];
+    return { posts: [], newLastVisible: null };
   }
 }
 

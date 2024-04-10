@@ -1,4 +1,8 @@
-import { type Timestamp } from "firebase/firestore";
+import {
+  type DocumentData,
+  type QueryDocumentSnapshot,
+  type Timestamp,
+} from "firebase/firestore";
 
 interface UserListItem {
   id: string;
@@ -105,4 +109,9 @@ interface CreateTrackingModel {
   userid: string;
   pagesRead: number;
   minutesRead: number;
+}
+
+interface PostPaginationModel {
+  userid: string;
+  lastVisiblePage: QueryDocumentSnapshot<DocumentData, DocumentData> | null;
 }
