@@ -1,11 +1,14 @@
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Button,
+  Image,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
@@ -13,6 +16,7 @@ import {
   fetchFriendData,
   followUserByID,
   getIsFollowing,
+  getUserProfileURL,
   unfollowUserByID,
 } from "../../../services/firebase-services/queries";
 import { type ConnectionModel, type UserDataModel } from "../../../types";
@@ -27,6 +31,8 @@ const FriendProfile = () => {
   const { friendUserID } = useLocalSearchParams<{ friendUserID: string }>();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [bio, setBio] = useState("");
+  const [image, setImage] = useState("");
   const { user } = useAuth();
   const [followStatus, setFollowStatus] = useState<string>(
     LocalFollowStatus.LOADING,
@@ -112,8 +118,29 @@ const FriendProfile = () => {
       if (setFriendData.last !== undefined) {
         setLastName(setFriendData.last);
       }
+      if (setFriendData.bio !== undefined) {
+        setBio(setFriendData.bio);
+      }
     }
   }, [friendData]);
+
+  const { data: friendIm, isLoading: isLoadingIm } = useQuery({
+    queryKey:
+      friendUserID != null ? ["profilepic", friendUserID] : ["profilepic"],
+    queryFn: async () => {
+      if (friendUserID != null && friendUserID !== "") {
+        return await getUserProfileURL(friendUserID);
+      } else {
+        return null;
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (friendIm !== undefined && friendIm !== null) {
+      setImage(friendIm);
+    }
+  }, [friendIm]);
 
   const handleFollowButtonPressed = () => {
     if (followStatus === LocalFollowStatus.LOADING) {
@@ -174,7 +201,7 @@ const FriendProfile = () => {
     }
   };
 
-  if (friendIsLoading) {
+  if (friendIsLoading || isLoadingIm) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />
@@ -184,32 +211,84 @@ const FriendProfile = () => {
 
   return (
     <View>
-      <Button
-        title="Back"
-        onPress={() => {
-          router.back();
-        }}
-      />
-      <Text>User ID: {friendUserID}</Text>
-      <Text>First: {firstName}</Text>
-      <Text>Last: {lastName}</Text>
-      <Button
-        title={
-          followStatus === LocalFollowStatus.LOADING
-            ? "Loading..."
-            : followStatus === LocalFollowStatus.FOLLOWING
-              ? "Following"
-              : "Follow"
-        }
-        onPress={handleFollowButtonPressed}
-        disabled={!followStatusFetched} // Disable button until follow status is fetched
-      />
+      <View style={styles.buttonwrapper}>
+        <Button
+          title="Back"
+          onPress={() => {
+            router.back();
+          }}
+          color="black"
+        />
+      </View>
+      <View style={styles.imageTextContainer}>
+        <View style={styles.defaultImageContainer}>
+          {
+            // TODO: use a default profile pic
+            image !== "" ? (
+              <Image style={styles.defaultImage} source={{ uri: image }} />
+            ) : (
+              <FontAwesome5 name="user" size={40} />
+            )
+          }
+        </View>
+        <View>
+          <Text style={styles.nameText}>
+            {firstName} {lastName}
+          </Text>
+          <Text style={styles.locText}>Salt Lake City, UT</Text>
+        </View>
+      </View>
+      <View>
+        <Text style={styles.bioPad}>{bio}</Text>
+      </View>
+      <View style={styles.imageTextContainer}>
+        <View>
+          <Text>Following</Text>
+          <Text>0</Text>
+        </View>
+        <View style={styles.locText}>
+          <Text>Followers</Text>
+          <Text>0</Text>
+        </View>
+        <View style={styles.buttoncontainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleFollowButtonPressed}
+            disabled={!followStatusFetched}
+          >
+            <Text style={styles.buttonText}>
+              {followStatus === LocalFollowStatus.LOADING
+                ? "Loading..."
+                : followStatus === LocalFollowStatus.FOLLOWING
+                  ? "Following"
+                  : "Follow"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 };
 export default FriendProfile;
 
 const styles = StyleSheet.create({
+  imageTextContainer: {
+    flexDirection: "row", // Arrange children horizontally
+    alignItems: "center", // Align children vertically in the center
+    marginLeft: 20, // Adjust as needed
+  },
+  bioPad: {
+    paddingLeft: 20,
+    paddingBottom: 10,
+  },
+  nameText: {
+    paddingLeft: 20,
+    fontSize: 30,
+    marginTop: -25,
+  },
+  locText: {
+    paddingLeft: 20,
+  },
   input: {
     borderColor: "gray",
     width: "100%",
@@ -227,5 +306,50 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  buttoncontainer: {
+    alignItems: "flex-end",
+    justifyContent: "center",
+    paddingRight: 160,
+    width: "100%",
+  },
+  button: {
+    paddingVertical: 2,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "orange",
+  },
+  buttonText: {
+    color: "orange",
+  },
+  backButtonContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 1,
+    padding: 10,
+  },
+  buttonwrapper: {
+    marginBottom: 8,
+    alignItems: "flex-start",
+  },
+  defaultImageContainer: {
+    backgroundColor: "#d3d3d3",
+    height: 60,
+    width: 60,
+    borderColor: "black",
+    borderRadius: 50,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    alignSelf: "flex-start",
+    marginLeft: 5,
+  },
+  defaultImage: {
+    height: 60, // Adjust the size of the image as needed
+    width: 60, // Adjust the size of the image as needed
+    borderRadius: 50, // Make the image circular
   },
 });
