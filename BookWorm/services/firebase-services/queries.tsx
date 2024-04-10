@@ -738,12 +738,16 @@ export async function fetchPostsForUserFeed(
 }> {
   try {
     const following = await getAllFollowing(userID);
-    const { posts, newLastVisible } = await fetchPostsByUserIDs(
-      following,
-      lastVisible,
-    );
-    // sortPostsByDate(posts);
-    return { posts, newLastVisible };
+    if (following.length === 0) {
+      return { posts: [], newLastVisible: null };
+    } else {
+      const { posts, newLastVisible } = await fetchPostsByUserIDs(
+        following,
+        lastVisible,
+      );
+      // sortPostsByDate(posts);
+      return { posts, newLastVisible };
+    }
   } catch (error) {
     console.error("Error fetching users feed", error);
     return { posts: [], newLastVisible: null };
