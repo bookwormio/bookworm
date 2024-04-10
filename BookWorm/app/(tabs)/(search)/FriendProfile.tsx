@@ -125,7 +125,8 @@ const FriendProfile = () => {
   }, [friendData]);
 
   const { data: friendIm, isLoading: isLoadingIm } = useQuery({
-    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
+    queryKey:
+      friendUserID != null ? ["profilepic", friendUserID] : ["profilepic"],
     queryFn: async () => {
       if (friendUserID != null && friendUserID !== "") {
         return await getUserProfileURL(friendUserID);

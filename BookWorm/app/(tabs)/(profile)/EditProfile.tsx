@@ -1,18 +1,23 @@
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Button,
+  Image,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import {
   emptyQuery,
+  getUserProfileURL,
   newFetchUserInfo,
   updateUser,
 } from "../../../services/firebase-services/queries";
@@ -24,6 +29,7 @@ const EditProfile = () => {
   const [editFirst, setEditFirst] = useState("");
   const [editLast, setEditLast] = useState("");
   const [editBio, setEditBio] = useState("");
+  const [image, setImage] = useState("");
 
   const queryClient = useQueryClient();
 
@@ -79,6 +85,23 @@ const EditProfile = () => {
     }
   }, [userData]);
 
+  const { data: userIm } = useQuery({
+    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
+    queryFn: async () => {
+      if (user != null) {
+        return await getUserProfileURL(user.uid);
+      } else {
+        return null;
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (userIm !== undefined && userIm !== null) {
+      setImage(userIm);
+    }
+  }, [userIm]);
+
   const handeSaveClick = () => {
     const userId = user?.uid;
 
@@ -86,12 +109,25 @@ const EditProfile = () => {
     newUserData.first = editFirst;
     newUserData.last = editLast;
     newUserData.number = editPhone;
+    if (image !== "" && image !== undefined && image !== null) {
+      newUserData.profilepic = image;
+    }
     if (userId === undefined) {
       console.error("Current user undefined");
     } else {
       newUserData.id = userId;
       userMutation.mutate(newUserData);
       router.back();
+    }
+  };
+
+  const pickImageAsync = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
     }
   };
 
@@ -113,6 +149,24 @@ const EditProfile = () => {
           router.back();
         }}
       />
+      <TouchableOpacity
+        style={styles.defaultImageContainer}
+        onPress={() => {
+          pickImageAsync().catch((error) => {
+            Toast.show({
+              type: "error",
+              text1: "Error selecting image: " + error,
+              text2: "Please adjust your media permissions",
+            });
+          });
+        }}
+      >
+        {image !== "" ? (
+          <Image source={{ uri: image }} style={styles.defaultImage} />
+        ) : (
+          <FontAwesome5 name="user" size={40} />
+        )}
+      </TouchableOpacity>
       <View>
         <Text style={styles.regtext}>First Name</Text>
         <TextInput
@@ -164,7 +218,7 @@ const EditProfile = () => {
       </View>
       <View>
         <TouchableOpacity style={styles.button} onPress={handeSaveClick}>
-          <Text style={styles.buttonText}>{"Let's Go"}</Text>
+          <Text style={styles.buttonText}>{" Save "}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -210,5 +264,23 @@ const styles = StyleSheet.create({
   },
   regtext: {
     marginLeft: 10,
+  },
+  defaultImageContainer: {
+    backgroundColor: "#d3d3d3",
+    height: 100,
+    width: 100,
+    borderColor: "black",
+    borderRadius: 50,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 40,
+    marginTop: 30,
+    alignSelf: "center",
+  },
+  defaultImage: {
+    height: 100, // Adjust the size of the image as needed
+    width: 100, // Adjust the size of the image as needed
+    borderRadius: 50, // Make the image circular
   },
 });
