@@ -42,7 +42,6 @@ import {
  */
 
 export const updateUser = async (userdata: UserDataModel): Promise<void> => {
-  console.log(userdata);
   try {
     if (
       userdata.first !== "" &&
