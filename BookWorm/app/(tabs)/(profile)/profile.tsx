@@ -8,7 +8,6 @@ import {
   Image,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
@@ -42,7 +41,7 @@ const Profile = () => {
     },
   });
 
-  const { data: userIm } = useQuery({
+  const { data: userIm, isLoading: isLoadingIm } = useQuery({
     queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
     queryFn: async () => {
       if (user != null) {
@@ -78,7 +77,7 @@ const Profile = () => {
     setProfileLoading(true);
   }, [navigation]);
 
-  if (isLoadingUserData || profileLoading) {
+  if (isLoadingUserData || profileLoading || isLoadingIm) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />
@@ -89,9 +88,13 @@ const Profile = () => {
   return (
     <View>
       <View style={styles.imageTextContainer}>
-        <TouchableOpacity style={styles.defaultImageContainer}>
-          <FontAwesome5 name="user" size={30} />
-        </TouchableOpacity>
+        <View style={styles.defaultImageContainer}>
+          {image !== "" ? (
+            <Image style={styles.defaultImage} source={{ uri: image }} />
+          ) : (
+            <FontAwesome5 name="user" size={40} />
+          )}
+        </View>
         <View>
           <Text style={styles.nameText}>
             {firstName} {lastName}
@@ -127,11 +130,6 @@ const Profile = () => {
         }}
       />
       <Button title="LogOut" onPress={signOut} color="#FB6D0B" />
-      <View>
-        {image !== null && image !== "" && (
-          <Image source={{ uri: image }} style={styles.image} />
-        )}
-      </View>
     </View>
   );
 };
@@ -196,6 +194,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignSelf: "flex-start",
     marginLeft: 5,
+  },
+  defaultImage: {
+    height: 60, // Adjust the size of the image as needed
+    width: 60, // Adjust the size of the image as needed
+    borderRadius: 50, // Make the image circular
   },
   image: {
     width: 200,

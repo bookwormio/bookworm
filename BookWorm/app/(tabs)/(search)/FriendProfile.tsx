@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Button,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -15,6 +16,7 @@ import {
   fetchFriendData,
   followUserByID,
   getIsFollowing,
+  getUserProfilePic,
   unfollowUserByID,
 } from "../../../services/firebase-services/queries";
 import { type ConnectionModel, type UserDataModel } from "../../../types";
@@ -30,6 +32,7 @@ const FriendProfile = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
+  const [image, setImage] = useState("");
   const { user } = useAuth();
   const [followStatus, setFollowStatus] = useState<string>(
     LocalFollowStatus.LOADING,
@@ -121,6 +124,23 @@ const FriendProfile = () => {
     }
   }, [friendData]);
 
+  const { data: friendIm, isLoading: isLoadingIm } = useQuery({
+    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
+    queryFn: async () => {
+      if (friendUserID != null && friendUserID !== "") {
+        return await getUserProfilePic(friendUserID);
+      } else {
+        return null;
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (friendIm !== undefined && friendIm !== null) {
+      setImage(friendIm);
+    }
+  }, [friendIm]);
+
   const handleFollowButtonPressed = () => {
     if (followStatus === LocalFollowStatus.LOADING) {
       // Do nothing if follow status is still loading
@@ -180,7 +200,7 @@ const FriendProfile = () => {
     }
   };
 
-  if (friendIsLoading) {
+  if (friendIsLoading || isLoadingIm) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />
@@ -200,9 +220,13 @@ const FriendProfile = () => {
         />
       </View>
       <View style={styles.imageTextContainer}>
-        <TouchableOpacity style={styles.defaultImageContainer}>
-          <FontAwesome5 name="user" size={30} />
-        </TouchableOpacity>
+        <View style={styles.defaultImageContainer}>
+          {image !== "" ? (
+            <Image style={styles.defaultImage} source={{ uri: image }} />
+          ) : (
+            <FontAwesome5 name="user" size={40} />
+          )}
+        </View>
         <View>
           <Text style={styles.nameText}>
             {firstName} {lastName}
@@ -318,5 +342,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignSelf: "flex-start",
     marginLeft: 5,
+  },
+  defaultImage: {
+    height: 60, // Adjust the size of the image as needed
+    width: 60, // Adjust the size of the image as needed
+    borderRadius: 50, // Make the image circular
   },
 });
