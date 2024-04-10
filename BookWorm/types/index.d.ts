@@ -15,7 +15,7 @@ interface UserDataModel {
   number: string;
   isPublic: boolean;
   bio: string;
-  profilepic: stting;
+  profilepic: string;
 }
 
 interface CreatePostModel {

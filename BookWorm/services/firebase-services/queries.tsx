@@ -63,8 +63,10 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
       if (userdata.bio !== "" && userdata.bio !== undefined) {
         dataToUpdate.bio = userdata.bio;
       }
-      if (userdata.profilepic !== "" && userdata.bio !== undefined) {
-        dataToUpdate.profilepic = userdata.profilepic;
+      if (userdata.profilepic !== "" && userdata.profilepic !== undefined) {
+        dataToUpdate.profilepic = "true";
+      } else {
+        dataToUpdate.profilepic = "false";
       }
       const docRef = doc(DB, "user_collection", userdata.id);
       await updateDoc(docRef, dataToUpdate);
