@@ -37,7 +37,7 @@ import {
 
 /**
  * Updates user data in the database.
- * @param {UserDataModel} userdata - The user data to update.
+ * @param {UserData} userdata - The user data to update.
  * @returns {Promise<void>} A promise that resolves when the update is complete.
  * @description
  * If all fields are empty, the function does nothing.
@@ -143,7 +143,7 @@ export async function newFetchUserInfo(
 /**
  * Fetches user information from the Firestore database.
  * @param {User} user - The user to fetch information for.
- * @returns {Promise<UserDataModel | undefined>} A Promise that resolves to the user data if found, otherwise undefined.
+ * @returns {Promise<UserData | undefined>} A Promise that resolves to the user data if found, otherwise undefined.
  * @throws {Error} If there is an error while fetching the user information.
  * @description
  * Retrieves user information from the Firestore database based on the provided user ID.
@@ -643,12 +643,12 @@ export async function fetchPostsByUserIDs(
         }
       }),
     );
-    return postsData;
+    const lastVisibleDoc = postsSnapshot.docs[postsSnapshot.docs.length - 1];
+    return { posts: postsData, newLastVisible: lastVisibleDoc };
   } catch (error) {
     console.error("Error fetching posts by User ID", error);
-    return [];
+    return { posts: [], newLastVisible: null };
   }
-  return [];
 }
 
 /**
