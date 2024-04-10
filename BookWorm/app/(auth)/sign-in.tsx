@@ -2,9 +2,10 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Button,
   StyleSheet,
+  Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../components/auth/context";
@@ -52,19 +53,25 @@ const Login = () => {
           setPassword(text);
         }}
       />
-      <Button
-        title="Login"
+      <TouchableOpacity
+        style={styles.button}
         onPress={() => {
           signIn(email, password);
           router.replace("/post");
         }}
-      />
-      <Button
-        title="Create Account"
-        onPress={() => {
-          router.push("/CreateAccount");
-        }}
-      />
+      >
+        <Text style={styles.buttonText}>{"Login"}</Text>
+      </TouchableOpacity>
+      <View style={styles.accountContainer}>
+        <Text>{"Don't have an account?"}</Text>
+        <TouchableOpacity
+          onPress={() => {
+            router.push("/CreateAccount");
+          }}
+        >
+          <Text style={styles.createButtonText}>{"Create Account"}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -72,6 +79,32 @@ const Login = () => {
 export default Login;
 
 const styles = StyleSheet.create({
+  accountContainer: {
+    flexDirection: "row", // Horizontal layout
+    alignItems: "center", // Align items vertically
+    justifyContent: "space-between", // Space between the inputs
+    paddingHorizontal: 16, // Padding for the container
+  },
+  button: {
+    backgroundColor: "#FB6D0B",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginVertical: 10,
+    marginTop: 15,
+    marginBottom: 8,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  createButtonText: {
+    color: "#A0D34D",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 10,
+  },
   container: {
     flex: 1,
     alignItems: "center",
@@ -87,9 +120,10 @@ const styles = StyleSheet.create({
   input: {
     borderColor: "gray",
     width: "100%",
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
+    borderBottomWidth: 1,
+    marginBottom: 20,
+    paddingBottom: 5,
+    fontSize: 16,
   },
   title: {
     fontSize: 64,

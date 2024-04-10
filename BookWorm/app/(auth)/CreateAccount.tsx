@@ -1,6 +1,12 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Button, StyleSheet, TextInput, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
 
@@ -71,8 +77,8 @@ const CreateAccount = () => {
           setConfirmPassword(text);
         }}
       />
-      <Button
-        title="Create Account"
+      <TouchableOpacity
+        style={styles.button}
         onPress={() => {
           if (validFields()) {
             try {
@@ -83,7 +89,9 @@ const CreateAccount = () => {
             }
           }
         }}
-      />
+      >
+        <Text style={styles.buttonText}>{"Create Account"}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -91,6 +99,18 @@ const CreateAccount = () => {
 export default CreateAccount;
 
 const styles = StyleSheet.create({
+  button: {
+    backgroundColor: "#FB6D0B",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   container: {
     flex: 1,
     alignItems: "center",
@@ -106,9 +126,10 @@ const styles = StyleSheet.create({
   input: {
     borderColor: "gray",
     width: "100%",
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
+    borderBottomWidth: 1,
+    marginBottom: 20,
+    paddingBottom: 5,
+    fontSize: 16,
   },
   title: {
     fontSize: 64,

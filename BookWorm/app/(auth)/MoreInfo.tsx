@@ -4,9 +4,9 @@ import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Button,
   Image,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -100,56 +100,11 @@ const MoreInfo = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.header}>A little bit about you...</Text>
+      <Text style={styles.subheader}>Enter some details about yourself</Text>
       <Toast />
-      <TextInput
-        style={styles.input}
-        value={username}
-        placeholder="username"
-        onChangeText={(text) => {
-          setUsername(text);
-        }}
-        autoCorrect={false}
-        autoComplete="off"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        value={first}
-        placeholder="first name"
-        onChangeText={(text) => {
-          setFirst(text);
-        }}
-        autoCorrect={false}
-        autoComplete="off"
-      />
-      <TextInput
-        style={styles.input}
-        value={last}
-        placeholder="last name"
-        onChangeText={(text) => {
-          setLast(text);
-        }}
-        autoCorrect={false}
-        autoComplete="off"
-      />
-      <TextInput
-        style={styles.input}
-        value={phone}
-        placeholder="phone number"
-        onChangeText={(text) => {
-          setPhone(text);
-        }}
-      />
-      <TextInput
-        style={styles.input}
-        value={bio}
-        placeholder="bio"
-        onChangeText={(text) => {
-          setBio(text);
-        }}
-      />
       <TouchableOpacity
-        style={styles.defaultImage}
+        style={styles.defaultImageContainer}
         onPress={() => {
           pickImageAsync().catch((error) => {
             Toast.show({
@@ -163,17 +118,67 @@ const MoreInfo = () => {
         {image !== "" ? (
           <Image source={{ uri: image }} style={styles.defaultImage} />
         ) : (
-          <FontAwesome5 name="image" size={20} />
+          <FontAwesome5 name="user" size={40} />
         )}
       </TouchableOpacity>
-      <Button
-        title="Confirm Account Information"
+      <TextInput
+        style={styles.input}
+        value={username}
+        placeholder="Username"
+        onChangeText={(text) => {
+          setUsername(text);
+        }}
+        autoCorrect={false}
+        autoComplete="off"
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        value={first}
+        placeholder="First Name"
+        onChangeText={(text) => {
+          setFirst(text);
+        }}
+        autoCorrect={false}
+        autoComplete="off"
+      />
+      <TextInput
+        style={styles.input}
+        value={last}
+        placeholder="Last Name"
+        onChangeText={(text) => {
+          setLast(text);
+        }}
+        autoCorrect={false}
+        autoComplete="off"
+      />
+      <TextInput
+        style={styles.input}
+        value={phone}
+        placeholder="Phone Number"
+        onChangeText={(text) => {
+          setPhone(text);
+        }}
+      />
+      <TextInput
+        style={styles.input}
+        value={bio}
+        placeholder="Bio"
+        multiline={true}
+        onChangeText={(text) => {
+          setBio(text);
+        }}
+      />
+      <TouchableOpacity
+        style={styles.button}
         onPress={() => {
           if (validFields()) {
             createNewTracking();
           }
         }}
-      />
+      >
+        <Text style={styles.buttonText}>{"Let's Go"}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -181,6 +186,25 @@ const MoreInfo = () => {
 export default MoreInfo;
 
 const styles = StyleSheet.create({
+  header: {
+    fontSize: 35,
+    paddingBottom: 20,
+  },
+  subheader: {
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: "#FB6D0B",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   container: {
     flex: 1,
     alignItems: "center",
@@ -190,21 +214,29 @@ const styles = StyleSheet.create({
   input: {
     borderColor: "gray",
     width: "100%",
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
+    borderBottomWidth: 1,
+    marginBottom: 20,
+    paddingBottom: 5,
+    fontSize: 16,
   },
   loading: {
     top: "50%",
   },
-  defaultImage: {
+  defaultImageContainer: {
     backgroundColor: "#d3d3d3",
     height: 100,
     width: 100,
     borderColor: "black",
-    borderRadius: 10,
+    borderRadius: 50,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 40,
+    marginTop: 30,
+  },
+  defaultImage: {
+    height: 100, // Adjust the size of the image as needed
+    width: 100, // Adjust the size of the image as needed
+    borderRadius: 50, // Make the image circular
   },
 });
