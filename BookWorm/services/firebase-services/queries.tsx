@@ -100,6 +100,35 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
   }
 };
 
+/**
+ * Fetches a user from the database based on the provided userID.
+ * @param {string} userID - The ID of the user to fetch.
+ * @returns {Promise<UserModel | null>} A Promise that resolves with the fetched user if it exists, or null if the user does not exist.
+ * @throws {Error} Throws an error if there's an issue fetching the user.
+ */
+export async function fetchUser(userID: string): Promise<UserModel | null> {
+  try {
+    const userDocRef = doc(DB, "user_collection", userID);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const user: UserModel = {
+        id: userDocSnap.id,
+        email: userDocSnap.data().email,
+        first: userDocSnap.data().first,
+        isPublic: userDocSnap.data().isPublic,
+        last: userDocSnap.data().last,
+        number: userDocSnap.data().number,
+      };
+      return user;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
+  }
+}
+
 export async function getUserProfileURL(
   userID: string,
 ): Promise<string | null> {
