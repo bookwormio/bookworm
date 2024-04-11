@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type UserSearchDisplayModel } from "../../types";
 
@@ -8,6 +8,7 @@ interface UserListItemProps {
 }
 
 const UserListItem = ({ user }: UserListItemProps) => {
+  const [imageLoading, setImageLoading] = useState(true);
   const handleUserClick = ({ user }: { user: UserSearchDisplayModel }) => {
     router.push({
       pathname: "FriendProfile",
@@ -26,10 +27,16 @@ const UserListItem = ({ user }: UserListItemProps) => {
     >
       <View style={styles.imageContainer}>
         <Image
-          // TODO: Add user image here
-          //   source={{ uri: volumeInfo?.imageLinks?.smallThumbnail }}
+          source={
+            !imageLoading && user.profilePicURL !== ""
+              ? { uri: user.profilePicURL }
+              : require("../../assets/default_profile.png")
+          }
           defaultSource={require("../../assets/default_profile.png")}
           style={styles.image}
+          onLoadEnd={() => {
+            setImageLoading(false);
+          }}
         />
       </View>
 
@@ -57,7 +64,8 @@ const styles = StyleSheet.create({
   image: {
     width: 40,
     height: 40,
-    resizeMode: "contain",
+    borderRadius: 100,
+    resizeMode: "cover",
   },
   infoContainer: {
     flex: 1,
@@ -70,6 +78,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "left",
+  },
+  placeholderImage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 40,
+    height: 40,
+    resizeMode: "cover",
+    borderRadius: 100,
   },
 });
 

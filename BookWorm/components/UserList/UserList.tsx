@@ -10,7 +10,7 @@ const UserList = ({ users }: UserListProps) => {
   return (
     <View>
       {users.map((value, index) => (
-        <UserListItem key={index} user={value}></UserListItem>
+        <UserListItem key={value.id} user={value}></UserListItem>
       ))}
     </View>
   );

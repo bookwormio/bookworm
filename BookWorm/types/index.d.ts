@@ -8,6 +8,7 @@ interface UserSearchDisplayModel {
   id: string;
   firstName: string;
   lastName: string;
+  profilePicURL: string;
 }
 
 interface UserDataModel {

@@ -52,7 +52,7 @@ const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
         contentContainerStyle={styles.scrollContent}
       >
         {users.map((user, index) => (
-          <View style={styles.userContainer} key={index}>
+          <View style={styles.userContainer} key={user.id}>
             <UserList users={[user]} />
           </View>
         ))}
