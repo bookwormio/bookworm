@@ -85,7 +85,7 @@ const Profile = () => {
   useEffect(() => {
     // Fetch data from the database when the component mounts
     if (user != null) {
-      fetchPagesReadData(user)
+      fetchPagesReadData(user.uid)
         .then((stats) => {
           // Process the fetched data and set it to state
           const processedData = stats.map((stat) => ({
@@ -100,6 +100,7 @@ const Profile = () => {
     }
   }, []);
 
+  // TODO: Cleanup
   // const printData = () => {
   //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   //   if (user != null) {

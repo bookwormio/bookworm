@@ -19,7 +19,6 @@ import {
   where,
   type DocumentData,
   type QueryDocumentSnapshot,
-  type Timestamp,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { BOOKS_API_KEY } from "../../constants/constants";
@@ -766,16 +765,22 @@ export async function addDataEntry(
 }
 
 // TODO: fix fetchPagesReadData
+/**
+ * Fetches pages read data for a specific user from Firestore.
+ * @param {string} userID - The ID of the user whose data to fetch.
+ * @returns {Promise<Array<{ x: number; y: number }>>} - A promise that resolves to an array of data points, each containing x and y coordinates representing timestamps and pages read respectively.
+ * @throws {Error} - Throws an error if there's an issue fetching the data.
+ */
 export async function fetchPagesReadData(
-  user: User,
+  userID: string,
 ): Promise<Array<{ x: number; y: number }>> {
+  const dataPoints: Array<{ x: number; y: number }> = [];
   try {
     const q = query(
       collection(DB, "data_collection"),
-      where("user_id", "==", user.uid),
+      where("user_id", "==", userID),
     );
     const querySnapshot = await getDocs(q);
-    const dataPoints: Array<{ x: number; y: number }> = [];
     // Add each user data to the array
     for (const doc of querySnapshot.docs) {
       console.log("Document:", doc.id, doc.data());
@@ -792,34 +797,6 @@ export async function fetchPagesReadData(
       });
     }
     console.log(dataPoints);
-    return dataPoints;
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    throw error;
-  }
-}
-
-export async function fetchPagesRead(user: User) {
-  try {
-    const q = query(
-      collection(DB, "data_collection"),
-      where("user_id", "==", user.uid),
-    );
-    const querySnapshot = await getDocs(q);
-    const dataPoints: Array<{ x: Timestamp; y: number }> = [];
-    // Add each user data to the array
-    for (const doc of querySnapshot.docs) {
-      const subcollectionRef = collection(doc.ref, "pages_read");
-      const subcollectionSnapshot = await getDocs(subcollectionRef);
-
-      // Iterate over each document in the subcollection
-      subcollectionSnapshot.forEach((subDoc) => {
-        dataPoints.push({
-          x: doc.data().added_at,
-          y: doc.data().pages,
-        });
-      });
-    }
     return dataPoints;
   } catch (error) {
     console.error("Error fetching user:", error);

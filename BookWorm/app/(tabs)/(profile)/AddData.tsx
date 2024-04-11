@@ -28,7 +28,7 @@ const AddData = () => {
   const [selectedMinutes, setSelectedMinutes] = useState(0);
 
   const createNewTracking = () => {
-    if (user !== undefined && user !== null) {
+    if (user !== null && user !== undefined) {
       setLoading(true);
       const tracking: CreateTrackingModel = {
         userid: user.uid,
@@ -113,22 +113,6 @@ const AddData = () => {
           }}
         />
       </View>
-      {/* <Animated.View>
-        style=
-        {[
-          styles.rowContainer,
-          {
-            transform: [
-              {
-                translateY: slideAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0, 250],
-                }),
-              },
-            ],
-          },
-        ]}
-      </Animated.View> */}
       <Button
         title="Save"
         color="#FB6D0B"
