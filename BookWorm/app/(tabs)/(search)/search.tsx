@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   activeButton: {
-    backgroundColor: "lightgrey",
+    backgroundColor: "#FFD8B1",
   },
   underline: {
     position: "absolute",

@@ -260,6 +260,7 @@ const NewPost = () => {
       >
         <Button
           title={creatingPost ? "Remove Post" : "Add Tracking"}
+          color="#FB6D0B"
           onPress={() => {
             if (creatingPost) {
               removePostView();
@@ -272,6 +273,7 @@ const NewPost = () => {
         />
         <Button
           title={creatingPost ? "Create Post + Tracking" : "Create Post"}
+          color="#FB6D0B"
           onPress={() => {
             if (!creatingPost) {
               addPostView();
