@@ -100,6 +100,35 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
   }
 };
 
+/**
+ * Fetches a user from the database based on the provided userID.
+ * @param {string} userID - The ID of the user to fetch.
+ * @returns {Promise<UserModel | null>} A Promise that resolves with the fetched user if it exists, or null if the user does not exist.
+ * @throws {Error} Throws an error if there's an issue fetching the user.
+ */
+export async function fetchUser(userID: string): Promise<UserModel | null> {
+  try {
+    const userDocRef = doc(DB, "user_collection", userID);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const user: UserModel = {
+        id: userDocSnap.id,
+        email: userDocSnap.data().email,
+        first: userDocSnap.data().first,
+        isPublic: userDocSnap.data().isPublic,
+        last: userDocSnap.data().last,
+        number: userDocSnap.data().number,
+      };
+      return user;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
+  }
+}
+
 export async function getUserProfileURL(
   userID: string,
 ): Promise<string | null> {
@@ -247,89 +276,6 @@ export async function fetchFriendData(
   } catch (error) {
     console.error("Error fetching user information:", error);
     return undefined; // Return undefined on error
-  }
-}
-
-/**
- * Fetches a user from the database based on the provided userID.
- * @param {string} userID - The ID of the user to fetch.
- * @returns {Promise<UserModel | null>} A Promise that resolves with the fetched user if it exists, or null if the user does not exist.
- * @throws {Error} Throws an error if there's an issue fetching the user.
- */
-export async function fetchUser(userID: string): Promise<UserModel | null> {
-  try {
-    const userDocRef = doc(DB, "user_collection", userID);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const user: UserModel = {
-        id: userDocSnap.id,
-        email: userDocSnap.data().email,
-        first: userDocSnap.data().first,
-        isPublic: userDocSnap.data().isPublic,
-        last: userDocSnap.data().last,
-        number: userDocSnap.data().number,
-      };
-      return user;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    throw error;
-  }
-}
-
-// fetches user's first name
-export async function fetchFirstName(user: User) {
-  try {
-    const userDocRef = doc(DB, "user_collection", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData.first;
-    } else {
-      console.log("User document DNE");
-      return "";
-    }
-  } catch (error) {
-    console.error("Error fetching first name:", error);
-    throw error;
-  }
-}
-
-// fetches user's last name
-export async function fetchLastName(user: User) {
-  try {
-    const userDocRef = doc(DB, "user_collection", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData.last;
-    } else {
-      console.error("User document DNE");
-      return "";
-    }
-  } catch (error) {
-    console.error("Error fetching last name:", error);
-    throw error;
-  }
-}
-
-// fetches user's phone number
-export async function fetchPhoneNumber(user: User) {
-  try {
-    const userDocRef = doc(DB, "user_collection", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      return userData.number;
-    } else {
-      console.error("User document DNE");
-      return "";
-    }
-  } catch (error) {
-    console.error("Error fetching phone number:", error);
-    throw error;
   }
 }
 
@@ -844,5 +790,45 @@ export async function addDataEntry(
   } catch (error) {
     console.error(error);
     return false;
+  }
+}
+
+// TODO: fix fetchPagesReadData
+/**
+ * Fetches pages read data for a specific user from Firestore.
+ * @param {string} userID - The ID of the user whose data to fetch.
+ * @returns {Promise<Array<{ x: number; y: number }>>} - A promise that resolves to an array of data points, each containing x and y coordinates representing timestamps and pages read respectively.
+ * @throws {Error} - Throws an error if there's an issue fetching the data.
+ */
+export async function fetchPagesReadData(
+  userID: string,
+): Promise<Array<{ x: number; y: number }>> {
+  const dataPoints: Array<{ x: number; y: number }> = [];
+  try {
+    const q = query(
+      collection(DB, "data_collection"),
+      where("user_id", "==", userID),
+    );
+    const querySnapshot = await getDocs(q);
+    // Add each user data to the array
+    for (const doc of querySnapshot.docs) {
+      console.log("Document:", doc.id, doc.data());
+      const subcollectionRef = collection(doc.ref, "pages_read");
+      const subcollectionSnapshot = await getDocs(subcollectionRef);
+      // const timestamp = new Date().getTime();
+      // Iterate over each document in the subcollection
+      subcollectionSnapshot.forEach((subDoc) => {
+        console.log("Subdocument:", subDoc.id, subDoc.data());
+        dataPoints.push({
+          x: subDoc.data().added_at.seconds,
+          y: subDoc.data().pages,
+        });
+      });
+    }
+    console.log(dataPoints);
+    return dataPoints;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
   }
 }

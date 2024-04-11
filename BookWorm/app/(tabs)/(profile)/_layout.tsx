@@ -12,6 +12,7 @@ const ProfileLayout = () => {
           headerTitle: "Edit Profile",
         }}
       />
+      <Stack.Screen name="AddData" />
     </Stack>
   );
 };

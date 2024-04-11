@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import {
+  fetchPagesReadData,
   fetchUserData,
   getUserProfileURL,
 } from "../../../services/firebase-services/queries";
@@ -26,6 +27,9 @@ const Profile = () => {
   const [image, setImage] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
   const navigation = useNavigation();
+  const [queriedData, setQueriedData] = useState<
+    Array<{ x: number; y: number }>
+  >([]);
 
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
     queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
@@ -76,6 +80,38 @@ const Profile = () => {
   useEffect(() => {
     setProfileLoading(true);
   }, [navigation]);
+
+  // TODO: fix fetchPagesReadData
+  useEffect(() => {
+    // Fetch data from the database when the component mounts
+    if (user != null) {
+      fetchPagesReadData(user.uid)
+        .then((stats) => {
+          // Process the fetched data and set it to state
+          const processedData = stats.map((stat) => ({
+            x: stat.x, // Assuming x is a number representing time or some other value
+            y: stat.y, // Assuming y is a number representing some metric
+          }));
+          setQueriedData(processedData);
+        })
+        .catch((error) => {
+          console.error("Error fetching stats:", error);
+        });
+    }
+  }, []);
+
+  // TODO: Cleanup
+  // const printData = () => {
+  //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  //   if (user != null) {
+  //     // const stringifiedOutput: string[] = [];
+  //     const output = queriedData;
+  //     // Iterate over each dictionary item and construct its string representation
+  //     console.log(output);
+  //   } else {
+  //     console.log("no user");
+  //   }
+  // };
 
   if (isLoadingUserData || profileLoading || isLoadingIm) {
     return (
@@ -133,6 +169,17 @@ const Profile = () => {
         }}
       />
       <Button title="LogOut" onPress={signOut} color="#FB6D0B" />
+      <Button
+        title="Add Entry"
+        color="#FB6D0B"
+        onPress={() => {
+          if (user != null) {
+            router.push({ pathname: "AddData" });
+          } else {
+            console.error("User DNE");
+          }
+        }}
+      />
     </View>
   );
 };
