@@ -498,14 +498,25 @@ export async function fetchUsersBySearch(
     );
     const querySnapshot = await getDocs(q);
     const usersData: UserSearchDisplayModel[] = [];
-    // Add each user data to the array
-    querySnapshot.forEach((doc) => {
-      usersData.push({
+
+    const promises = querySnapshot.docs.map(async (doc) => {
+      const userData: UserSearchDisplayModel = {
         id: doc.id,
         firstName: doc.data().first,
         lastName: doc.data().last,
-      });
+        profilePicURL: "",
+      };
+
+      const profilePicURL = await getUserProfileURL(doc.id);
+      if (profilePicURL != null) {
+        userData.profilePicURL = profilePicURL;
+      }
+
+      usersData.push(userData);
     });
+
+    await Promise.all(promises);
+
     return usersData;
   } catch (error) {
     console.error("Error searching for users: ", error);

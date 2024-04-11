@@ -9,8 +9,8 @@ interface UserListProps {
 const UserList = ({ users }: UserListProps) => {
   return (
     <View>
-      {users.map((value, index) => (
-        <UserListItem key={index} user={value}></UserListItem>
+      {users.map((value) => (
+        <UserListItem key={value.id} user={value}></UserListItem>
       ))}
     </View>
   );
