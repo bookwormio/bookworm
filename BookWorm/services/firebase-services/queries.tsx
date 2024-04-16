@@ -804,6 +804,12 @@ export async function addDataEntry(
   }
 }
 
+// interface for data point structure
+interface LineDataPoint {
+  x: number; // Assuming time is represented as a number
+  y: number; // Assuming pages is represented as a number
+}
+
 // TODO: fix fetchPagesReadData
 /**
  * Fetches pages read data for a specific user from Firestore.
@@ -813,30 +819,75 @@ export async function addDataEntry(
  */
 export async function fetchPagesReadData(
   userID: string,
-): Promise<Array<{ x: number; y: number }>> {
-  const dataPoints: Array<{ x: number; y: number }> = [];
+): Promise<LineDataPoint[]> {
+  const dataPoints: LineDataPoint[] = [];
   try {
     const q = query(
       collection(DB, "data_collection"),
       where("user_id", "==", userID),
     );
     const querySnapshot = await getDocs(q);
-    // Add each user data to the array
-    for (const doc of querySnapshot.docs) {
-      console.log("Document:", doc.id, doc.data());
-      const subcollectionRef = collection(doc.ref, "pages_read");
-      const subcollectionSnapshot = await getDocs(subcollectionRef);
-      // const timestamp = new Date().getTime();
-      // Iterate over each document in the subcollection
-      subcollectionSnapshot.forEach((subDoc) => {
-        console.log("Subdocument:", subDoc.id, subDoc.data());
-        dataPoints.push({
-          x: subDoc.data().added_at.seconds,
-          y: subDoc.data().pages,
+    if (!querySnapshot.empty) {
+      const docRef = querySnapshot.docs[0].ref;
+      const docSnapshot = await getDoc(docRef);
+
+      if (docSnapshot.exists()) {
+        // Add each user data to the array
+        const subcollectionRef = collection(docRef, "pages_read");
+        const subcollectionSnapshot = await getDocs(subcollectionRef);
+        // Iterate over each document in the subcollection
+        subcollectionSnapshot.forEach((subDoc) => {
+          // console.log("Subdocument:", subDoc.id, subDoc.data());
+          dataPoints.push({
+            x: subDoc.data().added_at.seconds,
+            y: subDoc.data().pages,
+          });
         });
-      });
+      }
+      console.log(dataPoints);
     }
-    console.log(dataPoints);
+    return dataPoints;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches pages read data for a specific user from Firestore.
+ * @param {string} userID - The ID of the user whose data to fetch.
+ * @returns {Promise<Array<{ x: number; y: number }>>} - A promise that resolves to an array of data points, each containing x and y coordinates representing timestamps and time read respectively.
+ * @throws {Error} - Throws an error if there's an issue fetching the data.
+ */
+export async function fetchTimeReadData(
+  userID: string,
+): Promise<LineDataPoint[]> {
+  const dataPoints: LineDataPoint[] = [];
+  try {
+    const q = query(
+      collection(DB, "data_collection"),
+      where("user_id", "==", userID),
+    );
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const docRef = querySnapshot.docs[0].ref;
+      const docSnapshot = await getDoc(docRef);
+
+      if (docSnapshot.exists()) {
+        // Add each user data to the array
+        const subcollectionRef = collection(docRef, "time_read");
+        const subcollectionSnapshot = await getDocs(subcollectionRef);
+        // Iterate over each document in the subcollection
+        subcollectionSnapshot.forEach((subDoc) => {
+          // Construct LineDataPoint objects and push them into the dataPoints array
+          dataPoints.push({
+            x: subDoc.data().added_at.seconds,
+            y: subDoc.data().minutes,
+          });
+        });
+      }
+      console.log(dataPoints);
+    }
     return dataPoints;
   } catch (error) {
     console.error("Error fetching user:", error);
