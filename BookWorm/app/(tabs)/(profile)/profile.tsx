@@ -145,11 +145,11 @@ const Profile = () => {
         }}
       />
       <Button
-        title="View Graphs"
+        title="View Data"
         color="#FB6D0B"
         onPress={() => {
           if (user != null) {
-            router.push({ pathname: "ViewGraphs" });
+            router.push({ pathname: "ViewData" });
           } else {
             console.error("User DNE");
           }

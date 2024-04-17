@@ -844,7 +844,7 @@ export async function fetchPagesReadData(
           });
         });
       }
-      console.log(dataPoints);
+      // console.log(dataPoints);
     }
     return dataPoints;
   } catch (error) {
@@ -886,7 +886,7 @@ export async function fetchTimeReadData(
           });
         });
       }
-      console.log(dataPoints);
+      // console.log(dataPoints);
     }
     return dataPoints;
   } catch (error) {
