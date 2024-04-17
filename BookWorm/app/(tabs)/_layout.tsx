@@ -87,7 +87,6 @@ const AppLayout = () => {
                     style={{ paddingLeft: 20 }}
                     disabled={!router.canGoBack()}
                     onPress={() => {
-                      console.log(segments[segments.length - 1]);
                       router.back();
                     }}
                   >

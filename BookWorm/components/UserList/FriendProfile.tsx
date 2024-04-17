@@ -1,6 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSegments } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -31,7 +30,6 @@ interface FriendProfileProps {
 }
 
 const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
-  console.log(useSegments());
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
