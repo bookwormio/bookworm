@@ -1,6 +1,6 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useSegments } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -28,6 +28,7 @@ enum LocalFollowStatus {
 }
 
 const FriendProfile = () => {
+  console.log(useSegments());
   const { friendUserID } = useLocalSearchParams<{ friendUserID: string }>();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -215,7 +216,7 @@ const FriendProfile = () => {
         <Button
           title="Back"
           onPress={() => {
-            router.back();
+            router.canGoBack() ? router.back() : router.navigate("/search");
           }}
           color="black"
         />
