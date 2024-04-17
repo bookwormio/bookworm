@@ -12,9 +12,14 @@ const USER_SEARCH_PLACEHOLDER = "Search for users";
 interface UserSearchProps {
   searchPhrase: string;
   setSearchPhrase: (searchString: string) => void;
+  routePrefix: string;
 }
 
-const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
+const UserSearch = ({
+  searchPhrase,
+  setSearchPhrase,
+  routePrefix,
+}: UserSearchProps) => {
   const [users, setUsers] = useState<UserSearchDisplayModel[]>([]);
   const [searchClicked, setSearchClicked] = useState<boolean>(
     searchPhrase !== "",
@@ -53,7 +58,7 @@ const UserSearch = ({ searchPhrase, setSearchPhrase }: UserSearchProps) => {
       >
         {users.map((user) => (
           <View style={styles.userContainer} key={user.id}>
-            <UserList users={[user]} />
+            <UserList routePrefix={routePrefix} users={[user]} />
           </View>
         ))}
         {isLoading && (

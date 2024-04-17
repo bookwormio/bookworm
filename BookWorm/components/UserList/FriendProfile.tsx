@@ -1,10 +1,9 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router, useSegments } from "expo-router";
+import { useSegments } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Button,
   Image,
   StyleSheet,
   Text,
@@ -215,16 +214,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
 
   return (
     <View>
-      <View style={styles.buttonwrapper}>
-        <Button
-          title="Back"
-          onPress={() => {
-            // router.canGoBack() ? router.back() : router.navigate("/search");
-            router.back();
-          }}
-          color="black"
-        />
-      </View>
+      <View style={styles.buttonwrapper}></View>
       <View style={styles.imageTextContainer}>
         <View style={styles.defaultImageContainer}>
           {

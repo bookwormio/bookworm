@@ -6,6 +6,10 @@ const PostsLayout = () => {
     <Stack>
       <Stack.Screen name="posts" options={{ headerShown: false }} />
       <Stack.Screen name="[postID]" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="user/[friendUserID]"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 };

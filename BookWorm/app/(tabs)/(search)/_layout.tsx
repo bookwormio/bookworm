@@ -7,7 +7,9 @@ const SearchLayout = () => {
       <Stack.Screen name="search" options={{ headerShown: false }} />
       <Stack.Screen
         name="user/[friendUserID]"
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+        }}
       />
       <Stack.Screen name="bookviewpage" options={{ headerShown: false }} />
     </Stack>

@@ -4,13 +4,18 @@ import { type UserSearchDisplayModel } from "../../types";
 import UserListItem from "./UserListItem";
 interface UserListProps {
   users: UserSearchDisplayModel[];
+  routePrefix: string;
 }
 
-const UserList = ({ users }: UserListProps) => {
+const UserList = ({ users, routePrefix }: UserListProps) => {
   return (
     <View>
       {users.map((value) => (
-        <UserListItem key={value.id} user={value}></UserListItem>
+        <UserListItem
+          routePrefix={routePrefix}
+          key={value.id}
+          user={value}
+        ></UserListItem>
       ))}
     </View>
   );

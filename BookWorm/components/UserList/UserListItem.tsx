@@ -5,13 +5,14 @@ import { type UserSearchDisplayModel } from "../../types";
 
 interface UserListItemProps {
   user: UserSearchDisplayModel;
+  routePrefix: string;
 }
 
-const UserListItem = ({ user }: UserListItemProps) => {
+const UserListItem = ({ user, routePrefix }: UserListItemProps) => {
   const [imageLoading, setImageLoading] = useState(true);
   const handleUserClick = ({ user }: { user: UserSearchDisplayModel }) => {
     router.push({
-      pathname: `/(search)/user/${user.id}`,
+      pathname: `/${routePrefix}/user/${user.id}`,
     });
   };
 

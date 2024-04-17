@@ -1,5 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useSegments } from "expo-router";
 import { Tabs } from "expo-router/tabs";
 import React from "react";
 import {
@@ -12,6 +12,7 @@ import { useAuth } from "../../components/auth/context";
 
 const AppLayout = () => {
   const { isLoading } = useAuth();
+  const segments = useSegments();
   if (isLoading) {
     const styles = StyleSheet.create({
       container: {
@@ -76,6 +77,24 @@ const AppLayout = () => {
           headerTitle: "Search",
           tabBarIcon: ({ color, size }) => (
             <FontAwesome5 name="search" size={size} color={color} />
+          ),
+          headerLeft: () => (
+            <View>
+              {router.canGoBack() &&
+                // ensure not at base search page
+                segments[segments.length - 1] !== "search" && (
+                  <TouchableOpacity
+                    style={{ paddingLeft: 20 }}
+                    disabled={!router.canGoBack()}
+                    onPress={() => {
+                      console.log(segments[segments.length - 1]);
+                      router.back();
+                    }}
+                  >
+                    <FontAwesome5 name="arrow-left" size={20} />
+                  </TouchableOpacity>
+                )}
+            </View>
           ),
         }}
       />
