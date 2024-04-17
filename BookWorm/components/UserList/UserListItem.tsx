@@ -11,7 +11,7 @@ const UserListItem = ({ user }: UserListItemProps) => {
   const [imageLoading, setImageLoading] = useState(true);
   const handleUserClick = ({ user }: { user: UserSearchDisplayModel }) => {
     router.push({
-      pathname: `/(search)/${user.id}`,
+      pathname: `/(search)/user/${user.id}`,
     });
   };
 
