@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import BookSearch from "../../../components/searchbar/booksearch";
 import UserSearch from "../../../components/searchbar/usersearch";
+import { SEARCH_ROUTE_PREFIX } from "../../../constants/constants";
 
 const Search = () => {
   const [searchType, setSearchType] = useState("book"); // Default to book search
@@ -73,6 +74,7 @@ const Search = () => {
         <UserSearch
           searchPhrase={searchPhrase}
           setSearchPhrase={setParentSearchPhrase}
+          routePrefix={SEARCH_ROUTE_PREFIX}
         />
       )}
     </View>

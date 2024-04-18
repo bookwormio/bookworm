@@ -32,3 +32,6 @@ export const MINUTES = Array.from({ length: 11 }, (_, index) => ({
   label: ((index + 1) * 5).toString(),
   value: ((index + 1) * 5).toString(),
 }));
+
+export const POSTS_ROUTE_PREFIX = "(posts)";
+export const SEARCH_ROUTE_PREFIX = "(search)";
