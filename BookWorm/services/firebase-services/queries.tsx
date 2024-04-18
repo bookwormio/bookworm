@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Image } from "expo-image";
 import { type User } from "firebase/auth";
 import {
   addDoc,
@@ -21,7 +22,8 @@ import {
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { BOOKS_API_KEY } from "../../constants/constants";
+import React from "react";
+import { BLURHASH, BOOKS_API_KEY } from "../../constants/constants";
 import { ServerFollowStatus } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
@@ -36,8 +38,6 @@ import {
   type UserModel,
   type UserSearchDisplayModel,
 } from "../../types";
-import React from "react";
-import { Image } from "expo-image";
 
 /**
  * Updates user data in the database.
@@ -645,6 +645,7 @@ export async function fetchPostsByUserIDs(
                     <Image
                       source={{ uri: url }}
                       cachePolicy={"memory-disk"}
+                      placeholder={BLURHASH}
                       style={{
                         height: 100,
                         width: 100,
@@ -725,6 +726,7 @@ export async function fetchPostByPostID(
                   <Image
                     source={{ uri: url }}
                     cachePolicy={"memory-disk"}
+                    placeholder={BLURHASH}
                     style={{
                       height: 100,
                       width: 100,
