@@ -37,7 +37,7 @@ import {
   type UserSearchDisplayModel,
 } from "../../types";
 import React from "react";
-import { Image } from "react-native";
+import { Image } from "expo-image";
 
 /**
  * Updates user data in the database.
@@ -644,6 +644,7 @@ export async function fetchPostsByUserIDs(
                   images.push(
                     <Image
                       source={{ uri: url }}
+                      cachePolicy={"memory-disk"}
                       style={{
                         height: 100,
                         width: 100,
@@ -723,6 +724,7 @@ export async function fetchPostByPostID(
                 images.push(
                   <Image
                     source={{ uri: url }}
+                    cachePolicy={"memory-disk"}
                     style={{
                       height: 100,
                       width: 100,

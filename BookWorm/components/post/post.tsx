@@ -41,7 +41,7 @@ const Post = memo(({ post, created, currentDate }: PostProps) => {
       <Text style={styles.time}>{formattedDate}</Text>
       <Text style={styles.body}>{post.text}</Text>
       {post.images.length > 0 && (
-        <ScrollView horizontal={true} style={{ marginTop: 20 }}>
+        <ScrollView horizontal={true} style={{ marginVertical: 10 }}>
           {post.images.map((image, index) => (
             <View key={index}>{image}</View>
           ))}
