@@ -85,7 +85,7 @@ interface PostModel {
   created: Timestamp;
   text: string;
   user: UserModel;
-  images: string[] | null;
+  images: JSX.Element[];
 }
 
 interface RelationshipModel {

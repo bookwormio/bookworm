@@ -36,6 +36,8 @@ import {
   type UserModel,
   type UserSearchDisplayModel,
 } from "../../types";
+import React from "react";
+import { Image } from "react-native";
 
 /**
  * Updates user data in the database.
@@ -296,7 +298,7 @@ export async function createPost(post: CreatePostModel) {
       created: serverTimestamp(),
       book: post.book,
       text: post.text,
-      image: post.images?.length,
+      image: post.images.length,
     })
       .then(async (docRef) => {
         if (post.images.length > 0) {
@@ -630,16 +632,42 @@ export async function fetchPostsByUserIDs(
         try {
           const user = await fetchUser(userID);
           if (user != null) {
+            const downloadPromises: Array<Promise<void>> = [];
+            const images: JSX.Element[] = [];
+            for (let index = 0; index < postDoc.data().image; index++) {
+              const storageRef = ref(
+                STORAGE,
+                "posts/" + postDoc.id + "/" + index,
+              );
+              const promise = getDownloadURL(storageRef)
+                .then((url) => {
+                  images.push(
+                    <Image
+                      source={{ uri: url }}
+                      style={{
+                        height: 100,
+                        width: 100,
+                        borderColor: "black",
+                        borderRadius: 10,
+                        borderWidth: 1,
+                        marginRight: 10,
+                      }}
+                    />,
+                  );
+                })
+                .catch((error) => {
+                  console.error("Error fetching image ", error);
+                });
+              downloadPromises.push(promise);
+            }
+            await Promise.all(downloadPromises);
             const post = {
               id: postDoc.id,
               book: postDoc.data().book,
               created: postDoc.data().created,
               text: postDoc.data().text,
               user,
-              images:
-                postDoc.data().image === true
-                  ? ["posts/" + userID + "/" + postDoc.id]
-                  : [],
+              images,
             };
             postsData.push(post);
           }
@@ -648,6 +676,7 @@ export async function fetchPostsByUserIDs(
         }
       }),
     );
+    sortPostsByDate(postsData);
     const lastVisibleDoc = postsSnapshot.docs[postsSnapshot.docs.length - 1];
     return { posts: postsData, newLastVisible: lastVisibleDoc };
   } catch (error) {
@@ -682,13 +711,42 @@ export async function fetchPostByPostID(
             last: userSnap.data().last,
             number: userSnap.data().number,
           };
+          const downloadPromises: Array<Promise<void>> = [];
+          const images: JSX.Element[] = [];
+          for (let index = 0; index < postSnap.data().image; index++) {
+            const storageRef = ref(
+              STORAGE,
+              "posts/" + postSnap.id + "/" + index,
+            );
+            const promise = getDownloadURL(storageRef)
+              .then((url) => {
+                images.push(
+                  <Image
+                    source={{ uri: url }}
+                    style={{
+                      height: 100,
+                      width: 100,
+                      borderColor: "black",
+                      borderRadius: 10,
+                      borderWidth: 1,
+                      marginRight: 10,
+                    }}
+                  />,
+                );
+              })
+              .catch((error) => {
+                console.error("Error fetching image ", error);
+              });
+            downloadPromises.push(promise);
+          }
+          await Promise.all(downloadPromises);
           post = {
             id: postSnap.id,
             book: postSnap.data().book,
             created: postSnap.data().created,
             text: postSnap.data().text,
             user,
-            images: null,
+            images,
           };
         }
       }
