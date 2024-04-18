@@ -1,25 +1,23 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Button,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useAuth } from "../../../components/auth/context";
 import {
   fetchFriendData,
   followUserByID,
   getIsFollowing,
   getUserProfileURL,
   unfollowUserByID,
-} from "../../../services/firebase-services/queries";
-import { type ConnectionModel, type UserDataModel } from "../../../types";
+} from "../../services/firebase-services/queries";
+import { type ConnectionModel, type UserDataModel } from "../../types";
+import { useAuth } from "../auth/context";
 
 enum LocalFollowStatus {
   FOLLOWING = "following",
@@ -27,8 +25,11 @@ enum LocalFollowStatus {
   LOADING = "loading",
 }
 
-const FriendProfile = () => {
-  const { friendUserID } = useLocalSearchParams<{ friendUserID: string }>();
+interface FriendProfileProps {
+  friendUserID: string;
+}
+
+const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
@@ -211,15 +212,7 @@ const FriendProfile = () => {
 
   return (
     <View>
-      <View style={styles.buttonwrapper}>
-        <Button
-          title="Back"
-          onPress={() => {
-            router.back();
-          }}
-          color="black"
-        />
-      </View>
+      <View style={styles.buttonwrapper}></View>
       <View style={styles.imageTextContainer}>
         <View style={styles.defaultImageContainer}>
           {

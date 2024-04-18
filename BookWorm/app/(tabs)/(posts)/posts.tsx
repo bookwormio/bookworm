@@ -70,7 +70,7 @@ const Posts = () => {
         }),
         { posts: [], newLastVisible: null }, // Initial accumulator value
       );
-      setPosts(allPosts.posts as PostModel[]);
+      setPosts(allPosts.posts);
     }
   }, [feedPostsData]);
 

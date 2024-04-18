@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Button, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 import Post from "../../../components/post/post";
+import { POSTS_ROUTE_PREFIX } from "../../../constants/constants";
 import { fetchPostByPostID } from "../../../services/firebase-services/queries";
 import { type PostModel } from "../../../types";
 
@@ -63,7 +64,18 @@ const ViewPost = () => {
         </View>
       )}
       {post != null && !postLoading && (
-        <Post post={post} created={post.created} currentDate={new Date()} />
+        <View>
+          <Post post={post} created={post.created} currentDate={new Date()} />
+          <Button
+            title="View Profile"
+            color="#FB6D0B"
+            onPress={() => {
+              router.push({
+                pathname: `/${POSTS_ROUTE_PREFIX}/user/${post?.user.id}`,
+              });
+            }}
+          ></Button>
+        </View>
       )}
     </View>
   );
