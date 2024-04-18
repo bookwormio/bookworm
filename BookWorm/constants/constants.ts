@@ -35,5 +35,4 @@ export const MINUTES = Array.from({ length: 11 }, (_, index) => ({
 
 export const POSTS_ROUTE_PREFIX = "(posts)";
 export const SEARCH_ROUTE_PREFIX = "(search)";
-export const BLURHASH =
-  "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
+export const BLURHASH = "LBN-4dMwIUWC~WRj%M^+-;4n4nWC";
