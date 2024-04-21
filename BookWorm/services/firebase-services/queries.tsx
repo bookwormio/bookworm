@@ -610,7 +610,6 @@ export async function fetchPostsByUserIDs(
       orderBy("created", "desc"),
       limit(10),
     );
-
     // if there is a last visible document, fetch the next visible
     if (lastVisible != null) {
       postsQuery = query(
@@ -621,10 +620,8 @@ export async function fetchPostsByUserIDs(
         limit(10),
       );
     }
-
     const postsSnapshot = await getDocs(postsQuery);
     const postsData: PostModel[] = [];
-
     for (const postDoc of postsSnapshot.docs) {
       const userID: string = postDoc.data().user;
       try {
