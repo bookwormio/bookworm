@@ -17,12 +17,17 @@ import {
 import RNPickerSelect from "react-native-picker-select";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
+import BookDropdownSelect from "../../../components/bookselect/BookDropdownSelect";
 import { HOURS, MINUTES } from "../../../constants/constants";
 import {
   addDataEntry,
   createPost,
 } from "../../../services/firebase-services/queries";
-import { type CreatePostModel, type CreateTrackingModel } from "../../../types";
+import {
+  type CreatePostModel,
+  type CreateTrackingModel,
+  type FlatBookItemModel,
+} from "../../../types";
 
 const NewPost = () => {
   const { user } = useAuth();
@@ -36,6 +41,12 @@ const NewPost = () => {
   const [selectedMinutes, setSelectedMinutes] = useState(0);
   const fadeAnimation = useRef(new Animated.Value(0)).current;
   const slideAnimation = useRef(new Animated.Value(0)).current;
+
+  const [selectedBook, setSelectedBook] = useState<FlatBookItemModel | null>(
+    null,
+  );
+  const [books, setBooks] = useState<FlatBookItemModel[]>([]);
+  const [searchPhrase, setSearchPhrase] = useState<string>("");
 
   const trackingMutation = useMutation({
     mutationFn: addDataEntry,
@@ -195,14 +206,22 @@ const NewPost = () => {
   return (
     <View style={styles.container}>
       <Toast />
-      <TextInput
+      {/* <TextInput
         style={styles.input}
         value={book}
         placeholder="Book"
         onChangeText={(book) => {
           setBook(book);
         }}
-      />
+      /> */}
+      <BookDropdownSelect
+        selectedBook={selectedBook}
+        setSelectedBook={setSelectedBook}
+        searchPhrase={searchPhrase}
+        setSearchPhrase={setSearchPhrase}
+        books={books}
+        setBooks={setBooks}
+      ></BookDropdownSelect>
       <View style={styles.pickerRow}>
         <View style={styles.pickerContainer}>
           <Text style={{ color: "#C7C7CD" }}>Time Read: </Text>
@@ -322,6 +341,7 @@ const NewPost = () => {
                 });
               });
             }}
+            disabled={!creatingPost}
           >
             <FontAwesome5 name="image" size={20} />
           </TouchableOpacity>

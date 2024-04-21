@@ -116,3 +116,10 @@ interface PostPaginationModel {
   userid: string;
   lastVisiblePage: QueryDocumentSnapshot<DocumentData, DocumentData> | null;
 }
+
+interface FlatBookItemModel {
+  id: string;
+  title: string;
+  // TODO change this to use new expo images
+  image: string;
+}
