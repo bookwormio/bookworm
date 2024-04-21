@@ -625,60 +625,54 @@ export async function fetchPostsByUserIDs(
     const postsSnapshot = await getDocs(postsQuery);
     const postsData: PostModel[] = [];
 
-    // Uses Promise.all to wait for all fetchUser promises to resolve
-    await Promise.all(
-      postsSnapshot.docs.map(async (postDoc) => {
-        const userID: string = postDoc.data().user;
-        try {
-          const user = await fetchUser(userID);
-          if (user != null) {
-            const downloadPromises: Array<Promise<void>> = [];
-            const images: JSX.Element[] = [];
-            for (let index = 0; index < postDoc.data().image; index++) {
-              const storageRef = ref(
-                STORAGE,
-                "posts/" + postDoc.id + "/" + index,
-              );
-              const promise = getDownloadURL(storageRef)
-                .then((url) => {
-                  images.push(
-                    <Image
-                      source={{ uri: url }}
-                      cachePolicy={"memory-disk"}
-                      placeholder={BLURHASH}
-                      style={{
-                        height: 100,
-                        width: 100,
-                        borderColor: "black",
-                        borderRadius: 10,
-                        borderWidth: 1,
-                        marginRight: 10,
-                      }}
-                    />,
-                  );
-                })
-                .catch((error) => {
-                  console.error("Error fetching image ", error);
-                });
-              downloadPromises.push(promise);
-            }
-            await Promise.all(downloadPromises);
-            const post = {
-              id: postDoc.id,
-              book: postDoc.data().book,
-              created: postDoc.data().created,
-              text: postDoc.data().text,
-              user,
-              images,
-            };
-            postsData.push(post);
+    for (const postDoc of postsSnapshot.docs) {
+      const userID: string = postDoc.data().user;
+      try {
+        const user = await fetchUser(userID);
+        if (user != null) {
+          const downloadPromises: Array<Promise<void>> = [];
+          const images: JSX.Element[] = [];
+          for (let index = 0; index < postDoc.data().image; index++) {
+            const storageRef = ref(STORAGE, `posts/${postDoc.id}/${index}`);
+            const promise = getDownloadURL(storageRef)
+              .then((url) => {
+                images[index] = (
+                  <Image
+                    key={index}
+                    source={{ uri: url }}
+                    cachePolicy={"memory-disk"}
+                    placeholder={BLURHASH}
+                    style={{
+                      height: 100,
+                      width: 100,
+                      borderColor: "black",
+                      borderRadius: 10,
+                      borderWidth: 1,
+                      marginRight: 10,
+                    }}
+                  />
+                );
+              })
+              .catch((error) => {
+                console.error("Error fetching image ", error);
+              });
+            downloadPromises.push(promise);
           }
-        } catch (error) {
-          console.error("Error fetching user", error);
+          await Promise.all(downloadPromises);
+          const post = {
+            id: postDoc.id,
+            book: postDoc.data().book,
+            created: postDoc.data().created,
+            text: postDoc.data().text,
+            user,
+            images,
+          };
+          postsData.push(post);
         }
-      }),
-    );
-    sortPostsByDate(postsData);
+      } catch (error) {
+        console.error("Error fetching user", error);
+      }
+    }
     const lastVisibleDoc = postsSnapshot.docs[postsSnapshot.docs.length - 1];
     return { posts: postsData, newLastVisible: lastVisibleDoc };
   } catch (error) {
@@ -716,14 +710,12 @@ export async function fetchPostByPostID(
           const downloadPromises: Array<Promise<void>> = [];
           const images: JSX.Element[] = [];
           for (let index = 0; index < postSnap.data().image; index++) {
-            const storageRef = ref(
-              STORAGE,
-              "posts/" + postSnap.id + "/" + index,
-            );
+            const storageRef = ref(STORAGE, `posts/${postSnap.id}/${index}`);
             const promise = getDownloadURL(storageRef)
               .then((url) => {
-                images.push(
+                images[index] = (
                   <Image
+                    key={index}
                     source={{ uri: url }}
                     cachePolicy={"memory-disk"}
                     placeholder={BLURHASH}
@@ -735,7 +727,7 @@ export async function fetchPostByPostID(
                       borderWidth: 1,
                       marginRight: 10,
                     }}
-                  />,
+                  />
                 );
               })
               .catch((error) => {
