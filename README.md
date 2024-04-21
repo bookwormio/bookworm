@@ -52,6 +52,8 @@ Underlying error (domain=com.apple.SimLaunchHostService.RequestError, code=4):
         Failed to start launchd_sim: could not bind to session, launchd_sim may have crashed or quit responding
 ```
 
-* You can try this
+You can try this
 
-* Mac --- > System Settings --- > Storage --- > Developer --- > Delete Xcode Caches.
+* From the simulator window
+* Device -> Erase all content and settings
+* Restart simulator
