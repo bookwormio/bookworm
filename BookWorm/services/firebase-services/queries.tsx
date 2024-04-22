@@ -31,6 +31,7 @@ import {
   type ConnectionModel,
   type CreatePostModel,
   type CreateTrackingModel,
+  type LineDataPointModel,
   type PostModel,
   type UserDataModel,
   type UserModel,
@@ -804,23 +805,15 @@ export async function addDataEntry(
   }
 }
 
-// interface for data point structure
-interface LineDataPoint {
-  x: number; // Assuming time is represented as a number
-  y: number; // Assuming pages is represented as a number
-}
-
-// TODO: fix fetchPagesReadData
 /**
- * Fetches pages read data for a specific user from Firestore.
- * @param {string} userID - The ID of the user whose data to fetch.
- * @returns {Promise<Array<{ x: number; y: number }>>} - A promise that resolves to an array of data points, each containing x and y coordinates representing timestamps and pages read respectively.
- * @throws {Error} - Throws an error if there's an issue fetching the data.
+ * Method to retrieve the time read data from database and put it into a graphable format
+ * @param userID - uid of whoever is logged in
+ * @returns {Promise<LineDataPointModel[]>} - x: timestamp, y: pages read
  */
 export async function fetchPagesReadData(
   userID: string,
-): Promise<LineDataPoint[]> {
-  const dataPoints: LineDataPoint[] = [];
+): Promise<LineDataPointModel[]> {
+  const dataPoints: LineDataPointModel[] = [];
   try {
     const q = query(
       collection(DB, "data_collection"),
@@ -854,15 +847,14 @@ export async function fetchPagesReadData(
 }
 
 /**
- * Fetches pages read data for a specific user from Firestore.
- * @param {string} userID - The ID of the user whose data to fetch.
- * @returns {Promise<Array<{ x: number; y: number }>>} - A promise that resolves to an array of data points, each containing x and y coordinates representing timestamps and time read respectively.
- * @throws {Error} - Throws an error if there's an issue fetching the data.
+ * Method to retrieve the time read data from database and put it into a graphable format
+ * @param userID - uid of whoever is logged in
+ * @returns {Promise<LineDataPointModel[]>} - x: timestamp, y: time read
  */
 export async function fetchTimeReadData(
   userID: string,
-): Promise<LineDataPoint[]> {
-  const dataPoints: LineDataPoint[] = [];
+): Promise<LineDataPointModel[]> {
+  const dataPoints: LineDataPointModel[] = [];
   try {
     const q = query(
       collection(DB, "data_collection"),
