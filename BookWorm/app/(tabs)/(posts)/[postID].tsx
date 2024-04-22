@@ -64,7 +64,7 @@ const ViewPost = () => {
         </View>
       )}
       {post != null && !postLoading && (
-        <View>
+        <View style={styles.postContainer}>
           <Post post={post} created={post.created} currentDate={new Date()} />
           <Button
             title="View Profile"
@@ -93,5 +93,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "absolute",
     top: "50%",
+  },
+  postContainer: {
+    flex: 1,
+    width: "100%",
   },
 });

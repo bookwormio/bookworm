@@ -1,6 +1,6 @@
 import { type Timestamp } from "firebase/firestore";
 import React, { memo } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { DAYS_OF_WEEK, MONTHS_OF_YEAR } from "../../constants/constants";
 import { type PostModel } from "../../types";
 
@@ -40,6 +40,13 @@ const Post = memo(({ post, created, currentDate }: PostProps) => {
       </Text>
       <Text style={styles.time}>{formattedDate}</Text>
       <Text style={styles.body}>{post.text}</Text>
+      {post.images.length > 0 && (
+        <ScrollView horizontal={true} style={{ marginVertical: 10 }}>
+          {post.images.map((image, index) => (
+            <View key={index}>{image}</View>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 });
@@ -49,6 +56,8 @@ export default Post;
 const styles = StyleSheet.create({
   container: {
     padding: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "lightgrey",
   },
   title: {
     fontSize: 15,
