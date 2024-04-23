@@ -960,6 +960,5 @@ export async function getNumberOfFollowingByUserID(
     where("follow_status", "==", "following"),
   );
   const followersSnapshot = await getCountFromServer(followingQuery);
-  console.log(followersSnapshot.data().count);
   return followersSnapshot.data().count;
 }
