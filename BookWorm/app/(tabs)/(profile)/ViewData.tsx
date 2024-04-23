@@ -12,7 +12,77 @@ import {
   type WeekDataPointModel,
 } from "../../../types";
 
-const ViewGraphs = () => {
+function aggregatePagesDataByWeek(
+  data: LineDataPointModel[],
+): WeekDataPointModel[] {
+  const aggregatedPagesData: Record<string, number> = {};
+  data.forEach(({ x, y }) => {
+    const date = new Date(x * 1000); // multiply by 1000 for milliseconds
+
+    const startOfWeek = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate() - date.getDay(),
+    );
+
+    const weekKey = startOfWeek.toISOString();
+
+    if (aggregatedPagesData[weekKey] === undefined) {
+      aggregatedPagesData[weekKey] = 0;
+    }
+
+    aggregatedPagesData[weekKey] += y;
+  });
+
+  const aggregatedArray: WeekDataPointModel[] = Object.entries(
+    aggregatedPagesData,
+  ).map(([weekKey, sum]) => ({
+    x: new Date(weekKey),
+    y: sum,
+  }));
+
+  // Sort the aggregated data by week in ascending order
+  aggregatedArray.sort((a, b) => a.x.getTime() - b.x.getTime());
+
+  return aggregatedArray;
+}
+
+function aggregateTimeDataByWeek(
+  data: LineDataPointModel[],
+): WeekDataPointModel[] {
+  const aggregatedTimeData: Record<string, number> = {};
+
+  data.forEach(({ x, y }) => {
+    const date = new Date(x * 1000); // multiply by 1000 for milliseconds
+
+    const startOfWeek = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate() - date.getDay(),
+    );
+
+    const weekKey = startOfWeek.toISOString();
+
+    if (aggregatedTimeData[weekKey] === undefined) {
+      aggregatedTimeData[weekKey] = 0;
+    }
+
+    aggregatedTimeData[weekKey] += y;
+  });
+
+  const aggregatedArray: WeekDataPointModel[] = Object.entries(
+    aggregatedTimeData,
+  ).map(([weekKey, sum]) => ({
+    x: new Date(weekKey),
+    y: sum,
+  }));
+
+  // Sort the aggregated data by week in ascending order
+  aggregatedArray.sort((a, b) => a.x.getTime() - b.x.getTime());
+  return aggregatedArray;
+}
+
+const ViewData = () => {
   const { user } = useAuth();
   const [queriedPagesData, setPagesData] = useState<LineDataPointModel[]>([]);
   const [queriedTimeData, setTimeData] = useState<LineDataPointModel[]>([]);
@@ -22,15 +92,12 @@ const ViewGraphs = () => {
   const [aggregatedTimeData, setAggregatedTimeData] = useState<
     WeekDataPointModel[]
   >([]);
-  const [pagesLoading, setPagesLoading] = useState(false);
-  const [timeLoading, setTimeLoading] = useState(false);
 
   const { data: pagesData, isLoading: isLoadingPagesData } = useQuery({
     queryKey: user != null ? ["pagesData", user.uid] : ["pagesData"],
     queryFn: async () => {
       if (user != null) {
         const pagesReadData = await fetchPagesReadData(user.uid);
-        setPagesLoading(false);
         return pagesReadData;
       } else {
         return {};
@@ -43,7 +110,6 @@ const ViewGraphs = () => {
     queryFn: async () => {
       if (user != null) {
         const timeReadData = await fetchTimeReadData(user.uid);
-        setTimeLoading(false);
         return timeReadData;
       } else {
         return {};
@@ -52,101 +118,32 @@ const ViewGraphs = () => {
   });
 
   useEffect(() => {
-    if (pagesData !== undefined && pagesData !== null) {
+    if (pagesData !== null && pagesData !== undefined) {
       const pagesDataAsPointModel = pagesData as LineDataPointModel[];
       setPagesData(pagesDataAsPointModel);
     }
   }, [pagesData]);
 
   useEffect(() => {
-    if (timeData !== undefined && timeData !== null) {
+    if (timeData !== null && timeData !== undefined) {
       const timeDataAsPointModel = timeData as LineDataPointModel[];
       setTimeData(timeDataAsPointModel);
     }
   }, [timeData]);
 
-  // TODO: move these fcns to top of page and call from within component
   useEffect(() => {
-    const aggregatePagesDataByWeek = (
-      data: LineDataPointModel[],
-    ): WeekDataPointModel[] => {
-      const aggregatedPagesData: Record<string, number> = {};
-      data.forEach(({ x, y }) => {
-        const date = new Date(x * 1000); // multiply by 1000 for milliseconds
-
-        const startOfWeek = new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          date.getDate() - date.getDay(),
-        );
-
-        const weekKey = startOfWeek.toISOString();
-
-        if (aggregatedPagesData[weekKey] === undefined) {
-          aggregatedPagesData[weekKey] = 0;
-        }
-
-        aggregatedPagesData[weekKey] += y;
-      });
-
-      const aggregatedArray: WeekDataPointModel[] = Object.entries(
-        aggregatedPagesData,
-      ).map(([weekKey, sum]) => ({
-        x: new Date(weekKey),
-        y: sum,
-      }));
-
-      // Sort the aggregated data by week in ascending order
-      aggregatedArray.sort((a, b) => a.x.getTime() - b.x.getTime());
-
-      return aggregatedArray;
-    };
-
     // Call the aggregateDataByWeek function with queriedData and update state
-    setAggregatedPagesData(aggregatePagesDataByWeek(queriedPagesData));
+    const aggregatedPages = aggregatePagesDataByWeek(queriedPagesData);
+    setAggregatedPagesData(aggregatedPages);
   }, [queriedPagesData]);
 
   useEffect(() => {
-    const aggregateTimeDataByWeek = (
-      data: LineDataPointModel[],
-    ): WeekDataPointModel[] => {
-      const aggregatedTimeData: Record<string, number> = {};
-
-      data.forEach(({ x, y }) => {
-        const date = new Date(x * 1000); // multiply by 1000 for milliseconds
-
-        const startOfWeek = new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          date.getDate() - date.getDay(),
-        );
-
-        const weekKey = startOfWeek.toISOString();
-
-        if (aggregatedTimeData[weekKey] === undefined) {
-          aggregatedTimeData[weekKey] = 0;
-        }
-
-        aggregatedTimeData[weekKey] += y;
-      });
-
-      const aggregatedArray: WeekDataPointModel[] = Object.entries(
-        aggregatedTimeData,
-      ).map(([weekKey, sum]) => ({
-        x: new Date(weekKey),
-        y: sum,
-      }));
-
-      // Sort the aggregated data by week in ascending order
-      aggregatedArray.sort((a, b) => a.x.getTime() - b.x.getTime());
-      return aggregatedArray;
-    };
-
     // Call the aggregateDataByWeek function with queriedData and update state
-    setAggregatedTimeData(aggregateTimeDataByWeek(queriedTimeData));
+    const aggregatedTime = aggregateTimeDataByWeek(queriedTimeData);
+    setAggregatedTimeData(aggregatedTime);
   }, [queriedTimeData]);
 
-  if (isLoadingPagesData || pagesLoading || isLoadingTimeData || timeLoading) {
+  if (isLoadingPagesData || isLoadingTimeData) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />
@@ -192,7 +189,7 @@ const ViewGraphs = () => {
   );
 };
 
-export default ViewGraphs;
+export default ViewData;
 
 const styles = StyleSheet.create({
   main: {
