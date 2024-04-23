@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Image } from "expo-image";
 import { type User } from "firebase/auth";
 import {
   addDoc,
@@ -21,7 +22,8 @@ import {
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { BOOKS_API_KEY } from "../../constants/constants";
+import React from "react";
+import { BLURHASH, BOOKS_API_KEY } from "../../constants/constants";
 import { ServerFollowStatus } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
@@ -297,7 +299,7 @@ export async function createPost(post: CreatePostModel) {
       bookid: post.bookid,
       booktitle: post.booktitle,
       text: post.text,
-      image: post.images?.length,
+      image: post.images.length,
     })
       .then(async (docRef) => {
         if (post.images.length > 0) {
@@ -609,7 +611,6 @@ export async function fetchPostsByUserIDs(
       orderBy("created", "desc"),
       limit(10),
     );
-
     // if there is a last visible document, fetch the next visible
     if (lastVisible != null) {
       postsQuery = query(
@@ -620,36 +621,57 @@ export async function fetchPostsByUserIDs(
         limit(10),
       );
     }
-
     const postsSnapshot = await getDocs(postsQuery);
     const postsData: PostModel[] = [];
-
-    // Uses Promise.all to wait for all fetchUser promises to resolve
-    await Promise.all(
-      postsSnapshot.docs.map(async (postDoc) => {
-        const userID: string = postDoc.data().user;
-        try {
-          const user = await fetchUser(userID);
-          if (user != null) {
-            const post = {
-              id: postDoc.id,
-              bookid: postDoc.data().bookid,
-              booktitle: postDoc.data().booktitle,
-              created: postDoc.data().created,
-              text: postDoc.data().text,
-              user,
-              images:
-                postDoc.data().image === true
-                  ? ["posts/" + userID + "/" + postDoc.id]
-                  : [],
-            };
-            postsData.push(post);
+    for (const postDoc of postsSnapshot.docs) {
+      const userID: string = postDoc.data().user;
+      try {
+        const user = await fetchUser(userID);
+        if (user != null) {
+          const downloadPromises: Array<Promise<void>> = [];
+          const images: JSX.Element[] = [];
+          for (let index = 0; index < postDoc.data().image; index++) {
+            const storageRef = ref(STORAGE, `posts/${postDoc.id}/${index}`);
+            const promise = getDownloadURL(storageRef)
+              .then((url) => {
+                images[index] = (
+                  <Image
+                    key={index}
+                    source={{ uri: url }}
+                    cachePolicy={"memory-disk"}
+                    placeholder={BLURHASH}
+                    style={{
+                      height: 100,
+                      width: 100,
+                      borderColor: "black",
+                      borderRadius: 10,
+                      borderWidth: 1,
+                      marginRight: 10,
+                    }}
+                  />
+                );
+              })
+              .catch((error) => {
+                console.error("Error fetching image ", error);
+              });
+            downloadPromises.push(promise);
           }
-        } catch (error) {
-          console.error("Error fetching user", error);
+          await Promise.all(downloadPromises);
+          const post = {
+            id: postDoc.id,
+            bookid: postDoc.data().bookid,
+            booktitle: postDoc.data().booktitle,
+            created: postDoc.data().created,
+            text: postDoc.data().text,
+            user,
+            images,
+          };
+          postsData.push(post);
         }
-      }),
-    );
+      } catch (error) {
+        console.error("Error fetching user", error);
+      }
+    }
     const lastVisibleDoc = postsSnapshot.docs[postsSnapshot.docs.length - 1];
     return { posts: postsData, newLastVisible: lastVisibleDoc };
   } catch (error) {
@@ -684,6 +706,35 @@ export async function fetchPostByPostID(
             last: userSnap.data().last,
             number: userSnap.data().number,
           };
+          const downloadPromises: Array<Promise<void>> = [];
+          const images: JSX.Element[] = [];
+          for (let index = 0; index < postSnap.data().image; index++) {
+            const storageRef = ref(STORAGE, `posts/${postSnap.id}/${index}`);
+            const promise = getDownloadURL(storageRef)
+              .then((url) => {
+                images[index] = (
+                  <Image
+                    key={index}
+                    source={{ uri: url }}
+                    cachePolicy={"memory-disk"}
+                    placeholder={BLURHASH}
+                    style={{
+                      height: 100,
+                      width: 100,
+                      borderColor: "black",
+                      borderRadius: 10,
+                      borderWidth: 1,
+                      marginRight: 10,
+                    }}
+                  />
+                );
+              })
+              .catch((error) => {
+                console.error("Error fetching image ", error);
+              });
+            downloadPromises.push(promise);
+          }
+          await Promise.all(downloadPromises);
           post = {
             id: postSnap.id,
             bookid: postSnap.data().bookid,
@@ -691,7 +742,7 @@ export async function fetchPostByPostID(
             created: postSnap.data().created,
             text: postSnap.data().text,
             user,
-            images: null,
+            images,
           };
         }
       }
