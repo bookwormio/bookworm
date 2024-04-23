@@ -297,7 +297,8 @@ export async function createPost(post: CreatePostModel) {
     addDoc(collection(DB, "posts"), {
       user: post.userid,
       created: serverTimestamp(),
-      book: post.book,
+      bookid: post.bookid,
+      booktitle: post.booktitle,
       text: post.text,
       image: post.images.length,
     })
@@ -659,7 +660,8 @@ export async function fetchPostsByUserIDs(
           await Promise.all(downloadPromises);
           const post = {
             id: postDoc.id,
-            book: postDoc.data().book,
+            bookid: postDoc.data().bookid,
+            booktitle: postDoc.data().booktitle,
             created: postDoc.data().created,
             text: postDoc.data().text,
             user,
@@ -736,7 +738,8 @@ export async function fetchPostByPostID(
           await Promise.all(downloadPromises);
           post = {
             id: postSnap.id,
-            book: postSnap.data().book,
+            bookid: postSnap.data().bookid,
+            booktitle: postSnap.data().booktitle,
             created: postSnap.data().created,
             text: postSnap.data().text,
             user,
@@ -779,7 +782,6 @@ export async function fetchPostsForUserFeed(
         following,
         lastVisible,
       );
-      // sortPostsByDate(posts);
       return { posts, newLastVisible };
     }
   } catch (error) {
@@ -793,13 +795,13 @@ export async function fetchPostsForUserFeed(
  * The sort() function mutates the posts list without needing to return a new list.
  * @param {PostModel[]} posts - The list of posts to be sorted.
  */
-function sortPostsByDate(posts: PostModel[]) {
-  posts.sort((postA, postB) => {
-    const dateA = postA.created.toDate();
-    const dateB = postB.created.toDate();
-    return dateB.getTime() - dateA.getTime();
-  });
-}
+// function sortPostsByDate(posts: PostModel[]) {
+//   posts.sort((postA, postB) => {
+//     const dateA = postA.created.toDate();
+//     const dateB = postB.created.toDate();
+//     return dateB.getTime() - dateA.getTime();
+//   });
+// }
 
 /**
  * Adds a data entry for a users time reading and number of pages

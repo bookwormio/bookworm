@@ -34,7 +34,8 @@ interface UserDataModel {
 
 interface CreatePostModel {
   userid: string;
-  book: stirng;
+  bookid: string;
+  booktitle: string; // TODO: Potentially remove
   text: string;
   images: string[];
 }
@@ -90,7 +91,8 @@ interface BooksResponse {
 
 interface PostModel {
   id: string;
-  book: string;
+  bookid: string;
+  booktitle: string;
   created: Timestamp;
   text: string;
   user: UserModel;
@@ -124,4 +126,11 @@ interface CreateTrackingModel {
 interface PostPaginationModel {
   userid: string;
   lastVisiblePage: QueryDocumentSnapshot<DocumentData, DocumentData> | null;
+}
+
+interface FlatBookItemModel {
+  id: string;
+  title: string;
+  // TODO change this to use new expo images
+  image: string;
 }

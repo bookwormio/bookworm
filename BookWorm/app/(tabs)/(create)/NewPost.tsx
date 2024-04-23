@@ -5,7 +5,6 @@ import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
-  Button,
   Image,
   ScrollView,
   StyleSheet,
@@ -17,16 +16,20 @@ import {
 import RNPickerSelect from "react-native-picker-select";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
+import BookDropdownSelect from "../../../components/bookselect/BookDropdownSelect";
 import { HOURS, MINUTES } from "../../../constants/constants";
 import {
   addDataEntry,
   createPost,
 } from "../../../services/firebase-services/queries";
-import { type CreatePostModel, type CreateTrackingModel } from "../../../types";
+import {
+  type CreatePostModel,
+  type CreateTrackingModel,
+  type FlatBookItemModel,
+} from "../../../types";
 
 const NewPost = () => {
   const { user } = useAuth();
-  const [book, setBook] = useState("");
   const [pagesRead, setPagesRead] = useState("");
   const [text, setText] = useState("");
   const [images, setImages] = useState<string[]>([]);
@@ -36,6 +39,11 @@ const NewPost = () => {
   const [selectedMinutes, setSelectedMinutes] = useState(0);
   const fadeAnimation = useRef(new Animated.Value(0)).current;
   const slideAnimation = useRef(new Animated.Value(0)).current;
+
+  const [selectedBook, setSelectedBook] = useState<FlatBookItemModel | null>(
+    null,
+  );
+  const [searchPhrase, setSearchPhrase] = useState<string>("");
 
   const trackingMutation = useMutation({
     mutationFn: addDataEntry,
@@ -50,7 +58,8 @@ const NewPost = () => {
         minutesRead: 60 * selectedHours + selectedMinutes,
       };
       trackingMutation.mutate(tracking);
-      setBook("");
+      setSelectedBook(null);
+      setSearchPhrase("");
       setSelectedHours(0);
       setSelectedMinutes(0);
       setPagesRead("");
@@ -58,7 +67,7 @@ const NewPost = () => {
       Toast.show({
         type: "success",
         text1: "Tracking Added",
-        text2: pagesRead + " pages of " + book,
+        text2: pagesRead + " pages of " + selectedBook?.title,
       });
     } else {
       Toast.show({
@@ -77,13 +86,16 @@ const NewPost = () => {
       setLoading(true);
       const post: CreatePostModel = {
         userid: user.uid,
-        book,
+        // TS requires null checks here but they get checked in fieldsMissing
+        bookid: selectedBook !== null ? selectedBook.id : "",
+        booktitle: selectedBook !== null ? selectedBook.title : "",
         text,
         images,
       };
       postMutation.mutate(post);
       removePostView();
-      setBook("");
+      setSelectedBook(null);
+      setSearchPhrase("");
       setSelectedHours(0);
       setSelectedMinutes(0);
       setText("");
@@ -104,7 +116,7 @@ const NewPost = () => {
   const fieldsMissing = () => {
     const missingFields: string[] = [];
     const totalMinutes = 60 * selectedHours + selectedMinutes;
-    if (book === "") {
+    if (selectedBook === null || selectedBook?.id === "") {
       missingFields.push("Book");
     }
     if (totalMinutes === 0) {
@@ -195,14 +207,12 @@ const NewPost = () => {
   return (
     <View style={styles.container}>
       <Toast />
-      <TextInput
-        style={styles.input}
-        value={book}
-        placeholder="Book"
-        onChangeText={(book) => {
-          setBook(book);
-        }}
-      />
+      <BookDropdownSelect
+        selectedBook={selectedBook}
+        setSelectedBook={setSelectedBook}
+        searchPhrase={searchPhrase}
+        setSearchPhrase={setSearchPhrase}
+      ></BookDropdownSelect>
       <View style={styles.pickerRow}>
         <View style={styles.pickerContainer}>
           <Text style={{ color: "#C7C7CD" }}>Time Read: </Text>
@@ -258,9 +268,8 @@ const NewPost = () => {
           },
         ]}
       >
-        <Button
-          title={creatingPost ? "Remove Post" : "Add Tracking"}
-          color="#FB6D0B"
+        <TouchableOpacity
+          style={styles.iconButton}
           onPress={() => {
             if (creatingPost) {
               removePostView();
@@ -270,10 +279,22 @@ const NewPost = () => {
               }
             }
           }}
-        />
-        <Button
-          title={creatingPost ? "Create Post + Tracking" : "Create Post"}
-          color="#FB6D0B"
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={{ color: "#FB6D0B", fontSize: 18 }}>
+              {creatingPost ? "Remove Post " : "Add Tracking"}
+            </Text>
+            {creatingPost && (
+              <FontAwesome5
+                name="caret-up"
+                size={20}
+                style={{ color: "#FB6D0B" }}
+              />
+            )}
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.iconButton}
           onPress={() => {
             if (!creatingPost) {
               addPostView();
@@ -284,7 +305,20 @@ const NewPost = () => {
               }
             }
           }}
-        />
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={{ color: "#FB6D0B", fontSize: 18 }}>
+              {creatingPost ? "Create Post + Tracking" : "Create Post "}
+            </Text>
+            {!creatingPost && (
+              <FontAwesome5
+                name="caret-down"
+                size={20}
+                style={{ color: "#FB6D0B" }}
+              />
+            )}
+          </View>
+        </TouchableOpacity>
       </Animated.View>
       <Animated.View style={{ opacity: fadeAnimation, width: "100%" }}>
         <TextInput
@@ -322,6 +356,7 @@ const NewPost = () => {
                 });
               });
             }}
+            disabled={!creatingPost}
           >
             <FontAwesome5 name="image" size={20} />
           </TouchableOpacity>
@@ -352,6 +387,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     zIndex: 999,
+    marginTop: 15,
   },
   pickerRow: {
     flexDirection: "row",
@@ -412,6 +448,9 @@ const styles = StyleSheet.create({
     borderColor: "grey",
     height: "100%",
     paddingHorizontal: 10,
+  },
+  iconButton: {
+    marginHorizontal: 10,
   },
 });
 
