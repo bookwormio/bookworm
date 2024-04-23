@@ -484,4 +484,10 @@ const pickerSelectStyles = StyleSheet.create({
     textAlign: "center",
     marginTop: "10%",
   },
+  chevronDown: {
+    display: "none",
+  },
+  chevronUp: {
+    display: "none",
+  },
 });
