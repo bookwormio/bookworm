@@ -82,7 +82,7 @@ const ViewGraphs = () => {
 
         const weekKey = startOfWeek.toISOString();
 
-        if (Number.isNaN(aggregatedPagesData[weekKey])) {
+        if (aggregatedPagesData[weekKey] === undefined) {
           aggregatedPagesData[weekKey] = 0;
         }
 
@@ -123,7 +123,7 @@ const ViewGraphs = () => {
 
         const weekKey = startOfWeek.toISOString();
 
-        if (Number.isNaN(aggregatedTimeData[weekKey])) {
+        if (aggregatedTimeData[weekKey] === undefined) {
           aggregatedTimeData[weekKey] = 0;
         }
 
@@ -139,7 +139,6 @@ const ViewGraphs = () => {
 
       // Sort the aggregated data by week in ascending order
       aggregatedArray.sort((a, b) => a.x.getTime() - b.x.getTime());
-
       return aggregatedArray;
     };
 
