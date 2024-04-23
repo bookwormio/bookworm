@@ -215,7 +215,11 @@ const NewPost = () => {
       ></BookDropdownSelect>
       <View style={styles.pickerRow}>
         <View style={styles.pickerContainer}>
-          <Text style={{ color: "#C7C7CD" }}>Time Read: </Text>
+          <TextInput
+            placeholder="Time Read:"
+            editable={false}
+            style={{ marginRight: 15 }}
+          />
           <RNPickerSelect
             placeholder={{
               label: "0",
@@ -226,6 +230,7 @@ const NewPost = () => {
             onValueChange={(hoursString: string) => {
               setSelectedHours(+hoursString);
             }}
+            useNativeAndroidPickerStyle={false}
             style={pickerSelectStyles}
           />
           <Text> hrs </Text>
@@ -239,6 +244,7 @@ const NewPost = () => {
             onValueChange={(minutesString: string) => {
               setSelectedMinutes(+minutesString);
             }}
+            useNativeAndroidPickerStyle={false}
             style={pickerSelectStyles}
           />
           <Text> mins </Text>
@@ -470,12 +476,12 @@ const pickerSelectStyles = StyleSheet.create({
   },
   inputAndroid: {
     fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 0.5,
-    borderColor: "purple",
-    borderRadius: 8,
+    width: 30,
+    height: 30,
+    borderRadius: 5,
     color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
+    backgroundColor: "#c9ccd3",
+    textAlign: "center",
+    marginTop: "10%",
   },
 });
