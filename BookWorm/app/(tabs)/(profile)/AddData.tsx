@@ -1,13 +1,13 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    Button,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import Toast from "react-native-toast-message";
@@ -22,10 +22,19 @@ const AddData = () => {
   const [buttonClicked, setButtonClicked] = useState<boolean>(false);
   const trackingMutation = useMutation({
     mutationFn: addDataEntry,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: user != null ? ["timeData", user.uid] : ["timeData"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: user != null ? ["pagesData", user.uid] : ["pagesData"],
+      });
+    },
   });
   const [loading, setLoading] = useState(false);
   const [selectedHours, setSelectedHours] = useState(0);
   const [selectedMinutes, setSelectedMinutes] = useState(0);
+  const queryClient = useQueryClient();
 
   const createNewTracking = () => {
     if (user !== null && user !== undefined) {

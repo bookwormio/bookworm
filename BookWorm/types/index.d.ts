@@ -4,6 +4,15 @@ import {
   type Timestamp,
 } from "firebase/firestore";
 
+interface LineDataPointModel {
+  x: number; // time in seconds
+  y: number; // pages or minutes
+}
+
+interface WeekDataPointModel {
+  x: Date; // time as week
+  y: number;
+}
 interface UserSearchDisplayModel {
   id: string;
   firstName: string;
