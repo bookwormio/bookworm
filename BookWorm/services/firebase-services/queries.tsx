@@ -294,7 +294,8 @@ export async function createPost(post: CreatePostModel) {
     addDoc(collection(DB, "posts"), {
       user: post.userid,
       created: serverTimestamp(),
-      book: post.book,
+      bookid: post.bookid,
+      booktitle: post.booktitle,
       text: post.text,
       image: post.images?.length,
     })
@@ -632,7 +633,12 @@ export async function fetchPostsByUserIDs(
           if (user != null) {
             const post = {
               id: postDoc.id,
-              book: postDoc.data().book,
+              bookid: postDoc.data().bookid,
+              // TODO: Migrate firestore so this check isn't needed
+              booktitle:
+                postDoc.data().booktitle !== undefined
+                  ? postDoc.data().booktitle
+                  : postDoc.data().book,
               created: postDoc.data().created,
               text: postDoc.data().text,
               user,
@@ -684,7 +690,12 @@ export async function fetchPostByPostID(
           };
           post = {
             id: postSnap.id,
-            book: postSnap.data().book,
+            bookid: postSnap.data().bookid,
+            // TODO: Migrate firestore so this check isn't needed
+            booktitle:
+              postSnap.data().booktitle !== undefined
+                ? postSnap.data().booktitle
+                : postSnap.data().book,
             created: postSnap.data().created,
             text: postSnap.data().text,
             user,

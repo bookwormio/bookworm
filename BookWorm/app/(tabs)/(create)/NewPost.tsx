@@ -31,7 +31,6 @@ import {
 
 const NewPost = () => {
   const { user } = useAuth();
-  const [book, setBook] = useState("");
   const [pagesRead, setPagesRead] = useState("");
   const [text, setText] = useState("");
   const [images, setImages] = useState<string[]>([]);
@@ -61,7 +60,9 @@ const NewPost = () => {
         minutesRead: 60 * selectedHours + selectedMinutes,
       };
       trackingMutation.mutate(tracking);
-      setBook("");
+      setSelectedBook(null);
+      setBooks([]);
+      setSearchPhrase("");
       setSelectedHours(0);
       setSelectedMinutes(0);
       setPagesRead("");
@@ -69,7 +70,7 @@ const NewPost = () => {
       Toast.show({
         type: "success",
         text1: "Tracking Added",
-        text2: pagesRead + " pages of " + book,
+        text2: pagesRead + " pages of " + selectedBook?.title,
       });
     } else {
       Toast.show({
@@ -88,13 +89,17 @@ const NewPost = () => {
       setLoading(true);
       const post: CreatePostModel = {
         userid: user.uid,
-        book,
+        // TS requires null checks here but they get checked in fieldsMissing
+        bookid: selectedBook !== null ? selectedBook.id : "",
+        booktitle: selectedBook !== null ? selectedBook.title : "",
         text,
         images,
       };
       postMutation.mutate(post);
       removePostView();
-      setBook("");
+      setSelectedBook(null);
+      setBooks([]);
+      setSearchPhrase("");
       setSelectedHours(0);
       setSelectedMinutes(0);
       setText("");
@@ -115,7 +120,7 @@ const NewPost = () => {
   const fieldsMissing = () => {
     const missingFields: string[] = [];
     const totalMinutes = 60 * selectedHours + selectedMinutes;
-    if (book === "") {
+    if (selectedBook === null || selectedBook?.id === "") {
       missingFields.push("Book");
     }
     if (totalMinutes === 0) {

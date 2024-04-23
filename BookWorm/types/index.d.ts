@@ -25,7 +25,8 @@ interface UserDataModel {
 
 interface CreatePostModel {
   userid: string;
-  book: stirng;
+  bookid: string;
+  booktitle: string; // TODO: Potentially remove
   text: string;
   images: string[];
 }
@@ -81,7 +82,8 @@ interface BooksResponse {
 
 interface PostModel {
   id: string;
-  book: string;
+  bookid: string;
+  booktitle: string;
   created: Timestamp;
   text: string;
   user: UserModel;

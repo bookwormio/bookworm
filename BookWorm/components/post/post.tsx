@@ -36,7 +36,7 @@ const Post = memo(({ post, created, currentDate }: PostProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        {post.user.first} {post.user.last} was reading {post.book}
+        {post.user.first} {post.user.last} was reading {post.booktitle}
       </Text>
       <Text style={styles.time}>{formattedDate}</Text>
       <Text style={styles.body}>{post.text}</Text>
