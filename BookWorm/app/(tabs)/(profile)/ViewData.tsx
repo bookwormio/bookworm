@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useAuth } from "../../../components/auth/context";
@@ -12,6 +12,7 @@ import {
   type WeekDataPointModel,
 } from "../../../types";
 
+// TODO: Combine these functions into a single generic
 function aggregatePagesDataByWeek(
   data: LineDataPointModel[],
 ): WeekDataPointModel[] {
@@ -84,64 +85,38 @@ function aggregateTimeDataByWeek(
 
 const ViewData = () => {
   const { user } = useAuth();
-  const [queriedPagesData, setPagesData] = useState<LineDataPointModel[]>([]);
-  const [queriedTimeData, setTimeData] = useState<LineDataPointModel[]>([]);
-  const [aggregatedPagesData, setAggregatedPagesData] = useState<
-    WeekDataPointModel[]
-  >([]);
-  const [aggregatedTimeData, setAggregatedTimeData] = useState<
-    WeekDataPointModel[]
-  >([]);
 
-  const { data: pagesData, isLoading: isLoadingPagesData } = useQuery({
+  const {
+    data: pagesData,
+    isLoading: isLoadingPagesData,
+    isError: isErrorPages,
+  } = useQuery({
     queryKey: user != null ? ["pagesData", user.uid] : ["pagesData"],
     queryFn: async () => {
       if (user != null) {
         const pagesReadData = await fetchPagesReadData(user.uid);
         return pagesReadData;
       } else {
-        return {};
+        return [];
       }
     },
   });
 
-  const { data: timeData, isLoading: isLoadingTimeData } = useQuery({
+  const {
+    data: timeData,
+    isLoading: isLoadingTimeData,
+    isError: isErrorTime,
+  } = useQuery({
     queryKey: user != null ? ["timeData", user.uid] : ["timeData"],
     queryFn: async () => {
       if (user != null) {
         const timeReadData = await fetchTimeReadData(user.uid);
         return timeReadData;
       } else {
-        return {};
+        return [];
       }
     },
   });
-
-  useEffect(() => {
-    if (pagesData !== null && pagesData !== undefined) {
-      const pagesDataAsPointModel = pagesData as LineDataPointModel[];
-      setPagesData(pagesDataAsPointModel);
-    }
-  }, [pagesData]);
-
-  useEffect(() => {
-    if (timeData !== null && timeData !== undefined) {
-      const timeDataAsPointModel = timeData as LineDataPointModel[];
-      setTimeData(timeDataAsPointModel);
-    }
-  }, [timeData]);
-
-  useEffect(() => {
-    // Call the aggregateDataByWeek function with queriedData and update state
-    const aggregatedPages = aggregatePagesDataByWeek(queriedPagesData);
-    setAggregatedPagesData(aggregatedPages);
-  }, [queriedPagesData]);
-
-  useEffect(() => {
-    // Call the aggregateDataByWeek function with queriedData and update state
-    const aggregatedTime = aggregateTimeDataByWeek(queriedTimeData);
-    setAggregatedTimeData(aggregatedTime);
-  }, [queriedTimeData]);
 
   if (isLoadingPagesData || isLoadingTimeData) {
     return (
@@ -150,6 +125,20 @@ const ViewData = () => {
       </View>
     );
   }
+
+  if (isErrorPages || isErrorTime) {
+    return (
+      <View style={styles.loading}>
+        <Text>Error loading data</Text>
+      </View>
+    );
+  }
+
+  const aggregatedPagesData =
+    pagesData !== undefined ? aggregatePagesDataByWeek(pagesData) : [];
+
+  const aggregatedTimeData =
+    timeData !== undefined ? aggregateTimeDataByWeek(timeData) : [];
 
   return (
     <View style={{ flex: 1 }}>
