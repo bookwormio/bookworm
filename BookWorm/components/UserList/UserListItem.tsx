@@ -1,6 +1,7 @@
+import { Image } from "expo-image";
 import { router } from "expo-router";
-import React, { useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type UserSearchDisplayModel } from "../../types";
 
 interface UserListItemProps {
@@ -9,7 +10,6 @@ interface UserListItemProps {
 }
 
 const UserListItem = ({ user, routePrefix }: UserListItemProps) => {
-  const [imageLoading, setImageLoading] = useState(true);
   const handleUserClick = ({ user }: { user: UserSearchDisplayModel }) => {
     router.push({
       pathname: `/${routePrefix}/user/${user.id}`,
@@ -26,15 +26,12 @@ const UserListItem = ({ user, routePrefix }: UserListItemProps) => {
       <View style={styles.imageContainer}>
         <Image
           source={
-            !imageLoading && user.profilePicURL !== ""
-              ? { uri: user.profilePicURL }
+            user.profilePicURL !== ""
+              ? user.profilePicURL
               : require("../../assets/default_profile.png")
           }
-          defaultSource={require("../../assets/default_profile.png")}
           style={styles.image}
-          onLoadEnd={() => {
-            setImageLoading(false);
-          }}
+          contentFit={"cover"}
         />
       </View>
 
@@ -63,7 +60,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 100,
-    resizeMode: "cover",
   },
   infoContainer: {
     flex: 1,

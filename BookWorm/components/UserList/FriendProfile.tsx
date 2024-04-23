@@ -1,4 +1,3 @@
-import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
@@ -243,18 +242,13 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       <View style={styles.buttonwrapper}></View>
       <View style={styles.imageTextContainer}>
         <View style={styles.defaultImageContainer}>
-          {
-            // TODO: use a default profile pic
-            image !== "" ? (
-              <Image
-                style={styles.defaultImage}
-                source={{ uri: image }}
-                cachePolicy={"memory-disk"}
-              />
-            ) : (
-              <FontAwesome5 name="user" size={40} />
-            )
-          }
+          <Image
+            source={
+              image !== "" ? image : require("../../assets/default_profile.png")
+            }
+            style={styles.defaultImage}
+            cachePolicy={"memory-disk"}
+          />
         </View>
         <View>
           <Text style={styles.nameText}>

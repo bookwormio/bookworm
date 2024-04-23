@@ -1,6 +1,7 @@
+import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type BookVolumeInfo } from "../../types";
 
 interface BookListItemProps {
@@ -28,7 +29,9 @@ const BookListItem = ({ bookID, volumeInfo }: BookListItemProps) => {
       <View style={styles.imageContainer}>
         <Image
           source={{ uri: volumeInfo?.imageLinks?.smallThumbnail }}
-          defaultSource={require("../../assets/default_book.png")}
+          placeholder={require("../../assets/default_book.png")}
+          cachePolicy={"memory-disk"}
+          contentFit={"contain"}
           style={styles.image}
         />
       </View>
@@ -60,7 +63,6 @@ const styles = StyleSheet.create({
   image: {
     width: 40,
     height: 40,
-    resizeMode: "contain",
   },
   infoContainer: {
     flex: 1, // Take up remaining space
