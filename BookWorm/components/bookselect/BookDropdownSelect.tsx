@@ -1,5 +1,6 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
-import React, { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { fetchBooksByTitleSearch } from "../../services/firebase-services/queries";
@@ -13,8 +14,6 @@ interface BookDropdownSelectProps {
   >;
   searchPhrase: string;
   setSearchPhrase: React.Dispatch<React.SetStateAction<string>>;
-  books: FlatBookItemModel[];
-  setBooks: React.Dispatch<React.SetStateAction<FlatBookItemModel[]>>;
 }
 
 const BookDropdownSelect = ({
@@ -22,26 +21,26 @@ const BookDropdownSelect = ({
   setSelectedBook,
   searchPhrase,
   setSearchPhrase,
-  books,
-  setBooks,
 }: BookDropdownSelectProps) => {
-  useEffect(() => {
-    if (searchPhrase !== "") {
-      fetchBooksByTitleSearch(searchPhrase)
-        .then((books) => {
-          setBooks(
-            books.map((book) => ({
-              id: book?.id,
-              title: book?.volumeInfo?.title,
-              image: book?.volumeInfo?.imageLinks?.smallThumbnail,
-            })),
-          );
-        })
-        .catch(console.error);
-    } else {
-      setBooks([]);
-    }
-  }, [searchPhrase]);
+  const { data: books } = useQuery({
+    queryKey: ["searchbooks", searchPhrase],
+    queryFn: async () => {
+      if (searchPhrase.trim() === "") {
+        return [];
+      }
+      return await fetchBooksByTitleSearch(searchPhrase);
+    },
+    // map books to flattened format
+    select: (data) =>
+      data === null || data === undefined
+        ? []
+        : data.map((book) => ({
+            id: book.id,
+            title: book.volumeInfo?.title,
+            image: book.volumeInfo?.imageLinks?.smallThumbnail,
+          })),
+    staleTime: 60000, // Set stale time to 1 minute
+  });
 
   const renderItem = (item: FlatBookItemModel) => {
     return (
@@ -78,7 +77,7 @@ const BookDropdownSelect = ({
       selectedTextStyle={styles.selectedTextStyle}
       inputSearchStyle={styles.inputSearchStyle}
       iconStyle={styles.iconStyle}
-      data={books}
+      data={books ?? []} // Default to empty array if books is undefined
       search
       maxHeight={300}
       labelField="title"

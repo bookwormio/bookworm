@@ -44,7 +44,6 @@ const NewPost = () => {
   const [selectedBook, setSelectedBook] = useState<FlatBookItemModel | null>(
     null,
   );
-  const [books, setBooks] = useState<FlatBookItemModel[]>([]);
   const [searchPhrase, setSearchPhrase] = useState<string>("");
 
   const trackingMutation = useMutation({
@@ -61,7 +60,6 @@ const NewPost = () => {
       };
       trackingMutation.mutate(tracking);
       setSelectedBook(null);
-      setBooks([]);
       setSearchPhrase("");
       setSelectedHours(0);
       setSelectedMinutes(0);
@@ -98,7 +96,6 @@ const NewPost = () => {
       postMutation.mutate(post);
       removePostView();
       setSelectedBook(null);
-      setBooks([]);
       setSearchPhrase("");
       setSelectedHours(0);
       setSelectedMinutes(0);
@@ -224,8 +221,6 @@ const NewPost = () => {
         setSelectedBook={setSelectedBook}
         searchPhrase={searchPhrase}
         setSearchPhrase={setSearchPhrase}
-        books={books}
-        setBooks={setBooks}
       ></BookDropdownSelect>
       <View style={styles.pickerRow}>
         <View style={styles.pickerContainer}>
