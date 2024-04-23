@@ -21,7 +21,11 @@ const formatDate = (created: Timestamp, currentDate: Date) => {
     date.getDate() === currentDate.getDate();
 
   return isToday
-    ? "Today"
+    ? `Today at ${date.toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      })}`
     : `${day}, ${month} ${dayNumber} at ${date.toLocaleString("en-US", {
         hour: "numeric",
         minute: "numeric",
