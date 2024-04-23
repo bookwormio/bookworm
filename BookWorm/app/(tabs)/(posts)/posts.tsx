@@ -137,7 +137,9 @@ const Posts = () => {
         }
         onEndReached={() => {
           if (hasNextPage) {
-            fetchNextPage();
+            fetchNextPage().catch((error) => {
+              console.error("Error fetching next page", error);
+            });
           }
         }}
         onEndReachedThreshold={0.1} // How close to the end to trigger

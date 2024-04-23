@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Button,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -65,6 +65,8 @@ const BookViewPage = () => {
         <Image
           // Using thumbnail here because the other image links (small / medium) may be different
           source={{ uri: bookData.imageLinks?.thumbnail }}
+          cachePolicy={"memory-disk"}
+          contentFit={"contain"}
           style={styles.image}
         />
       </View>
@@ -116,7 +118,6 @@ const styles = StyleSheet.create({
   image: {
     width: 128,
     height: 192,
-    resizeMode: "contain",
     justifyContent: "center",
     alignItems: "center",
   },

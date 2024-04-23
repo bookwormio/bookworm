@@ -1,9 +1,8 @@
-import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,6 +12,8 @@ import {
   fetchFriendData,
   followUserByID,
   getIsFollowing,
+  getNumberOfFollowersByUserID,
+  getNumberOfFollowingByUserID,
   getUserProfileURL,
   unfollowUserByID,
 } from "../../services/firebase-services/queries";
@@ -71,6 +72,30 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     },
   });
 
+  const { data: followersData } = useQuery({
+    queryKey: ["followersdata"],
+    queryFn: async () => {
+      if (user != null) {
+        const followersCount = await getNumberOfFollowersByUserID(friendUserID);
+        return followersCount ?? 0;
+      } else {
+        return 0;
+      }
+    },
+  });
+
+  const { data: followingData } = useQuery({
+    queryKey: ["followingdata"],
+    queryFn: async () => {
+      if (user != null) {
+        const followingCount = await getNumberOfFollowingByUserID(friendUserID);
+        return followingCount ?? 0;
+      } else {
+        return 0;
+      }
+    },
+  });
+
   const followMutation = useMutation({
     mutationFn: followUserByID,
     onSuccess: async () => {
@@ -80,6 +105,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
             ? ["followingstatus", friendUserID, user?.uid]
             : ["followingstatus"],
       });
+      await queryClient.invalidateQueries({ queryKey: ["followersdata"] });
       setFollowStatusFetched(true);
     },
   });
@@ -93,6 +119,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
             ? ["followingstatus", friendUserID, user?.uid]
             : ["followingstatus"],
       });
+      await queryClient.invalidateQueries({ queryKey: ["followersdata"] });
       setFollowStatusFetched(true);
     },
   });
@@ -215,14 +242,13 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       <View style={styles.buttonwrapper}></View>
       <View style={styles.imageTextContainer}>
         <View style={styles.defaultImageContainer}>
-          {
-            // TODO: use a default profile pic
-            image !== "" ? (
-              <Image style={styles.defaultImage} source={{ uri: image }} />
-            ) : (
-              <FontAwesome5 name="user" size={40} />
-            )
-          }
+          <Image
+            source={
+              image !== "" ? image : require("../../assets/default_profile.png")
+            }
+            style={styles.defaultImage}
+            cachePolicy={"memory-disk"}
+          />
         </View>
         <View>
           <Text style={styles.nameText}>
@@ -236,12 +262,12 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       </View>
       <View style={styles.imageTextContainer}>
         <View>
-          <Text>Following</Text>
-          <Text>0</Text>
+          <Text>Followers</Text>
+          <Text>{followersData ?? "-"}</Text>
         </View>
         <View style={styles.locText}>
-          <Text>Followers</Text>
-          <Text>0</Text>
+          <Text>Following</Text>
+          <Text>{followingData ?? "-"}</Text>
         </View>
         <View style={styles.buttoncontainer}>
           <TouchableOpacity

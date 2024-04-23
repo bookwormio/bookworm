@@ -1,11 +1,11 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import { Image } from "expo-image";
 import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Button,
-  Image,
   StyleSheet,
   Text,
   View,
@@ -13,6 +13,8 @@ import {
 import { useAuth } from "../../../components/auth/context";
 import {
   fetchUserData,
+  getNumberOfFollowersByUserID,
+  getNumberOfFollowingByUserID,
   getUserProfileURL,
 } from "../../../services/firebase-services/queries";
 import { type UserDataModel } from "../../../types";
@@ -48,6 +50,30 @@ const Profile = () => {
         return await getUserProfileURL(user.uid);
       } else {
         return null;
+      }
+    },
+  });
+
+  const { data: followersCount } = useQuery({
+    queryKey: user != null ? ["followersdata", user.uid] : ["followersdata"],
+    queryFn: async () => {
+      if (user != null) {
+        const followers = await getNumberOfFollowersByUserID(user.uid);
+        return followers ?? 0;
+      } else {
+        return 0;
+      }
+    },
+  });
+
+  const { data: followingCount } = useQuery({
+    queryKey: user != null ? ["followingdata", user.uid] : ["followingdata"],
+    queryFn: async () => {
+      if (user != null) {
+        const following = await getNumberOfFollowingByUserID(user.uid);
+        return following ?? 0;
+      } else {
+        return 0;
       }
     },
   });
@@ -110,12 +136,12 @@ const Profile = () => {
       </View>
       <View style={styles.imageTextContainer}>
         <View style={styles.locText}>
-          <Text>Following</Text>
-          <Text>0</Text>
+          <Text>Followers</Text>
+          <Text>{followersCount ?? "-"}</Text>
         </View>
         <View style={styles.locText}>
-          <Text>Followers</Text>
-          <Text>0</Text>
+          <Text>Following</Text>
+          <Text>{followingCount ?? "-"}</Text>
         </View>
       </View>
       <Button
