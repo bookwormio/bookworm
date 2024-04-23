@@ -141,7 +141,7 @@ const Profile = () => {
         </View>
         <View style={styles.locText}>
           <Text>Following</Text>
-          <Text>{followingCount ?? 0}</Text>
+          <Text>{followingCount ?? "-"}</Text>
         </View>
       </View>
       <Button
