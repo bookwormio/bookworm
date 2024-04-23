@@ -13,6 +13,8 @@ import {
 import { useAuth } from "../../../components/auth/context";
 import {
   fetchUserData,
+  getNumberOfFollowersByUserID,
+  getNumberOfFollowingByUserID,
   getUserProfileURL,
 } from "../../../services/firebase-services/queries";
 import { type UserDataModel } from "../../../types";
@@ -25,6 +27,8 @@ const Profile = () => {
   const [bio, setBio] = useState("");
   const [image, setImage] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
+  const [following, setFollowing] = useState(0);
+  const [followers, setFollowers] = useState(0);
   const navigation = useNavigation();
 
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
@@ -48,6 +52,32 @@ const Profile = () => {
         return await getUserProfileURL(user.uid);
       } else {
         return null;
+      }
+    },
+  });
+
+  useQuery({
+    queryKey: user != null ? ["followersdata", user.uid] : ["followersdata"],
+    queryFn: async () => {
+      if (user != null) {
+        const followersCount = await getNumberOfFollowersByUserID(user.uid);
+        setFollowers(followersCount ?? 0);
+        return followersCount ?? 0;
+      } else {
+        return 0;
+      }
+    },
+  });
+
+  useQuery({
+    queryKey: user != null ? ["followingdata", user.uid] : ["followingdata"],
+    queryFn: async () => {
+      if (user != null) {
+        const followingCount = await getNumberOfFollowingByUserID(user.uid);
+        setFollowing(followingCount ?? 0);
+        return followingCount ?? 0;
+      } else {
+        return 0;
       }
     },
   });
@@ -110,12 +140,12 @@ const Profile = () => {
       </View>
       <View style={styles.imageTextContainer}>
         <View style={styles.locText}>
-          <Text>Following</Text>
-          <Text>0</Text>
+          <Text>Followers</Text>
+          <Text>{followers}</Text>
         </View>
         <View style={styles.locText}>
-          <Text>Followers</Text>
-          <Text>0</Text>
+          <Text>Following</Text>
+          <Text>{following}</Text>
         </View>
       </View>
       <Button

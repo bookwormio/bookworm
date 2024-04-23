@@ -6,6 +6,7 @@ import {
   and,
   collection,
   doc,
+  getCountFromServer,
   getDoc,
   getDocs,
   limit,
@@ -792,19 +793,6 @@ export async function fetchPostsForUserFeed(
 }
 
 /**
- * Sorts a list of PostModels by their dates descending.
- * The sort() function mutates the posts list without needing to return a new list.
- * @param {PostModel[]} posts - The list of posts to be sorted.
- */
-// function sortPostsByDate(posts: PostModel[]) {
-//   posts.sort((postA, postB) => {
-//     const dateA = postA.created.toDate();
-//     const dateB = postB.created.toDate();
-//     return dateB.getTime() - dateA.getTime();
-//   });
-// }
-
-/**
  * Adds a data entry for a users time reading and number of pages
  * Combines getAllFollowing(), fetchPostsByUserID(), and sortPostsByDate() functions.
  * @param {CreateTrackingModel} tracking - A tracking object storing the userID, minutesRead, and pagesRead.
@@ -939,4 +927,39 @@ export async function fetchTimeReadData(
     console.error("Error fetching user:", error);
     throw error;
   }
+}
+
+/**
+ * Method to retrieve the number of followers a user has.
+ * @param userID - The uid of the current user.
+ * @returns {Promise<number>} - The number of followers a user has.
+ */
+export async function getNumberOfFollowersByUserID(
+  userID: string,
+): Promise<number> {
+  const followersQuery = query(
+    collection(DB, "relationships"),
+    where("following", "==", userID),
+    where("follow_status", "==", "following"),
+  );
+  const followersSnapshot = await getCountFromServer(followersQuery);
+  return followersSnapshot.data().count;
+}
+
+/**
+ * Method to retrieve the number of users the provided user is following.
+ * @param userID - The uid of the current user.
+ * @returns {Promise<number>} - The number of folowees a user has.
+ */
+export async function getNumberOfFollowingByUserID(
+  userID: string,
+): Promise<number> {
+  const followingQuery = query(
+    collection(DB, "relationships"),
+    where("follower", "==", userID),
+    where("follow_status", "==", "following"),
+  );
+  const followersSnapshot = await getCountFromServer(followingQuery);
+  console.log(followersSnapshot.data().count);
+  return followersSnapshot.data().count;
 }
