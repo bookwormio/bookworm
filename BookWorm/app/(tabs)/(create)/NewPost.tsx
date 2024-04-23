@@ -207,15 +207,6 @@ const NewPost = () => {
 
   return (
     <View style={styles.container}>
-      <Toast />
-      {/* <TextInput
-        style={styles.input}
-        value={book}
-        placeholder="Book"
-        onChangeText={(book) => {
-          setBook(book);
-        }}
-      /> */}
       <BookDropdownSelect
         selectedBook={selectedBook}
         setSelectedBook={setSelectedBook}

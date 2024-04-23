@@ -1,7 +1,8 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useQuery } from "@tanstack/react-query";
+import { Image } from "expo-image";
 import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { fetchBooksByTitleSearch } from "../../services/firebase-services/queries";
 import { type FlatBookItemModel } from "../../types";
@@ -48,7 +49,9 @@ const BookDropdownSelect = ({
         <View style={styles.imageContainer}>
           <Image
             source={{ uri: item?.image }}
-            defaultSource={require("../../assets/default_book.png")}
+            cachePolicy={"memory-disk"}
+            placeholder={require("../../assets/default_book.png")}
+            contentFit={"contain"}
             style={styles.image}
           />
         </View>
@@ -149,6 +152,5 @@ const styles = StyleSheet.create({
   image: {
     width: 40,
     height: 40,
-    resizeMode: "contain",
   },
 });
