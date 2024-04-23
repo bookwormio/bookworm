@@ -58,10 +58,9 @@ const BookDropdownSelect = ({
         <Text style={styles.textItem}>{item.title}</Text>
         {item.id === selectedBook?.id && (
           <AntDesign
-            // TODO: Fix this selected icon
             style={styles.icon}
             color="black"
-            name="Safety"
+            name="checkcircleo"
             size={20}
           />
         )}

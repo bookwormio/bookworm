@@ -634,11 +634,7 @@ export async function fetchPostsByUserIDs(
             const post = {
               id: postDoc.id,
               bookid: postDoc.data().bookid,
-              // TODO: Migrate firestore so this check isn't needed
-              booktitle:
-                postDoc.data().booktitle !== undefined
-                  ? postDoc.data().booktitle
-                  : postDoc.data().book,
+              booktitle: postDoc.data().booktitle,
               created: postDoc.data().created,
               text: postDoc.data().text,
               user,
@@ -691,11 +687,7 @@ export async function fetchPostByPostID(
           post = {
             id: postSnap.id,
             bookid: postSnap.data().bookid,
-            // TODO: Migrate firestore so this check isn't needed
-            booktitle:
-              postSnap.data().booktitle !== undefined
-                ? postSnap.data().booktitle
-                : postSnap.data().book,
+            booktitle: postSnap.data().booktitle,
             created: postSnap.data().created,
             text: postSnap.data().text,
             user,
@@ -738,7 +730,6 @@ export async function fetchPostsForUserFeed(
         following,
         lastVisible,
       );
-      // sortPostsByDate(posts);
       return { posts, newLastVisible };
     }
   } catch (error) {
@@ -752,13 +743,13 @@ export async function fetchPostsForUserFeed(
  * The sort() function mutates the posts list without needing to return a new list.
  * @param {PostModel[]} posts - The list of posts to be sorted.
  */
-function sortPostsByDate(posts: PostModel[]) {
-  posts.sort((postA, postB) => {
-    const dateA = postA.created.toDate();
-    const dateB = postB.created.toDate();
-    return dateB.getTime() - dateA.getTime();
-  });
-}
+// function sortPostsByDate(posts: PostModel[]) {
+//   posts.sort((postA, postB) => {
+//     const dateA = postA.created.toDate();
+//     const dateB = postB.created.toDate();
+//     return dateB.getTime() - dateA.getTime();
+//   });
+// }
 
 /**
  * Adds a data entry for a users time reading and number of pages
