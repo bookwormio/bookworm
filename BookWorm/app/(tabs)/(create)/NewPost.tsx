@@ -5,7 +5,6 @@ import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
-  Button,
   Image,
   ScrollView,
   StyleSheet,
@@ -207,6 +206,7 @@ const NewPost = () => {
 
   return (
     <View style={styles.container}>
+      <Toast />
       <BookDropdownSelect
         selectedBook={selectedBook}
         setSelectedBook={setSelectedBook}
@@ -268,9 +268,8 @@ const NewPost = () => {
           },
         ]}
       >
-        <Button
-          title={creatingPost ? "Remove Post" : "Add Tracking"}
-          color="#FB6D0B"
+        <TouchableOpacity
+          style={styles.iconButton}
           onPress={() => {
             if (creatingPost) {
               removePostView();
@@ -280,10 +279,22 @@ const NewPost = () => {
               }
             }
           }}
-        />
-        <Button
-          title={creatingPost ? "Create Post + Tracking" : "Create Post"}
-          color="#FB6D0B"
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={{ color: "#FB6D0B", fontSize: 18 }}>
+              {creatingPost ? "Remove Post " : "Add Tracking"}
+            </Text>
+            {creatingPost && (
+              <FontAwesome5
+                name="caret-up"
+                size={20}
+                style={{ color: "#FB6D0B" }}
+              />
+            )}
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.iconButton}
           onPress={() => {
             if (!creatingPost) {
               addPostView();
@@ -294,7 +305,20 @@ const NewPost = () => {
               }
             }
           }}
-        />
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={{ color: "#FB6D0B", fontSize: 18 }}>
+              {creatingPost ? "Create Post + Tracking" : "Create Post "}
+            </Text>
+            {!creatingPost && (
+              <FontAwesome5
+                name="caret-down"
+                size={20}
+                style={{ color: "#FB6D0B" }}
+              />
+            )}
+          </View>
+        </TouchableOpacity>
       </Animated.View>
       <Animated.View style={{ opacity: fadeAnimation, width: "100%" }}>
         <TextInput
@@ -363,6 +387,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     zIndex: 999,
+    marginTop: 15,
   },
   pickerRow: {
     flexDirection: "row",
@@ -423,6 +448,9 @@ const styles = StyleSheet.create({
     borderColor: "grey",
     height: "100%",
     paddingHorizontal: 10,
+  },
+  iconButton: {
+    marginHorizontal: 10,
   },
 });
 
