@@ -1,8 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useAuth } from "../../../components/auth/context";
+import ViewDataChart from "../../../components/chart/ViewDataChart";
 import {
   fetchPagesReadData,
   fetchTimeReadData,
@@ -141,40 +148,17 @@ const ViewData = () => {
     timeData !== undefined ? aggregateTimeDataByWeek(timeData) : [];
 
   return (
-    <View style={{ flex: 1 }}>
+    <ScrollView style={{ flex: 1 }}>
       <View>
         <Text style={styles.dataType}>Pages Read:</Text>
+        <ViewDataChart aggregatedData={aggregatedPagesData}></ViewDataChart>
       </View>
-      <View>
-        {aggregatedPagesData.map(({ x, y }) => (
-          <View key={x.toISOString()}>
-            <Text>
-              {x.toDateString().slice(4, 10)} - {x.getDate() + 6}: {y}
-            </Text>
-          </View>
-        ))}
-      </View>
+      <View></View>
       <View>
         <Text style={styles.dataType}>Minutes Read:</Text>
+        <ViewDataChart aggregatedData={aggregatedTimeData}></ViewDataChart>
       </View>
-      <View>
-        {aggregatedTimeData.map(({ x, y }) => (
-          <View key={x.toISOString()}>
-            <Text>
-              {x.toDateString().slice(4, 10)} - {x.getDate() + 6}: {y}
-            </Text>
-          </View>
-        ))}
-      </View>
-      {/* <View style={styles.container}>
-        <LineChart
-          style={styles.chart}
-          data={{
-            dataSets: [{ label: "demo", values: queriedPagesData }],
-          }}
-        />
-      </View> */}
-    </View>
+    </ScrollView>
   );
 };
 
