@@ -97,16 +97,17 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 15,
     fontWeight: "bold",
+    color: "#333333",
   },
   activeButton: {
-    backgroundColor: "#FFD8B1",
+    backgroundColor: "#FFDAB9",
   },
   underline: {
     position: "absolute",
     bottom: 0,
     height: 2,
     width: "50%",
-    backgroundColor: "black",
+    backgroundColor: "#FB6D0B",
   },
 });
 

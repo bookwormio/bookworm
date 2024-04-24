@@ -45,9 +45,11 @@ const AppLayout = () => {
         options={{
           tabBarLabel: "Posts",
           headerTitle: "Posts",
+          tabBarActiveTintColor: "#FB6D0B",
+          tabBarInactiveTintColor: "grey",
           headerRight: () => (
             <TouchableOpacity style={styles.newPost} onPress={() => {}}>
-              <FontAwesome5 name="bell" size={20} />
+              <FontAwesome5 name="bell" size={20} color="#FB6D0B" />
             </TouchableOpacity>
           ),
           headerLeft: () => (
@@ -65,7 +67,7 @@ const AppLayout = () => {
               )}
             </View>
           ),
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ size, color }) => (
             <FontAwesome5 name="stream" size={size} color={color} />
           ),
         }}
@@ -75,7 +77,9 @@ const AppLayout = () => {
         options={{
           tabBarLabel: "Search",
           headerTitle: "Search",
-          tabBarIcon: ({ color, size }) => (
+          tabBarActiveTintColor: "#FB6D0B",
+          tabBarInactiveTintColor: "grey",
+          tabBarIcon: ({ size, color }) => (
             <FontAwesome5 name="search" size={size} color={color} />
           ),
           headerLeft: () => (
@@ -102,7 +106,9 @@ const AppLayout = () => {
         options={{
           tabBarLabel: "Create",
           headerTitle: "Create",
-          tabBarIcon: ({ color, size }) => (
+          tabBarActiveTintColor: "#FB6D0B",
+          tabBarInactiveTintColor: "grey",
+          tabBarIcon: ({ size, focused, color }) => (
             <FontAwesome5 name="book-medical" size={size} color={color} />
           ),
         }}
@@ -112,8 +118,25 @@ const AppLayout = () => {
         options={{
           tabBarLabel: "Profile",
           headerTitle: "Profile",
-          tabBarIcon: ({ color, size }) => (
+          tabBarActiveTintColor: "#FB6D0B",
+          tabBarInactiveTintColor: "grey",
+          tabBarIcon: ({ size, color }) => (
             <FontAwesome5 name="id-card" size={size} color={color} />
+          ),
+          headerLeft: () => (
+            <View>
+              {router.canGoBack() && (
+                <TouchableOpacity
+                  style={{ paddingLeft: 20 }}
+                  disabled={!router.canGoBack()}
+                  onPress={() => {
+                    router.back();
+                  }}
+                >
+                  <FontAwesome5 name="arrow-left" size={20} color="#FB6D0B" />
+                </TouchableOpacity>
+              )}
+            </View>
           ),
         }}
       />
