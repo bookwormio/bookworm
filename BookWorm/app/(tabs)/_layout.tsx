@@ -125,7 +125,7 @@ const AppLayout = () => {
           ),
           headerLeft: () => (
             <View>
-              {router.canGoBack() && (
+              {router.canGoBack() && segments[2] !== "profile" && (
                 <TouchableOpacity
                   style={{ paddingLeft: 20 }}
                   disabled={!router.canGoBack()}
