@@ -189,6 +189,7 @@ const styles = StyleSheet.create({
   dataType: {
     fontSize: 36,
     color: "#FB6D0B",
+    marginLeft: 10,
   },
   loading: {
     flex: 1,

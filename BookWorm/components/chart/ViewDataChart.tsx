@@ -108,7 +108,7 @@ const ViewDataChart = ({ aggregatedData }: ViewDataChartProps) => {
         decorator={() => {
           // TODO FIX THIS DECORATOR TO HANDLE CLICK OFF
           return tooltipPos.visible ? (
-            <View>
+            <View style={{ alignContent: "center", justifyContent: "center" }}>
               <Svg>
                 <Rect
                   x={tooltipPos.x - 15}
