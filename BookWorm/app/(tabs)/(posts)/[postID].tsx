@@ -1,14 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Button, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Toast from "react-native-toast-message";
+import { useAuth } from "../../../components/auth/context";
 import Post from "../../../components/post/post";
 import { POSTS_ROUTE_PREFIX } from "../../../constants/constants";
 import { fetchPostByPostID } from "../../../services/firebase-services/queries";
 import { type PostModel } from "../../../types";
 
 const ViewPost = () => {
+  const { user } = useAuth();
   const { postID } = useLocalSearchParams();
   const [post, setPost] = useState<PostModel | null>(null);
   const [preLoad, setPreLoading] = useState(true);
@@ -63,18 +71,28 @@ const ViewPost = () => {
           <ActivityIndicator size="large" color="black" />
         </View>
       )}
+      {/* TODO: Down the user's name should just be clickable instead of a button */}
       {post != null && !postLoading && (
         <View style={styles.postContainer}>
           <Post post={post} created={post.created} currentDate={new Date()} />
-          <Button
-            title="View Profile"
-            color="#FB6D0B"
-            onPress={() => {
-              router.push({
-                pathname: `/${POSTS_ROUTE_PREFIX}/user/${post?.user.id}`,
-              });
-            }}
-          ></Button>
+          {post?.user.id !== user?.uid && (
+            <View style={styles.outerButtonsContainer}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                  if (user != null) {
+                    router.push({
+                      pathname: `/${POSTS_ROUTE_PREFIX}/user/${post?.user.id}`,
+                    });
+                  } else {
+                    console.error("User DNE");
+                  }
+                }}
+              >
+                <Text style={styles.buttonText}>{"View Profile"}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       )}
     </View>
@@ -97,5 +115,24 @@ const styles = StyleSheet.create({
   postContainer: {
     flex: 1,
     width: "100%",
+  },
+  button: {
+    backgroundColor: "#FB6D0B",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: "center",
+    marginVertical: 10,
+    marginHorizontal: 10,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  outerButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingHorizontal: 2,
   },
 });

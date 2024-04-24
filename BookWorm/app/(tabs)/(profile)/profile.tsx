@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
   },
   bioPad: {
     paddingLeft: 40,
+    paddingRight: 40,
   },
   nameText: {
     paddingLeft: 20,
