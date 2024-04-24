@@ -108,6 +108,7 @@ const EditProfile = () => {
     newUserData.first = editFirst;
     newUserData.last = editLast;
     newUserData.number = editPhone;
+    newUserData.bio = editBio;
     if (image !== "" && image !== undefined && image !== null) {
       newUserData.profilepic = image;
     }
