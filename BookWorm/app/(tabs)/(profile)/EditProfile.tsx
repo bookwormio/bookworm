@@ -5,7 +5,6 @@ import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Button,
   Image,
   StyleSheet,
   Text,
@@ -141,14 +140,6 @@ const EditProfile = () => {
 
   return (
     <View>
-      <Button
-        title="Close"
-        color="black"
-        onPress={() => {
-          onClose();
-          router.back();
-        }}
-      />
       <TouchableOpacity
         style={styles.defaultImageContainer}
         onPress={() => {
@@ -172,7 +163,7 @@ const EditProfile = () => {
         <TextInput
           style={styles.input}
           value={editFirst}
-          placeholder={editFirst === "" ? "first name" : editFirst}
+          placeholder={"first name"}
           autoCapitalize="none"
           onChangeText={(text) => {
             setEditFirst(text);
@@ -184,7 +175,7 @@ const EditProfile = () => {
         <TextInput
           style={styles.input}
           value={editLast}
-          placeholder={editLast === "" ? "last name" : editLast}
+          placeholder={"last name"}
           autoCapitalize="none"
           onChangeText={(text) => {
             setEditLast(text);
@@ -196,7 +187,7 @@ const EditProfile = () => {
         <TextInput
           style={styles.input}
           value={editPhone}
-          placeholder={editPhone === "" ? "phone number" : editPhone}
+          placeholder={"phone number"}
           autoCapitalize="none"
           onChangeText={(text) => {
             setEditPhone(text);
@@ -208,7 +199,7 @@ const EditProfile = () => {
         <TextInput
           style={styles.input}
           value={editBio}
-          placeholder={editBio === "" ? "phone number" : editBio}
+          placeholder={"bio"}
           autoCapitalize="none"
           multiline={true}
           onChangeText={(text) => {
@@ -216,7 +207,16 @@ const EditProfile = () => {
           }}
         />
       </View>
-      <View>
+      <View style={styles.outerButtonsContainer}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            onClose();
+            router.back();
+          }}
+        >
+          <Text style={styles.buttonText}>{" Close "}</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handeSaveClick}>
           <Text style={styles.buttonText}>{" Save "}</Text>
         </TouchableOpacity>
@@ -246,6 +246,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: "30%",
     alignSelf: "center",
+    marginHorizontal: 10,
   },
   buttonText: {
     color: "white", // Ensure text color is white
@@ -282,5 +283,9 @@ const styles = StyleSheet.create({
     height: 100, // Adjust the size of the image as needed
     width: 100, // Adjust the size of the image as needed
     borderRadius: 50, // Make the image circular
+  },
+  outerButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
   },
 });
