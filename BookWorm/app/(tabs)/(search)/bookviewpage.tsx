@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  Button,
   ScrollView,
   StyleSheet,
   Text,
@@ -54,13 +53,6 @@ const BookViewPage = () => {
       style={styles.scrollContainer}
       contentContainerStyle={styles.scrollContent}
     >
-      <Button
-        title="Back"
-        onPress={() => {
-          router.back();
-        }}
-      />
-
       <View>
         <Image
           // Using thumbnail here because the other image links (small / medium) may be different
