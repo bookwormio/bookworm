@@ -337,10 +337,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: "orange",
+    borderColor: "#FB6D0B",
   },
   buttonText: {
-    color: "orange",
+    color: "#FB6D0B",
   },
   backButtonContainer: {
     position: "absolute",
