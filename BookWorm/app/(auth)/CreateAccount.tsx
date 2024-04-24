@@ -76,6 +76,16 @@ const CreateAccount = () => {
         onChangeText={(text) => {
           setConfirmPassword(text);
         }}
+        onSubmitEditing={() => {
+          if (validFields()) {
+            try {
+              createAccount(email, password);
+              router.push("/MoreInfo");
+            } catch (error) {
+              console.error(error);
+            }
+          }
+        }}
       />
       <TouchableOpacity
         style={styles.button}

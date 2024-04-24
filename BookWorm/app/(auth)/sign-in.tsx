@@ -44,6 +44,10 @@ const Login = () => {
         }}
       />
       <TextInput
+        onSubmitEditing={() => {
+          signIn(email, password);
+          router.replace("/post");
+        }}
         style={styles.input}
         value={password}
         secureTextEntry={true}
@@ -63,7 +67,7 @@ const Login = () => {
         <Text style={styles.buttonText}>{"Login"}</Text>
       </TouchableOpacity>
       <View style={styles.accountContainer}>
-        <Text>{"Don't have an account?"}</Text>
+        <Text style={styles.question}>{"Don't have an account?"}</Text>
         <TouchableOpacity
           onPress={() => {
             router.push("/CreateAccount");
@@ -100,7 +104,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   createButtonText: {
-    color: "#A0D34D",
+    color: "#FB6D0B",
     fontSize: 16,
     fontWeight: "bold",
     marginLeft: 10,
@@ -132,5 +136,8 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 36,
     color: "#38434D",
+  },
+  question: {
+    fontSize: 16,
   },
 });

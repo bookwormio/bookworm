@@ -5,9 +5,9 @@ import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Button,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
@@ -144,43 +144,52 @@ const Profile = () => {
           <Text>{followingCount ?? "-"}</Text>
         </View>
       </View>
-      <Button
-        color="#FB6D0B"
-        title="Edit Profile"
-        onPress={() => {
-          if (user != null) {
-            router.push({
-              pathname: "EditProfile",
-            });
-          } else {
-            console.error("User DNE");
-          }
-          setProfileLoading(true);
-        }}
-      />
-      <Button title="LogOut" onPress={signOut} color="#FB6D0B" />
-      <Button
-        title="Add Entry"
-        color="#FB6D0B"
-        onPress={() => {
-          if (user != null) {
-            router.push({ pathname: "AddData" });
-          } else {
-            console.error("User DNE");
-          }
-        }}
-      />
-      <Button
-        title="View Data"
-        color="#FB6D0B"
-        onPress={() => {
-          if (user != null) {
-            router.push({ pathname: "ViewData" });
-          } else {
-            console.error("User DNE");
-          }
-        }}
-      />
+      <View style={styles.outerButtonsContainer}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            if (user != null) {
+              router.push({
+                pathname: "EditProfile",
+              });
+            } else {
+              console.error("User DNE");
+            }
+            setProfileLoading(true);
+          }}
+        >
+          <Text style={styles.buttonText}>{"Edit Profile"}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={signOut}>
+          <Text style={styles.buttonText}>{"Log Out"}</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.outerButtonsContainer}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            if (user != null) {
+              router.push({ pathname: "AddData" });
+            } else {
+              console.error("User DNE");
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>{"Add Entry"}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            if (user != null) {
+              router.push({ pathname: "ViewData" });
+            } else {
+              console.error("User DNE");
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>{"View Data"}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -188,6 +197,25 @@ const Profile = () => {
 export default Profile;
 
 const styles = StyleSheet.create({
+  outerButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingHorizontal: 2,
+  },
+  button: {
+    backgroundColor: "#FB6D0B",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginVertical: 10,
+    marginHorizontal: 10,
+    flex: 1,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   main: {
     flex: 1,
     justifyContent: "center",
