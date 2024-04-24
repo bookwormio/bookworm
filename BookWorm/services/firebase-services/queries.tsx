@@ -883,7 +883,7 @@ export async function fetchPagesReadData(
     }
     return dataPoints;
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error("Error fetching pages data:", error);
     throw error;
   }
 }
@@ -924,7 +924,7 @@ export async function fetchTimeReadData(
     }
     return dataPoints;
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error("Error fetching time data:", error);
     throw error;
   }
 }

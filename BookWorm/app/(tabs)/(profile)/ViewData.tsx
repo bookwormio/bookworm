@@ -151,12 +151,20 @@ const ViewData = () => {
     <ScrollView style={{ flex: 1 }}>
       <View>
         <Text style={styles.dataType}>Pages Read:</Text>
-        <ViewDataChart aggregatedData={aggregatedPagesData}></ViewDataChart>
+        {aggregatedPagesData.length > 0 ? (
+          <ViewDataChart aggregatedData={aggregatedPagesData}></ViewDataChart>
+        ) : (
+          <Text>No data to display</Text>
+        )}
       </View>
       <View></View>
       <View>
         <Text style={styles.dataType}>Minutes Read:</Text>
-        <ViewDataChart aggregatedData={aggregatedTimeData}></ViewDataChart>
+        {aggregatedTimeData.length > 0 ? (
+          <ViewDataChart aggregatedData={aggregatedTimeData}></ViewDataChart>
+        ) : (
+          <Text>No data to display</Text>
+        )}
       </View>
     </ScrollView>
   );
