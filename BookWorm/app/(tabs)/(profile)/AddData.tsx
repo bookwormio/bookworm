@@ -3,10 +3,10 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Button,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
@@ -74,14 +74,7 @@ const AddData = () => {
   }
 
   return (
-    <View>
-      <Button
-        title="Close"
-        color="#FB6D0B"
-        onPress={() => {
-          router.back();
-        }}
-      />
+    <View style={styles.container}>
       <View style={styles.pickerRow}>
         <View style={styles.pickerContainer}>
           <Text style={{ color: "#C7C7CD" }}>Time Read: </Text>
@@ -95,6 +88,7 @@ const AddData = () => {
             onValueChange={(hoursString: string) => {
               setSelectedHours(+hoursString);
             }}
+            useNativeAndroidPickerStyle={false}
             style={pickerSelectStyles}
           />
           <Text> hrs </Text>
@@ -108,6 +102,7 @@ const AddData = () => {
             onValueChange={(minutesString: string) => {
               setSelectedMinutes(+minutesString);
             }}
+            useNativeAndroidPickerStyle={false}
             style={pickerSelectStyles}
           />
           <Text> mins </Text>
@@ -122,9 +117,8 @@ const AddData = () => {
           }}
         />
       </View>
-      <Button
-        title="Save"
-        color="#FB6D0B"
+      <TouchableOpacity
+        style={styles.button}
         onPress={() => {
           if (user != null) {
             setButtonClicked(true);
@@ -135,7 +129,9 @@ const AddData = () => {
           }
         }}
         disabled={buttonClicked}
-      />
+      >
+        <Text style={styles.buttonText}>Save</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -147,7 +143,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     paddingHorizontal: 20,
-    justifyContent: "center",
+    paddingTop: 30,
   },
   input: {
     borderColor: "gray",
@@ -204,6 +200,20 @@ const styles = StyleSheet.create({
     height: "100%",
     paddingHorizontal: 10,
   },
+  button: {
+    backgroundColor: "#FB6D0B",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginVertical: 10,
+    width: "30%",
+    alignSelf: "center",
+  },
+  buttonText: {
+    color: "white", // Ensure text color is white
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
 
 const pickerSelectStyles = StyleSheet.create({
@@ -222,12 +232,18 @@ const pickerSelectStyles = StyleSheet.create({
   },
   inputAndroid: {
     fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 0.5,
-    borderColor: "purple",
-    borderRadius: 8,
+    width: 30,
+    height: 30,
+    borderRadius: 5,
     color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
+    backgroundColor: "#c9ccd3",
+    textAlign: "center",
+    marginTop: "10%",
+  },
+  chevronDown: {
+    display: "none",
+  },
+  chevronUp: {
+    display: "none",
   },
 });
