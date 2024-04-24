@@ -125,17 +125,19 @@ const AppLayout = () => {
           ),
           headerLeft: () => (
             <View>
-              {router.canGoBack() && segments[2] !== "profile" && (
-                <TouchableOpacity
-                  style={{ paddingLeft: 20 }}
-                  disabled={!router.canGoBack()}
-                  onPress={() => {
-                    router.back();
-                  }}
-                >
-                  <FontAwesome5 name="arrow-left" size={20} color="#FB6D0B" />
-                </TouchableOpacity>
-              )}
+              {router.canGoBack() &&
+                segments[2] !== "profile" &&
+                segments[2] !== "EditProfile" && (
+                  <TouchableOpacity
+                    style={{ paddingLeft: 20 }}
+                    disabled={!router.canGoBack()}
+                    onPress={() => {
+                      router.back();
+                    }}
+                  >
+                    <FontAwesome5 name="arrow-left" size={20} color="#FB6D0B" />
+                  </TouchableOpacity>
+                )}
             </View>
           ),
         }}
