@@ -133,4 +133,5 @@ interface FlatBookItemModel {
   title: string;
   // TODO change this to use new expo images
   image: string;
+  author: string;
 }

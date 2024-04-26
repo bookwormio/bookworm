@@ -39,6 +39,7 @@ const BookDropdownSelect = ({
             id: book.id,
             title: book.volumeInfo?.title,
             image: book.volumeInfo?.imageLinks?.smallThumbnail,
+            author: book.volumeInfo?.authors[0],
           })),
     staleTime: 60000, // Set stale time to 1 minute
   });
