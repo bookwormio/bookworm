@@ -135,3 +135,10 @@ interface FlatBookItemModel {
   image: string;
   author: string;
 }
+interface BookShelfBookModel {
+  id: string;
+  created: Timestamp;
+  volumeInfo?: BookVolumeInfo; // Optional property for detailed information
+}
+
+type UserBookShelvesModel = Record<string, BookShelfBookModel[]>;

@@ -1,30 +1,29 @@
 import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { type FlatBookItemModel } from "../../../types";
+import { type BookVolumeInfo } from "../../../types";
 
 interface BookShelfBookProps {
-  book: FlatBookItemModel;
+  book: BookVolumeInfo;
 }
-
-const FAKE_IMAGE_PLACEHOLDER =
-  "http://books.google.com/books/content?id=wrOQLV6xB-wC&printsec=frontcover&img=1&zoom=1&edge=curl&imgtk=AFLRE70E0RCBnKtA6EfZAa0-wXgtUtfXjaYAARBNvitnpjRmV9u6N4g9sX87R_GQHkrqkq9qb03NulHqxkwWYYQvNUwOiIcl0Nolkn2_H-IMw_TO71Pbjw_uOmJDaMkw7ZZR1CdSmr8g&source=gbs_api";
-
 const BookShelfBook = ({ book }: BookShelfBookProps) => {
   return (
     <TouchableOpacity>
       <View>
         <View style={styles.imageBox}>
           <Image
+            // Using thumbnail here because the other image links (small / medium) may be different
+            source={{ uri: book.imageLinks?.thumbnail }}
+            cachePolicy={"memory-disk"}
             style={styles.bookImage}
-            source={{
-              uri: FAKE_IMAGE_PLACEHOLDER,
-            }}
           />
         </View>
-
+        {/* TODO center the text */}
+        <Text numberOfLines={1} style={styles.titleText}>
+          {book.title}
+        </Text>
         <Text numberOfLines={1} style={styles.bookText}>
-          {book.author}
+          {book.authors?.join(", ")}
         </Text>
       </View>
     </TouchableOpacity>
@@ -46,6 +45,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   bookText: {
+    width: 120,
+    marginRight: 20,
+    marginTop: 20 / 2,
+    justifyContent: "center",
+  },
+  titleText: {
+    fontWeight: "bold",
     width: 120,
     marginRight: 20,
     marginTop: 20 / 2,

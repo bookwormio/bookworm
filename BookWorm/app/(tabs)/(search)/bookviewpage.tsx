@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  Button,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,10 +11,19 @@ import {
   useWindowDimensions,
 } from "react-native";
 import RenderHtml from "react-native-render-html";
-import { fetchBookByVolumeID } from "../../../services/firebase-services/queries";
+import { useAuth } from "../../../components/auth/context";
+import {
+  bookStatusDisplayMap,
+  type ServerBookStatus,
+} from "../../../enums/Enums";
+import {
+  addBookToUserBookshelf,
+  fetchBookByVolumeID,
+} from "../../../services/firebase-services/queries";
 import { type BookVolumeInfo } from "../../../types";
 
 const BookViewPage = () => {
+  const { user } = useAuth();
   const [bookData, setBookData] = useState<BookVolumeInfo | null>(null);
   const { bookID } = useLocalSearchParams<{ bookID: string }>();
 
@@ -48,6 +58,29 @@ const BookViewPage = () => {
     );
   }
 
+  const addToBookshelf = async (bookshelfName: ServerBookStatus) => {
+    if (user !== null && bookID !== undefined) {
+      try {
+        const success = await addBookToUserBookshelf(
+          user.uid,
+          bookID,
+          bookshelfName,
+        );
+        if (success) {
+          // TODO: modify display to show that the book was added
+          // TODO: remove console logs
+          console.log("SUCCESS. Added to ", bookshelfName);
+        } else {
+          console.log("Failed to add the book to the bookshelf");
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    } else {
+      console.log("User or book ID is not available");
+    }
+  };
+
   return (
     <ScrollView
       style={styles.scrollContainer}
@@ -64,6 +97,21 @@ const BookViewPage = () => {
       </View>
       <Text style={styles.title}>{bookData.title}</Text>
       <Text style={styles.author}>Author: {bookData.authors?.join(", ")}</Text>
+      {/* TODO break this into a separate component */}
+      {/* This gives a button for every bookshelf to add the book to */}
+      <View>
+        {Object.entries(bookStatusDisplayMap).map(([status, title]) => (
+          <Button
+            key={status}
+            onPress={() => {
+              void (async () => {
+                await addToBookshelf(status as ServerBookStatus);
+              })();
+            }}
+            title={`Add to ${title}`}
+          />
+        ))}
+      </View>
 
       {bookData.description !== null && (
         <Text style={styles.description}>

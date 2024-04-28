@@ -1,49 +1,91 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { type FlatBookItemModel } from "../../types";
+import { ServerBookStatus } from "../../enums/Enums";
+import {
+  getBooksByBookIDs,
+  getBooksFromUserBookShelves,
+} from "../../services/firebase-services/queries";
+import { type UserBookShelvesModel } from "../../types";
+import { useAuth } from "../auth/context";
 import BookShelf from "./BookShelf/BookShelf";
 
-const myBookShelves = ["CurrentlyReading", "Up Next", "Physically Own"];
-
-// TODO: add query to get books
-const fakeBooks: FlatBookItemModel[] = [
-  {
-    id: "9781529301033",
-    title: "Secrets of the Forgotten Forest",
-    image: "https://example.com/forest.jpg",
-    author: "JK Rownling",
-  },
-  {
-    id: "9781789091374",
-    title: "Echoes of Eternity",
-    image: "https://example.com/eternity.jpg",
-    author: "JK Rownling",
-  },
-  {
-    id: "9780062945953",
-    title: "The Midnight Mirage",
-    image: "https://example.com/midnight.jpg",
-    author: "JK Rownling",
-  },
-  {
-    id: "9781974705667",
-    title: "Whispers from the Abyss",
-    image: "https://example.com/abyss.jpg",
-    author: "JK Rownling",
-  },
-  {
-    id: "9780062892615",
-    title: "Chronicles of the Crystal Kingdom",
-    image: "https://example.com/crystal.jpg",
-    author: "JK Rownling",
-  },
-];
-
 const ProfileBookShelves = () => {
+  const { user } = useAuth();
+  // Initialize the bookShelves state with all shelves empty
+  const initialShelves: UserBookShelvesModel = Object.values(
+    ServerBookStatus,
+  ).reduce<UserBookShelvesModel>((acc, cur) => {
+    acc[cur] = [];
+    return acc;
+  }, {});
+
+  const [bookShelves, setBookShelves] =
+    useState<UserBookShelvesModel>(initialShelves);
+
+  // TODO: redo ths using react query
+  // TODO: add loading state based on react query
+  const getBooks = async () => {
+    if (user !== null) {
+      try {
+        // Dynamically generate the list of shelf types
+        const shelfTypes = Object.values(ServerBookStatus);
+        const userBooks = await getBooksFromUserBookShelves(
+          user.uid,
+          shelfTypes,
+        );
+
+        if (userBooks != null) {
+          const allShelfPromises = Object.entries(userBooks).map(
+            async ([shelf, books]) => {
+              const bookIds = books.map((book) => book.id);
+              // Fetch book info for each book in the shelf
+              const bookInfos = await getBooksByBookIDs(bookIds);
+              return {
+                [shelf]: books.map((book, index) => ({
+                  ...book,
+                  volumeInfo: bookInfos[index],
+                })),
+              };
+            },
+          );
+          // Concurrently fetch books for all shelves
+          const shelvesWithBooksArray = await Promise.all(allShelfPromises);
+          // Merge the shelves with books into a single object
+          const newShelves = shelvesWithBooksArray.reduce(
+            (acc, shelf) => ({
+              ...acc,
+              ...shelf,
+            }),
+            {},
+          );
+
+          setBookShelves(newShelves);
+        } else {
+          console.log("No books found on any shelves.");
+        }
+      } catch (error) {
+        console.error("Failed to fetch books:", error);
+      }
+    } else {
+      console.log("User not logged in.");
+    }
+  };
+
+  console.log(bookShelves);
+  // TODO: remove once react query is implemented
+  useEffect(() => {
+    // Optionally preload books when the component mounts
+    void getBooks();
+  }, []); // Re-run when user changes
+
   return (
     <View style={styles.scrollContent}>
-      {myBookShelves.map((shelfName) => (
-        <BookShelf key={shelfName} shelfName={shelfName} books={fakeBooks} />
+      {Object.entries(bookShelves).map(([shelfName, books]) => (
+        <BookShelf
+          key={shelfName}
+          shelfName={shelfName as ServerBookStatus}
+          books={books}
+        />
       ))}
     </View>
   );
