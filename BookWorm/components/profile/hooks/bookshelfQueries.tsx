@@ -5,6 +5,7 @@ import {
   fetchBookByVolumeID,
   getBooksByBookIDs,
   getBooksFromUserBookShelves,
+  getShelvesContainingBook,
   removeBookFromUserBookshelf,
 } from "../../../services/firebase-services/queries";
 import { type UserBookShelvesModel } from "../../../types";
@@ -59,7 +60,7 @@ export const useAddBookToShelf = () => {
       return await addBookToUserBookshelf(userID, bookID, shelfName);
     },
 
-    onSuccess: async (data, { userID, shelfName }) => {
+    onSuccess: async (data, { userID, bookID, shelfName }) => {
       console.log("Book added successfully");
 
       // Access the returned book data
@@ -100,6 +101,14 @@ export const useAddBookToShelf = () => {
               }
 
               return newData;
+            },
+          );
+          queryClient.setQueryData<string[]>(
+            ["shelvesContainingBook", userID, bookID],
+            (old) => {
+              const newShelves = new Set<string>(old ?? []);
+              newShelves.add(shelfName);
+              return Array.from(newShelves);
             },
           );
         }
@@ -151,7 +160,19 @@ export const useRemoveBookFromShelf = () => {
         );
       }
 
-      return { previousShelves };
+      const previousShelvesContainingBook = queryClient.getQueryData<string[]>([
+        "shelvesContainingBook",
+        userID,
+        bookID,
+      ]);
+      if (previousShelvesContainingBook != null) {
+        queryClient.setQueryData<string[]>(
+          ["shelvesContainingBook", userID, bookID],
+          previousShelvesContainingBook.filter((shelf) => shelf !== shelfName),
+        );
+      }
+
+      return { previousShelves, previousShelvesContainingBook };
     },
     onError: (error, variables, context) => {
       console.error("An error occurred:", error);
@@ -166,5 +187,19 @@ export const useRemoveBookFromShelf = () => {
     onSuccess: (_, { userID, bookID, shelfName }) => {
       console.log("Book removed successfully");
     },
+  });
+};
+
+/**
+ * Custom hook to fetch the shelves that contain a specific book for a given user.
+ * @param {string} userID - The user's ID.
+ * @param {string} bookID - The book's ID.
+ */
+export const useGetShelvesForBook = (userID: string, bookID: string) => {
+  return useQuery({
+    queryKey: ["shelvesContainingBook", userID, bookID], // Unique query key, including dependencies
+    queryFn: async () => await getShelvesContainingBook(userID, bookID), // Query function
+    enabled: !(userID === "") && !(bookID === ""), // Only run query if userID and bookID are not null or undefined
+    staleTime: 60000, // refetch data, here set to 1 minute
   });
 };

@@ -1,43 +1,71 @@
 import React from "react";
-import { Button } from "react-native";
+import { Button, StyleSheet, View } from "react-native";
 import { type ServerBookShelfName } from "../../enums/Enums";
-import { useAddBookToShelf } from "./hooks/bookshelfQueries";
+import {
+  useAddBookToShelf,
+  useRemoveBookFromShelf,
+} from "./hooks/bookshelfQueries";
 
 interface AddBookButtonProps {
-  status: string;
+  shelfName: string;
   title: string;
   userID: string;
   bookID: string;
+  isInShelf: boolean;
+  isLoadingInBookshelves: boolean;
 }
 
 const AddBookButton = ({
-  status,
+  shelfName,
   title,
   userID,
   bookID,
+  isInShelf,
+  isLoadingInBookshelves,
 }: AddBookButtonProps) => {
-  const { mutate, isPending } = useAddBookToShelf();
+  const { mutate: addBook, isPending: isAdding } = useAddBookToShelf();
+  const { mutate: removeBook, isPending: isRemoving } =
+    useRemoveBookFromShelf();
 
-  // TODO: display stateful button
-  // depending on whether the book is already in the shelf
   const handlePress = () => {
-    if (userID !== null && bookID !== undefined && !isPending) {
-      mutate({
-        userID,
-        bookID,
-        shelfName: status as ServerBookShelfName,
-      });
+    if (userID !== "" && bookID !== "" && !(isAdding || isRemoving)) {
+      if (isInShelf) {
+        removeBook({
+          userID,
+          bookID,
+          shelfName: shelfName as ServerBookShelfName,
+        });
+      } else {
+        addBook({
+          userID,
+          bookID,
+          shelfName: shelfName as ServerBookShelfName,
+        });
+      }
     }
   };
 
   return (
     // TODO: Make this pretty
-    <Button
-      onPress={handlePress}
-      title={`Add to ${title}`}
-      disabled={isPending}
-    />
+    <View style={styles.buttonContainer}>
+      <Button
+        onPress={handlePress}
+        title={
+          isAdding || isRemoving || isLoadingInBookshelves
+            ? "Loading..."
+            : `${isInShelf ? "Remove from" : "Add to"} ${title}`
+        }
+        accessibilityLabel={`Press to ${isInShelf ? "remove from" : "add to"} ${title}`}
+        disabled={isAdding || isRemoving || isLoadingInBookshelves}
+      />
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    marginVertical: 5,
+  },
+});
 
 export default AddBookButton;

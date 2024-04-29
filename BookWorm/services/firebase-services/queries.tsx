@@ -26,7 +26,7 @@ import {
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import React from "react";
 import { BLURHASH, BOOKS_API_KEY } from "../../constants/constants";
-import { ServerFollowStatus } from "../../enums/Enums";
+import { ServerBookShelfName, ServerFollowStatus } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
   type BookShelfBookModel,
@@ -1069,6 +1069,34 @@ export async function getBooksFromUserBookShelves(
   } catch (error) {
     console.error("Error retrieving books from user bookshelves:", error);
     return null;
+  }
+}
+
+// make a function to get the shelves a book is in
+export async function getShelvesContainingBook(userID: string, bookID: string) {
+  const shelves: ServerBookShelfName[] = [
+    ServerBookShelfName.CURRENTLY_READING,
+    ServerBookShelfName.WANT_TO_READ,
+    ServerBookShelfName.FINISHED,
+    ServerBookShelfName.LENDING_LIBRARY,
+  ];
+  const shelvesContainingBook: string[] = [];
+
+  try {
+    for (const shelf of shelves) {
+      const bookRef = doc(DB, "bookshelf_collection", userID, shelf, bookID);
+      const bookSnap = await getDoc(bookRef);
+
+      if (bookSnap.exists()) {
+        shelvesContainingBook.push(shelf);
+      }
+    }
+
+    console.log("Shelves containing the book: ", shelvesContainingBook);
+    return shelvesContainingBook;
+  } catch (e) {
+    console.error("Failed to check shelves for book:", e);
+    return [];
   }
 }
 

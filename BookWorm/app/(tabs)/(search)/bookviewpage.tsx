@@ -12,6 +12,7 @@ import {
 import RenderHtml from "react-native-render-html";
 import { useAuth } from "../../../components/auth/context";
 import AddBookButton from "../../../components/profile/AddBookButton";
+import { useGetShelvesForBook } from "../../../components/profile/hooks/bookshelfQueries";
 import { bookShelfDisplayMap } from "../../../enums/Enums";
 import { fetchBookByVolumeID } from "../../../services/firebase-services/queries";
 import { type BookVolumeInfo } from "../../../types";
@@ -20,6 +21,9 @@ const BookViewPage = () => {
   const { user } = useAuth();
   const [bookData, setBookData] = useState<BookVolumeInfo | null>(null);
   const { bookID } = useLocalSearchParams<{ bookID: string }>();
+
+  const { data: inBookshelves, isLoading: isLoadingInBookshelves } =
+    useGetShelvesForBook(user?.uid ?? "", bookID ?? "");
 
   const { data: queryBookData, isLoading: isLoadingBook } = useQuery({
     queryKey:
@@ -80,10 +84,14 @@ const BookViewPage = () => {
         {Object.entries(bookShelfDisplayMap).map(([status, title]) => (
           <AddBookButton
             key={status}
-            status={status}
+            shelfName={status}
             title={title}
             userID={user.uid}
             bookID={bookID}
+            isInShelf={
+              inBookshelves !== undefined && inBookshelves.includes(status)
+            }
+            isLoadingInBookshelves={isLoadingInBookshelves}
           />
         ))}
       </View>
