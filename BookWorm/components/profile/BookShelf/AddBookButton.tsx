@@ -1,10 +1,10 @@
 import React from "react";
 import { Button, StyleSheet, View } from "react-native";
-import { type ServerBookShelfName } from "../../enums/Enums";
+import { type ServerBookShelfName } from "../../../enums/Enums";
 import {
   useAddBookToShelf,
   useRemoveBookFromShelf,
-} from "./hooks/bookshelfQueries";
+} from "../hooks/bookshelfQueries";
 
 interface AddBookButtonProps {
   serverShelfName: string;

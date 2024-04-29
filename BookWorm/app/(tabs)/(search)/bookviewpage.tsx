@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import RenderHtml from "react-native-render-html";
 import { useAuth } from "../../../components/auth/context";
-import AddBookButton from "../../../components/profile/AddBookButton";
+import AddBookButton from "../../../components/profile/BookShelf/AddBookButton";
 import { useGetShelvesForBook } from "../../../components/profile/hooks/bookshelfQueries";
 import {
   bookShelfDisplayMap,

@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ProfileBookShelves from "./ProfileBookShelves";
+import ProfileBookShelves from "./BookShelf/ProfileBookShelves";
+import ViewData from "./Data/ViewData";
 
 const ProfileTabSelector = () => {
   const [searchType, setSearchType] = useState("shelf"); // Default to book search
@@ -64,7 +65,7 @@ const ProfileTabSelector = () => {
             {
               left: underlinePosition.interpolate({
                 inputRange: [0, 1, 2],
-                outputRange: ["0%", "33%", "66%"],
+                outputRange: ["0%", "33.33%", "66.66%"],
               }),
             },
           ]}
@@ -77,7 +78,7 @@ const ProfileTabSelector = () => {
       ) : searchType === "post" ? (
         <Text>PUT THE POSTS HERE</Text>
       ) : (
-        <Text>PUT THE DATA HERE</Text>
+        <ViewData></ViewData>
       )}
     </View>
   );
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     paddingVertical: 10,
-    width: "33%",
+    width: "33.33%",
   },
   buttonText: {
     fontSize: 15,
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     height: 2,
-    width: "33%",
+    width: "33.33%",
     backgroundColor: "#FB6D0B",
   },
 });

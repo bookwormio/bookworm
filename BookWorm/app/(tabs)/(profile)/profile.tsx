@@ -178,19 +178,6 @@ const Profile = () => {
           }}
         >
           <Text style={styles.buttonText}>{"Add Entry"}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            if (user != null) {
-              router.push({ pathname: "ViewData" });
-            } else {
-              console.error("User DNE");
-            }
-          }}
-        >
-          <Text style={styles.buttonText}>{"View Data"}</Text>
-        </TouchableOpacity>
       </View> */}
       <ProfileTabSelector></ProfileTabSelector>
     </ScrollView>

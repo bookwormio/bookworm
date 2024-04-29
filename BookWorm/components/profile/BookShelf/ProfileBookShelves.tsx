@@ -1,9 +1,9 @@
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { type ServerBookShelfName } from "../../enums/Enums";
-import { useAuth } from "../auth/context";
-import BookShelf from "./BookShelf/BookShelf";
-import { useGetBooksForBookshelves } from "./hooks/bookshelfQueries";
+import { type ServerBookShelfName } from "../../../enums/Enums";
+import { useAuth } from "../../auth/context";
+import { useGetBooksForBookshelves } from "../hooks/bookshelfQueries";
+import BookShelf from "./BookShelf";
 
 const ProfileBookShelves = () => {
   const { user } = useAuth();

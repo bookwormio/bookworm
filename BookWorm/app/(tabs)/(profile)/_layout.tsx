@@ -13,7 +13,6 @@ const ProfileLayout = () => {
         }}
       />
       <Stack.Screen name="AddData" options={{ headerShown: false }} />
-      <Stack.Screen name="ViewData" options={{ headerShown: false }} />
     </Stack>
   );
 };

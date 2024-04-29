@@ -8,8 +8,6 @@ import {
   View,
 } from "react-native";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { useAuth } from "../../../components/auth/context";
-import ViewDataChart from "../../../components/chart/ViewDataChart";
 import {
   fetchPagesReadData,
   fetchTimeReadData,
@@ -18,6 +16,8 @@ import {
   type LineDataPointModel,
   type WeekDataPointModel,
 } from "../../../types";
+import { useAuth } from "../../auth/context";
+import ViewDataChart from "../../chart/ViewDataChart";
 
 // TODO: Combine these functions into a single generic
 function aggregatePagesDataByWeek(
@@ -127,15 +127,15 @@ const ViewData = () => {
 
   if (isLoadingPagesData || isLoadingTimeData) {
     return (
-      <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#000000" />
+      <View style={styles.container}>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
 
   if (isErrorPages || isErrorTime) {
     return (
-      <View style={styles.loading}>
+      <View style={styles.container}>
         <Text>Error loading data</Text>
       </View>
     );
@@ -218,5 +218,11 @@ const styles = StyleSheet.create({
   locText: {
     paddingLeft: 20,
     paddingBottom: 20,
+  },
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
   },
 });
