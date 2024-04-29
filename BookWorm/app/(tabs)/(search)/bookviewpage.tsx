@@ -10,12 +10,23 @@ import {
   useWindowDimensions,
 } from "react-native";
 import RenderHtml from "react-native-render-html";
+import { useAuth } from "../../../components/auth/context";
+import AddBookButton from "../../../components/profile/BookShelf/AddBookButton";
+import { useGetShelvesForBook } from "../../../components/profile/hooks/bookshelfQueries";
+import {
+  bookShelfDisplayMap,
+  type ServerBookShelfName,
+} from "../../../enums/Enums";
 import { fetchBookByVolumeID } from "../../../services/firebase-services/queries";
 import { type BookVolumeInfo } from "../../../types";
 
 const BookViewPage = () => {
+  const { user } = useAuth();
   const [bookData, setBookData] = useState<BookVolumeInfo | null>(null);
   const { bookID } = useLocalSearchParams<{ bookID: string }>();
+
+  const { data: inBookshelves, isLoading: isLoadingInBookshelves } =
+    useGetShelvesForBook(user?.uid ?? "", bookID ?? "");
 
   const { data: queryBookData, isLoading: isLoadingBook } = useQuery({
     queryKey:
@@ -48,6 +59,14 @@ const BookViewPage = () => {
     );
   }
 
+  if (bookID == null || user == null) {
+    return (
+      <View style={styles.container}>
+        <Text>Error: Book ID or user is not available</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       style={styles.scrollContainer}
@@ -64,6 +83,24 @@ const BookViewPage = () => {
       </View>
       <Text style={styles.title}>{bookData.title}</Text>
       <Text style={styles.author}>Author: {bookData.authors?.join(", ")}</Text>
+      <View>
+        {Object.entries(bookShelfDisplayMap).map(
+          ([serverShelfName, displayTitle]) => (
+            <AddBookButton
+              key={serverShelfName}
+              serverShelfName={serverShelfName}
+              title={displayTitle}
+              userID={user.uid}
+              bookID={bookID}
+              isInShelf={
+                inBookshelves !== undefined &&
+                inBookshelves.includes(serverShelfName as ServerBookShelfName)
+              }
+              isLoadingInBookshelves={isLoadingInBookshelves}
+            />
+          ),
+        )}
+      </View>
 
       {bookData.description !== null && (
         <Text style={styles.description}>

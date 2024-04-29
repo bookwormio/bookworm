@@ -5,12 +5,14 @@ import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
+import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
 import {
   fetchUserData,
   getNumberOfFollowersByUserID,
@@ -112,7 +114,7 @@ const Profile = () => {
   }
 
   return (
-    <View>
+    <ScrollView style={styles.scrollContainer}>
       <View style={styles.imageTextContainer}>
         <View style={styles.defaultImageContainer}>
           {
@@ -164,7 +166,7 @@ const Profile = () => {
           <Text style={styles.buttonText}>{"Log Out"}</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.outerButtonsContainer}>
+      {/* <View style={styles.outerButtonsContainer}>
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
@@ -176,27 +178,19 @@ const Profile = () => {
           }}
         >
           <Text style={styles.buttonText}>{"Add Entry"}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            if (user != null) {
-              router.push({ pathname: "ViewData" });
-            } else {
-              console.error("User DNE");
-            }
-          }}
-        >
-          <Text style={styles.buttonText}>{"View Data"}</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+      </View> */}
+      <ProfileTabSelector></ProfileTabSelector>
+    </ScrollView>
   );
 };
 
 export default Profile;
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    height: "100%",
+  },
   outerButtonsContainer: {
     flexDirection: "row",
     justifyContent: "center",

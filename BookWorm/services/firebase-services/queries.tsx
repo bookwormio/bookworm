@@ -5,6 +5,7 @@ import {
   addDoc,
   and,
   collection,
+  deleteDoc,
   doc,
   getCountFromServer,
   getDoc,
@@ -25,9 +26,10 @@ import {
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import React from "react";
 import { BLURHASH, BOOKS_API_KEY } from "../../constants/constants";
-import { ServerFollowStatus } from "../../enums/Enums";
+import { ServerBookShelfName, ServerFollowStatus } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
+  type BookShelfBookModel,
   type BookVolumeInfo,
   type BookVolumeItem,
   type BooksResponse,
@@ -36,6 +38,7 @@ import {
   type CreateTrackingModel,
   type LineDataPointModel,
   type PostModel,
+  type UserBookShelvesModel,
   type UserDataModel,
   type UserModel,
   type UserSearchDisplayModel,
@@ -961,4 +964,190 @@ export async function getNumberOfFollowingByUserID(
   );
   const followingSnapshot = await getCountFromServer(followingQuery);
   return followingSnapshot.data().count;
+}
+
+/**
+ * Adds a book to the user's bookshelf.
+ * @param {string} userID - The ID of the user.
+ * @param {string} bookID - The ID of the book to be added.
+ * @param {string} bookshelfName - The name of the bookshelf where the book will be added.
+ * @returns {Promise<{ success: boolean; book?: BookShelfBookModel }>} A promise that resolves with an object containing the success status and, if successful, the book information.
+ * @throws {Error} Throws an error if user ID is null or book ID is undefined.
+ */
+export async function addBookToUserBookshelf(
+  userID: string,
+  bookID: string,
+  bookshelfName: string,
+): Promise<{ success: boolean; book?: BookShelfBookModel }> {
+  try {
+    const userDocRef = doc(collection(DB, "bookshelf_collection"), userID);
+    const bookshelfRef = doc(collection(userDocRef, bookshelfName), bookID);
+
+    // Add the book document with the bookID as its ID and created timestamp field
+    await setDoc(bookshelfRef, {
+      created: serverTimestamp(),
+    });
+
+    // Fetch the book data after adding it to the user's bookshelf
+    const bookSnapshot = await getDoc(bookshelfRef);
+    if (bookSnapshot.exists()) {
+      const bookData = bookSnapshot.data();
+      const book: BookShelfBookModel = {
+        id: bookSnapshot.id,
+        created: bookData.created,
+      };
+
+      return { success: true, book };
+    } else {
+      console.error("Failed to fetch book data after adding to bookshelf.");
+      return { success: false };
+    }
+  } catch (error) {
+    console.error("Error adding book to user bookshelf:", error);
+    return { success: false };
+  }
+}
+
+/**
+ * Removes a book from a specified bookshelf for a user.
+ *
+ * @param {string} userID The ID of the user.
+ * @param {string} bookID The ID of the book to remove.
+ * @param {string} bookshelfName The name of the bookshelf from which the book will be removed.
+ * @returns {Promise<boolean>} A promise that resolves to true if the book was successfully removed, otherwise false.
+ */
+export async function removeBookFromUserBookshelf(
+  userID: string,
+  bookID: string,
+  bookshelfName: string,
+): Promise<boolean> {
+  try {
+    const bookshelfRef = doc(
+      collection(DB, "bookshelf_collection", userID, bookshelfName),
+      bookID,
+    );
+    await deleteDoc(bookshelfRef);
+    return true;
+  } catch (error) {
+    console.error("Error removing book from user bookshelf:", error);
+    return false;
+  }
+}
+
+/**
+ * Fetches books from specified bookshelves for a user and organizes them by shelf.
+ *
+ * @param {string} userID - The user's ID.
+ * @param {string[]} shelves - List of shelf names to retrieve books from.
+ * @returns {Promise<UserBookShelvesModel | null>} - A promise that resolves to a map of shelves with their corresponding books or null if an error occurs.
+ */
+export async function getBooksFromUserBookShelves(
+  userID: string,
+  shelves: string[],
+): Promise<UserBookShelvesModel | null> {
+  try {
+    const userBookShelves: UserBookShelvesModel = {};
+
+    for (const shelf of shelves) {
+      const bookshelfQuery = query(
+        collection(DB, "bookshelf_collection", userID, shelf),
+        orderBy("created", "desc"),
+      );
+
+      const bookshelfSnapshot = await getDocs(bookshelfQuery);
+      userBookShelves[shelf] = [];
+      bookshelfSnapshot.forEach((doc) => {
+        const bookData = doc.data();
+        userBookShelves[shelf].push({
+          id: doc.id,
+          created: bookData.created,
+        });
+      });
+    }
+
+    return userBookShelves;
+  } catch (error) {
+    console.error("Error retrieving books from user bookshelves:", error);
+    return null;
+  }
+}
+
+/**
+ * Retrieves the shelves containing a specific book for a given user.
+ * @param {string} userID - The user's ID.
+ * @param {string} bookID - The book's ID.
+ * @returns {Promise<ServerBookShelfName[]>} An array of shelf names containing the book.
+ * @throws {Error} If an error occurs during the retrieval process.
+ */
+export async function getShelvesContainingBook(
+  userID: string,
+  bookID: string,
+): Promise<ServerBookShelfName[]> {
+  const shelves: ServerBookShelfName[] = [
+    ServerBookShelfName.CURRENTLY_READING,
+    ServerBookShelfName.WANT_TO_READ,
+    ServerBookShelfName.FINISHED,
+    ServerBookShelfName.LENDING_LIBRARY,
+  ];
+  const shelvesContainingBook: ServerBookShelfName[] = [];
+
+  try {
+    for (const shelf of shelves) {
+      const bookRef = doc(DB, "bookshelf_collection", userID, shelf, bookID);
+      const bookSnap = await getDoc(bookRef);
+
+      if (bookSnap.exists()) {
+        shelvesContainingBook.push(shelf);
+      }
+    }
+
+    return shelvesContainingBook;
+  } catch (e) {
+    console.error("Failed to check shelves for book:", e);
+    return [];
+  }
+}
+
+/**
+ * Fetches book information for a list of book volume IDs using Google Books API.
+ *
+ * @param {string[]} volumeIDs An array of volume IDs for which to retrieve book information.
+ * @returns {Promise<BookVolumeInfo[]>} A promise that resolves to an array of book volume information, or an empty array if no valid IDs are provided or an error occurs.
+ */
+export async function getBooksByBookIDs(
+  volumeIDs: string[],
+): Promise<BookVolumeInfo[]> {
+  // Filter out empty volume IDs
+  const validVolumeIDs = volumeIDs.filter((id) => id.trim() !== "");
+
+  // If there are no valid volume IDs, return an empty array
+  if (validVolumeIDs.length === 0) {
+    return [];
+  }
+
+  try {
+    // Create an array to store promises for each request
+    const requests = validVolumeIDs.map(
+      async (volumeID: string) =>
+        await axios.get<{
+          volumeInfo: BookVolumeInfo;
+        }>("https://www.googleapis.com/books/v1/volumes/" + volumeID, {
+          params: {
+            key: BOOKS_API_KEY,
+            projection: "lite",
+          },
+        }),
+    );
+
+    // Use Promise.all to execute all requests in parallel
+    const responses = await Promise.all(requests);
+
+    // Extract volume info from each response
+    const volumeInfos = responses.map((response) => response.data.volumeInfo);
+
+    return volumeInfos;
+  } catch (error) {
+    console.error("Error fetching books by volume IDs", error);
+    return [];
+  }
 }
