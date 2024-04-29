@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Button,
   FlatList,
@@ -11,9 +11,9 @@ import {
   bookShelfDisplayMap,
   type ServerBookShelfName,
 } from "../../../enums/Enums";
-import { removeBookFromUserBookshelf } from "../../../services/firebase-services/queries";
 import { type BookShelfBookModel } from "../../../types";
 import { useAuth } from "../../auth/context";
+import { useRemoveBookFromShelf } from "../hooks/bookshelfQueries";
 import BookShelfBook from "./BookShelfBook";
 
 interface BookShelfProps {
@@ -21,47 +21,31 @@ interface BookShelfProps {
   books: BookShelfBookModel[];
 }
 
-const BookShelf = ({ shelfName, books: initialBooks }: BookShelfProps) => {
+const BookShelf = ({ shelfName, books }: BookShelfProps) => {
   const { user } = useAuth();
-  // TODO: clean this up
-  // stateful var should be moved to the parent component
-  const [books, setBooks] = useState<BookShelfBookModel[]>(initialBooks);
 
-  const removeBookFromShelf = async (bookID: string) => {
-    if (user !== null && bookID !== undefined) {
-      try {
-        const success = await removeBookFromUserBookshelf(
-          user.uid,
-          bookID,
-          shelfName,
-        );
-        if (success) {
-          // TODO: modify display to show that the book was added
-          // TODO: remove console logs
-          console.log("SUCCESS, removed from shelf", shelfName);
-          // remove book from books with bookID
-          setBooks((prevBooks) =>
-            prevBooks.filter((book) => book.id !== bookID),
-          );
-        } else {
-          console.log("Failed to add the book to the bookshelf");
-        }
-      } catch (error) {
-        console.error("An error occurred:", error);
-      }
+  const { mutate: removeBook } = useRemoveBookFromShelf();
+
+  // Function to call the mutation
+  const handleRemoveBook = (bookID: string) => {
+    if (user != null && bookID != null) {
+      // Trigger the mutation with error handling
+      removeBook(
+        { userID: user.uid, bookID, shelfName },
+        {
+          onError: (error) => {
+            console.error("Failed to remove book:", error);
+            // Here you might want to trigger some user notification or logging
+          },
+        },
+      );
     } else {
       console.log("User or book ID is not available");
     }
   };
 
-  // TODO: clean this up: remove down the line
-  // Use optimistic UI update
-  useEffect(() => {
-    setBooks(initialBooks);
-  }, [initialBooks]);
+  const shelfNameDisplay = bookShelfDisplayMap[shelfName];
 
-  const shelfNameDisplay =
-    bookShelfDisplayMap[shelfName as ServerBookShelfName];
   return (
     <View style={styles.list}>
       <View style={styles.heading}>
@@ -73,13 +57,12 @@ const BookShelf = ({ shelfName, books: initialBooks }: BookShelfProps) => {
         scrollEventThrottle={1}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
-        style={styles.flatList} // Added style for the FlatList
+        style={styles.flatList}
         data={books}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View>
             <TouchableOpacity>
-              {/* Ensure volumeInfo is available before rendering the component */}
               {item.volumeInfo != null && (
                 <BookShelfBook book={item.volumeInfo} />
               )}
@@ -87,20 +70,15 @@ const BookShelf = ({ shelfName, books: initialBooks }: BookShelfProps) => {
             {/* TODO: make this look better with minus sign button */}
             <Button
               onPress={() => {
-                void (async () => {
-                  try {
-                    await removeBookFromShelf(item.id);
-                  } catch (error) {
-                    console.error("Failed to process the request:", error);
-                  }
-                })();
+                handleRemoveBook(item.id);
               }}
               title="Remove from shelf"
+              // TODO: ADD THIS disabled={isRemoving}
             />
           </View>
         )}
         ListEmptyComponent={() => (
-          <Text style={styles.emptyShelfText}>No books available</Text> // Optional: Display when no books are available
+          <Text style={styles.emptyShelfText}>No books available</Text>
         )}
       />
     </View>

@@ -29,6 +29,7 @@ import { BLURHASH, BOOKS_API_KEY } from "../../constants/constants";
 import { ServerFollowStatus } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
+  type BookShelfBookModel,
   type BookVolumeInfo,
   type BookVolumeItem,
   type BooksResponse,
@@ -966,23 +967,20 @@ export async function getNumberOfFollowingByUserID(
 }
 
 /**
- * Adds a book to a specified bookshelf for a user.
- *
- * @param {string} userID The ID of the user.
- * @param {string} bookID The ID of the book to add.
- * @param {string} bookshelfName The name of the bookshelf to which the book will be added.
- * @returns {Promise<boolean>} A promise that resolves to true if the book was successfully added, otherwise false.
+ * Adds a book to the user's bookshelf.
+ * @param {string} userID - The ID of the user.
+ * @param {string} bookID - The ID of the book to be added.
+ * @param {string} bookshelfName - The name of the bookshelf where the book will be added.
+ * @returns {Promise<{ success: boolean; book?: BookShelfBookModel }>} A promise that resolves with an object containing the success status and, if successful, the book information.
+ * @throws {Error} Throws an error if user ID is null or book ID is undefined.
  */
 export async function addBookToUserBookshelf(
   userID: string,
   bookID: string,
   bookshelfName: string,
-): Promise<boolean> {
+): Promise<{ success: boolean; book?: BookShelfBookModel }> {
   try {
-    // Reference to the user's document
     const userDocRef = doc(collection(DB, "bookshelf_collection"), userID);
-
-    // Reference to the subcollection based on bookshelfName
     const bookshelfRef = doc(collection(userDocRef, bookshelfName), bookID);
 
     // Add the book document with the bookID as its ID and created timestamp field
@@ -990,10 +988,23 @@ export async function addBookToUserBookshelf(
       created: serverTimestamp(),
     });
 
-    return true; // Successfully added the book to the user's bookshelf
+    // Fetch the book data after adding it to the user's bookshelf
+    const bookSnapshot = await getDoc(bookshelfRef);
+    if (bookSnapshot.exists()) {
+      const bookData = bookSnapshot.data();
+      const book: BookShelfBookModel = {
+        id: bookSnapshot.id,
+        created: bookData.created,
+      };
+
+      return { success: true, book };
+    } else {
+      console.error("Failed to fetch book data after adding to bookshelf.");
+      return { success: false };
+    }
   } catch (error) {
     console.error("Error adding book to user bookshelf:", error);
-    return false; // Failed to add the book to the user's bookshelf
+    return { success: false };
   }
 }
 

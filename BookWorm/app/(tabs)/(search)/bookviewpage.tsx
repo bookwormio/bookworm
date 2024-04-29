@@ -3,7 +3,6 @@ import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  Button,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,14 +11,9 @@ import {
 } from "react-native";
 import RenderHtml from "react-native-render-html";
 import { useAuth } from "../../../components/auth/context";
-import {
-  bookShelfDisplayMap,
-  type ServerBookShelfName,
-} from "../../../enums/Enums";
-import {
-  addBookToUserBookshelf,
-  fetchBookByVolumeID,
-} from "../../../services/firebase-services/queries";
+import AddBookButton from "../../../components/profile/AddBookButton";
+import { bookShelfDisplayMap } from "../../../enums/Enums";
+import { fetchBookByVolumeID } from "../../../services/firebase-services/queries";
 import { type BookVolumeInfo } from "../../../types";
 
 const BookViewPage = () => {
@@ -58,28 +52,13 @@ const BookViewPage = () => {
     );
   }
 
-  const addToBookshelf = async (bookshelfName: ServerBookShelfName) => {
-    if (user !== null && bookID !== undefined) {
-      try {
-        const success = await addBookToUserBookshelf(
-          user.uid,
-          bookID,
-          bookshelfName,
-        );
-        if (success) {
-          // TODO: modify display to show that the book was added
-          // TODO: remove console logs
-          console.log("SUCCESS. Added to ", bookshelfName);
-        } else {
-          console.log("Failed to add the book to the bookshelf");
-        }
-      } catch (error) {
-        console.error("An error occurred:", error);
-      }
-    } else {
-      console.log("User or book ID is not available");
-    }
-  };
+  if (bookID == null || user == null) {
+    return (
+      <View style={styles.container}>
+        <Text>Error: Book ID or user is not available</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView
@@ -97,18 +76,14 @@ const BookViewPage = () => {
       </View>
       <Text style={styles.title}>{bookData.title}</Text>
       <Text style={styles.author}>Author: {bookData.authors?.join(", ")}</Text>
-      {/* TODO break this into a separate component */}
-      {/* This gives a button for every bookshelf to add the book to */}
       <View>
         {Object.entries(bookShelfDisplayMap).map(([status, title]) => (
-          <Button
+          <AddBookButton
             key={status}
-            onPress={() => {
-              void (async () => {
-                await addToBookshelf(status as ServerBookShelfName);
-              })();
-            }}
-            title={`Add to ${title}`}
+            status={status}
+            title={title}
+            userID={user.uid}
+            bookID={bookID}
           />
         ))}
       </View>
