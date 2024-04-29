@@ -8,8 +8,8 @@ import {
   View,
 } from "react-native";
 import {
-  bookStatusDisplayMap,
-  type ServerBookStatus,
+  bookShelfDisplayMap,
+  type ServerBookShelfName,
 } from "../../../enums/Enums";
 import { removeBookFromUserBookshelf } from "../../../services/firebase-services/queries";
 import { type BookShelfBookModel } from "../../../types";
@@ -17,7 +17,7 @@ import { useAuth } from "../../auth/context";
 import BookShelfBook from "./BookShelfBook";
 
 interface BookShelfProps {
-  shelfName: ServerBookStatus;
+  shelfName: ServerBookShelfName;
   books: BookShelfBookModel[];
 }
 
@@ -60,7 +60,8 @@ const BookShelf = ({ shelfName, books: initialBooks }: BookShelfProps) => {
     setBooks(initialBooks);
   }, [initialBooks]);
 
-  const shelfNameDisplay = bookStatusDisplayMap[shelfName as ServerBookStatus];
+  const shelfNameDisplay =
+    bookShelfDisplayMap[shelfName as ServerBookShelfName];
   return (
     <View style={styles.list}>
       <View style={styles.heading}>

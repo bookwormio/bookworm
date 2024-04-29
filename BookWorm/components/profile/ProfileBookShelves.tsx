@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { ServerBookStatus } from "../../enums/Enums";
+import { ServerBookShelfName } from "../../enums/Enums";
 import {
   getBooksByBookIDs,
   getBooksFromUserBookShelves,
@@ -13,7 +13,7 @@ const ProfileBookShelves = () => {
   const { user } = useAuth();
   // Initialize the bookShelves state with all shelves empty
   const initialShelves: UserBookShelvesModel = Object.values(
-    ServerBookStatus,
+    ServerBookShelfName,
   ).reduce<UserBookShelvesModel>((acc, cur) => {
     acc[cur] = [];
     return acc;
@@ -28,7 +28,7 @@ const ProfileBookShelves = () => {
     if (user !== null) {
       try {
         // Dynamically generate the list of shelf types
-        const shelfTypes = Object.values(ServerBookStatus);
+        const shelfTypes = Object.values(ServerBookShelfName);
         const userBooks = await getBooksFromUserBookShelves(
           user.uid,
           shelfTypes,
@@ -83,7 +83,7 @@ const ProfileBookShelves = () => {
       {Object.entries(bookShelves).map(([shelfName, books]) => (
         <BookShelf
           key={shelfName}
-          shelfName={shelfName as ServerBookStatus}
+          shelfName={shelfName as ServerBookShelfName}
           books={books}
         />
       ))}

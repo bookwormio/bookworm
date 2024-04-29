@@ -13,8 +13,8 @@ import {
 import RenderHtml from "react-native-render-html";
 import { useAuth } from "../../../components/auth/context";
 import {
-  bookStatusDisplayMap,
-  type ServerBookStatus,
+  bookShelfDisplayMap,
+  type ServerBookShelfName,
 } from "../../../enums/Enums";
 import {
   addBookToUserBookshelf,
@@ -58,7 +58,7 @@ const BookViewPage = () => {
     );
   }
 
-  const addToBookshelf = async (bookshelfName: ServerBookStatus) => {
+  const addToBookshelf = async (bookshelfName: ServerBookShelfName) => {
     if (user !== null && bookID !== undefined) {
       try {
         const success = await addBookToUserBookshelf(
@@ -100,12 +100,12 @@ const BookViewPage = () => {
       {/* TODO break this into a separate component */}
       {/* This gives a button for every bookshelf to add the book to */}
       <View>
-        {Object.entries(bookStatusDisplayMap).map(([status, title]) => (
+        {Object.entries(bookShelfDisplayMap).map(([status, title]) => (
           <Button
             key={status}
             onPress={() => {
               void (async () => {
-                await addToBookshelf(status as ServerBookStatus);
+                await addToBookshelf(status as ServerBookShelfName);
               })();
             }}
             title={`Add to ${title}`}
