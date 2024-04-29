@@ -10,6 +10,15 @@ import {
 } from "../../../services/firebase-services/queries";
 import { type UserBookShelvesModel } from "../../../types";
 
+/**
+ * Custom hook to fetch books for the user's bookshelves.
+ * @param {string} userID - The user's ID.
+ * @returns {UseQueryResult} - The result of the query.
+ *
+ * @example
+ * const { data: bookShelves, isLoading, isError, error } = useGetBooksForBookshelves(userID);
+ * // bookShelves is of type UserBookShelvesModel
+ */
 export const useGetBooksForBookshelves = (userID: string) => {
   return useQuery({
     queryKey: ["bookshelves", userID],
@@ -42,6 +51,19 @@ export const useGetBooksForBookshelves = (userID: string) => {
   });
 };
 
+/**
+ * Custom hook to add a book to a user's bookshelf.
+ * @returns {UseMutationResult} - The result of the mutation.
+ *
+ * @example
+ * const { mutate: addBook, isPending: isAdding } = useAddBookToShelf();
+ * // Invoke the mutation:
+ * addBook({
+ *  userID,
+ *  bookID,
+ *  shelfName: shelfName as ServerBookShelfName,
+ * });
+ */
 export const useAddBookToShelf = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -60,9 +82,8 @@ export const useAddBookToShelf = () => {
       return await addBookToUserBookshelf(userID, bookID, shelfName);
     },
 
+    // Only update cache once addBookToUserBookshelf is successful
     onSuccess: async (data, { userID, bookID, shelfName }) => {
-      console.log("Book added successfully");
-
       // Access the returned book data
       const { success, book } = data;
 
@@ -70,6 +91,7 @@ export const useAddBookToShelf = () => {
         const volumeInfo = await fetchBookByVolumeID(book.id);
         // Update the query data with the new book information
         if (volumeInfo != null) {
+          // Update the bookshelves with the new book and volume info
           queryClient.setQueryData<UserBookShelvesModel>(
             userID != null ? ["bookshelves", userID] : ["bookshelves"],
             (prevData) => {
@@ -87,9 +109,9 @@ export const useAddBookToShelf = () => {
                 );
                 if (existingBookIndex === -1) {
                   // If the book doesn't exist, add it to the shelf with volume info
-                  newData[shelfName] = [{ ...book, volumeInfo }, ...shelf]; // Push the new book to the top
+                  newData[shelfName] = [{ ...book, volumeInfo }, ...shelf]; // Push the new book to the TOP of the shelf
                 } else {
-                  // If the book already exists, update its data with volume info
+                  // If the book already exists, update its data with new volume info
                   newData[shelfName][existingBookIndex] = {
                     ...book,
                     volumeInfo,
@@ -103,9 +125,12 @@ export const useAddBookToShelf = () => {
               return newData;
             },
           );
+
+          // Update the list of shelves containing the book
           queryClient.setQueryData<string[]>(
             ["shelvesContainingBook", userID, bookID],
             (old) => {
+              // Add the shelf to the list of shelves containing the book
               const newShelves = new Set<string>(old ?? []);
               newShelves.add(shelfName);
               return Array.from(newShelves);
@@ -120,6 +145,19 @@ export const useAddBookToShelf = () => {
   });
 };
 
+/**
+ * Custom hook to remove a book from a user's bookshelf.
+ * @returns {UseMutationResult} - The result of the mutation.
+ *
+ * @example
+ * const { mutate: removeBook, isPending: isRemoving } = useRemoveBookFromShelf();
+ * // Invoke the mutation:
+ * removeBook({
+ * userID,
+ * bookID,
+ * shelfName: shelfName as ServerBookShelfName,
+ * });
+ */
 export const useRemoveBookFromShelf = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -137,17 +175,18 @@ export const useRemoveBookFromShelf = () => {
       }
       return await removeBookFromUserBookshelf(userID, bookID, shelfName);
     },
+    // This happens before the mutation is sent to the server
     onMutate: async ({ userID, bookID, shelfName }) => {
-      // Cancel any outgoing refetches (so they don't overwrite the optimistic update)
+      // Cancel any outgoing refetches for bookshelves (so they don't overwrite the optimistic update)
       await queryClient.cancelQueries({ queryKey: ["bookshelves", userID] });
 
-      // Snapshot the previous value
+      // Snapshot the previous bookshelves
       const previousShelves = queryClient.getQueryData<UserBookShelvesModel>([
         "bookshelves",
         userID,
       ]);
 
-      // Optimistically update to the new value
+      // Optimistically remove the book from the shelf
       if (previousShelves?.[shelfName] != null) {
         queryClient.setQueryData<UserBookShelvesModel>(
           ["bookshelves", userID],
@@ -160,11 +199,18 @@ export const useRemoveBookFromShelf = () => {
         );
       }
 
+      // Cancel any outgoing refetches for shelves containing the book
+      await queryClient.cancelQueries({
+        queryKey: ["shelvesContainingBook", userID, bookID],
+      });
+
+      // Snapshot the previous shelves containing the book
       const previousShelvesContainingBook = queryClient.getQueryData<string[]>([
         "shelvesContainingBook",
         userID,
         bookID,
       ]);
+      // Remove the book from the list of shelves containing the book
       if (previousShelvesContainingBook != null) {
         queryClient.setQueryData<string[]>(
           ["shelvesContainingBook", userID, bookID],
@@ -177,15 +223,20 @@ export const useRemoveBookFromShelf = () => {
     onError: (error, variables, context) => {
       console.error("An error occurred:", error);
       // Revert the changes if the mutation fails
+      // Revert the bookshelves
       if (context?.previousShelves != null) {
         queryClient.setQueryData(
           ["bookshelves", variables.userID],
           context.previousShelves,
         );
       }
-    },
-    onSuccess: (_, { userID, bookID, shelfName }) => {
-      console.log("Book removed successfully");
+      // Revert the shelves containing the book
+      if (context?.previousShelvesContainingBook != null) {
+        queryClient.setQueryData(
+          ["shelvesContainingBook", variables.userID, variables.bookID],
+          context.previousShelvesContainingBook,
+        );
+      }
     },
   });
 };
@@ -194,6 +245,11 @@ export const useRemoveBookFromShelf = () => {
  * Custom hook to fetch the shelves that contain a specific book for a given user.
  * @param {string} userID - The user's ID.
  * @param {string} bookID - The book's ID.
+ * @returns {UseQueryResult} - The result of the query.
+ *
+ * @example
+ * const { data: inBookshelves, isLoading: isLoadingInBookshelves } = useGetShelvesForBook(userID, bookID);
+ *  // inBookshelves is of type ServerBookShelfName[]
  */
 export const useGetShelvesForBook = (userID: string, bookID: string) => {
   return useQuery({

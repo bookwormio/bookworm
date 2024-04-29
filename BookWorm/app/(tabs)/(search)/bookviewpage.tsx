@@ -13,7 +13,10 @@ import RenderHtml from "react-native-render-html";
 import { useAuth } from "../../../components/auth/context";
 import AddBookButton from "../../../components/profile/AddBookButton";
 import { useGetShelvesForBook } from "../../../components/profile/hooks/bookshelfQueries";
-import { bookShelfDisplayMap } from "../../../enums/Enums";
+import {
+  bookShelfDisplayMap,
+  type ServerBookShelfName,
+} from "../../../enums/Enums";
 import { fetchBookByVolumeID } from "../../../services/firebase-services/queries";
 import { type BookVolumeInfo } from "../../../types";
 
@@ -81,19 +84,22 @@ const BookViewPage = () => {
       <Text style={styles.title}>{bookData.title}</Text>
       <Text style={styles.author}>Author: {bookData.authors?.join(", ")}</Text>
       <View>
-        {Object.entries(bookShelfDisplayMap).map(([status, title]) => (
-          <AddBookButton
-            key={status}
-            shelfName={status}
-            title={title}
-            userID={user.uid}
-            bookID={bookID}
-            isInShelf={
-              inBookshelves !== undefined && inBookshelves.includes(status)
-            }
-            isLoadingInBookshelves={isLoadingInBookshelves}
-          />
-        ))}
+        {Object.entries(bookShelfDisplayMap).map(
+          ([serverShelfName, displayTitle]) => (
+            <AddBookButton
+              key={serverShelfName}
+              serverShelfName={serverShelfName}
+              title={displayTitle}
+              userID={user.uid}
+              bookID={bookID}
+              isInShelf={
+                inBookshelves !== undefined &&
+                inBookshelves.includes(serverShelfName as ServerBookShelfName)
+              }
+              isLoadingInBookshelves={isLoadingInBookshelves}
+            />
+          ),
+        )}
       </View>
 
       {bookData.description !== null && (

@@ -7,7 +7,7 @@ import {
 } from "./hooks/bookshelfQueries";
 
 interface AddBookButtonProps {
-  shelfName: string;
+  serverShelfName: string;
   title: string;
   userID: string;
   bookID: string;
@@ -16,7 +16,7 @@ interface AddBookButtonProps {
 }
 
 const AddBookButton = ({
-  shelfName,
+  serverShelfName,
   title,
   userID,
   bookID,
@@ -33,13 +33,13 @@ const AddBookButton = ({
         removeBook({
           userID,
           bookID,
-          shelfName: shelfName as ServerBookShelfName,
+          shelfName: serverShelfName as ServerBookShelfName,
         });
       } else {
         addBook({
           userID,
           bookID,
-          shelfName: shelfName as ServerBookShelfName,
+          shelfName: serverShelfName as ServerBookShelfName,
         });
       }
     }

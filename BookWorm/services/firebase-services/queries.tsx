@@ -1072,15 +1072,24 @@ export async function getBooksFromUserBookShelves(
   }
 }
 
-// make a function to get the shelves a book is in
-export async function getShelvesContainingBook(userID: string, bookID: string) {
+/**
+ * Retrieves the shelves containing a specific book for a given user.
+ * @param {string} userID - The user's ID.
+ * @param {string} bookID - The book's ID.
+ * @returns {Promise<ServerBookShelfName[]>} An array of shelf names containing the book.
+ * @throws {Error} If an error occurs during the retrieval process.
+ */
+export async function getShelvesContainingBook(
+  userID: string,
+  bookID: string,
+): Promise<ServerBookShelfName[]> {
   const shelves: ServerBookShelfName[] = [
     ServerBookShelfName.CURRENTLY_READING,
     ServerBookShelfName.WANT_TO_READ,
     ServerBookShelfName.FINISHED,
     ServerBookShelfName.LENDING_LIBRARY,
   ];
-  const shelvesContainingBook: string[] = [];
+  const shelvesContainingBook: ServerBookShelfName[] = [];
 
   try {
     for (const shelf of shelves) {
@@ -1092,7 +1101,6 @@ export async function getShelvesContainingBook(userID: string, bookID: string) {
       }
     }
 
-    console.log("Shelves containing the book: ", shelvesContainingBook);
     return shelvesContainingBook;
   } catch (e) {
     console.error("Failed to check shelves for book:", e);
