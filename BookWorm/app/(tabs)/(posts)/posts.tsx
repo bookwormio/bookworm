@@ -19,10 +19,8 @@ import {
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import Post from "../../../components/post/post";
-import {
-  emptyQuery,
-  fetchPostsForUserFeed,
-} from "../../../services/firebase-services/queries";
+import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQueries";
+import { emptyQuery } from "../../../services/util/queryUtils";
 import { type PostModel } from "../../../types";
 
 const Posts = () => {

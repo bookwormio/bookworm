@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import { fetchBooksByTitleSearch } from "../../services/firebase-services/queries";
+import { fetchBooksByTitleSearch } from "../../services/books-services/BookQueries";
 import { type FlatBookItemModel } from "../../types";
 
 // Stateful vars passed in by parent component

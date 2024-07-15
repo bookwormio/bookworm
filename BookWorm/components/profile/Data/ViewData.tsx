@@ -11,7 +11,7 @@ import {
 import {
   fetchPagesReadData,
   fetchTimeReadData,
-} from "../../../services/firebase-services/queries";
+} from "../../../services/firebase-services/DataQueries";
 import {
   type LineDataPointModel,
   type WeekDataPointModel,

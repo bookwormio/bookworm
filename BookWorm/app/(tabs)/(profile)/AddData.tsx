@@ -13,7 +13,7 @@ import RNPickerSelect from "react-native-picker-select";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import { HOURS, MINUTES } from "../../../constants/constants";
-import { addDataEntry } from "../../../services/firebase-services/queries";
+import { addDataEntry } from "../../../services/firebase-services/DataQueries";
 import { type CreateTrackingModel } from "../../../types";
 
 const AddData = () => {

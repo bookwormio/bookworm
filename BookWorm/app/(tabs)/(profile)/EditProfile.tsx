@@ -15,11 +15,11 @@ import {
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import {
-  emptyQuery,
   getUserProfileURL,
   newFetchUserInfo,
   updateUser,
-} from "../../../services/firebase-services/queries";
+} from "../../../services/firebase-services/userQueries";
+import { emptyQuery } from "../../../services/util/queryUtils";
 import { type UserDataModel } from "../../../types";
 
 const EditProfile = () => {

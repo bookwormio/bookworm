@@ -9,14 +9,16 @@ import {
   View,
 } from "react-native";
 import {
-  fetchFriendData,
   followUserByID,
   getIsFollowing,
+  unfollowUserByID,
+} from "../../services/firebase-services/FriendQueries";
+import {
+  fetchFriendData,
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
   getUserProfileURL,
-  unfollowUserByID,
-} from "../../services/firebase-services/queries";
+} from "../../services/firebase-services/userQueries";
 import { type ConnectionModel, type UserDataModel } from "../../types";
 import { useAuth } from "../auth/context";
 

@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ServerBookShelfName } from "../../../enums/Enums";
+import { fetchBookByVolumeID } from "../../../services/books-services/BookQueries";
 import {
   addBookToUserBookshelf,
-  fetchBookByVolumeID,
   getBooksByBookIDs,
   getBooksFromUserBookShelves,
   getShelvesContainingBook,
   removeBookFromUserBookshelf,
-} from "../../../services/firebase-services/queries";
+} from "../../../services/firebase-services/userQueries";
 import { type UserBookShelvesModel } from "../../../types";
 
 /**

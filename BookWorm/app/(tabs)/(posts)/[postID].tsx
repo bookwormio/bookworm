@@ -12,7 +12,7 @@ import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import Post from "../../../components/post/post";
 import { POSTS_ROUTE_PREFIX } from "../../../constants/constants";
-import { fetchPostByPostID } from "../../../services/firebase-services/queries";
+import { fetchPostByPostID } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
 
 const ViewPost = () => {

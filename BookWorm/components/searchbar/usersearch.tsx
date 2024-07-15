@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchUsersBySearch } from "../../services/firebase-services/queries";
+import { fetchUsersBySearch } from "../../services/firebase-services/userQueries";
 import { type UserSearchDisplayModel } from "../../types";
 import UserList from "../UserList/UserList";
 import SearchBar from "./searchbar";

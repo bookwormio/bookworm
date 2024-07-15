@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
-import { updateUser } from "../../services/firebase-services/queries";
+import { updateUser } from "../../services/firebase-services/userQueries";
 import { type UserDataModel } from "../../types";
 
 const MoreInfo = () => {

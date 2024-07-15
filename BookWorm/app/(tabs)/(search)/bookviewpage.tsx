@@ -17,7 +17,7 @@ import {
   bookShelfDisplayMap,
   type ServerBookShelfName,
 } from "../../../enums/Enums";
-import { fetchBookByVolumeID } from "../../../services/firebase-services/queries";
+import { fetchBookByVolumeID } from "../../../services/books-services/BookQueries";
 import { type BookVolumeInfo } from "../../../types";
 
 const BookViewPage = () => {

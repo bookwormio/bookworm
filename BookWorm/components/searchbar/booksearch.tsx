@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchBooksByTitleSearch } from "../../services/firebase-services/queries";
+import { fetchBooksByTitleSearch } from "../../services/books-services/BookQueries";
 import { type BookVolumeItem } from "../../types";
 import BookList from "../booklist/BookList";
 import SearchBar from "./searchbar";

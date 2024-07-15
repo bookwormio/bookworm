@@ -18,10 +18,9 @@ import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import BookDropdownSelect from "../../../components/bookselect/BookDropdownSelect";
 import { HOURS, MINUTES } from "../../../constants/constants";
-import {
-  addDataEntry,
-  createPost,
-} from "../../../services/firebase-services/queries";
+
+import { addDataEntry } from "../../../services/firebase-services/DataQueries";
+import { createPost } from "../../../services/firebase-services/PostQueries";
 import {
   type CreatePostModel,
   type CreateTrackingModel,
