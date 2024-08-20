@@ -1,6 +1,13 @@
+import { FontAwesome5 } from "@expo/vector-icons";
 import { type Timestamp } from "firebase/firestore";
 import React, { memo } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { DAYS_OF_WEEK, MONTHS_OF_YEAR } from "../../constants/constants";
 import { type PostModel } from "../../types";
 
@@ -51,6 +58,16 @@ const Post = memo(({ post, created, currentDate }: PostProps) => {
           ))}
         </ScrollView>
       )}
+      <View style={styles.buttonrow}>
+        <TouchableOpacity style={styles.likebutton}>
+          <FontAwesome5 name="heart" size={15} />
+        </TouchableOpacity>
+        <Text style={{ paddingRight: 10 }}>{post.likes.length} Likes</Text>
+        <TouchableOpacity style={styles.likebutton}>
+          <FontAwesome5 name="comment" size={15} />
+          <Text style={{ paddingLeft: 5 }}>Comments</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 });
@@ -74,5 +91,15 @@ const styles = StyleSheet.create({
   body: {
     fontSize: 13,
     paddingTop: 10,
+  },
+  buttonrow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: 10,
+  },
+  likebutton: {
+    flexDirection: "row",
+    paddingRight: 5,
+    alignItems: "center",
   },
 });

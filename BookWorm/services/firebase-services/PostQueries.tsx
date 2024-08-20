@@ -145,6 +145,7 @@ export async function fetchPostsByUserIDs(
             text: postDoc.data().text,
             user,
             images,
+            likes: postDoc.data().likes ?? [],
           };
           postsData.push(post);
         }
@@ -223,6 +224,7 @@ export async function fetchPostByPostID(
             text: postSnap.data().text,
             user,
             images,
+            likes: postSnap.data().likes ?? [],
           };
         }
       }

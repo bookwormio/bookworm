@@ -97,6 +97,7 @@ interface PostModel {
   text: string;
   user: UserModel;
   images: JSX.Element[];
+  likes: string[];
 }
 
 interface RelationshipModel {
