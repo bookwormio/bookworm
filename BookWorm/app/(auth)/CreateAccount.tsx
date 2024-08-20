@@ -74,6 +74,7 @@ const CreateAccount = () => {
             style={styles.input}
             value={password}
             secureTextEntry={true}
+            textContentType="oneTimeCode"
             placeholder="password"
             autoCapitalize="none"
             autoComplete="off"
@@ -85,6 +86,7 @@ const CreateAccount = () => {
             style={styles.input}
             value={confirmPassword}
             secureTextEntry={true}
+            textContentType="oneTimeCode"
             placeholder="confirm password"
             autoCapitalize="none"
             autoComplete="off"
