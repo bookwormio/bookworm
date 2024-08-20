@@ -29,6 +29,8 @@ interface UserDataModel {
   number: string;
   isPublic: boolean;
   bio: string;
+  city: string;
+  state: string;
   profilepic: string;
 }
 

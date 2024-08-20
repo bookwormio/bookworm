@@ -31,6 +31,8 @@ const EditProfile = () => {
   const [editFirst, setEditFirst] = useState("");
   const [editLast, setEditLast] = useState("");
   const [editBio, setEditBio] = useState("");
+  const [editCity, setEditCity] = useState("");
+  const [editState, setEditState] = useState("");
   const [image, setImage] = useState("");
 
   const queryClient = useQueryClient();
@@ -84,6 +86,12 @@ const EditProfile = () => {
       if (userDataTyped.bio !== undefined) {
         setEditBio(userDataTyped.bio);
       }
+      if (userDataTyped.city !== undefined) {
+        setEditCity(userDataTyped.city);
+      }
+      if (userDataTyped.state !== undefined) {
+        setEditState(userDataTyped.state);
+      }
     }
   }, [userData]);
 
@@ -112,6 +120,8 @@ const EditProfile = () => {
     newUserData.last = editLast;
     newUserData.number = editPhone;
     newUserData.bio = editBio;
+    newUserData.city = editCity;
+    newUserData.state = editState;
     if (image !== "" && image !== undefined && image !== null) {
       newUserData.profilepic = image;
     }
@@ -220,6 +230,30 @@ const EditProfile = () => {
               }}
             />
           </View>
+          <View>
+            <Text style={styles.regtext}>City</Text>
+            <TextInput
+              style={styles.input}
+              value={editCity}
+              placeholder={"city"}
+              autoCapitalize="none"
+              onChangeText={(text) => {
+                setEditCity(text);
+              }}
+            />
+          </View>
+          <View>
+            <Text style={styles.regtext}>State</Text>
+            <TextInput
+              style={styles.input}
+              value={editState}
+              placeholder={"state"}
+              autoCapitalize="none"
+              onChangeText={(text) => {
+                setEditState(text);
+              }}
+            />
+          </View>
           <View style={styles.outerButtonsContainer}>
             <TouchableOpacity
               style={styles.button}
@@ -268,14 +302,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  keyAvoidContainer: {
-    flex: 1,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: "center",
-    paddingBottom: 150,
-  },
   loading: {
     flex: 1,
     alignItems: "center",
@@ -285,6 +311,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  keyAvoidContainer: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingBottom: 140,
   },
   regtext: {
     marginLeft: 10,

@@ -64,6 +64,12 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
       if (userdata.bio !== "" && userdata.bio !== undefined) {
         dataToUpdate.bio = userdata.bio;
       }
+      if (userdata.city !== "" && userdata.city !== undefined) {
+        dataToUpdate.city = userdata.city;
+      }
+      if (userdata.state !== "" && userdata.state !== undefined) {
+        dataToUpdate.state = userdata.state;
+      }
       if (
         userdata.profilepic !== "" &&
         userdata.profilepic !== undefined &&
@@ -173,6 +179,8 @@ export async function newFetchUserInfo(
           last: userData.last ?? "",
           number: userData.number ?? "",
           bio: userData.bio ?? "",
+          city: userData.city ?? "",
+          state: userData.state ?? "",
           profilepic: userData.profilepic ?? "",
         };
       }
@@ -243,6 +251,8 @@ export async function fetchFriendData(
           last: userData.last ?? "",
           number: userData.number ?? "",
           bio: userData.bio ?? "",
+          city: userData.city ?? "",
+          state: userData.state ?? "",
           profilepic: userData.profilepic ?? "",
         };
       }

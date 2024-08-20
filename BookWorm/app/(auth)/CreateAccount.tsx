@@ -81,6 +81,11 @@ const CreateAccount = () => {
             onChangeText={(text) => {
               setPassword(text);
             }}
+            onSubmitEditing={() => {
+              if (password.length < 7) {
+                alert("Your password must be at least 6 characters long.");
+              }
+            }}
           />
           <TextInput
             style={styles.input}
@@ -94,6 +99,11 @@ const CreateAccount = () => {
               setConfirmPassword(text);
             }}
             onSubmitEditing={() => {
+              if (confirmPassword.length < 7) {
+                alert("Your password must be at least 6 characters long");
+              } else if (confirmPassword !== password) {
+                alert("Passwords don't match");
+              }
               if (validFields()) {
                 try {
                   createAccount(email, password);
