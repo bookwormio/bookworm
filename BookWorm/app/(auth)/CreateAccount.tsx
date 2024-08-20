@@ -1,6 +1,9 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -46,63 +49,79 @@ const CreateAccount = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Toast />
-      <TextInput
-        style={styles.input}
-        value={email}
-        placeholder="email"
-        autoCapitalize="none"
-        onChangeText={(text) => {
-          setEmail(text);
-        }}
-      />
-      <TextInput
-        style={styles.input}
-        value={password}
-        secureTextEntry={true}
-        placeholder="password"
-        autoCapitalize="none"
-        onChangeText={(text) => {
-          setPassword(text);
-        }}
-      />
-      <TextInput
-        style={styles.input}
-        value={confirmPassword}
-        secureTextEntry={true}
-        placeholder="confirm password"
-        autoCapitalize="none"
-        onChangeText={(text) => {
-          setConfirmPassword(text);
-        }}
-        onSubmitEditing={() => {
-          if (validFields()) {
-            try {
-              createAccount(email, password);
-              router.push("/MoreInfo");
-            } catch (error) {
-              console.error(error);
-            }
-          }
-        }}
-      />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          if (validFields()) {
-            try {
-              createAccount(email, password);
-              router.push("/MoreInfo");
-            } catch (error) {
-              console.error(error);
-            }
-          }
-        }}
+    <KeyboardAvoidingView
+      style={styles.keyAvoidContainer}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        scrollEnabled={true}
       >
-        <Text style={styles.buttonText}>{"Create Account"}</Text>
-      </TouchableOpacity>
-    </View>
+        <View style={styles.container}>
+          <Toast />
+          <TextInput
+            style={styles.input}
+            value={email}
+            placeholder="email"
+            autoCapitalize="none"
+            onChangeText={(text) => {
+              setEmail(text);
+            }}
+          />
+          <TextInput
+            style={styles.input}
+            value={password}
+            secureTextEntry={true}
+            textContentType="oneTimeCode"
+            placeholder="password"
+            autoCapitalize="none"
+            autoComplete="off"
+            onChangeText={(text) => {
+              setPassword(text);
+            }}
+          />
+          <TextInput
+            style={styles.input}
+            value={confirmPassword}
+            secureTextEntry={true}
+            textContentType="oneTimeCode"
+            placeholder="confirm password"
+            autoCapitalize="none"
+            autoComplete="off"
+            onChangeText={(text) => {
+              setConfirmPassword(text);
+            }}
+            onSubmitEditing={() => {
+              if (validFields()) {
+                try {
+                  createAccount(email, password);
+                  router.push("/MoreInfo");
+                } catch (error) {
+                  console.error(error);
+                }
+              }
+            }}
+          />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              if (validFields()) {
+                try {
+                  createAccount(email, password);
+                  router.push("/MoreInfo");
+                } catch (error) {
+                  console.error(error);
+                }
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>{"Create Account"}</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -121,8 +140,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  container: {
+  keyAvoidContainer: {
     flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingBottom: 40,
+  },
+  container: {
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 20,

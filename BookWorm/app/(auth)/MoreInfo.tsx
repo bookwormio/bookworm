@@ -5,6 +5,9 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -99,87 +102,101 @@ const MoreInfo = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>A little bit about you...</Text>
-      <Text style={styles.subheader}>Enter some details about yourself</Text>
-      <Toast />
-      <TouchableOpacity
-        style={styles.defaultImageContainer}
-        onPress={() => {
-          pickImageAsync().catch((error) => {
-            Toast.show({
-              type: "error",
-              text1: "Error selecting image: " + error,
-              text2: "Please adjust your media permissions",
-            });
-          });
-        }}
+    <KeyboardAvoidingView
+      style={styles.keyAvoidContainer}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        bounces={false}
       >
-        {image !== "" ? (
-          <Image source={{ uri: image }} style={styles.defaultImage} />
-        ) : (
-          <FontAwesome5 name="user" size={40} />
-        )}
-      </TouchableOpacity>
-      <TextInput
-        style={styles.input}
-        value={username}
-        placeholder="Username"
-        onChangeText={(text) => {
-          setUsername(text);
-        }}
-        autoCorrect={false}
-        autoComplete="off"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        value={first}
-        placeholder="First Name"
-        onChangeText={(text) => {
-          setFirst(text);
-        }}
-        autoCorrect={false}
-        autoComplete="off"
-      />
-      <TextInput
-        style={styles.input}
-        value={last}
-        placeholder="Last Name"
-        onChangeText={(text) => {
-          setLast(text);
-        }}
-        autoCorrect={false}
-        autoComplete="off"
-      />
-      <TextInput
-        style={styles.input}
-        value={phone}
-        placeholder="Phone Number"
-        onChangeText={(text) => {
-          setPhone(text);
-        }}
-      />
-      <TextInput
-        style={styles.input}
-        value={bio}
-        placeholder="Bio"
-        multiline={true}
-        onChangeText={(text) => {
-          setBio(text);
-        }}
-      />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          if (validFields()) {
-            createNewTracking();
-          }
-        }}
-      >
-        <Text style={styles.buttonText}>{"Let's Go"}</Text>
-      </TouchableOpacity>
-    </View>
+        <View style={styles.container}>
+          <Text style={styles.header}>A little bit about you...</Text>
+          <Text style={styles.subheader}>
+            Enter some details about yourself
+          </Text>
+          <Toast />
+          <TouchableOpacity
+            style={styles.defaultImageContainer}
+            onPress={() => {
+              pickImageAsync().catch((error) => {
+                Toast.show({
+                  type: "error",
+                  text1: "Error selecting image: " + error,
+                  text2: "Please adjust your media permissions",
+                });
+              });
+            }}
+          >
+            {image !== "" ? (
+              <Image source={{ uri: image }} style={styles.defaultImage} />
+            ) : (
+              <FontAwesome5 name="user" size={40} />
+            )}
+          </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            value={username}
+            placeholder="Username"
+            onChangeText={(text) => {
+              setUsername(text);
+            }}
+            autoCorrect={false}
+            autoComplete="off"
+            autoCapitalize="none"
+          />
+          <TextInput
+            style={styles.input}
+            value={first}
+            placeholder="First Name"
+            onChangeText={(text) => {
+              setFirst(text);
+            }}
+            autoCorrect={false}
+            autoComplete="off"
+          />
+          <TextInput
+            style={styles.input}
+            value={last}
+            placeholder="Last Name"
+            onChangeText={(text) => {
+              setLast(text);
+            }}
+            autoCorrect={false}
+            autoComplete="off"
+          />
+          <TextInput
+            style={styles.input}
+            value={phone}
+            placeholder="Phone Number"
+            onChangeText={(text) => {
+              setPhone(text);
+            }}
+          />
+          <TextInput
+            style={styles.input}
+            value={bio}
+            placeholder="Bio"
+            multiline={true}
+            onChangeText={(text) => {
+              setBio(text);
+            }}
+          />
+          <TextInput style={styles.input} placeholder="City" />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              if (validFields()) {
+                createNewTracking();
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>{"Let's Go"}</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -205,8 +222,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  container: {
+  keyAvoidContainer: {
     flex: 1,
+  },
+  // had to add paddingBottom to scrollContainer so it can scroll further down
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingBottom: 100,
+  },
+  container: {
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 20,
