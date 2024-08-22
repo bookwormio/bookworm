@@ -7,7 +7,7 @@ import {
   getBooksFromUserBookShelves,
   getShelvesContainingBook,
   removeBookFromUserBookshelf,
-} from "../../../services/firebase-services/userQueries";
+} from "../../../services/firebase-services/UserQueries";
 import { type UserBookShelvesModel } from "../../../types";
 
 /**

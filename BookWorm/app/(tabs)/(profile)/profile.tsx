@@ -18,7 +18,7 @@ import {
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
   getUserProfileURL,
-} from "../../../services/firebase-services/userQueries";
+} from "../../../services/firebase-services/UserQueries";
 import { type UserDataModel } from "../../../types";
 
 const Profile = () => {

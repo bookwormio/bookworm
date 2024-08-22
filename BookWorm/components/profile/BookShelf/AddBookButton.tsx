@@ -4,7 +4,7 @@ import { type ServerBookShelfName } from "../../../enums/Enums";
 import {
   useAddBookToShelf,
   useRemoveBookFromShelf,
-} from "../hooks/bookshelfQueries";
+} from "../hooks/useBookshelfQueries";
 
 interface AddBookButtonProps {
   serverShelfName: string;
