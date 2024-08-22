@@ -40,6 +40,7 @@ export async function getAllFRNotifications(userID: string): Promise<{
       orderBy("created_at", "desc"),
     );
 
+    console.log("got inside AllFR");
     const querySnap = await getDocs(q);
 
     for (const notDoc of querySnap.docs) {
@@ -49,8 +50,9 @@ export async function getAllFRNotifications(userID: string): Promise<{
         message: notDoc.data().message,
         read_at: notDoc.data().read_at,
         sender_id: notDoc.data().sender_id,
-        type: notDoc.data().created_at,
+        type: notDoc.data().type,
       };
+      console.log(notif);
       notifdata.push(notif);
     }
     return { notifs: notifdata };
