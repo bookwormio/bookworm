@@ -52,7 +52,6 @@ const Posts = () => {
     getNextPageParam: (lastPage) =>
       lastPage !== null ? lastPage.newLastVisible : null, // Function to get the parameter for fetching the next page
     initialPageParam: null,
-    staleTime: 0,
   });
 
   const currentDate = new Date();
