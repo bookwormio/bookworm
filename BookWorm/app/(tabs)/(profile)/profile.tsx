@@ -140,7 +140,7 @@ const Profile = () => {
           </Text>
           <Text style={styles.locText}>
             {city === "" ? "" : city}
-            {state === "" ? "" : ", "}
+            {city !== "" && state !== "" ? ", " : ""}
             {state === "" ? "" : state}
           </Text>
         </View>
