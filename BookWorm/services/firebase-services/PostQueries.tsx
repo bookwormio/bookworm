@@ -24,7 +24,7 @@ import {
   type UserModel,
 } from "../../types";
 import { getAllFollowing } from "./FriendQueries";
-import { fetchUsersByIDs } from "./userQueries";
+import { fetchUsersByIDs } from "./UserQueries";
 
 /**
  * Follows a user by updating the relationship document between the current user and the friend user.
