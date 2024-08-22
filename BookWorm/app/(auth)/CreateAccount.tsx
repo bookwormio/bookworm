@@ -1,8 +1,6 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -49,89 +47,83 @@ const CreateAccount = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.keyAvoidContainer}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+    <ScrollView
+      contentContainerStyle={styles.scrollContainer}
+      keyboardShouldPersistTaps="handled"
+      scrollEnabled={true}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-        scrollEnabled={true}
-      >
-        <View style={styles.container}>
-          <Toast />
-          <TextInput
-            style={styles.input}
-            value={email}
-            placeholder="email"
-            autoCapitalize="none"
-            onChangeText={(text) => {
-              setEmail(text);
-            }}
-          />
-          <TextInput
-            style={styles.input}
-            value={password}
-            secureTextEntry={true}
-            textContentType="oneTimeCode"
-            placeholder="password"
-            autoCapitalize="none"
-            autoComplete="off"
-            onChangeText={(text) => {
-              setPassword(text);
-            }}
-            onSubmitEditing={() => {
-              if (password.length < 7) {
-                alert("Your password must be at least 6 characters long.");
+      <View style={styles.container}>
+        <Toast />
+        <TextInput
+          style={styles.input}
+          value={email}
+          placeholder="email"
+          autoCapitalize="none"
+          onChangeText={(text) => {
+            setEmail(text);
+          }}
+        />
+        <TextInput
+          style={styles.input}
+          value={password}
+          secureTextEntry={true}
+          textContentType="oneTimeCode"
+          placeholder="password"
+          autoCapitalize="none"
+          autoComplete="off"
+          onChangeText={(text) => {
+            setPassword(text);
+          }}
+          onSubmitEditing={() => {
+            if (password.length < 7) {
+              alert("Your password must be at least 6 characters long.");
+            }
+          }}
+        />
+        <TextInput
+          style={styles.input}
+          value={confirmPassword}
+          secureTextEntry={true}
+          textContentType="oneTimeCode"
+          placeholder="confirm password"
+          autoCapitalize="none"
+          autoComplete="off"
+          onChangeText={(text) => {
+            setConfirmPassword(text);
+          }}
+          onSubmitEditing={() => {
+            if (confirmPassword.length < 7) {
+              alert("Your password must be at least 6 characters long");
+            } else if (confirmPassword !== password) {
+              alert("Passwords don't match");
+            }
+            if (validFields()) {
+              try {
+                createAccount(email, password);
+                router.push("/MoreInfo");
+              } catch (error) {
+                console.error(error);
               }
-            }}
-          />
-          <TextInput
-            style={styles.input}
-            value={confirmPassword}
-            secureTextEntry={true}
-            textContentType="oneTimeCode"
-            placeholder="confirm password"
-            autoCapitalize="none"
-            autoComplete="off"
-            onChangeText={(text) => {
-              setConfirmPassword(text);
-            }}
-            onSubmitEditing={() => {
-              if (confirmPassword.length < 7) {
-                alert("Your password must be at least 6 characters long");
-              } else if (confirmPassword !== password) {
-                alert("Passwords don't match");
+            }
+          }}
+        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            if (validFields()) {
+              try {
+                createAccount(email, password);
+                router.push("/MoreInfo");
+              } catch (error) {
+                console.error(error);
               }
-              if (validFields()) {
-                try {
-                  createAccount(email, password);
-                  router.push("/MoreInfo");
-                } catch (error) {
-                  console.error(error);
-                }
-              }
-            }}
-          />
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              if (validFields()) {
-                try {
-                  createAccount(email, password);
-                  router.push("/MoreInfo");
-                } catch (error) {
-                  console.error(error);
-                }
-              }
-            }}
-          >
-            <Text style={styles.buttonText}>{"Create Account"}</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>{"Create Account"}</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
