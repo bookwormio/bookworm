@@ -12,6 +12,7 @@ const PostsLayout = () => {
           name="user/[friendUserID]"
           options={{ headerShown: false }}
         />
+        <Stack.Screen name="notifications" options={{ headerShown: false }} />
       </Stack>
     </PostsProvider>
   );

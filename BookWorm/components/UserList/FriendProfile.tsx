@@ -13,13 +13,18 @@ import {
   getIsFollowing,
   unfollowUserByID,
 } from "../../services/firebase-services/FriendQueries";
+import { createFriendRequestNotification } from "../../services/firebase-services/NotificationQueries";
 import {
   fetchFriendData,
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
   getUserProfileURL,
 } from "../../services/firebase-services/UserQueries";
-import { type ConnectionModel, type UserDataModel } from "../../types";
+import {
+  type BasicNotification,
+  type ConnectionModel,
+  type UserDataModel,
+} from "../../types";
 import { useAuth } from "../auth/context";
 
 enum LocalFollowStatus {
@@ -126,6 +131,15 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     },
   });
 
+  const notifyMutation = useMutation({
+    mutationFn: createFriendRequestNotification,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["notifications", friendUserID],
+      });
+    },
+  });
+
   useEffect(() => {
     if (user?.uid !== undefined && friendUserID !== undefined) {
       if (isFollowingData !== null && isFollowingData !== undefined) {
@@ -202,6 +216,14 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         friendUserID,
       };
       followMutation.mutate(connection);
+      if (user !== undefined && user !== null) {
+        const FRnotify: BasicNotification = {
+          user: friendUserID,
+          message: "someone has followed you",
+          sender_id: user?.uid, // Use an empty string if user?.uid is undefined
+        };
+        notifyMutation.mutate(FRnotify);
+      }
     } catch (error) {
       setFollowStatus("not following");
       console.error("Error occurred while following user:", error);

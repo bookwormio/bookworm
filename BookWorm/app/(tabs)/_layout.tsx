@@ -54,7 +54,13 @@ const AppLayout = () => {
             tabBarActiveTintColor: "#FB6D0B",
             tabBarInactiveTintColor: "grey",
             headerRight: () => (
-              <TouchableOpacity style={styles.newPost} onPress={() => {}}>
+              <TouchableOpacity
+                style={styles.newPost}
+                onPress={() => {
+                  router.push({ pathname: "notifications" });
+                }}
+                disabled={false}
+              >
                 <FontAwesome5 name="bell" size={20} color="#FB6D0B" />
               </TouchableOpacity>
             ),
