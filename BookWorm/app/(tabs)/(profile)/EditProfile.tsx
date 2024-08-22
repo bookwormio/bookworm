@@ -316,14 +316,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  keyAvoidContainer: {
-    flex: 1,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: "center",
-    paddingBottom: 140,
-  },
   regtext: {
     marginLeft: 10,
   },
