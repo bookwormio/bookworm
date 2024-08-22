@@ -178,3 +178,12 @@ interface BookshelfVolumeInfo {
 }
 
 type UserBookShelvesModel = Record<string, BookShelfBookModel[]>;
+
+interface FRNotification {
+  created_at: Timestamp;
+  id: string;
+  message: string;
+  read_at: Timestamp;
+  sender_id: string;
+  type: "FRIEND_REQUEST";
+}
