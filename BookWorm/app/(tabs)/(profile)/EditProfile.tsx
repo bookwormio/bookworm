@@ -144,14 +144,10 @@ const EditProfile = () => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.keyAvoidContainer}
+      style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-        bounces={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View>
           <TouchableOpacity
             style={styles.defaultImageContainer}
@@ -274,7 +270,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "center",
-    paddingBottom: 150,
+    paddingBottom: 200,
   },
   loading: {
     flex: 1,
