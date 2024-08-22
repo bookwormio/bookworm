@@ -1,14 +1,10 @@
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import {
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -20,11 +16,8 @@ import {
 import { useAuth } from "../../../components/auth/context";
 import Post from "../../../components/post/post";
 import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQueries";
-import { emptyQuery } from "../../../services/util/queryUtils";
-import { type PostModel } from "../../../types";
 
 const Posts = () => {
-  const [posts, setPosts] = useState<PostModel[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -43,53 +36,48 @@ const Posts = () => {
     }
   };
 
+  const queryKey =
+    user != null ? ["userfeedposts", user.uid] : ["userfeedposts"];
+
   const {
     data: feedPostsData,
     isLoading: isLoadingFeedPosts,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    refetch,
   } = useInfiniteQuery({
-    queryKey: user != null ? ["userfeedposts", user.uid] : ["userfeedposts"],
+    queryKey,
     queryFn: fetchPosts,
     getNextPageParam: (lastPage) =>
       lastPage !== null ? lastPage.newLastVisible : null, // Function to get the parameter for fetching the next page
     initialPageParam: null,
+    staleTime: 0,
   });
 
   const currentDate = new Date();
 
-  useEffect(() => {
-    if (feedPostsData?.pages !== undefined) {
-      const allPosts = feedPostsData.pages.reduce(
-        (acc, page) => ({
-          posts: [...acc.posts, ...page.posts], // Concatenate all posts from different pages
-          newLastVisible: page.newLastVisible, // Update the new last visible document snapshot
-        }),
-        { posts: [], newLastVisible: null }, // Initial accumulator value
-      );
-      setPosts(allPosts.posts);
-    }
-  }, [feedPostsData]);
-
-  const refreshMutation = useMutation({
-    mutationFn: emptyQuery,
-    onSuccess: async () => {
-      await queryClient
-        .invalidateQueries({
-          queryKey:
-            user != null ? ["userfeedposts", user.uid] : ["userfeedposts"],
-        })
-        .then(() => {
-          setRefreshing(false);
-        });
-    },
-  });
-
   const onRefresh = () => {
     setRefreshing(true);
-    refreshMutation.mutate();
+
+    // Reset the query data to only the first page
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    queryClient.setQueryData(queryKey, (data: any) => ({
+      pages: data.pages.slice(0, 1),
+      pageParams: data.pageParams.slice(0, 1),
+    }));
+
+    refetch()
+      .then(() => {
+        setRefreshing(false);
+      })
+      .catch((error) => {
+        console.error("Error refetching feed posts", error);
+        setRefreshing(false);
+      });
   };
+
+  const posts = feedPostsData?.pages.flatMap((page) => page.posts) ?? [];
 
   return (
     <View style={styles.container}>
