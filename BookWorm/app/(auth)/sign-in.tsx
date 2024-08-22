@@ -2,14 +2,12 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { useAuth } from "../../components/auth/context";
 
@@ -36,60 +34,55 @@ const Login = () => {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.keyAvoidContainer}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <ScrollView
+      contentContainerStyle={styles.scrollContainer}
+      keyboardShouldPersistTaps="handled"
     >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.container}>
-          <TextInput
-            style={styles.input}
-            value={email}
-            placeholder="email"
-            autoCapitalize="none"
-            onChangeText={(text) => {
-              setEmail(text);
-            }}
-          />
-          <TextInput
-            onSubmitEditing={() => {
-              signIn(email, password);
-              router.replace("/post");
-            }}
-            style={styles.input}
-            value={password}
-            secureTextEntry={true}
-            placeholder="password"
-            autoCapitalize="none"
-            onChangeText={(text) => {
-              setPassword(text);
-            }}
-          />
+      <View style={styles.container}>
+        <TextInput
+          style={styles.input}
+          value={email}
+          placeholder="email"
+          autoCapitalize="none"
+          onChangeText={(text) => {
+            setEmail(text);
+          }}
+        />
+        <TextInput
+          onSubmitEditing={() => {
+            signIn(email, password);
+            router.replace("/post");
+          }}
+          style={styles.input}
+          value={password}
+          secureTextEntry={true}
+          placeholder="password"
+          autoCapitalize="none"
+          onChangeText={(text) => {
+            setPassword(text);
+          }}
+        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            signIn(email, password);
+            router.replace("/post");
+          }}
+        >
+          <Text style={styles.buttonText}>{"Login"}</Text>
+        </TouchableOpacity>
+        <View style={styles.accountContainer}>
+          <Text style={styles.question}>{"Don't have an account?"}</Text>
           <TouchableOpacity
-            style={styles.button}
             onPress={() => {
-              signIn(email, password);
-              router.replace("/post");
+              router.push("/CreateAccount");
             }}
           >
-            <Text style={styles.buttonText}>{"Login"}</Text>
+            <Text style={styles.createButtonText}>{"Create Account"}</Text>
           </TouchableOpacity>
-          <View style={styles.accountContainer}>
-            <Text style={styles.question}>{"Don't have an account?"}</Text>
-            <TouchableOpacity
-              onPress={() => {
-                router.push("/CreateAccount");
-              }}
-            >
-              <Text style={styles.createButtonText}>{"Create Account"}</Text>
-            </TouchableOpacity>
-          </View>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+    </ScrollView>
   );
 };
 
