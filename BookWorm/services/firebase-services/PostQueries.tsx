@@ -24,7 +24,7 @@ import {
   type UserModel,
 } from "../../types";
 import { getAllFollowing } from "./FriendQueries";
-import { fetchUser } from "./userQueries";
+import { fetchUsersByIDs } from "./userQueries";
 
 /**
  * Follows a user by updating the relationship document between the current user and the friend user.
@@ -103,10 +103,11 @@ export async function fetchPostsByUserIDs(
     }
     const postsSnapshot = await getDocs(postsQuery);
     const postsData: PostModel[] = [];
+    const userModels = await fetchUsersByIDs(userIDs);
     for (const postDoc of postsSnapshot.docs) {
       const userID: string = postDoc.data().user;
       try {
-        const user = await fetchUser(userID);
+        const user = userModels.find((user) => user.id === userID);
         if (user != null) {
           const downloadPromises: Array<Promise<void>> = [];
           const images: JSX.Element[] = [];

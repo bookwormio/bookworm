@@ -4,12 +4,14 @@ import {
   collection,
   deleteDoc,
   doc,
+  type DocumentData,
   getCountFromServer,
   getDoc,
   getDocs,
   or,
   orderBy,
   query,
+  type QuerySnapshot,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -125,6 +127,64 @@ export async function fetchUser(userID: string): Promise<UserModel | null> {
     }
   } catch (error) {
     console.error("Error fetching user:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches user data from Firebase by an array of user IDs.
+ *
+ * This function handles the Firebase limitation of a maximum of 10 items in an 'in' clause by splitting
+ * the input array into chunks of 10 and making separate requests for each chunk. It then combines
+ * the results and returns an array of `UserModel` objects.
+ *
+ * @param {string[]} userIDs - An array of user IDs to fetch data for.
+ * @returns {Promise<UserModel[]>} - A promise that resolves to an array of `UserModel` objects.
+ * @throws Will throw an error if fetching the users fails.
+ */
+export async function fetchUsersByIDs(userIDs: string[]): Promise<UserModel[]> {
+  try {
+    if (userIDs.length === 0) {
+      return [];
+    }
+
+    // Firebase has a limit of 10 items in an 'in' clause
+    const chunkSize = 10;
+    const userChunks = [];
+    for (let i = 0; i < userIDs.length; i += chunkSize) {
+      userChunks.push(userIDs.slice(i, i + chunkSize));
+    }
+
+    const querySnapshots: Array<QuerySnapshot<DocumentData>> =
+      await Promise.all(
+        userChunks.map(
+          async (chunk) =>
+            await getDocs(
+              query(
+                collection(DB, "user_collection"),
+                where("__name__", "in", chunk),
+              ),
+            ),
+        ),
+      );
+
+    const users: UserModel[] = querySnapshots.flatMap((snapshot) =>
+      snapshot.docs.map((doc) => {
+        const userData = doc.data();
+        return {
+          id: doc.id,
+          email: userData.email,
+          first: userData.first,
+          isPublic: userData.isPublic,
+          last: userData.last,
+          number: userData.number,
+        };
+      }),
+    );
+
+    return users;
+  } catch (error) {
+    console.error("Error fetching users by IDs:", error);
     throw error;
   }
 }
