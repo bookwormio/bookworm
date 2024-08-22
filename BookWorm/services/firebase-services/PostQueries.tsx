@@ -270,3 +270,33 @@ export async function fetchPostsForUserFeed(
     return { posts: [], newLastVisible: null };
   }
 }
+
+export async function addLikeToPost(
+  userID: string,
+  postID: string,
+): Promise<PostModel | null> {
+  try {
+    const post = await fetchPostByPostID(postID);
+    if (post != null) {
+      const postRef = doc(DB, "posts", postID);
+      await runTransaction(DB, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        if (postSnap.exists()) {
+          const likes = postSnap.data().likes ?? [];
+          if ((likes as string[]).includes(userID)) {
+            likes.splice(likes.indexOf(userID), 1);
+          } else {
+            likes.push(userID);
+          }
+          transaction.update(postRef, { likes });
+          post.likes = likes;
+          return post;
+        }
+      });
+    }
+    return post;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}

@@ -1,6 +1,7 @@
 import { FontAwesome5 } from "@expo/vector-icons";
+import { useMutation } from "@tanstack/react-query";
 import { type Timestamp } from "firebase/firestore";
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -9,7 +10,9 @@ import {
   View,
 } from "react-native";
 import { DAYS_OF_WEEK, MONTHS_OF_YEAR } from "../../constants/constants";
+import { addLikeToPost } from "../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../types";
+import { useAuth } from "../auth/context";
 
 interface PostProps {
   post: PostModel;
@@ -42,7 +45,30 @@ const formatDate = (created: Timestamp, currentDate: Date) => {
 
 // Using memo here makes it so it re-renders only when the props passed to it change
 const Post = memo(({ post, created, currentDate }: PostProps) => {
+  const [postLikes, setPostLikes] = useState(post.likes);
   const formattedDate = formatDate(created, currentDate);
+  const { user } = useAuth();
+
+  const likeMutation = useMutation({
+    mutationFn: async () => {
+      if (user != null) {
+        if (postLikes.includes(user.uid)) {
+          postLikes.splice(postLikes.indexOf(user.uid), 1);
+        } else {
+          postLikes.push(user.uid);
+        }
+        addLikeToPost(user.uid, post.id)
+          .then((updatedPost) => {
+            if (updatedPost != null) {
+              setPostLikes(updatedPost.likes);
+            }
+          })
+          .catch(() => {
+            console.error("Error liking post");
+          });
+      }
+    },
+  });
 
   return (
     <View style={styles.container}>
@@ -59,10 +85,22 @@ const Post = memo(({ post, created, currentDate }: PostProps) => {
         </ScrollView>
       )}
       <View style={styles.buttonrow}>
-        <TouchableOpacity style={styles.likebutton}>
-          <FontAwesome5 name="heart" size={15} />
+        <TouchableOpacity
+          style={styles.likebutton}
+          onPress={() => {
+            likeMutation.mutate();
+          }}
+        >
+          {postLikes.includes(user?.uid ?? "") ? (
+            <FontAwesome5 name="heart" solid size={15} color="red" />
+          ) : (
+            <FontAwesome5 name="heart" size={15} />
+          )}
         </TouchableOpacity>
-        <Text style={{ paddingRight: 10 }}>{post.likes.length} Likes</Text>
+        <Text style={{ paddingRight: 10 }}>
+          {postLikes.length}
+          {postLikes.length === 1 ? " Like" : " Likes"}
+        </Text>
         <TouchableOpacity style={styles.likebutton}>
           <FontAwesome5 name="comment" size={15} />
           <Text style={{ paddingLeft: 5 }}>Comments</Text>
