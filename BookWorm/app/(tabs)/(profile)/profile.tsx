@@ -27,6 +27,8 @@ const Profile = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
   const [image, setImage] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
   const navigation = useNavigation();
@@ -98,6 +100,12 @@ const Profile = () => {
       if (userDataTyped.bio !== undefined) {
         setBio(userDataTyped.bio);
       }
+      if (userDataTyped.city !== undefined) {
+        setCity(userDataTyped.city);
+      }
+      if (userDataTyped.state !== undefined) {
+        setState(userDataTyped.state);
+      }
     }
   }, [userData]);
 
@@ -130,7 +138,11 @@ const Profile = () => {
           <Text style={styles.nameText}>
             {firstName} {lastName}
           </Text>
-          <Text style={styles.locText}>Salt Lake City, UT</Text>
+          <Text style={styles.locText}>
+            {city === "" ? "" : city}
+            {city !== "" && state !== "" ? ", " : ""}
+            {state === "" ? "" : state}
+          </Text>
         </View>
       </View>
       <View>

@@ -10,7 +10,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
@@ -26,6 +26,8 @@ const MoreInfo = () => {
   const [phone, setPhone] = useState("");
   const [bio, setBio] = useState("");
   const [image, setImage] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
 
   const accountInfoMutation = useMutation({
     mutationFn: updateUser,
@@ -43,6 +45,8 @@ const MoreInfo = () => {
         number: phone,
         isPublic: true,
         bio,
+        city,
+        state,
         profilepic: image,
       };
       accountInfoMutation.mutate(accountInfo);
@@ -175,7 +179,22 @@ const MoreInfo = () => {
             setBio(text);
           }}
         />
-        <TextInput style={styles.input} placeholder="City" />
+        <TextInput
+          style={styles.input}
+          value={city}
+          placeholder="City"
+          onChangeText={(text) => {
+            setCity(text);
+          }}
+        />
+        <TextInput
+          style={styles.input}
+          value={state}
+          placeholder="State"
+          onChangeText={(text) => {
+            setState(text);
+          }}
+        />
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
