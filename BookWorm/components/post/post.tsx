@@ -14,7 +14,7 @@ import {
 import { DAYS_OF_WEEK, MONTHS_OF_YEAR } from "../../constants/constants";
 import {
   addCommentToPost,
-  addLikeToPost,
+  likeUnlikePost,
 } from "../../services/firebase-services/PostQueries";
 import { type CommentModel, type PostModel } from "../../types";
 import { useAuth } from "../auth/context";
@@ -69,10 +69,10 @@ const Post = memo(({ post, created, currentDate, showComments }: PostProps) => {
         } else {
           postLikes.push(user.uid);
         }
-        addLikeToPost(user.uid, post.id)
-          .then((updatedPost) => {
-            if (updatedPost != null) {
-              setPostLikes(updatedPost.likes);
+        likeUnlikePost(user.uid, post.id)
+          .then((updatedLikes) => {
+            if (updatedLikes != null) {
+              setPostLikes(updatedLikes);
             }
           })
           .catch(() => {

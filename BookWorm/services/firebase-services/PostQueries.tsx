@@ -281,36 +281,49 @@ export async function fetchPostsForUserFeed(
   }
 }
 
-export async function addLikeToPost(
+/**
+ * Either removes or adds a like to a post
+ * @param {string} userID - The ID of the user liking/unliking.
+ * @param {string} postID - The ID of post being liked/unliked.
+ * @returns {Promise<string[] | null>} A promise that resolves to an object containing the updated likes or null if the post doesnt exist.
+ */
+export async function likeUnlikePost(
   userID: string,
   postID: string,
-): Promise<PostModel | null> {
+): Promise<string[] | null> {
   try {
     const post = await fetchPostByPostID(postID);
+    let updatedLikes: string[] | null = null;
     if (post != null) {
       const postRef = doc(DB, "posts", postID);
       await runTransaction(DB, async (transaction) => {
         const postSnap = await transaction.get(postRef);
         if (postSnap.exists()) {
-          const likes = postSnap.data().likes ?? [];
-          if ((likes as string[]).includes(userID)) {
+          const likes = (postSnap.data().likes as string[]) ?? [];
+          if (likes.includes(userID)) {
             likes.splice(likes.indexOf(userID), 1);
           } else {
             likes.push(userID);
           }
           transaction.update(postRef, { likes });
-          post.likes = likes;
-          return post;
+          updatedLikes = likes;
         }
       });
     }
-    return post;
+    return updatedLikes;
   } catch (error) {
     console.error(error);
     return null;
   }
 }
 
+/**
+ * Updates a post by adding a new comment.
+ * @param {string} userID - The ID of the user commenting.
+ * @param {string} postID - The ID of post being commented on.
+ * @param {string} commentText - The text being commented.
+ * @returns {Promise<CommentModel[] | null>} A promise that resolves to an object containing the updated comments or null if the post doesnt exist.
+ */
 export async function addCommentToPost(
   userID: string,
   postID: string,
