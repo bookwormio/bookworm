@@ -139,6 +139,7 @@ const BookshelfAddDropdown = ({
     <View style={styles.container}>
       <MultiSelect
         style={styles.dropdown}
+        containerStyle={styles.dropdownContainer}
         data={shelfItems}
         labelField="label"
         valueField="value"
@@ -156,6 +157,10 @@ const BookshelfAddDropdown = ({
 
 export default BookshelfAddDropdown;
 
+// TODO: remove the background color
+// just have it be a + sign to add
+// a loading spinner when adding
+// a minus sign to remove
 const styles = StyleSheet.create({
   container: {
     marginVertical: 5,
@@ -173,5 +178,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     elevation: 2,
+  },
+  dropdownContainer: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
   },
 });
