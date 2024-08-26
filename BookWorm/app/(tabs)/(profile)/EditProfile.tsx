@@ -21,7 +21,7 @@ import {
   getUserProfileURL,
   newFetchUserInfo,
   updateUser,
-} from "../../../services/firebase-services/userQueries";
+} from "../../../services/firebase-services/UserQueries";
 import { emptyQuery } from "../../../services/util/queryUtils";
 import { type UserDataModel } from "../../../types";
 

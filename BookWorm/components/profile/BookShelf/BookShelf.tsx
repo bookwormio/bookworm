@@ -13,7 +13,7 @@ import {
 } from "../../../enums/Enums";
 import { type BookShelfBookModel } from "../../../types";
 import { useAuth } from "../../auth/context";
-import { useRemoveBookFromShelf } from "../hooks/bookshelfQueries";
+import { useRemoveBookFromShelf } from "../hooks/useBookshelfQueries";
 import BookShelfBook from "./BookShelfBook";
 
 interface BookShelfProps {

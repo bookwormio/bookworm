@@ -7,7 +7,7 @@ import {
 } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { FIREBASE_AUTH } from "../../firebase.config";
-import { fetchUserData } from "../../services/firebase-services/userQueries";
+import { fetchUserData } from "../../services/firebase-services/UserQueries";
 
 const AuthContext = React.createContext<{
   signIn: (email: string, password: string) => void;
