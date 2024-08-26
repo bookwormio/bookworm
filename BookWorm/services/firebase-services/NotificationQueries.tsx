@@ -1,14 +1,6 @@
-import {
-  addDoc,
-  collection,
-  getDocs,
-  orderBy,
-  query,
-  serverTimestamp,
-  where,
-} from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { DB } from "../../firebase.config";
-import { type BasicNotification, type FRNotification } from "../../types";
+import { type BasicNotification } from "../../types";
 
 export async function createFriendRequestNotification(
   notif: BasicNotification,
@@ -16,12 +8,9 @@ export async function createFriendRequestNotification(
   if (notif.user != null) {
     try {
       await addDoc(collection(DB, "notifications"), {
-        created_at: serverTimestamp(),
         user: notif.user,
         message: notif.message,
-        read_at: null,
         sender_id: notif.sender_id,
-        type: "FRIEND_REQUEST",
       });
     } catch (error) {
       console.error("Error creating friend request notification: ", error);
@@ -29,35 +18,33 @@ export async function createFriendRequestNotification(
   }
 }
 
-export async function getAllFRNotifications(userID: string): Promise<{
-  notifs: FRNotification[];
-}> {
+export async function getAllFRNotifications(
+  userID: string,
+): Promise<BasicNotification[]> {
   try {
-    const notifdata: FRNotification[] = [];
+    const notifdata: BasicNotification[] = [];
     const q = query(
       collection(DB, "notifications"),
       where("user", "==", userID),
-      orderBy("created_at", "desc"),
     );
 
     console.log("got inside AllFR");
     const querySnap = await getDocs(q);
 
     for (const notDoc of querySnap.docs) {
-      const notif: FRNotification = {
-        created_at: notDoc.data().created_at,
+      const notif = {
         user: notDoc.data().user,
         message: notDoc.data().message,
-        read_at: notDoc.data().read_at,
         sender_id: notDoc.data().sender_id,
-        type: notDoc.data().type,
       };
       console.log(notif);
       notifdata.push(notif);
+      console.log("nxT");
+      console.log(notifdata);
     }
-    return { notifs: notifdata };
+    return notifdata;
   } catch (error) {
     console.error("Error getting all notifications: ", error);
-    return { notifs: [] };
+    return [];
   }
 }

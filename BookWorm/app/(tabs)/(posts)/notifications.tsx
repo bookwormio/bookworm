@@ -3,7 +3,6 @@ import React from "react";
 import { Button, FlatList, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import { getAllFRNotifications } from "../../../services/firebase-services/NotificationQueries";
-import { type FRNotification } from "../../../types";
 
 const NotificationsScreen = () => {
   const handlePress = () => {
@@ -27,23 +26,33 @@ const NotificationsScreen = () => {
     title: string;
   }
 
-  const Item = ({ title }: ItemProps) => (
+  const Item = (title: string) => (
     <View>
       <Text style={styles.title}>{title}</Text>
     </View>
   );
 
   if (!notifIsLoading) {
+    // console.log(notifdata);
     if (notifdata !== null && notifdata !== undefined) {
+      console.log("here");
+      console.log(notifdata);
+      const not = notifdata;
+      console.log(not[0]);
       return (
         <View style={styles.container}>
           <FlatList
-            data={notifdata as FRNotification[]}
-            renderItem={({ item }) => <Item title={item.message} />}
-            keyExtractor={(item) => item.created_at.toMillis().toString()}
+            style={{ flex: 1 }}
+            data={notifdata}
+            renderItem={({ item }) => (
+              <View>
+                <Text>
+                  {item.sender_id} {item.message}
+                </Text>
+              </View>
+            )}
+            keyExtractor={(item, index) => index.toString()}
           />
-          <Text style={styles.title}>Notifications Page</Text>
-          <Button title="Show Alert" onPress={handlePress} />
         </View>
       );
     } else {
