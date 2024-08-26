@@ -6,8 +6,12 @@ import {
   type BooksResponse,
 } from "../../types";
 
-// Query the Google Books API for book volumes based on the entered search phrase
-// TODO: down the line this should get moved out of the firebase queries file
+/**
+ * Fetch books from Google Books API by title search
+ * @param {string} searchValue - the search phrase to query the API
+ * @returns {Promise<BookVolumeItem[]>} - an array of book volume items
+ * @throws {Error} If there's an error during the operation.
+ */
 export async function fetchBooksByTitleSearch(
   searchValue: string,
 ): Promise<BookVolumeItem[]> {
@@ -20,7 +24,6 @@ export async function fetchBooksByTitleSearch(
       {
         params: {
           q: searchValue,
-          projection: "lite",
           key: BOOKS_API_KEY,
           limit: 10,
         },
@@ -42,8 +45,11 @@ export async function fetchBooksByTitleSearch(
   }
 }
 
-// Query the Google Books API for book volume by id
-// TODO: down the line this should get moved out of the firebase queries file
+/**
+ * Fetch a book from Google Books API by its volume ID
+ * @param volumeID - the volume ID of the book
+ * @returns {Promise<BookVolumeInfo | null>} - the book volume info or null if not found
+ */
 export async function fetchBookByVolumeID(
   volumeID: string,
 ): Promise<BookVolumeInfo | null> {

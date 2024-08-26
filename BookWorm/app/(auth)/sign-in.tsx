@@ -2,11 +2,12 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { useAuth } from "../../components/auth/context";
 
@@ -33,50 +34,55 @@ const Login = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        value={email}
-        placeholder="email"
-        autoCapitalize="none"
-        onChangeText={(text) => {
-          setEmail(text);
-        }}
-      />
-      <TextInput
-        onSubmitEditing={() => {
-          signIn(email, password);
-          router.replace("/post");
-        }}
-        style={styles.input}
-        value={password}
-        secureTextEntry={true}
-        placeholder="password"
-        autoCapitalize="none"
-        onChangeText={(text) => {
-          setPassword(text);
-        }}
-      />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          signIn(email, password);
-          router.replace("/post");
-        }}
-      >
-        <Text style={styles.buttonText}>{"Login"}</Text>
-      </TouchableOpacity>
-      <View style={styles.accountContainer}>
-        <Text style={styles.question}>{"Don't have an account?"}</Text>
+    <ScrollView
+      contentContainerStyle={styles.scrollContainer}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={styles.container}>
+        <TextInput
+          style={styles.input}
+          value={email}
+          placeholder="email"
+          autoCapitalize="none"
+          onChangeText={(text) => {
+            setEmail(text);
+          }}
+        />
+        <TextInput
+          onSubmitEditing={() => {
+            signIn(email, password);
+            router.replace("/post");
+          }}
+          style={styles.input}
+          value={password}
+          secureTextEntry={true}
+          placeholder="password"
+          autoCapitalize="none"
+          onChangeText={(text) => {
+            setPassword(text);
+          }}
+        />
         <TouchableOpacity
+          style={styles.button}
           onPress={() => {
-            router.push("/CreateAccount");
+            signIn(email, password);
+            router.replace("/post");
           }}
         >
-          <Text style={styles.createButtonText}>{"Create Account"}</Text>
+          <Text style={styles.buttonText}>{"Login"}</Text>
         </TouchableOpacity>
+        <View style={styles.accountContainer}>
+          <Text style={styles.question}>{"Don't have an account?"}</Text>
+          <TouchableOpacity
+            onPress={() => {
+              router.push("/CreateAccount");
+            }}
+          >
+            <Text style={styles.createButtonText}>{"Create Account"}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -88,6 +94,13 @@ const styles = StyleSheet.create({
     alignItems: "center", // Align items vertically
     justifyContent: "space-between", // Space between the inputs
     paddingHorizontal: 16, // Padding for the container
+  },
+  keyAvoidContainer: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
   },
   button: {
     backgroundColor: "#FB6D0B",
@@ -110,7 +123,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   container: {
-    flex: 1,
     alignItems: "center",
     padding: 40,
     justifyContent: "center",

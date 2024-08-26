@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -46,63 +47,83 @@ const CreateAccount = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Toast />
-      <TextInput
-        style={styles.input}
-        value={email}
-        placeholder="email"
-        autoCapitalize="none"
-        onChangeText={(text) => {
-          setEmail(text);
-        }}
-      />
-      <TextInput
-        style={styles.input}
-        value={password}
-        secureTextEntry={true}
-        placeholder="password"
-        autoCapitalize="none"
-        onChangeText={(text) => {
-          setPassword(text);
-        }}
-      />
-      <TextInput
-        style={styles.input}
-        value={confirmPassword}
-        secureTextEntry={true}
-        placeholder="confirm password"
-        autoCapitalize="none"
-        onChangeText={(text) => {
-          setConfirmPassword(text);
-        }}
-        onSubmitEditing={() => {
-          if (validFields()) {
-            try {
-              createAccount(email, password);
-              router.push("/MoreInfo");
-            } catch (error) {
-              console.error(error);
+    <ScrollView
+      contentContainerStyle={styles.scrollContainer}
+      keyboardShouldPersistTaps="handled"
+      scrollEnabled={true}
+    >
+      <View style={styles.container}>
+        <Toast />
+        <TextInput
+          style={styles.input}
+          value={email}
+          placeholder="email"
+          autoCapitalize="none"
+          onChangeText={(text) => {
+            setEmail(text);
+          }}
+        />
+        <TextInput
+          style={styles.input}
+          value={password}
+          secureTextEntry={true}
+          textContentType="oneTimeCode"
+          placeholder="password"
+          autoCapitalize="none"
+          autoComplete="off"
+          onChangeText={(text) => {
+            setPassword(text);
+          }}
+          onSubmitEditing={() => {
+            if (password.length < 6) {
+              alert("Your password must be at least 6 characters long.");
             }
-          }
-        }}
-      />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          if (validFields()) {
-            try {
-              createAccount(email, password);
-              router.push("/MoreInfo");
-            } catch (error) {
-              console.error(error);
+          }}
+        />
+        <TextInput
+          style={styles.input}
+          value={confirmPassword}
+          secureTextEntry={true}
+          textContentType="oneTimeCode"
+          placeholder="confirm password"
+          autoCapitalize="none"
+          autoComplete="off"
+          onChangeText={(text) => {
+            setConfirmPassword(text);
+          }}
+          onSubmitEditing={() => {
+            if (confirmPassword.length < 6) {
+              alert("Your password must be at least 6 characters long");
+            } else if (confirmPassword !== password) {
+              alert("Passwords don't match");
             }
-          }
-        }}
-      >
-        <Text style={styles.buttonText}>{"Create Account"}</Text>
-      </TouchableOpacity>
-    </View>
+            if (validFields()) {
+              try {
+                createAccount(email, password);
+                router.push("/MoreInfo");
+              } catch (error) {
+                console.error(error);
+              }
+            }
+          }}
+        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            if (validFields()) {
+              try {
+                createAccount(email, password);
+                router.push("/MoreInfo");
+              } catch (error) {
+                console.error(error);
+              }
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>{"Create Account"}</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -121,8 +142,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  container: {
+  keyAvoidContainer: {
     flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingBottom: 40,
+  },
+  container: {
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 20,

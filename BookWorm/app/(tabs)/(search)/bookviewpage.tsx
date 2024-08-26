@@ -12,7 +12,7 @@ import {
 import RenderHtml from "react-native-render-html";
 import { useAuth } from "../../../components/auth/context";
 import AddBookButton from "../../../components/profile/BookShelf/AddBookButton";
-import { useGetShelvesForBook } from "../../../components/profile/hooks/bookshelfQueries";
+import { useGetShelvesForBook } from "../../../components/profile/hooks/useBookshelfQueries";
 import {
   bookShelfDisplayMap,
   type ServerBookShelfName,

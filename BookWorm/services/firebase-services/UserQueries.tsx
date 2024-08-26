@@ -4,12 +4,15 @@ import {
   collection,
   deleteDoc,
   doc,
+  type DocumentData,
   getCountFromServer,
   getDoc,
   getDocs,
   or,
   orderBy,
   query,
+  type QuerySnapshot,
+  runTransaction,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -63,6 +66,12 @@ export const updateUser = async (userdata: UserDataModel): Promise<void> => {
       }
       if (userdata.bio !== "" && userdata.bio !== undefined) {
         dataToUpdate.bio = userdata.bio;
+      }
+      if (userdata.city !== "" && userdata.city !== undefined) {
+        dataToUpdate.city = userdata.city;
+      }
+      if (userdata.state !== "" && userdata.state !== undefined) {
+        dataToUpdate.state = userdata.state;
       }
       if (
         userdata.profilepic !== "" &&
@@ -123,6 +132,64 @@ export async function fetchUser(userID: string): Promise<UserModel | null> {
   }
 }
 
+/**
+ * Fetches user data from Firebase by an array of user IDs.
+ *
+ * This function handles the Firebase limitation of a maximum of 10 items in an 'in' clause by splitting
+ * the input array into chunks of 10 and making separate requests for each chunk. It then combines
+ * the results and returns an array of `UserModel` objects.
+ *
+ * @param {string[]} userIDs - An array of user IDs to fetch data for.
+ * @returns {Promise<UserModel[]>} - A promise that resolves to an array of `UserModel` objects.
+ * @throws Will throw an error if fetching the users fails.
+ */
+export async function fetchUsersByIDs(userIDs: string[]): Promise<UserModel[]> {
+  try {
+    if (userIDs.length === 0) {
+      return [];
+    }
+
+    // Firebase has a limit of 10 items in an 'in' clause
+    const chunkSize = 10;
+    const userChunks = [];
+    for (let i = 0; i < userIDs.length; i += chunkSize) {
+      userChunks.push(userIDs.slice(i, i + chunkSize));
+    }
+
+    const querySnapshots: Array<QuerySnapshot<DocumentData>> =
+      await Promise.all(
+        userChunks.map(
+          async (chunk) =>
+            await getDocs(
+              query(
+                collection(DB, "user_collection"),
+                where("__name__", "in", chunk),
+              ),
+            ),
+        ),
+      );
+
+    const users: UserModel[] = querySnapshots.flatMap((snapshot) =>
+      snapshot.docs.map((doc) => {
+        const userData = doc.data();
+        return {
+          id: doc.id,
+          email: userData.email,
+          first: userData.first,
+          isPublic: userData.isPublic,
+          last: userData.last,
+          number: userData.number,
+        };
+      }),
+    );
+
+    return users;
+  } catch (error) {
+    console.error("Error fetching users by IDs:", error);
+    throw error;
+  }
+}
+
 export async function getUserProfileURL(
   userID: string,
 ): Promise<string | null> {
@@ -173,6 +240,8 @@ export async function newFetchUserInfo(
           last: userData.last ?? "",
           number: userData.number ?? "",
           bio: userData.bio ?? "",
+          city: userData.city ?? "",
+          state: userData.state ?? "",
           profilepic: userData.profilepic ?? "",
         };
       }
@@ -243,6 +312,8 @@ export async function fetchFriendData(
           last: userData.last ?? "",
           number: userData.number ?? "",
           bio: userData.bio ?? "",
+          city: userData.city ?? "",
+          state: userData.state ?? "",
           profilepic: userData.profilepic ?? "",
         };
       }
@@ -526,5 +597,74 @@ export async function getBooksByBookIDs(
   } catch (error) {
     console.error("Error fetching books by volume IDs", error);
     return [];
+  }
+}
+
+/**
+ * Get the bookmark for a certain book for a user.
+ * @param {string} userID - The user's ID.
+ * @param {string} bookID - The book's ID.
+ * @returns {Promise<number>} - The bookmark for the book.
+ */
+export async function getBookmarkForBook(
+  userID: string,
+  bookID: string,
+): Promise<number> {
+  try {
+    const bookRef = doc(DB, "bookmark_collection", userID, "bookmarks", bookID);
+    const bookSnap = await getDoc(bookRef);
+    if (bookSnap.exists()) {
+      const data = bookSnap.data();
+      return typeof data.bookmark === "number" ? data.bookmark : 0;
+    }
+    return 0;
+  } catch (e) {
+    console.error("Error getting bookmark for book", e);
+    throw e; // Re-throw the error to allow the caller to handle it
+  }
+}
+
+/**
+ * Set or update the bookmark for a certain book for a user.
+ * @param {string} userID - The user's ID.
+ * @param {string} bookID - The book's ID.
+ * @param {number} bookmark - The bookmark for the book.
+ * @returns {Promise<boolean>} - A promise that resolves to true if the bookmark was successfully set, otherwise false.
+ */
+export async function setBookmarkForBook(
+  userID: string,
+  bookID: string,
+  bookmark: number,
+): Promise<boolean> {
+  const bookmarkRef = doc(
+    DB,
+    "bookmark_collection",
+    userID,
+    "bookmarks",
+    bookID,
+  );
+  try {
+    await runTransaction(DB, async (transaction) => {
+      const bookmarkDoc = await transaction.get(bookmarkRef);
+
+      if (!bookmarkDoc.exists()) {
+        // If the document doesn't exist, create a new one with created and updated timestamps
+        transaction.set(bookmarkRef, {
+          bookmark,
+          created: serverTimestamp(),
+          updated: serverTimestamp(),
+        });
+      } else {
+        // If the document exists, only update the bookmark and the updated timestamp
+        transaction.update(bookmarkRef, {
+          bookmark,
+          updated: serverTimestamp(),
+        });
+      }
+    });
+    return true;
+  } catch (e) {
+    console.error("Error setting bookmark for book", e);
+    return false;
   }
 }

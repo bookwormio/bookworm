@@ -1,10 +1,11 @@
 import { FontAwesome5 } from "@expo/vector-icons";
+
+import { Slider } from "@miblanchard/react-native-slider";
 import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Animated,
   Image,
   ScrollView,
   StyleSheet,
@@ -13,75 +14,51 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import RNPickerSelect from "react-native-picker-select";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
-import BookDropdownSelect from "../../../components/bookselect/BookDropdownSelect";
-import { HOURS, MINUTES } from "../../../constants/constants";
-
-import { addDataEntry } from "../../../services/firebase-services/DataQueries";
-import { createPost } from "../../../services/firebase-services/PostQueries";
 import {
-  type CreatePostModel,
-  type CreateTrackingModel,
-  type FlatBookItemModel,
-} from "../../../types";
+  useGetBookmarkForBook,
+  useSetBookmarkForBook,
+} from "../../../components/bookmark/hooks/useBookmarkQueries";
+import BookDropdownSelect from "../../../components/bookselect/BookDropdownSelect";
+import { createPost } from "../../../services/firebase-services/PostQueries";
+import { type CreatePostModel, type FlatBookItemModel } from "../../../types";
 
 const NewPost = () => {
   const { user } = useAuth();
-  const [pagesRead, setPagesRead] = useState("");
   const [text, setText] = useState("");
-  const [images, setImages] = useState<string[]>([]);
-  const [creatingPost, setCreatedPost] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [selectedHours, setSelectedHours] = useState(0);
-  const [selectedMinutes, setSelectedMinutes] = useState(0);
-  const fadeAnimation = useRef(new Animated.Value(0)).current;
-  const slideAnimation = useRef(new Animated.Value(0)).current;
-
   const [selectedBook, setSelectedBook] = useState<FlatBookItemModel | null>(
     null,
   );
-  const [searchPhrase, setSearchPhrase] = useState<string>("");
+  const [searchPhrase, setSearchPhrase] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [textboxFocused, setTextboxFocused] = useState(false);
+  const [shareDisabled, setShareDisabled] = useState(true);
 
-  const trackingMutation = useMutation({
-    mutationFn: addDataEntry,
-  });
+  const { mutate: setBookmark } = useSetBookmarkForBook();
+  const postMutation = useMutation({ mutationFn: createPost });
 
-  const createNewTracking = () => {
-    if (user !== undefined && user !== null) {
-      setLoading(true);
-      const tracking: CreateTrackingModel = {
-        userid: user.uid,
-        pagesRead: +pagesRead,
-        minutesRead: 60 * selectedHours + selectedMinutes,
-      };
-      trackingMutation.mutate(tracking);
-      setSelectedBook(null);
-      setSearchPhrase("");
-      setSelectedHours(0);
-      setSelectedMinutes(0);
-      setPagesRead("");
-      setLoading(false);
-      Toast.show({
-        type: "success",
-        text1: "Tracking Added",
-        text2: pagesRead + " pages of " + selectedBook?.title,
-      });
-    } else {
-      Toast.show({
-        type: "error",
-        text1: "Current user is undefined",
-      });
+  const {
+    data: oldBookmark,
+    isLoading: bookmarkLoading,
+    isSuccess: isBookmarkLoadedSuccess,
+  } = useGetBookmarkForBook(user?.uid, selectedBook?.id);
+
+  const [currentBookmark, setCurrentBookmark] = useState(0);
+
+  useEffect(() => {
+    setCurrentBookmark(isBookmarkLoadedSuccess ? oldBookmark ?? 0 : 0);
+  }, [isBookmarkLoadedSuccess, oldBookmark, selectedBook]);
+
+  useEffect(() => {
+    if (selectedBook != null && text !== "") {
+      setShareDisabled(false);
     }
-  };
-
-  const postMutation = useMutation({
-    mutationFn: createPost,
-  });
+  }, [selectedBook, text]);
 
   const createNewPost = () => {
-    if (user !== undefined && user !== null) {
+    if (user != null) {
       setLoading(true);
       const post: CreatePostModel = {
         userid: user.uid,
@@ -90,16 +67,11 @@ const NewPost = () => {
         booktitle: selectedBook !== null ? selectedBook.title : "",
         text,
         images,
+        oldBookmark,
+        newBookmark: currentBookmark,
       };
       postMutation.mutate(post);
-      removePostView();
-      setSelectedBook(null);
-      setSearchPhrase("");
-      setSelectedHours(0);
-      setSelectedMinutes(0);
-      setText("");
-      setImages([]);
-      setLoading(false);
+      resetForm();
       Toast.show({
         type: "success",
         text1: "Post Created",
@@ -112,22 +84,22 @@ const NewPost = () => {
     }
   };
 
+  const resetForm = () => {
+    setSelectedBook(null);
+    setSearchPhrase("");
+    setText("");
+    setImages([]);
+    setCurrentBookmark(0);
+    setLoading(false);
+  };
+
   const fieldsMissing = () => {
     const missingFields: string[] = [];
-    const totalMinutes = 60 * selectedHours + selectedMinutes;
-    if (selectedBook === null || selectedBook?.id === "") {
+    if (selectedBook?.id == null) {
       missingFields.push("Book");
     }
-    if (totalMinutes === 0) {
-      missingFields.push("Time Read");
-    }
-    if (pagesRead === "") {
-      missingFields.push("Pages Read");
-    }
-    if (creatingPost) {
-      if (text === "") {
-        missingFields.push("Post Text");
-      }
+    if (text === "") {
+      missingFields.push("Post Text");
     }
     if (missingFields.length > 0) {
       Toast.show({
@@ -140,6 +112,21 @@ const NewPost = () => {
     return false;
   };
 
+  const handleShareClicked = () => {
+    if (!fieldsMissing()) {
+      createNewPost();
+      setBookmark({
+        userID: user?.uid,
+        bookID: selectedBook?.id,
+        bookmark: currentBookmark,
+      });
+    }
+  };
+
+  const removeImageByIndex = (indexToRemove: number) => {
+    setImages((images) => images.filter((_, index) => index !== indexToRemove));
+  };
+
   const pickImageAsync = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -148,47 +135,6 @@ const NewPost = () => {
     if (!result.canceled) {
       setImages((oldArray) => [...oldArray, result.assets[0].uri]);
     }
-  };
-
-  const removeImageByIndex = (indexToRemove: number) => {
-    setImages((images) => images.filter((_, index) => index !== indexToRemove));
-  };
-
-  const addPostView = () => {
-    setCreatedPost(true);
-    Animated.parallel([
-      Animated.timing(slideAnimation, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnimation, {
-        toValue: 1,
-        delay: 250,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  const removePostView = () => {
-    setCreatedPost(false);
-    Animated.parallel([
-      Animated.timing(fadeAnimation, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnimation, {
-        delay: 200,
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setText("");
-      setImages([]);
-    });
   };
 
   if (loading) {
@@ -205,238 +151,234 @@ const NewPost = () => {
 
   return (
     <View style={styles.container}>
-      <Toast />
-      <BookDropdownSelect
-        selectedBook={selectedBook}
-        setSelectedBook={setSelectedBook}
-        searchPhrase={searchPhrase}
-        setSearchPhrase={setSearchPhrase}
-      ></BookDropdownSelect>
-      <View style={styles.pickerRow}>
-        <View style={styles.pickerContainer}>
-          <TextInput
-            placeholder="Time Read:"
-            editable={false}
-            style={{ marginRight: 15 }}
-          />
-          <RNPickerSelect
-            placeholder={{
-              label: "0",
-              value: "0",
-            }}
-            items={HOURS}
-            value={selectedHours}
-            onValueChange={(hoursString: string) => {
-              setSelectedHours(+hoursString);
-            }}
-            useNativeAndroidPickerStyle={false}
-            style={pickerSelectStyles}
-          />
-          <Text> hrs </Text>
-          <RNPickerSelect
-            placeholder={{
-              label: "0",
-              value: "0",
-            }}
-            items={MINUTES}
-            value={selectedMinutes}
-            onValueChange={(minutesString: string) => {
-              setSelectedMinutes(+minutesString);
-            }}
-            useNativeAndroidPickerStyle={false}
-            style={pickerSelectStyles}
-          />
-          <Text> mins </Text>
-        </View>
-        <TextInput
-          style={styles.pagesInput}
-          value={pagesRead}
-          keyboardType="numeric"
-          placeholder="Pages Read"
-          onChangeText={(pages) => {
-            setPagesRead(pages);
-          }}
+      <View style={styles.dropdownContainer}>
+        <BookDropdownSelect
+          selectedBook={selectedBook}
+          setSelectedBook={setSelectedBook}
+          searchPhrase={searchPhrase}
+          setSearchPhrase={setSearchPhrase}
         />
       </View>
-      <Animated.View
-        style={[
-          styles.rowContainer,
-          {
-            transform: [
-              {
-                translateY: slideAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0, 250],
-                }),
-              },
-            ],
-          },
-        ]}
-      >
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => {
-            if (creatingPost) {
-              removePostView();
-            } else {
-              if (!fieldsMissing()) {
-                createNewTracking();
-              }
-            }
-          }}
-        >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ color: "#FB6D0B", fontSize: 18 }}>
-              {creatingPost ? "Remove Post " : "Add Tracking"}
-            </Text>
-            {creatingPost && (
-              <FontAwesome5
-                name="caret-up"
-                size={20}
-                style={{ color: "#FB6D0B" }}
-              />
-            )}
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => {
-            if (!creatingPost) {
-              addPostView();
-            } else {
-              if (!fieldsMissing()) {
-                createNewPost();
-                createNewTracking();
-              }
-            }
-          }}
-        >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ color: "#FB6D0B", fontSize: 18 }}>
-              {creatingPost ? "Create Post + Tracking" : "Create Post "}
-            </Text>
-            {!creatingPost && (
-              <FontAwesome5
-                name="caret-down"
-                size={20}
-                style={{ color: "#FB6D0B" }}
-              />
-            )}
-          </View>
-        </TouchableOpacity>
-      </Animated.View>
-      <Animated.View style={{ opacity: fadeAnimation, width: "100%" }}>
-        <TextInput
-          style={[styles.input, { height: "25%" }]}
-          multiline={true}
-          value={text}
-          placeholder="Add some text to your post"
-          onChangeText={(text) => {
-            setText(text);
-          }}
-          editable={creatingPost}
-        />
-        <ScrollView horizontal={true} style={{ marginTop: 20 }}>
-          {images.map((image: string, index: number) => (
-            <View key={index}>
-              <Image source={{ uri: image }} style={styles.image} />
-              <TouchableOpacity
-                style={styles.removeButton}
-                onPress={() => {
-                  removeImageByIndex(index);
-                }}
-              >
-                <FontAwesome5 name="times-circle" size={20} />
-              </TouchableOpacity>
-            </View>
-          ))}
-          <TouchableOpacity
-            style={styles.defaultImage}
-            onPress={() => {
-              pickImageAsync().catch((error) => {
-                Toast.show({
-                  type: "error",
-                  text1: "Error selecting image: " + error,
-                  text2: "Please adjust your media permissions",
-                });
-              });
+      {selectedBook?.pageCount != null && !bookmarkLoading && (
+        <>
+          <Text style={styles.bookmark}>Bookmark</Text>
+          <Slider
+            containerStyle={styles.sliderContainer}
+            value={[currentBookmark]}
+            onValueChange={(value: number[]) => {
+              setCurrentBookmark(value[0]);
             }}
-            disabled={!creatingPost}
+            minimumValue={0}
+            maximumValue={selectedBook.pageCount}
+            renderThumbComponent={() => (
+              <BookmarkSliderThumb currentBookmark={currentBookmark} />
+            )}
+            step={1}
+            minimumTrackTintColor="#FB6D0B"
+          />
+        </>
+      )}
+
+      <View style={styles.textInputWrapper}>
+        <View
+          style={[
+            styles.textInputDivider,
+            textboxFocused && styles.textInputDividerFocused,
+          ]}
+        />
+        <View style={styles.textInputContainer}>
+          <TextInput
+            style={styles.textInputField}
+            multiline={true}
+            value={text}
+            placeholder="What's on your mind..."
+            placeholderTextColor="#888888"
+            onChangeText={(text) => {
+              setText(text);
+            }}
+            onFocus={() => {
+              setTextboxFocused(true);
+            }}
+            onBlur={() => {
+              setTextboxFocused(false);
+            }}
+          />
+        </View>
+        <View
+          style={[
+            styles.textInputDivider,
+            textboxFocused && styles.textInputDividerFocused,
+          ]}
+        />
+      </View>
+      <ScrollView
+        horizontal={true}
+        style={styles.imageScroll}
+        showsHorizontalScrollIndicator={false}
+      >
+        {images.map((image, index) => (
+          <View key={index} style={styles.imageContainer}>
+            <Image source={{ uri: image }} style={styles.image} />
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => {
+                removeImageByIndex(index);
+              }}
+            >
+              <FontAwesome5 name="times-circle" size={20} />
+            </TouchableOpacity>
+          </View>
+        ))}
+        <TouchableOpacity
+          style={styles.addImageButton}
+          onPress={() => {
+            pickImageAsync().catch((error) => {
+              Toast.show({
+                type: "error",
+                text1: "Error selecting image: " + error,
+                text2: "Please adjust your media permissions",
+              });
+            });
+          }}
+        >
+          <FontAwesome5 name="plus" size={24} color="#555555" />
+        </TouchableOpacity>
+      </ScrollView>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.button, shareDisabled && styles.buttonDisabled]}
+          onPress={handleShareClicked}
+          disabled={shareDisabled}
+        >
+          <Text
+            style={[
+              styles.buttonText,
+              shareDisabled && styles.buttonTextDisabled,
+            ]}
           >
-            <FontAwesome5 name="image" size={20} />
-          </TouchableOpacity>
-        </ScrollView>
-      </Animated.View>
+            Share!
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <Toast />
     </View>
   );
 };
 
-export default NewPost;
+interface BookmarkSliderThumbProps {
+  currentBookmark: number;
+}
+
+const BookmarkSliderThumb = ({ currentBookmark }: BookmarkSliderThumbProps) => {
+  return (
+    <View style={styles.sliderThumbContainer}>
+      <Text>{currentBookmark}</Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
     paddingHorizontal: 20,
-    justifyContent: "center",
+    paddingTop: 20,
+  },
+  dropdownContainer: {
+    paddingBottom: 20,
+  },
+  bookmark: {
+    fontSize: 16,
+    marginBottom: 10,
+    fontWeight: "bold",
+  },
+  slider: {
+    marginBottom: 20,
+  },
+  inputContainer: {
+    borderRadius: 15,
+    marginBottom: 20,
   },
   input: {
-    borderColor: "gray",
-    width: "100%",
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-  },
-  rowContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    zIndex: 999,
-    marginTop: 15,
-  },
-  pickerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    zIndex: 999,
-    width: "100%",
-    marginTop: 10,
-  },
-  pagesInput: {
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-    width: "30%",
-  },
-  defaultImage: {
-    backgroundColor: "#d3d3d3",
+    padding: 15,
+    fontSize: 16,
     height: 100,
-    width: 100,
-    borderColor: "black",
-    borderRadius: 10,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    textAlignVertical: "top",
+  },
+  imageScroll: {
+    flexGrow: 0,
+    marginBottom: 20,
+  },
+  imageContainer: {
+    marginRight: 10,
   },
   image: {
-    height: 100,
-    width: 100,
-    borderColor: "black",
+    height: 200,
+    width: 200,
     borderRadius: 10,
-    borderWidth: 1,
-    marginRight: 10,
   },
   removeButton: {
     position: "absolute",
-    top: 0,
-    right: 7,
-    backgroundColor: "white",
-    borderRadius: 50,
-    width: 20,
-    height: 20,
+    top: 5,
+    right: 5,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderRadius: 20,
+    width: 30,
+    height: 30,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  addImageButton: {
+    height: 200,
+    width: 200,
+    backgroundColor: "#DDDDDD",
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonContainer: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+  },
+  button: {
+    backgroundColor: "#FB6D0B",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: "rgba(251, 109, 11, 0.5)", // 50% opacity of original color
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
+  },
+  buttonTextDisabled: {
+    color: "rgba(255, 255, 255, 0.7)", // 70% opacity white
+  },
+  sliderContainer: {
+    width: "100%",
+    height: 20,
+    alignSelf: "flex-start",
+    paddingVertical: 30,
+  },
+  sliderThumbContainer: {
+    alignItems: "center",
+    backgroundColor: "#F2F2F2",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    borderColor: "grey",
   },
   loading: {
     alignItems: "center",
@@ -444,49 +386,28 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: "50%",
   },
-  pickerContainer: {
-    flexDirection: "row",
-    alignItems: "center", // Vertically center the items
-    backgroundColor: "#F2F2F2",
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: "grey",
-    height: "100%",
-    paddingHorizontal: 10,
+  textInputWrapper: {
+    marginVertical: 15,
   },
-  iconButton: {
-    marginHorizontal: 10,
+  textInputContainer: {
+    borderRadius: 8,
+    padding: 10,
+    marginVertical: 5,
+  },
+  textInputField: {
+    color: "#333333",
+    fontSize: 16,
+    minHeight: 100,
+    textAlignVertical: "top",
+  },
+  textInputDivider: {
+    height: 1,
+    backgroundColor: "#E0E0E0",
+    marginVertical: 5,
+  },
+  textInputDividerFocused: {
+    backgroundColor: "#000000",
   },
 });
 
-const pickerSelectStyles = StyleSheet.create({
-  placeholder: {
-    color: "black",
-  },
-  inputIOS: {
-    fontSize: 16,
-    width: 30,
-    height: 30,
-    borderRadius: 5,
-    color: "black",
-    backgroundColor: "#c9ccd3",
-    textAlign: "center",
-    marginTop: "10%",
-  },
-  inputAndroid: {
-    fontSize: 16,
-    width: 30,
-    height: 30,
-    borderRadius: 5,
-    color: "black",
-    backgroundColor: "#c9ccd3",
-    textAlign: "center",
-    marginTop: "10%",
-  },
-  chevronDown: {
-    display: "none",
-  },
-  chevronUp: {
-    display: "none",
-  },
-});
+export default NewPost;

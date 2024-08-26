@@ -6,6 +6,9 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -18,7 +21,7 @@ import {
   getUserProfileURL,
   newFetchUserInfo,
   updateUser,
-} from "../../../services/firebase-services/userQueries";
+} from "../../../services/firebase-services/UserQueries";
 import { emptyQuery } from "../../../services/util/queryUtils";
 import { type UserDataModel } from "../../../types";
 
@@ -28,6 +31,8 @@ const EditProfile = () => {
   const [editFirst, setEditFirst] = useState("");
   const [editLast, setEditLast] = useState("");
   const [editBio, setEditBio] = useState("");
+  const [editCity, setEditCity] = useState("");
+  const [editState, setEditState] = useState("");
   const [image, setImage] = useState("");
 
   const queryClient = useQueryClient();
@@ -81,6 +86,12 @@ const EditProfile = () => {
       if (userDataTyped.bio !== undefined) {
         setEditBio(userDataTyped.bio);
       }
+      if (userDataTyped.city !== undefined) {
+        setEditCity(userDataTyped.city);
+      }
+      if (userDataTyped.state !== undefined) {
+        setEditState(userDataTyped.state);
+      }
     }
   }, [userData]);
 
@@ -109,6 +120,8 @@ const EditProfile = () => {
     newUserData.last = editLast;
     newUserData.number = editPhone;
     newUserData.bio = editBio;
+    newUserData.city = editCity;
+    newUserData.state = editState;
     if (image !== "" && image !== undefined && image !== null) {
       newUserData.profilepic = image;
     }
@@ -140,89 +153,120 @@ const EditProfile = () => {
   }
 
   return (
-    <View>
-      <TouchableOpacity
-        style={styles.defaultImageContainer}
-        onPress={() => {
-          pickImageAsync().catch((error) => {
-            Toast.show({
-              type: "error",
-              text1: "Error selecting image: " + error,
-              text2: "Please adjust your media permissions",
-            });
-          });
-        }}
-      >
-        {image !== "" ? (
-          <Image source={{ uri: image }} style={styles.defaultImage} />
-        ) : (
-          <FontAwesome5 name="user" size={40} />
-        )}
-      </TouchableOpacity>
-      <View>
-        <Text style={styles.regtext}>First Name</Text>
-        <TextInput
-          style={styles.input}
-          value={editFirst}
-          placeholder={"first name"}
-          autoCapitalize="none"
-          onChangeText={(text) => {
-            setEditFirst(text);
-          }}
-        />
-      </View>
-      <View>
-        <Text style={styles.regtext}>Last Name</Text>
-        <TextInput
-          style={styles.input}
-          value={editLast}
-          placeholder={"last name"}
-          autoCapitalize="none"
-          onChangeText={(text) => {
-            setEditLast(text);
-          }}
-        />
-      </View>
-      <View>
-        <Text style={styles.regtext}>Phone Number</Text>
-        <TextInput
-          style={styles.input}
-          value={editPhone}
-          placeholder={"phone number"}
-          autoCapitalize="none"
-          onChangeText={(text) => {
-            setEditPhone(text);
-          }}
-        />
-      </View>
-      <View>
-        <Text style={styles.regtext}>Bio</Text>
-        <TextInput
-          style={styles.input}
-          value={editBio}
-          placeholder={"bio"}
-          autoCapitalize="none"
-          multiline={true}
-          onChangeText={(text) => {
-            setEditBio(text);
-          }}
-        />
-      </View>
-      <View style={styles.outerButtonsContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            onClose();
-            router.back();
-          }}
-        >
-          <Text style={styles.buttonText}>{" Close "}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handeSaveClick}>
-          <Text style={styles.buttonText}>{" Save "}</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View>
+          <TouchableOpacity
+            style={styles.defaultImageContainer}
+            onPress={() => {
+              pickImageAsync().catch((error) => {
+                Toast.show({
+                  type: "error",
+                  text1: "Error selecting image: " + error,
+                  text2: "Please adjust your media permissions",
+                });
+              });
+            }}
+          >
+            {image !== "" ? (
+              <Image source={{ uri: image }} style={styles.defaultImage} />
+            ) : (
+              <FontAwesome5 name="user" size={40} />
+            )}
+          </TouchableOpacity>
+          <View>
+            <Text style={styles.regtext}>First Name</Text>
+            <TextInput
+              style={styles.input}
+              value={editFirst}
+              placeholder={"first name"}
+              autoCapitalize="none"
+              onChangeText={(text) => {
+                setEditFirst(text);
+              }}
+            />
+          </View>
+          <View>
+            <Text style={styles.regtext}>Last Name</Text>
+            <TextInput
+              style={styles.input}
+              value={editLast}
+              placeholder={"last name"}
+              autoCapitalize="none"
+              onChangeText={(text) => {
+                setEditLast(text);
+              }}
+            />
+          </View>
+          <View>
+            <Text style={styles.regtext}>Phone Number</Text>
+            <TextInput
+              style={styles.input}
+              value={editPhone}
+              placeholder={"phone number"}
+              autoCapitalize="none"
+              onChangeText={(text) => {
+                setEditPhone(text);
+              }}
+            />
+          </View>
+          <View>
+            <Text style={styles.regtext}>Bio</Text>
+            <TextInput
+              style={styles.input}
+              value={editBio}
+              placeholder={"bio"}
+              autoCapitalize="none"
+              multiline={true}
+              onChangeText={(text) => {
+                setEditBio(text);
+              }}
+            />
+          </View>
+          <View>
+            <Text style={styles.regtext}>City</Text>
+            <TextInput
+              style={styles.input}
+              value={editCity}
+              placeholder={"city"}
+              autoCapitalize="none"
+              onChangeText={(text) => {
+                setEditCity(text);
+              }}
+            />
+          </View>
+          <View>
+            <Text style={styles.regtext}>State</Text>
+            <TextInput
+              style={styles.input}
+              value={editState}
+              placeholder={"state"}
+              autoCapitalize="none"
+              onChangeText={(text) => {
+                setEditState(text);
+              }}
+            />
+          </View>
+          <View style={styles.outerButtonsContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                onClose();
+                router.back();
+              }}
+            >
+              <Text style={styles.buttonText}>{" Close "}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handeSaveClick}>
+              <Text style={styles.buttonText}>{" Save "}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -253,6 +297,14 @@ const styles = StyleSheet.create({
     color: "white", // Ensure text color is white
     fontSize: 16,
     fontWeight: "bold",
+  },
+  keyAvoidContainer: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingBottom: 150,
   },
   loading: {
     flex: 1,

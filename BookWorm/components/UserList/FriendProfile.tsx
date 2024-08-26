@@ -18,7 +18,7 @@ import {
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
   getUserProfileURL,
-} from "../../services/firebase-services/userQueries";
+} from "../../services/firebase-services/UserQueries";
 import { type ConnectionModel, type UserDataModel } from "../../types";
 import { useAuth } from "../auth/context";
 

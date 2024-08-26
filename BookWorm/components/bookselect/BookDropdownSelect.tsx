@@ -40,6 +40,7 @@ const BookDropdownSelect = ({
             title: book.volumeInfo?.title,
             image: book.volumeInfo?.imageLinks?.smallThumbnail,
             author: book.volumeInfo?.authors[0],
+            pageCount: book.volumeInfo?.pageCount,
           })),
     staleTime: 60000, // Set stale time to 1 minute
   });
@@ -104,7 +105,7 @@ export default BookDropdownSelect;
 const styles = StyleSheet.create({
   dropdown: {
     width: "100%",
-    margin: 16,
+    justifyContent: "center",
     height: 50,
     backgroundColor: "white",
     borderRadius: 12,
