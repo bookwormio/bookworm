@@ -105,6 +105,7 @@ const Posts = () => {
               post={post}
               created={post.created}
               currentDate={currentDate}
+              showComments={false}
             />
           </TouchableOpacity>
         )}

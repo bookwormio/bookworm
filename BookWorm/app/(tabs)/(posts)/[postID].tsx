@@ -74,7 +74,12 @@ const ViewPost = () => {
       {/* TODO: Down the user's name should just be clickable instead of a button */}
       {post != null && !postLoading && (
         <View style={styles.postContainer}>
-          <Post post={post} created={post.created} currentDate={new Date()} />
+          <Post
+            post={post}
+            created={post.created}
+            currentDate={new Date()}
+            showComments={true}
+          />
           {post?.user.id !== user?.uid && (
             <View style={styles.outerButtonsContainer}>
               <TouchableOpacity

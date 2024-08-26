@@ -102,8 +102,15 @@ interface PostModel {
   user: UserModel;
   images: JSX.Element[];
   likes: string[];
+  comments: CommentModel[];
   oldBookmark: number;
   newBookmark: number;
+}
+
+interface CommentModel {
+  userID: string;
+  first: string;
+  text: string;
 }
 
 interface RelationshipModel {

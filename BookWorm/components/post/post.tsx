@@ -3,21 +3,28 @@ import { useMutation } from "@tanstack/react-query";
 import { type Timestamp } from "firebase/firestore";
 import React, { memo, useState } from "react";
 import {
+  FlatList,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { DAYS_OF_WEEK, MONTHS_OF_YEAR } from "../../constants/constants";
-import { addLikeToPost } from "../../services/firebase-services/PostQueries";
-import { type PostModel } from "../../types";
+import {
+  addCommentToPost,
+  addLikeToPost,
+} from "../../services/firebase-services/PostQueries";
+import { type CommentModel, type PostModel } from "../../types";
 import { useAuth } from "../auth/context";
+import Comment from "../comment/comment";
 
 interface PostProps {
   post: PostModel;
   created: Timestamp;
   currentDate: Date;
+  showComments: boolean;
 }
 
 const formatDate = (created: Timestamp, currentDate: Date) => {
@@ -44,8 +51,13 @@ const formatDate = (created: Timestamp, currentDate: Date) => {
 };
 
 // Using memo here makes it so it re-renders only when the props passed to it change
-const Post = memo(({ post, created, currentDate }: PostProps) => {
-  const [postLikes, setPostLikes] = useState<string[]>(post.likes as string[]);
+const Post = memo(({ post, created, currentDate, showComments }: PostProps) => {
+  const [postLikes, setPostLikes] = useState<string[]>(post.likes);
+  const [showCommentSection, setShowComments] = useState(showComments);
+  const [postComments, setPostComments] = useState<CommentModel[]>(
+    post.comments,
+  );
+  const [newComment, setNewComment] = useState("");
   const formattedDate = formatDate(created, currentDate);
   const { user } = useAuth();
 
@@ -60,7 +72,24 @@ const Post = memo(({ post, created, currentDate }: PostProps) => {
         addLikeToPost(user.uid, post.id)
           .then((updatedPost) => {
             if (updatedPost != null) {
-              setPostLikes(updatedPost.likes as string[]);
+              setPostLikes(updatedPost.likes);
+            }
+          })
+          .catch(() => {
+            console.error("Error liking post");
+          });
+      }
+    },
+  });
+
+  const commentMutation = useMutation({
+    mutationFn: async () => {
+      if (user != null) {
+        addCommentToPost(user.uid, post.id, newComment)
+          .then((updatedComments) => {
+            if (updatedComments != null) {
+              setNewComment("");
+              setPostComments(updatedComments);
             }
           })
           .catch(() => {
@@ -101,11 +130,47 @@ const Post = memo(({ post, created, currentDate }: PostProps) => {
           {postLikes.length}
           {postLikes.length === 1 ? " Like" : " Likes"}
         </Text>
-        <TouchableOpacity style={styles.likebutton}>
+        <TouchableOpacity
+          style={styles.likebutton}
+          onPress={() => {
+            setShowComments(!showCommentSection);
+          }}
+        >
           <FontAwesome5 name="comment" size={15} />
-          <Text style={{ paddingLeft: 5 }}>Comments</Text>
+          <Text style={{ paddingLeft: 5 }}>
+            {postComments.length}
+            {postComments.length === 1 ? " Comment" : " Comments"}
+          </Text>
         </TouchableOpacity>
       </View>
+      {showCommentSection && (
+        <>
+          <FlatList
+            data={postComments}
+            renderItem={({ item: comment }) => <Comment comment={comment} />}
+          />
+          <View style={styles.likebutton}>
+            <TextInput
+              style={{ flex: 1 }}
+              value={newComment}
+              placeholder={`Add a comment to ${post.user.first}'s post`}
+              autoCapitalize="none"
+              multiline
+              onChangeText={(text) => {
+                setNewComment(text);
+              }}
+            />
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                commentMutation.mutate();
+              }}
+            >
+              <Text style={styles.buttonText}>{"Comment"}</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
     </View>
   );
 });
@@ -139,5 +204,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingRight: 5,
     alignItems: "center",
+  },
+  button: {
+    marginLeft: 10,
+    backgroundColor: "#FB6D0B",
+    borderRadius: 5,
+    alignItems: "center",
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

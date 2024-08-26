@@ -19,12 +19,13 @@ import React from "react";
 import { BLURHASH } from "../../constants/constants";
 import { DB, STORAGE } from "../../firebase.config";
 import {
+  type CommentModel,
   type CreatePostModel,
   type PostModel,
   type UserModel,
 } from "../../types";
 import { getAllFollowing } from "./FriendQueries";
-import { fetchUsersByIDs } from "./UserQueries";
+import { fetchUser, fetchUsersByIDs } from "./UserQueries";
 
 /**
  * Follows a user by updating the relationship document between the current user and the friend user.
@@ -151,6 +152,7 @@ export async function fetchPostsByUserIDs(
             oldBookmark: postDoc.data().oldBookmark,
             newBookmark: postDoc.data().newBookmark,
             likes: postDoc.data().likes ?? [],
+            comments: (postDoc.data().comments as CommentModel[]) ?? [],
           };
           postsData.push(post);
         }
@@ -229,9 +231,10 @@ export async function fetchPostByPostID(
             text: postSnap.data().text,
             user,
             images,
+            likes: postSnap.data().likes ?? [],
+            comments: (postSnap.data().comments as CommentModel[]) ?? [],
             oldBookmark: postSnap.data().oldBookmark,
             newBookmark: postSnap.data().newBookmark,
-            likes: postSnap.data().likes ?? [],
           };
         }
       }
@@ -302,6 +305,38 @@ export async function addLikeToPost(
       });
     }
     return post;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export async function addCommentToPost(
+  userID: string,
+  postID: string,
+  commentText: string,
+): Promise<CommentModel[] | null> {
+  try {
+    const user = await fetchUser(userID);
+    if (user != null) {
+      const postRef = doc(DB, "posts", postID);
+      let updatedComments: CommentModel[] | null = null;
+      await runTransaction(DB, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        if (postSnap.exists()) {
+          const comments = (postSnap.data().comments as CommentModel[]) ?? [];
+          comments.push({
+            userID,
+            first: user.first,
+            text: commentText,
+          });
+          transaction.update(postRef, { comments });
+          updatedComments = comments;
+        }
+      });
+      return updatedComments;
+    }
+    return null;
   } catch (error) {
     console.error(error);
     return null;
