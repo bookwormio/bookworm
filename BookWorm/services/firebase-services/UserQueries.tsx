@@ -12,6 +12,7 @@ import {
   orderBy,
   query,
   type QuerySnapshot,
+  runTransaction,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -596,5 +597,74 @@ export async function getBooksByBookIDs(
   } catch (error) {
     console.error("Error fetching books by volume IDs", error);
     return [];
+  }
+}
+
+/**
+ * Get the bookmark for a certain book for a user.
+ * @param {string} userID - The user's ID.
+ * @param {string} bookID - The book's ID.
+ * @returns {Promise<number>} - The bookmark for the book.
+ */
+export async function getBookmarkForBook(
+  userID: string,
+  bookID: string,
+): Promise<number> {
+  try {
+    const bookRef = doc(DB, "bookmark_collection", userID, "bookmarks", bookID);
+    const bookSnap = await getDoc(bookRef);
+    if (bookSnap.exists()) {
+      const data = bookSnap.data();
+      return typeof data.bookmark === "number" ? data.bookmark : 0;
+    }
+    return 0;
+  } catch (e) {
+    console.error("Error getting bookmark for book", e);
+    throw e; // Re-throw the error to allow the caller to handle it
+  }
+}
+
+/**
+ * Set or update the bookmark for a certain book for a user.
+ * @param {string} userID - The user's ID.
+ * @param {string} bookID - The book's ID.
+ * @param {number} bookmark - The bookmark for the book.
+ * @returns {Promise<boolean>} - A promise that resolves to true if the bookmark was successfully set, otherwise false.
+ */
+export async function setBookmarkForBook(
+  userID: string,
+  bookID: string,
+  bookmark: number,
+): Promise<boolean> {
+  const bookmarkRef = doc(
+    DB,
+    "bookmark_collection",
+    userID,
+    "bookmarks",
+    bookID,
+  );
+  try {
+    await runTransaction(DB, async (transaction) => {
+      const bookmarkDoc = await transaction.get(bookmarkRef);
+
+      if (!bookmarkDoc.exists()) {
+        // If the document doesn't exist, create a new one with created and updated timestamps
+        transaction.set(bookmarkRef, {
+          bookmark,
+          created: serverTimestamp(),
+          updated: serverTimestamp(),
+        });
+      } else {
+        // If the document exists, only update the bookmark and the updated timestamp
+        transaction.update(bookmarkRef, {
+          bookmark,
+          updated: serverTimestamp(),
+        });
+      }
+    });
+    return true;
+  } catch (e) {
+    console.error("Error setting bookmark for book", e);
+    return false;
   }
 }

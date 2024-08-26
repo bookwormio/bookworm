@@ -40,6 +40,8 @@ interface CreatePostModel {
   booktitle: string; // TODO: Potentially remove
   text: string;
   images: string[];
+  oldBookmark: number | undefined;
+  newBookmark: number | undefined;
 }
 
 interface ConnectionModel {
@@ -99,6 +101,8 @@ interface PostModel {
   text: string;
   user: UserModel;
   images: JSX.Element[];
+  oldBookmark: number;
+  newBookmark: number;
 }
 
 interface RelationshipModel {
@@ -136,6 +140,7 @@ interface FlatBookItemModel {
   // TODO change this to use new expo images
   image: string;
   author: string;
+  pageCount: number | undefined;
 }
 interface BookShelfBookModel {
   id: string;

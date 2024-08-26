@@ -2,7 +2,7 @@ import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { type ServerBookShelfName } from "../../../enums/Enums";
 import { useAuth } from "../../auth/context";
-import { useGetBooksForBookshelves } from "../hooks/bookshelfQueries";
+import { useGetBooksForBookshelves } from "../hooks/useBookshelfQueries";
 import BookShelf from "./BookShelf";
 
 const ProfileBookShelves = () => {

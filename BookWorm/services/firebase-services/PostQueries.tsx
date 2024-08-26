@@ -24,7 +24,7 @@ import {
   type UserModel,
 } from "../../types";
 import { getAllFollowing } from "./FriendQueries";
-import { fetchUsersByIDs } from "./userQueries";
+import { fetchUsersByIDs } from "./UserQueries";
 
 /**
  * Follows a user by updating the relationship document between the current user and the friend user.
@@ -45,6 +45,8 @@ export async function createPost(post: CreatePostModel) {
       booktitle: post.booktitle,
       text: post.text,
       image: post.images.length,
+      oldBookmark: post.oldBookmark,
+      newBookmark: post.newBookmark,
     })
       .then(async (docRef) => {
         if (post.images.length > 0) {
@@ -146,6 +148,8 @@ export async function fetchPostsByUserIDs(
             text: postDoc.data().text,
             user,
             images,
+            oldBookmark: postDoc.data().oldBookmark,
+            newBookmark: postDoc.data().newBookmark,
           };
           postsData.push(post);
         }
@@ -224,6 +228,8 @@ export async function fetchPostByPostID(
             text: postSnap.data().text,
             user,
             images,
+            oldBookmark: postSnap.data().oldBookmark,
+            newBookmark: postSnap.data().newBookmark,
           };
         }
       }
