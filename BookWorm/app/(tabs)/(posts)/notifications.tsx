@@ -22,16 +22,6 @@ const NotificationsScreen = () => {
     },
   });
 
-  interface ItemProps {
-    title: string;
-  }
-
-  const Item = (title: string) => (
-    <View>
-      <Text style={styles.title}>{title}</Text>
-    </View>
-  );
-
   if (!notifIsLoading) {
     // console.log(notifdata);
     if (notifdata !== null && notifdata !== undefined) {
