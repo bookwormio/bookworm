@@ -45,7 +45,7 @@ const formatDate = (created: Timestamp, currentDate: Date) => {
 
 // Using memo here makes it so it re-renders only when the props passed to it change
 const Post = memo(({ post, created, currentDate }: PostProps) => {
-  const [postLikes, setPostLikes] = useState(post.likes);
+  const [postLikes, setPostLikes] = useState<string[]>(post.likes as string[]);
   const formattedDate = formatDate(created, currentDate);
   const { user } = useAuth();
 
@@ -60,7 +60,7 @@ const Post = memo(({ post, created, currentDate }: PostProps) => {
         addLikeToPost(user.uid, post.id)
           .then((updatedPost) => {
             if (updatedPost != null) {
-              setPostLikes(updatedPost.likes);
+              setPostLikes(updatedPost.likes as string[]);
             }
           })
           .catch(() => {
