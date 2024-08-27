@@ -63,14 +63,6 @@ const BookViewPage = () => {
     ),
     [],
   );
-      <BottomSheetBackdrop
-        {...props}
-        appearsOnIndex={0}
-        disappearsOnIndex={-1}
-      />
-    ),
-    [],
-  );
 
   const { data: queryBookData, isLoading: isLoadingBook } = useQuery({
     queryKey: ["bookdata", bookID],
