@@ -589,7 +589,7 @@ export async function getBooksByBookIDs(
     });
 
     // Extract volume info from the response
-    const volumeInfos = response.data.items.map((item) => item.volumeInfo);
+    const volumeInfos = response?.data?.items.map((item) => item?.volumeInfo);
 
     return volumeInfos;
   } catch (error) {
