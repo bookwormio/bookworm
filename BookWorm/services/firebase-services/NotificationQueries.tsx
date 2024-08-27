@@ -1,6 +1,14 @@
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  query,
+  serverTimestamp,
+  type Timestamp,
+  where,
+} from "firebase/firestore";
 import { DB } from "../../firebase.config";
-import { type BasicNotification } from "../../types";
+import { type BasicNotification, type FRNotification } from "../../types";
 
 export async function createFriendRequestNotification(
   notif: BasicNotification,
@@ -10,7 +18,10 @@ export async function createFriendRequestNotification(
       await addDoc(collection(DB, "notifications"), {
         user: notif.user,
         message: notif.message,
-        sender_id: notif.sender_id,
+        sender: notif.sender,
+        created: serverTimestamp(),
+        read: null,
+        type: "FRIEND_REQUEST",
       });
     } catch (error) {
       console.error("Error creating friend request notification: ", error);
@@ -20,9 +31,9 @@ export async function createFriendRequestNotification(
 
 export async function getAllFRNotifications(
   userID: string,
-): Promise<BasicNotification[]> {
+): Promise<FRNotification[]> {
   try {
-    const notifdata: BasicNotification[] = [];
+    const notifdata: FRNotification[] = [];
     const q = query(
       collection(DB, "notifications"),
       where("user", "==", userID),
@@ -35,7 +46,10 @@ export async function getAllFRNotifications(
       const notif = {
         user: notDoc.data().user,
         message: notDoc.data().message,
-        sender_id: notDoc.data().sender_id,
+        sender: notDoc.data().sender,
+        created: notDoc.data().created as Timestamp,
+        read: notDoc.data().read,
+        type: notDoc.data().type,
       };
       console.log(notif);
       notifdata.push(notif);

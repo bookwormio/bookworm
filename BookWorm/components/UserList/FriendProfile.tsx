@@ -220,7 +220,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         const FRnotify: BasicNotification = {
           user: friendUserID,
           message: "someone has followed you",
-          sender_id: user?.uid, // Use an empty string if user?.uid is undefined
+          sender: user?.uid, // Use an empty string if user?.uid is undefined
         };
         notifyMutation.mutate(FRnotify);
       }

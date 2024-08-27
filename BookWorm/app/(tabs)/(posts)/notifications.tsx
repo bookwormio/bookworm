@@ -26,7 +26,9 @@ const NotificationsScreen = () => {
     // console.log(notifdata);
     if (notifdata !== null && notifdata !== undefined) {
       console.log("here");
-      console.log(notifdata);
+      console.log(notifdata[0].created);
+      const date: Date = notifdata[0].created.toDate();
+      console.log(date);
       const not = notifdata;
       console.log(not[0]);
       return (
@@ -34,13 +36,24 @@ const NotificationsScreen = () => {
           <FlatList
             style={{ flex: 1 }}
             data={notifdata}
-            renderItem={({ item }) => (
-              <View>
-                <Text>
-                  {item.sender_id} {item.message}
-                </Text>
-              </View>
-            )}
+            renderItem={({ item }) => {
+              const createdDate: Date = item.created.toDate();
+              const formattedDate = createdDate.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true,
+              });
+              return (
+                <View>
+                  <Text>
+                    {item.sender} {item.message} on {formattedDate}
+                  </Text>
+                </View>
+              );
+            }}
             keyExtractor={(item, index) => index.toString()}
           />
         </View>
