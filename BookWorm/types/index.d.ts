@@ -183,12 +183,16 @@ interface BasicNotification {
   user: string;
   message: string;
   sender: string;
+  sender_name: string;
+  sender_img: string;
 }
 
 interface FRNotification {
   user: string;
   message: string;
   sender: string;
+  sender_name: string;
+  sender_img: string;
   created: Timestamp;
   read: Timestamp;
   type: "FRIEND_REQUEST";

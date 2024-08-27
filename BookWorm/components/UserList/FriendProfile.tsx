@@ -16,6 +16,7 @@ import {
 import { createFriendRequestNotification } from "../../services/firebase-services/NotificationQueries";
 import {
   fetchFriendData,
+  fetchUserData,
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
   getUserProfileURL,
@@ -63,6 +64,32 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       }
     },
     staleTime: 60000, // Set stale time to 1 minute
+  });
+
+  // getting userdata
+  const { data: userData, isLoading: isLoadingUserData } = useQuery({
+    queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+    queryFn: async () => {
+      if (user != null) {
+        const userdata = await fetchUserData(user);
+        return userdata;
+      } else {
+        // Return default value when user is null
+        return {};
+      }
+    },
+  });
+
+  // getting userIm
+  const { data: userIm, isLoading: isLoadingUserIm } = useQuery({
+    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
+    queryFn: async () => {
+      if (user != null) {
+        return await getUserProfileURL(user.uid);
+      } else {
+        return "";
+      }
+    },
   });
 
   const { data: isFollowingData } = useQuery({
@@ -217,10 +244,13 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       };
       followMutation.mutate(connection);
       if (user !== undefined && user !== null) {
+        const uData = userData as UserDataModel;
         const FRnotify: BasicNotification = {
           user: friendUserID,
-          message: "someone has followed you",
-          sender: user?.uid, // Use an empty string if user?.uid is undefined
+          message: "followed you on",
+          sender: user?.uid,
+          sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+          sender_img: userIm ?? "",
         };
         notifyMutation.mutate(FRnotify);
       }
@@ -253,7 +283,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     }
   };
 
-  if (friendIsLoading || isLoadingIm) {
+  if (friendIsLoading || isLoadingIm || isLoadingUserData || isLoadingUserIm) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />

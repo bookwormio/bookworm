@@ -2,6 +2,7 @@ import {
   addDoc,
   collection,
   getDocs,
+  orderBy,
   query,
   serverTimestamp,
   type Timestamp,
@@ -19,6 +20,8 @@ export async function createFriendRequestNotification(
         user: notif.user,
         message: notif.message,
         sender: notif.sender,
+        sender_name: notif.sender_name,
+        sender_img: notif.sender_img,
         created: serverTimestamp(),
         read: null,
         type: "FRIEND_REQUEST",
@@ -37,6 +40,7 @@ export async function getAllFRNotifications(
     const q = query(
       collection(DB, "notifications"),
       where("user", "==", userID),
+      orderBy("created", "desc"),
     );
 
     console.log("got inside AllFR");
@@ -47,6 +51,8 @@ export async function getAllFRNotifications(
         user: notDoc.data().user,
         message: notDoc.data().message,
         sender: notDoc.data().sender,
+        sender_name: notDoc.data().sender_name,
+        sender_img: notDoc.data().sender_img,
         created: notDoc.data().created as Timestamp,
         read: notDoc.data().read,
         type: notDoc.data().type,
