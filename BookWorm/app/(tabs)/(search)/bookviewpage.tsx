@@ -15,6 +15,7 @@ import React, {
   useState,
 } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -161,10 +162,10 @@ const BookViewPage = () => {
     [applyPendingChanges],
   );
 
-  if (bookData === null || bookData === undefined || isLoadingBook) {
+  if (bookData == null || isLoadingBook) {
     return (
       <View style={styles.container}>
-        <Text>Loading...</Text>
+        <ActivityIndicator size="small" color="#000000" />
       </View>
     );
   }

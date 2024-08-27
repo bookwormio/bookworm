@@ -576,7 +576,8 @@ export async function getBooksByBookIDs(
   try {
     // Create a single API request URL for all volume IDs
     // TODO: Maybe break this into chunks if we hit a limit here
-    const apiUrl = `https://www.googleapis.com/books/v1/volumes?q=${validVolumeIDs.join("|")}`;
+    const query = validVolumeIDs.map((id) => `id:${id}`).join(" OR ");
+    const apiUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`;
 
     // Make a single API request
     const response = await axios.get<{
@@ -584,7 +585,6 @@ export async function getBooksByBookIDs(
     }>(apiUrl, {
       params: {
         key: BOOKS_API_KEY,
-        projection: "lite",
       },
     });
 
