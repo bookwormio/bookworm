@@ -574,28 +574,36 @@ export async function getBooksByBookIDs(
   }
 
   try {
-    // Create an array to store promises for each request
-    const requests = validVolumeIDs.map(
-      async (volumeID: string) =>
-        await axios.get<{
-          volumeInfo: BookVolumeInfo;
-        }>("https://www.googleapis.com/books/v1/volumes/" + volumeID, {
-          params: {
-            key: BOOKS_API_KEY,
-            projection: "lite",
-          },
-        }),
-    );
+    // Create a single API request URL for all volume IDs
+    // TODO: Maybe break this into chunks if we hit a limit here
+    const apiUrl = `https://www.googleapis.com/books/v1/volumes?q=${validVolumeIDs.join("|")}`;
 
-    // Use Promise.all to execute all requests in parallel
-    const responses = await Promise.all(requests);
+    // Make a single API request
+    const response = await axios.get<{
+      items: Array<{ volumeInfo: BookVolumeInfo }>;
+    }>(apiUrl, {
+      params: {
+        key: BOOKS_API_KEY,
+        projection: "lite",
+      },
+    });
 
-    // Extract volume info from each response
-    const volumeInfos = responses.map((response) => response.data.volumeInfo);
+    // Extract volume info from the response
+    const volumeInfos = response.data.items.map((item) => item.volumeInfo);
 
     return volumeInfos;
   } catch (error) {
-    console.error("Error fetching books by volume IDs", error);
+    // Lots of logs to help with debugging
+    if (axios.isAxiosError(error)) {
+      console.error("Error fetching books by volume IDs", {
+        message: error.message,
+        stack: error.stack,
+        response: error.response?.data,
+        config: error.config,
+      });
+    } else {
+      console.error("Unknown error fetching books by volume IDs", error);
+    }
     return [];
   }
 }
