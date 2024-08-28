@@ -109,13 +109,30 @@ const BookViewPage = () => {
   };
 
   const applyPendingChanges = async () => {
-    if (user?.uid == null || bookID == null) return;
+    if (user?.uid == null || bookID == null || queryBookData == null) return;
 
     const addPromises = pendingChanges.add.map(
       async (shelfName) =>
         await addBookMutation.mutateAsync({
           userID: user.uid,
           bookID,
+          volumeInfo: {
+            title: queryBookData?.title,
+            subtitle: queryBookData?.subtitle,
+            authors: queryBookData?.authors,
+            publisher: queryBookData?.publisher,
+            publishedDate: queryBookData?.publishedDate,
+            description: queryBookData?.description,
+            pageCount: queryBookData?.pageCount,
+            categories: queryBookData?.categories,
+            maturityRating: queryBookData?.maturityRating,
+            previewLink: queryBookData?.previewLink,
+            averageRating: queryBookData?.averageRating,
+            ratingsCount: queryBookData?.ratingsCount,
+            language: queryBookData?.language,
+            mainCategory: queryBookData?.mainCategory,
+            thumbnail: queryBookData?.imageLinks?.thumbnail,
+          },
           shelfName,
         }),
     );
