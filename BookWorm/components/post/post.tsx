@@ -1,5 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Timestamp } from "firebase/firestore";
 import React, { memo, useState } from "react";
 import {
@@ -25,6 +25,8 @@ interface PostProps {
   created: Timestamp;
   currentDate: Date;
   showComments: boolean;
+  likePost: (postID: string, userID: string) => void;
+  commentOnPost: (postID: string, userID: string, commentText: string) => void;
 }
 
 const formatDate = (created: Timestamp, currentDate: Date) => {
@@ -51,129 +53,138 @@ const formatDate = (created: Timestamp, currentDate: Date) => {
 };
 
 // Using memo here makes it so it re-renders only when the props passed to it change
-const Post = memo(({ post, created, currentDate, showComments }: PostProps) => {
-  const [postLikes, setPostLikes] = useState<string[]>(post.likes);
-  const [showCommentSection, setShowComments] = useState(showComments);
-  const [postComments, setPostComments] = useState<CommentModel[]>(
-    post.comments,
-  );
-  const [newComment, setNewComment] = useState("");
-  const formattedDate = formatDate(created, currentDate);
-  const { user } = useAuth();
+const Post = memo(
+  ({
+    post,
+    created,
+    currentDate,
+    showComments,
+    likePost,
+    commentOnPost,
+  }: PostProps) => {
+    const queryClient = useQueryClient();
+    const [postLikes, setPostLikes] = useState<string[]>(post.likes);
+    const [showCommentSection, setShowComments] = useState(showComments);
+    const [postComments, setPostComments] = useState<CommentModel[]>(
+      post.comments,
+    );
+    const [newComment, setNewComment] = useState("");
+    const formattedDate = formatDate(created, currentDate);
+    const { user } = useAuth();
 
-  const likeMutation = useMutation({
-    mutationFn: async () => {
-      if (user != null) {
-        if (postLikes.includes(user.uid)) {
-          postLikes.splice(postLikes.indexOf(user.uid), 1);
-        } else {
-          postLikes.push(user.uid);
-        }
-        likeUnlikePost(user.uid, post.id)
-          .then((updatedLikes) => {
+    const likeMutation = useMutation({
+      mutationFn: async () => {
+        if (user != null) {
+          if (postLikes.includes(user.uid)) {
+            postLikes.splice(postLikes.indexOf(user.uid), 1);
+          } else {
+            postLikes.push(user.uid);
+          }
+          try {
+            const updatedLikes = await likeUnlikePost(user.uid, post.id);
             if (updatedLikes != null) {
-              setPostLikes(updatedLikes);
+              likePost(post.id, user.uid);
             }
-          })
-          .catch(() => {
-            console.error("Error liking post");
-          });
-      }
-    },
-  });
+          } catch (error) {
+            console.error("Error liking post", error);
+          }
+        }
+      },
+    });
 
-  const commentMutation = useMutation({
-    mutationFn: async () => {
-      if (user != null) {
-        addCommentToPost(user.uid, post.id, newComment)
-          .then((updatedComments) => {
-            if (updatedComments != null) {
-              setNewComment("");
-              setPostComments(updatedComments);
-            }
-          })
-          .catch(() => {
-            console.error("Error liking post");
-          });
-      }
-    },
-  });
+    const commentMutation = useMutation({
+      mutationFn: async () => {
+        if (user != null) {
+          addCommentToPost(user.uid, post.id, newComment)
+            .then(async (updatedComments) => {
+              if (updatedComments != null) {
+                commentOnPost(post.id, user.uid, newComment);
+                setNewComment("");
+              }
+            })
+            .catch(() => {
+              console.error("Error commenting on post");
+            });
+        }
+      },
+    });
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        {post.user.first} {post.user.last} was reading {post.booktitle}
-      </Text>
-      <Text style={styles.time}>{formattedDate}</Text>
-      <Text style={styles.body}>{post.text}</Text>
-      {post.images.length > 0 && (
-        <ScrollView horizontal={true} style={{ marginVertical: 10 }}>
-          {post.images.map((image, index) => (
-            <View key={index}>{image}</View>
-          ))}
-        </ScrollView>
-      )}
-      <View style={styles.buttonrow}>
-        <TouchableOpacity
-          style={styles.likebutton}
-          onPress={() => {
-            likeMutation.mutate();
-          }}
-        >
-          {postLikes.includes(user?.uid ?? "") ? (
-            <FontAwesome5 name="heart" solid size={15} color="red" />
-          ) : (
-            <FontAwesome5 name="heart" size={15} />
-          )}
-        </TouchableOpacity>
-        <Text style={{ paddingRight: 10 }}>
-          {postLikes.length}
-          {postLikes.length === 1 ? " Like" : " Likes"}
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>
+          {post.user.first} {post.user.last} was reading {post.booktitle}
         </Text>
-        <TouchableOpacity
-          style={styles.likebutton}
-          onPress={() => {
-            setShowComments(!showCommentSection);
-          }}
-        >
-          <FontAwesome5 name="comment" size={15} />
-          <Text style={{ paddingLeft: 5 }}>
-            {postComments.length}
-            {postComments.length === 1 ? " Comment" : " Comments"}
+        <Text style={styles.time}>{formattedDate}</Text>
+        <Text style={styles.body}>{post.text}</Text>
+        {post.images.length > 0 && (
+          <ScrollView horizontal={true} style={{ marginVertical: 10 }}>
+            {post.images.map((image, index) => (
+              <View key={index}>{image}</View>
+            ))}
+          </ScrollView>
+        )}
+        <View style={styles.buttonrow}>
+          <TouchableOpacity
+            style={styles.likebutton}
+            onPress={() => {
+              likeMutation.mutate();
+            }}
+          >
+            {postLikes.includes(user?.uid ?? "") ? (
+              <FontAwesome5 name="heart" solid size={15} color="red" />
+            ) : (
+              <FontAwesome5 name="heart" size={15} />
+            )}
+          </TouchableOpacity>
+          <Text style={{ paddingRight: 10 }}>
+            {postLikes.length}
+            {postLikes.length === 1 ? " Like" : " Likes"}
           </Text>
-        </TouchableOpacity>
-      </View>
-      {showCommentSection && (
-        <>
-          <FlatList
-            data={postComments}
-            renderItem={({ item: comment }) => <Comment comment={comment} />}
-          />
-          <View style={styles.likebutton}>
-            <TextInput
-              style={{ flex: 1 }}
-              value={newComment}
-              placeholder={`Add a comment to ${post.user.first}'s post`}
-              autoCapitalize="none"
-              multiline
-              onChangeText={(text) => {
-                setNewComment(text);
-              }}
+          <TouchableOpacity
+            style={styles.likebutton}
+            onPress={() => {
+              setShowComments(!showCommentSection);
+            }}
+          >
+            <FontAwesome5 name="comment" size={15} />
+            <Text style={{ paddingLeft: 5 }}>
+              {postComments.length}
+              {postComments.length === 1 ? " Comment" : " Comments"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {showCommentSection && (
+          <>
+            <FlatList
+              data={postComments}
+              renderItem={({ item: comment }) => <Comment comment={comment} />}
             />
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                commentMutation.mutate();
-              }}
-            >
-              <Text style={styles.buttonText}>{"Comment"}</Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
-    </View>
-  );
-});
+            <View style={styles.likebutton}>
+              <TextInput
+                style={{ flex: 1 }}
+                value={newComment}
+                placeholder={`Add a comment to ${post.user.first}'s post`}
+                autoCapitalize="none"
+                multiline
+                onChangeText={(text) => {
+                  setNewComment(text);
+                }}
+              />
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                  commentMutation.mutate();
+                }}
+              >
+                <Text style={styles.buttonText}>{"Comment"}</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+      </View>
+    );
+  },
+);
 
 export default Post;
 

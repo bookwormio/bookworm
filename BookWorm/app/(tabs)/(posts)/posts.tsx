@@ -4,7 +4,7 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -76,7 +76,43 @@ const Posts = () => {
       });
   };
 
-  const posts = feedPostsData?.pages.flatMap((page) => page.posts) ?? [];
+  const [posts, setPosts] = useState(
+    feedPostsData?.pages.flatMap((page) => page.posts) ?? [],
+  );
+  useEffect(() => {
+    if (feedPostsData != null) {
+      setPosts(feedPostsData.pages.flatMap((page) => page.posts));
+    }
+  }, [feedPostsData]);
+
+  const likePost = (postID: string, userID: string) => {
+    const post = posts.find((p) => p.id === postID);
+    if (post !== undefined) {
+      if (post.likes.includes(userID)) {
+        post.likes.splice(post.likes.indexOf(userID), 1);
+      } else {
+        post.likes.push(userID);
+      }
+      setPosts([...posts]);
+    }
+  };
+
+  const commentOnPost = (
+    postID: string,
+    userID: string,
+    commentText: string,
+  ) => {
+    const post = posts.find((p) => p.id === postID);
+    if (post !== undefined) {
+      const newComment = {
+        userID,
+        first: "First Name",
+        text: commentText,
+      };
+      post.comments.push(newComment);
+    }
+    setPosts([...posts]);
+  };
 
   return (
     <View style={styles.container}>
@@ -106,6 +142,8 @@ const Posts = () => {
               created={post.created}
               currentDate={currentDate}
               showComments={false}
+              likePost={likePost}
+              commentOnPost={commentOnPost}
             />
           </TouchableOpacity>
         )}

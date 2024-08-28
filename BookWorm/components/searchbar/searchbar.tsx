@@ -58,6 +58,7 @@ const SearchBar = ({
       {clicked && (
         <View>
           <Button
+            color={"#FB6D0B"}
             title="Cancel"
             onPress={() => {
               Keyboard.dismiss();
