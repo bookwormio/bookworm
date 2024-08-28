@@ -34,6 +34,7 @@ const EditProfile = () => {
   const [editCity, setEditCity] = useState("");
   const [editState, setEditState] = useState("");
   const [image, setImage] = useState("");
+  const [save, setSave] = useState("Save");
 
   const queryClient = useQueryClient();
 
@@ -64,12 +65,11 @@ const EditProfile = () => {
       await queryClient.invalidateQueries({
         queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
       });
+      await queryClient.invalidateQueries({
+        queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
+      });
     },
   });
-
-  const onClose = () => {
-    refreshMutation.mutate();
-  };
 
   useEffect(() => {
     if (userData !== undefined) {
@@ -112,7 +112,7 @@ const EditProfile = () => {
     }
   }, [userIm]);
 
-  const handeSaveClick = () => {
+  const handeSaveClick = async () => {
     const userId = user?.uid;
 
     const newUserData = userData as UserDataModel;
@@ -129,7 +129,8 @@ const EditProfile = () => {
       console.error("Current user undefined");
     } else {
       newUserData.id = userId;
-      userMutation.mutate(newUserData);
+      await userMutation.mutateAsync(newUserData);
+      await refreshMutation.mutateAsync();
       router.back();
     }
   };
@@ -254,14 +255,25 @@ const EditProfile = () => {
             <TouchableOpacity
               style={styles.button}
               onPress={() => {
-                onClose();
+                refreshMutation.mutate();
                 router.back();
               }}
             >
               <Text style={styles.buttonText}>{" Close "}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={handeSaveClick}>
-              <Text style={styles.buttonText}>{" Save "}</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                setSave("Saving...");
+                handeSaveClick()
+                  .then(() => {})
+                  .catch((error) => {
+                    console.error("Error saving profile:", error);
+                    setSave("Save");
+                  });
+              }}
+            >
+              <Text style={styles.buttonText}>{save}</Text>
             </TouchableOpacity>
           </View>
         </View>
