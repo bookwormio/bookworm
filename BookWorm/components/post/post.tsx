@@ -27,6 +27,7 @@ interface PostProps {
   showComments: boolean;
   likePost: (postID: string, userID: string) => void;
   commentOnPost: (postID: string, userID: string, commentText: string) => void;
+  presentComments: (postID: string) => void;
 }
 
 const formatDate = (created: Timestamp, currentDate: Date) => {
@@ -61,6 +62,7 @@ const Post = memo(
     showComments,
     likePost,
     commentOnPost,
+    presentComments,
   }: PostProps) => {
     const [showCommentSection, setShowComments] = useState(showComments);
     const [postComments, setPostComments] = useState<CommentModel[]>(
@@ -74,7 +76,6 @@ const Post = memo(
     const likeMutation = useMutation({
       mutationFn: async () => {
         if (user != null) {
-          likePost(post.id, user?.uid ?? "");
           return await likeUnlikePost(user.uid, post.id);
         }
       },
@@ -131,6 +132,22 @@ const Post = memo(
             {post.likes.length}
             {post.likes.length === 1 ? " Like" : " Likes"}
           </Text>
+          <TouchableOpacity
+            style={styles.likebutton}
+            onPress={() => {
+              if (!showComments) {
+                presentComments(post.id);
+              } else {
+                setShowComments(!showCommentSection);
+              }
+            }}
+          >
+            <FontAwesome5 name="comment" size={15} />
+            <Text style={{ paddingLeft: 5 }}>
+              {postComments.length}
+              {postComments.length === 1 ? " Comment" : " Comments"}
+            </Text>
+          </TouchableOpacity>
         </View>
         {showCommentSection && (
           <>
