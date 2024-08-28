@@ -19,6 +19,7 @@ const CreateAccount = () => {
 
   const validFields = () => {
     const missingFields: string[] = [];
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     if (email === "") {
       missingFields.push("Email");
     }
@@ -28,7 +29,14 @@ const CreateAccount = () => {
     if (confirmPassword === "") {
       missingFields.push("Confirm Password");
     }
-    if (missingFields.length > 0) {
+    if (!emailPattern.test(email)) {
+      Toast.show({
+        type: "error",
+        text1: "Incorrect Email Format",
+        text2: "Please put in a valid email",
+      });
+      return false;
+    } else if (missingFields.length > 0) {
       Toast.show({
         type: "error",
         text1: "Please Complete the Following Fields:",
@@ -40,6 +48,13 @@ const CreateAccount = () => {
         type: "error",
         text1: "Passwords Do Not Match",
         text2: "Please ensure both passwords are the same",
+      });
+      return false;
+    } else if (confirmPassword.length < 6) {
+      Toast.show({
+        type: "error",
+        text1: "Password Too Short",
+        text2: "Your password must be at least 6 characters long",
       });
       return false;
     }
@@ -92,11 +107,6 @@ const CreateAccount = () => {
             setConfirmPassword(text);
           }}
           onSubmitEditing={() => {
-            if (confirmPassword.length < 6) {
-              alert("Your password must be at least 6 characters long");
-            } else if (confirmPassword !== password) {
-              alert("Passwords don't match");
-            }
             if (validFields()) {
               try {
                 createAccount(email, password);
@@ -116,6 +126,7 @@ const CreateAccount = () => {
                 router.push("/MoreInfo");
               } catch (error) {
                 console.error(error);
+                router.back();
               }
             }
           }}
