@@ -1,5 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { type Timestamp } from "firebase/firestore";
 import React, { memo, useState } from "react";
 import {
@@ -62,50 +62,41 @@ const Post = memo(
     likePost,
     commentOnPost,
   }: PostProps) => {
-    const queryClient = useQueryClient();
-    const [postLikes, setPostLikes] = useState<string[]>(post.likes);
     const [showCommentSection, setShowComments] = useState(showComments);
     const [postComments, setPostComments] = useState<CommentModel[]>(
       post.comments,
     );
     const [newComment, setNewComment] = useState("");
+    const isCommentEmpty = () => newComment.trim() === "";
     const formattedDate = formatDate(created, currentDate);
     const { user } = useAuth();
 
     const likeMutation = useMutation({
       mutationFn: async () => {
         if (user != null) {
-          if (postLikes.includes(user.uid)) {
-            postLikes.splice(postLikes.indexOf(user.uid), 1);
-          } else {
-            postLikes.push(user.uid);
-          }
-          try {
-            const updatedLikes = await likeUnlikePost(user.uid, post.id);
-            if (updatedLikes != null) {
-              likePost(post.id, user.uid);
-            }
-          } catch (error) {
-            console.error("Error liking post", error);
-          }
+          likePost(post.id, user?.uid ?? "");
+          return await likeUnlikePost(user.uid, post.id);
         }
+      },
+      onError: () => {
+        console.error("Error liking post");
       },
     });
 
     const commentMutation = useMutation({
       mutationFn: async () => {
         if (user != null) {
-          addCommentToPost(user.uid, post.id, newComment)
-            .then(async (updatedComments) => {
-              if (updatedComments != null) {
-                commentOnPost(post.id, user.uid, newComment);
-                setNewComment("");
-              }
-            })
-            .catch(() => {
-              console.error("Error commenting on post");
-            });
+          return await addCommentToPost(user.uid, post.id, newComment);
         }
+      },
+      onSuccess: (updatedComments) => {
+        if (updatedComments != null) {
+          setNewComment("");
+          setPostComments(updatedComments);
+        }
+      },
+      onError: () => {
+        console.error("Error commenting on post");
       },
     });
 
@@ -130,28 +121,16 @@ const Post = memo(
               likeMutation.mutate();
             }}
           >
-            {postLikes.includes(user?.uid ?? "") ? (
+            {post.likes.includes(user?.uid ?? "") ? (
               <FontAwesome5 name="heart" solid size={15} color="red" />
             ) : (
               <FontAwesome5 name="heart" size={15} />
             )}
           </TouchableOpacity>
           <Text style={{ paddingRight: 10 }}>
-            {postLikes.length}
-            {postLikes.length === 1 ? " Like" : " Likes"}
+            {post.likes.length}
+            {post.likes.length === 1 ? " Like" : " Likes"}
           </Text>
-          <TouchableOpacity
-            style={styles.likebutton}
-            onPress={() => {
-              setShowComments(!showCommentSection);
-            }}
-          >
-            <FontAwesome5 name="comment" size={15} />
-            <Text style={{ paddingLeft: 5 }}>
-              {postComments.length}
-              {postComments.length === 1 ? " Comment" : " Comments"}
-            </Text>
-          </TouchableOpacity>
         </View>
         {showCommentSection && (
           <>
@@ -159,9 +138,9 @@ const Post = memo(
               data={postComments}
               renderItem={({ item: comment }) => <Comment comment={comment} />}
             />
-            <View style={styles.likebutton}>
+            <View style={styles.commentInputContainer}>
               <TextInput
-                style={{ flex: 1 }}
+                style={styles.commentInput}
                 value={newComment}
                 placeholder={`Add a comment to ${post.user.first}'s post`}
                 autoCapitalize="none"
@@ -171,12 +150,16 @@ const Post = memo(
                 }}
               />
               <TouchableOpacity
-                style={styles.button}
+                style={[
+                  styles.button,
+                  isCommentEmpty() && styles.buttonDisabled,
+                ]}
                 onPress={() => {
                   commentMutation.mutate();
                 }}
+                disabled={isCommentEmpty()}
               >
-                <Text style={styles.buttonText}>{"Comment"}</Text>
+                <Text style={styles.buttonText}>Comment</Text>
               </TouchableOpacity>
             </View>
           </>
@@ -216,13 +199,27 @@ const styles = StyleSheet.create({
     paddingRight: 5,
     alignItems: "center",
   },
+  commentInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  commentInput: {
+    flex: 1,
+    paddingVertical: 8,
+  },
   button: {
     marginLeft: 10,
     backgroundColor: "#FB6D0B",
     borderRadius: 5,
-    alignItems: "center",
-    paddingHorizontal: 5,
-    paddingVertical: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    justifyContent: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: "#fb6d0b80",
   },
   buttonText: {
     color: "white",
