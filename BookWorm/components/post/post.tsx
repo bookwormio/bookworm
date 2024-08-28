@@ -58,6 +58,7 @@ const Post = memo(({ post, created, currentDate, showComments }: PostProps) => {
     post.comments,
   );
   const [newComment, setNewComment] = useState("");
+  const isCommentEmpty = () => newComment.trim() === "";
   const formattedDate = formatDate(created, currentDate);
   const { user } = useAuth();
 
@@ -69,33 +70,33 @@ const Post = memo(({ post, created, currentDate, showComments }: PostProps) => {
         } else {
           postLikes.push(user.uid);
         }
-        likeUnlikePost(user.uid, post.id)
-          .then((updatedLikes) => {
-            if (updatedLikes != null) {
-              setPostLikes(updatedLikes);
-            }
-          })
-          .catch(() => {
-            console.error("Error liking post");
-          });
+        return await likeUnlikePost(user.uid, post.id);
       }
+    },
+    onSuccess: (updatedLikes) => {
+      if (updatedLikes != null) {
+        setPostLikes(updatedLikes);
+      }
+    },
+    onError: () => {
+      console.error("Error liking post");
     },
   });
 
   const commentMutation = useMutation({
     mutationFn: async () => {
       if (user != null) {
-        addCommentToPost(user.uid, post.id, newComment)
-          .then((updatedComments) => {
-            if (updatedComments != null) {
-              setNewComment("");
-              setPostComments(updatedComments);
-            }
-          })
-          .catch(() => {
-            console.error("Error liking post");
-          });
+        return await addCommentToPost(user.uid, post.id, newComment);
       }
+    },
+    onSuccess: (updatedComments) => {
+      if (updatedComments != null) {
+        setNewComment("");
+        setPostComments(updatedComments);
+      }
+    },
+    onError: () => {
+      console.error("Error commenting on post");
     },
   });
 
@@ -149,9 +150,9 @@ const Post = memo(({ post, created, currentDate, showComments }: PostProps) => {
             data={postComments}
             renderItem={({ item: comment }) => <Comment comment={comment} />}
           />
-          <View style={styles.likebutton}>
+          <View style={styles.commentInputContainer}>
             <TextInput
-              style={{ flex: 1 }}
+              style={styles.commentInput}
               value={newComment}
               placeholder={`Add a comment to ${post.user.first}'s post`}
               autoCapitalize="none"
@@ -161,12 +162,13 @@ const Post = memo(({ post, created, currentDate, showComments }: PostProps) => {
               }}
             />
             <TouchableOpacity
-              style={styles.button}
+              style={[styles.button, isCommentEmpty() && styles.buttonDisabled]}
               onPress={() => {
                 commentMutation.mutate();
               }}
+              disabled={isCommentEmpty()}
             >
-              <Text style={styles.buttonText}>{"Comment"}</Text>
+              <Text style={styles.buttonText}>Comment</Text>
             </TouchableOpacity>
           </View>
         </>
@@ -205,13 +207,27 @@ const styles = StyleSheet.create({
     paddingRight: 5,
     alignItems: "center",
   },
+  commentInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  commentInput: {
+    flex: 1,
+    paddingVertical: 8,
+  },
   button: {
     marginLeft: 10,
     backgroundColor: "#FB6D0B",
     borderRadius: 5,
-    alignItems: "center",
-    paddingHorizontal: 5,
-    paddingVertical: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    justifyContent: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: "#fb6d0b80",
   },
   buttonText: {
     color: "white",

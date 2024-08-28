@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   scrollContent: {
-    paddingRight: 16, // Adjusted padding to accommodate scroll bar
+    paddingRight: 16,
   },
   feedLoading: {
     alignItems: "center",
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     marginTop: "10%",
     alignItems: "center",
     justifyContent: "center",
-    bottom: 20, // Position the loading indicator 20 units from the bottom
-    width: "100%", // Ensure it stretches the full width
+    bottom: 20,
+    width: "100%",
   },
 });
