@@ -34,7 +34,6 @@ const ViewPost = () => {
         return null;
       }
     },
-    staleTime: 60000, // Set stale time to 1 minute
   });
 
   useEffect(() => {
@@ -78,7 +77,8 @@ const ViewPost = () => {
             post={post}
             created={post.created}
             currentDate={new Date()}
-            showComments={true}
+            individualPage={true}
+            presentComments={() => {}}
           />
           {post?.user.id !== user?.uid && (
             <View style={styles.outerButtonsContainer}>

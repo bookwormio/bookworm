@@ -3,11 +3,7 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import {
   type DocumentData,
@@ -33,10 +29,8 @@ import {
 import { useAuth } from "../../../components/auth/context";
 import Comment from "../../../components/comment/comment";
 import Post from "../../../components/post/post";
-import {
-  addCommentToPost,
-  fetchPostsForUserFeed,
-} from "../../../services/firebase-services/PostQueries";
+import { usePosts } from "../../../components/post/PostsContext";
+import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
 
 const Posts = () => {
@@ -74,9 +68,7 @@ const Posts = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [activePost, setActivePost] = useState<PostModel | null>(null);
-  const [posts, setPosts] = useState(
-    feedPostsData?.pages.flatMap((page) => page.posts) ?? [],
-  );
+  const { posts, setPosts, commentOnPost } = usePosts();
   const snapPoints = useMemo(() => ["25%", "50%"], []);
   const queryClient = useQueryClient();
   const currentDate = new Date();
@@ -105,63 +97,6 @@ const Posts = () => {
       setPosts(newPosts);
     }
   }, [feedPostsData]);
-
-  const likePost = (postID: string, userID: string) => {
-    const post = posts.find((p) => p.id === postID);
-    if (post !== undefined) {
-      if (post.likes.includes(userID)) {
-        post.likes.splice(post.likes.indexOf(userID), 1);
-      } else {
-        post.likes.push(userID);
-      }
-      setPosts([...posts]);
-    }
-  };
-
-  const commentOnPost = (
-    postID: string,
-    userID: string,
-    commentText: string,
-  ) => {
-    const post = posts.find((p) => p.id === postID);
-    if (post !== undefined && user != null) {
-      const addNewComment = {
-        userID,
-        first: "Sam",
-        text: commentText,
-      };
-      post.comments.push(addNewComment);
-    }
-    setPosts([...posts]);
-  };
-
-  const commentMutation = useMutation({
-    mutationFn: async () => {
-      if (user != null && activePost != null) {
-        return await addCommentToPost(user.uid, activePost.id, newComment);
-      }
-    },
-    onSuccess: (updatedComments) => {
-      if (updatedComments != null) {
-        setNewComment("");
-        const updatedPost = activePost;
-        if (updatedPost != null && activePost != null) {
-          updatedPost.comments = updatedComments;
-          setActivePost(updatedPost);
-          setPosts((prevPosts) =>
-            prevPosts.map((post) =>
-              post.id === activePost.id
-                ? { ...post, comments: updatedComments }
-                : post,
-            ),
-          );
-        }
-      }
-    },
-    onError: () => {
-      console.error("Error commenting on post");
-    },
-  });
 
   const renderBackdrop = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -215,9 +150,7 @@ const Posts = () => {
                 post={post}
                 created={post.created}
                 currentDate={currentDate}
-                showComments={false}
-                likePost={likePost}
-                commentOnPost={commentOnPost}
+                individualPage={false}
                 presentComments={onCommentsPress}
               />
             </TouchableOpacity>
@@ -272,7 +205,10 @@ const Posts = () => {
           <TouchableOpacity
             style={[styles.button]}
             onPress={() => {
-              commentMutation.mutate();
+              if (activePost != null) {
+                setNewComment("");
+                commentOnPost(activePost.id, newComment);
+              }
             }}
           >
             <Text style={styles.buttonText}>Comment</Text>
@@ -336,6 +272,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     justifyContent: "center",
+    marginBottom: 10,
   },
   buttonDisabled: {
     backgroundColor: "#fb6d0b80",

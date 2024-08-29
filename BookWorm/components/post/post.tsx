@@ -1,7 +1,6 @@
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useMutation } from "@tanstack/react-query";
 import { type Timestamp } from "firebase/firestore";
-import React, { memo, useState } from "react";
+import React, { useState } from "react";
 import {
   FlatList,
   ScrollView,
@@ -12,21 +11,16 @@ import {
   View,
 } from "react-native";
 import { DAYS_OF_WEEK, MONTHS_OF_YEAR } from "../../constants/constants";
-import {
-  addCommentToPost,
-  likeUnlikePost,
-} from "../../services/firebase-services/PostQueries";
-import { type CommentModel, type PostModel } from "../../types";
+import { type PostModel } from "../../types";
 import { useAuth } from "../auth/context";
 import Comment from "../comment/comment";
+import { usePosts } from "./PostsContext";
 
 interface PostProps {
   post: PostModel;
   created: Timestamp;
   currentDate: Date;
-  showComments: boolean;
-  likePost: (postID: string, userID: string) => void;
-  commentOnPost: (postID: string, userID: string, commentText: string) => void;
+  individualPage: boolean;
   presentComments: (postID: string) => void;
 }
 
@@ -54,137 +48,107 @@ const formatDate = (created: Timestamp, currentDate: Date) => {
 };
 
 // Using memo here makes it so it re-renders only when the props passed to it change
-const Post = memo(
-  ({
-    post,
-    created,
-    currentDate,
-    showComments,
-    likePost,
-    commentOnPost,
-    presentComments,
-  }: PostProps) => {
-    const [showCommentSection, setShowComments] = useState(showComments);
-    const [postComments, setPostComments] = useState<CommentModel[]>(
-      post.comments,
-    );
-    const [newComment, setNewComment] = useState("");
-    const isCommentEmpty = () => newComment.trim() === "";
-    const formattedDate = formatDate(created, currentDate);
-    const { user } = useAuth();
+const Post = ({
+  post,
+  created,
+  currentDate,
+  individualPage,
+  presentComments,
+}: PostProps) => {
+  const { user } = useAuth();
+  const { posts, likePost, commentOnPost } = usePosts();
+  const [showCommentSection, setShowComments] = useState(individualPage);
+  const [newComment, setNewComment] = useState("");
+  const formattedDate = formatDate(created, currentDate);
+  const currentPost = posts.find((p) => p.id === post.id);
 
-    const likeMutation = useMutation({
-      mutationFn: async () => {
-        if (user != null) {
-          return await likeUnlikePost(user.uid, post.id);
-        }
-      },
-      onError: () => {
-        console.error("Error liking post");
-      },
-    });
+  if (currentPost !== undefined) {
+    post = currentPost;
+  }
 
-    const commentMutation = useMutation({
-      mutationFn: async () => {
-        if (user != null) {
-          return await addCommentToPost(user.uid, post.id, newComment);
-        }
-      },
-      onSuccess: (updatedComments) => {
-        if (updatedComments != null) {
-          setNewComment("");
-          setPostComments(updatedComments);
-        }
-      },
-      onError: () => {
-        console.error("Error commenting on post");
-      },
-    });
-
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>
-          {post.user.first} {post.user.last} was reading {post.booktitle}
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>
+        {post.user.first} {post.user.last} was reading {post.booktitle}
+      </Text>
+      <Text style={styles.time}>{formattedDate}</Text>
+      <Text style={styles.body}>{post.text}</Text>
+      {post.images.length > 0 && (
+        <ScrollView horizontal={true} style={{ marginVertical: 10 }}>
+          {post.images.map((image, index) => (
+            <View key={index}>{image}</View>
+          ))}
+        </ScrollView>
+      )}
+      <View style={styles.buttonrow}>
+        <TouchableOpacity
+          style={styles.likebutton}
+          onPress={() => {
+            likePost(post.id);
+          }}
+        >
+          {post.likes.includes(user?.uid ?? "") ? (
+            <FontAwesome5 name="heart" solid size={15} color="red" />
+          ) : (
+            <FontAwesome5 name="heart" size={15} />
+          )}
+        </TouchableOpacity>
+        <Text style={{ paddingRight: 10 }}>
+          {post.likes.length}
+          {post.likes.length === 1 ? " Like" : " Likes"}
         </Text>
-        <Text style={styles.time}>{formattedDate}</Text>
-        <Text style={styles.body}>{post.text}</Text>
-        {post.images.length > 0 && (
-          <ScrollView horizontal={true} style={{ marginVertical: 10 }}>
-            {post.images.map((image, index) => (
-              <View key={index}>{image}</View>
-            ))}
-          </ScrollView>
-        )}
-        <View style={styles.buttonrow}>
-          <TouchableOpacity
-            style={styles.likebutton}
-            onPress={() => {
-              likeMutation.mutate();
-            }}
-          >
-            {post.likes.includes(user?.uid ?? "") ? (
-              <FontAwesome5 name="heart" solid size={15} color="red" />
-            ) : (
-              <FontAwesome5 name="heart" size={15} />
-            )}
-          </TouchableOpacity>
-          <Text style={{ paddingRight: 10 }}>
-            {post.likes.length}
-            {post.likes.length === 1 ? " Like" : " Likes"}
+        <TouchableOpacity
+          style={styles.likebutton}
+          onPress={() => {
+            if (individualPage) {
+              setShowComments(!showCommentSection);
+            } else {
+              presentComments(post.id);
+            }
+          }}
+        >
+          <FontAwesome5 name="comment" size={15} />
+          <Text style={{ paddingLeft: 5 }}>
+            {post.comments.length}
+            {post.comments.length === 1 ? " Comment" : " Comments"}
           </Text>
-          <TouchableOpacity
-            style={styles.likebutton}
-            onPress={() => {
-              if (!showComments) {
-                presentComments(post.id);
-              } else {
-                setShowComments(!showCommentSection);
-              }
-            }}
-          >
-            <FontAwesome5 name="comment" size={15} />
-            <Text style={{ paddingLeft: 5 }}>
-              {postComments.length}
-              {postComments.length === 1 ? " Comment" : " Comments"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-        {showCommentSection && (
-          <>
-            <FlatList
-              data={postComments}
-              renderItem={({ item: comment }) => <Comment comment={comment} />}
-            />
-            <View style={styles.commentInputContainer}>
-              <TextInput
-                style={styles.commentInput}
-                value={newComment}
-                placeholder={`Add a comment to ${post.user.first}'s post`}
-                autoCapitalize="none"
-                multiline
-                onChangeText={(text) => {
-                  setNewComment(text);
-                }}
-              />
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  isCommentEmpty() && styles.buttonDisabled,
-                ]}
-                onPress={() => {
-                  commentMutation.mutate();
-                }}
-                disabled={isCommentEmpty()}
-              >
-                <Text style={styles.buttonText}>Comment</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
+        </TouchableOpacity>
       </View>
-    );
-  },
-);
+      {showCommentSection && (
+        <>
+          <FlatList
+            data={post.comments}
+            renderItem={({ item: comment }) => <Comment comment={comment} />}
+          />
+          <View style={styles.commentInputContainer}>
+            <TextInput
+              style={styles.commentInput}
+              value={newComment}
+              placeholder={`Add a comment to ${post.user.first}'s post`}
+              autoCapitalize="none"
+              multiline
+              onChangeText={(text) => {
+                setNewComment(text);
+              }}
+            />
+            <TouchableOpacity
+              style={[
+                styles.button,
+                newComment.trim() === "" && styles.buttonDisabled,
+              ]}
+              onPress={() => {
+                commentOnPost(post.id, newComment);
+              }}
+              disabled={newComment.trim() === ""}
+            >
+              <Text style={styles.buttonText}>Comment</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+    </View>
+  );
+};
 
 export default Post;
 
