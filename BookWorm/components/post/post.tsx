@@ -138,6 +138,7 @@ const Post = ({
               ]}
               onPress={() => {
                 commentOnPost(post.id, newComment);
+                setNewComment("");
               }}
               disabled={newComment.trim() === ""}
             >
