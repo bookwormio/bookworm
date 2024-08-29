@@ -3,14 +3,19 @@ import {
   Animated,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  TouchableHighlight,
   View,
 } from "react-native";
-import ProfileBookShelves from "./BookShelf/ProfileBookShelves";
-import ViewData from "./Data/ViewData";
 
-const ProfileTabSelector = () => {
-  const [searchType, setSearchType] = useState("shelf"); // Default to book search
+interface ProfileTabSelectorProps {
+  profileTab: string;
+  setProfileTab: (profileTab: string) => void;
+}
+
+const ProfileTabSelector = ({
+  profileTab,
+  setProfileTab,
+}: ProfileTabSelectorProps) => {
   const [underlinePosition] = useState(new Animated.Value(0));
   const animateUnderline = (toValue: number) => {
     Animated.timing(underlinePosition, {
@@ -23,40 +28,57 @@ const ProfileTabSelector = () => {
     <View>
       <View style={styles.container}>
         {/* Shelves Button */}
-        <TouchableOpacity
-          style={[styles.button, searchType === "shelf" && styles.activeButton]}
+        <TouchableHighlight
+          style={[
+            styles.button,
+            profileTab === "shelf"
+              ? styles.activeButton
+              : styles.inactiveButton,
+          ]}
           onPress={() => {
-            setSearchType("shelf");
+            setProfileTab("shelf");
             animateUnderline(0);
           }}
-          disabled={searchType === "shelf"}
+          disabled={profileTab === "shelf"}
+          activeOpacity={0.6}
+          underlayColor="#DDDDDD"
         >
           <Text style={styles.buttonText}>Shelves</Text>
-        </TouchableOpacity>
+        </TouchableHighlight>
 
         {/* Posts Button */}
-        <TouchableOpacity
-          style={[styles.button, searchType === "post" && styles.activeButton]}
+        <TouchableHighlight
+          style={[
+            styles.button,
+            profileTab === "post" ? styles.activeButton : styles.inactiveButton,
+          ]}
           onPress={() => {
-            setSearchType("post");
+            setProfileTab("post");
             animateUnderline(1);
           }}
-          disabled={searchType === "post"}
+          disabled={profileTab === "post"}
+          activeOpacity={0.6}
+          underlayColor="#DDDDDD"
         >
           <Text style={styles.buttonText}>Posts</Text>
-        </TouchableOpacity>
+        </TouchableHighlight>
 
         {/* Data Button */}
-        <TouchableOpacity
-          style={[styles.button, searchType === "data" && styles.activeButton]}
+        <TouchableHighlight
+          style={[
+            styles.button,
+            profileTab === "data" ? styles.activeButton : styles.inactiveButton,
+          ]}
           onPress={() => {
-            setSearchType("data");
+            setProfileTab("data");
             animateUnderline(2);
           }}
-          disabled={searchType === "data"}
+          disabled={profileTab === "data"}
+          activeOpacity={0.6}
+          underlayColor="#DDDDDD"
         >
           <Text style={styles.buttonText}>Data</Text>
-        </TouchableOpacity>
+        </TouchableHighlight>
 
         {/* Animated underline */}
         <Animated.View
@@ -71,15 +93,6 @@ const ProfileTabSelector = () => {
           ]}
         />
       </View>
-
-      {/* Conditional rendering based on searchType */}
-      {searchType === "shelf" ? (
-        <ProfileBookShelves />
-      ) : searchType === "post" ? (
-        <Text>PUT THE POSTS HERE</Text>
-      ) : (
-        <ViewData></ViewData>
-      )}
     </View>
   );
 };
@@ -106,6 +119,9 @@ const styles = StyleSheet.create({
   },
   activeButton: {
     backgroundColor: "#FFDAB9",
+  },
+  inactiveButton: {
+    backgroundColor: "#F2F2F2",
   },
   underline: {
     position: "absolute",
