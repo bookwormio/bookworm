@@ -4,7 +4,8 @@ import {
   addCommentToPost,
   likeUnlikePost,
 } from "../../services/firebase-services/PostQueries";
-import { type PostModel } from "../../types";
+import { fetchUser } from "../../services/firebase-services/UserQueries";
+import { type CommentModel, type PostModel } from "../../types";
 import { useAuth } from "../auth/context";
 
 const PostsContext = React.createContext<{
@@ -43,7 +44,23 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   const likeMutation = useMutation({
     mutationFn: async ({ postID }: LikeMutationProps) => {
       if (user != null) {
-        return await likeUnlikePost(user.uid, postID);
+        const postToUpdate = posts.find((post) => post.id === postID);
+        if (postToUpdate !== undefined) {
+          const likesToUpdate = postToUpdate.likes;
+          if (likesToUpdate.includes(user.uid)) {
+            likesToUpdate.splice(likesToUpdate.indexOf(user.uid), 1);
+          } else {
+            likesToUpdate.push(user.uid);
+          }
+          setPosts((prevPosts) =>
+            prevPosts.map((post) =>
+              post.id === postToUpdate.id
+                ? { ...post, likes: likesToUpdate }
+                : post,
+            ),
+          );
+          return await likeUnlikePost(user.uid, postID);
+        }
       }
     },
     onSuccess: (updatedLikes, variables) => {
@@ -68,7 +85,27 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   const commentMutation = useMutation({
     mutationFn: async ({ postID, comment }: CommentMutationProps) => {
       if (user != null) {
-        return await addCommentToPost(user.uid, postID, comment);
+        const currentUser = await fetchUser(user.uid);
+        if (currentUser != null) {
+          const postToUpdate = posts.find((post) => post.id === postID);
+          if (postToUpdate !== undefined) {
+            const commentsToUpdate = postToUpdate.comments;
+            const temporaryComment: CommentModel = {
+              userID: user.uid,
+              first: currentUser.first,
+              text: comment,
+            };
+            commentsToUpdate.push(temporaryComment);
+            setPosts((prevPosts) =>
+              prevPosts.map((post) =>
+                post.id === postToUpdate.id
+                  ? { ...post, comments: commentsToUpdate }
+                  : post,
+              ),
+            );
+            return await addCommentToPost(user.uid, postID, comment);
+          }
+        }
       }
     },
     onSuccess: async (updatedComments, variables) => {
