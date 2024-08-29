@@ -17,9 +17,9 @@ import {
   fetchUserData,
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
-  getUserProfileURL,
 } from "../../../services/firebase-services/UserQueries";
 import { type UserDataModel } from "../../../types";
+import { useProfilePicQuery } from "./hooks/useProfileQueries";
 
 const Profile = () => {
   // const navigation = useNavigation();
@@ -44,16 +44,7 @@ const Profile = () => {
     },
   });
 
-  const { data: userIm } = useQuery({
-    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
-    queryFn: async () => {
-      if (user != null) {
-        return await getUserProfileURL(user.uid);
-      } else {
-        return null;
-      }
-    },
-  });
+  const { data: userIm } = useProfilePicQuery(user?.uid);
 
   const { data: followersCount } = useQuery({
     queryKey: user != null ? ["followersdata", user.uid] : ["followersdata"],
