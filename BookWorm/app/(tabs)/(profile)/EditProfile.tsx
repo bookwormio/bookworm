@@ -18,12 +18,12 @@ import {
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import {
-  getUserProfileURL,
   newFetchUserInfo,
   updateUser,
 } from "../../../services/firebase-services/UserQueries";
 import { emptyQuery } from "../../../services/util/queryUtils";
 import { type UserDataModel } from "../../../types";
+import { useProfilePicQuery } from "./hooks/useProfileQueries";
 
 const EditProfile = () => {
   const { user } = useAuth();
@@ -61,15 +61,16 @@ const EditProfile = () => {
   const refreshMutation = useMutation({
     mutationFn: emptyQuery,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
+        }),
+      ]);
     },
   });
-
-  const onClose = () => {
-    refreshMutation.mutate();
-  };
 
   useEffect(() => {
     if (userData !== undefined) {
@@ -95,16 +96,7 @@ const EditProfile = () => {
     }
   }, [userData]);
 
-  const { data: userIm } = useQuery({
-    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
-    queryFn: async () => {
-      if (user != null) {
-        return await getUserProfileURL(user.uid);
-      } else {
-        return null;
-      }
-    },
-  });
+  const { data: userIm } = useProfilePicQuery(user?.uid);
 
   useEffect(() => {
     if (userIm !== undefined && userIm !== null) {
@@ -112,7 +104,7 @@ const EditProfile = () => {
     }
   }, [userIm]);
 
-  const handeSaveClick = () => {
+  const handeSaveClick = async () => {
     const userId = user?.uid;
 
     const newUserData = userData as UserDataModel;
@@ -129,7 +121,10 @@ const EditProfile = () => {
       console.error("Current user undefined");
     } else {
       newUserData.id = userId;
-      userMutation.mutate(newUserData);
+      await Promise.all([
+        userMutation.mutateAsync(newUserData),
+        refreshMutation.mutateAsync(),
+      ]);
       router.back();
     }
   };
@@ -143,6 +138,8 @@ const EditProfile = () => {
       setImage(result.assets[0].uri);
     }
   };
+
+  const isSaving = userMutation.isPending || refreshMutation.isPending;
 
   if (isLoadingUserData) {
     return (
@@ -254,14 +251,27 @@ const EditProfile = () => {
             <TouchableOpacity
               style={styles.button}
               onPress={() => {
-                onClose();
+                refreshMutation.mutate();
                 router.back();
               }}
             >
               <Text style={styles.buttonText}>{" Close "}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={handeSaveClick}>
-              <Text style={styles.buttonText}>{" Save "}</Text>
+            <TouchableOpacity
+              style={[styles.button, isSaving && styles.buttonDisabled]}
+              disabled={isSaving}
+              onPress={() => {
+                handeSaveClick().catch((error) => {
+                  Toast.show({
+                    type: "error",
+                    text2: "Error saving profile: " + error,
+                  });
+                });
+              }}
+            >
+              <Text style={styles.buttonText}>
+                {isSaving ? "Saving..." : "Save"}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -292,6 +302,9 @@ const styles = StyleSheet.create({
     width: "30%",
     alignSelf: "center",
     marginHorizontal: 10,
+  },
+  buttonDisabled: {
+    backgroundColor: "rgba(251, 109, 11, 0.5)",
   },
   buttonText: {
     color: "white", // Ensure text color is white
