@@ -68,7 +68,6 @@ const CreateAccount = () => {
       scrollEnabled={true}
     >
       <View style={styles.container}>
-        <Toast />
         <TextInput
           style={styles.input}
           value={email}
@@ -134,6 +133,7 @@ const CreateAccount = () => {
           <Text style={styles.buttonText}>{"Create Account"}</Text>
         </TouchableOpacity>
       </View>
+      <Toast />
     </ScrollView>
   );
 };
