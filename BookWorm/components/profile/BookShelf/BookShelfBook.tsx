@@ -1,10 +1,10 @@
 import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { type BookVolumeInfo } from "../../../types";
+import { type BookshelfVolumeInfo } from "../../../types";
 
 interface BookShelfBookProps {
-  book: BookVolumeInfo;
+  book: BookshelfVolumeInfo;
 }
 const BookShelfBook = ({ book }: BookShelfBookProps) => {
   return (
@@ -13,7 +13,7 @@ const BookShelfBook = ({ book }: BookShelfBookProps) => {
         <View style={styles.imageBox}>
           <Image
             // Using thumbnail here because the other image links (small / medium) may be different
-            source={{ uri: book.imageLinks?.thumbnail }}
+            source={{ uri: book?.thumbnail }}
             cachePolicy={"memory-disk"}
             style={styles.bookImage}
           />

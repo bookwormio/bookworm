@@ -1,14 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ServerBookShelfName } from "../../../enums/Enums";
-import { fetchBookByVolumeID } from "../../../services/books-services/BookQueries";
 import {
   addBookToUserBookshelf,
-  getBooksByBookIDs,
   getBooksFromUserBookShelves,
   getShelvesContainingBook,
   removeBookFromUserBookshelf,
 } from "../../../services/firebase-services/UserQueries";
-import { type UserBookShelvesModel } from "../../../types";
+import {
+  type BookshelfVolumeInfo,
+  type UserBookShelvesModel,
+} from "../../../types";
 
 /**
  * Custom hook to fetch books for the user's bookshelves.
@@ -28,25 +29,9 @@ export const useGetBooksForBookshelves = (userID: string) => {
 
       const shelfTypes = Object.values(ServerBookShelfName);
       const userBooks = await getBooksFromUserBookShelves(userID, shelfTypes);
-      if (userBooks == null) throw new Error("No books found on any shelves");
+      if (userBooks == null) throw new Error("Error fetching user books");
 
-      const shelvesWithBooksArray = await Promise.all(
-        Object.entries(userBooks).map(async ([shelf, books]) => {
-          const bookIds = books.map((book) => book.id);
-          const bookInfos = await getBooksByBookIDs(bookIds);
-          return {
-            [shelf]: books.map((book, index) => ({
-              ...book,
-              volumeInfo: bookInfos[index],
-            })),
-          };
-        }),
-      );
-
-      return shelvesWithBooksArray.reduce(
-        (acc, shelf) => ({ ...acc, ...shelf }),
-        {},
-      );
+      return userBooks;
     },
   });
 };
@@ -70,26 +55,31 @@ export const useAddBookToShelf = () => {
     mutationFn: async ({
       userID,
       bookID,
+      volumeInfo,
       shelfName,
     }: {
       userID: string;
       bookID: string;
+      volumeInfo: BookshelfVolumeInfo;
       shelfName: ServerBookShelfName;
     }) => {
       if (userID === null || bookID === undefined) {
         throw new Error("User or book ID is not available");
       }
-      return await addBookToUserBookshelf(userID, bookID, shelfName);
+      return await addBookToUserBookshelf(
+        userID,
+        bookID,
+        volumeInfo,
+        shelfName,
+      );
     },
 
     // Only update cache once addBookToUserBookshelf is successful
-    onSuccess: async (data, { userID, bookID, shelfName }) => {
+    onSuccess: async (data, { userID, bookID, shelfName, volumeInfo }) => {
       // Access the returned book data
       const { success, book } = data;
 
       if (success && book != null) {
-        const volumeInfo = await fetchBookByVolumeID(book.id);
-        // Update the query data with the new book information
         if (volumeInfo != null) {
           // Update the bookshelves with the new book and volume info
           queryClient.setQueryData<UserBookShelvesModel>(
