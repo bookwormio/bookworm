@@ -18,12 +18,12 @@ import {
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import {
+  getUserProfileURL,
   newFetchUserInfo,
   updateUser,
 } from "../../../services/firebase-services/UserQueries";
 import { emptyQuery } from "../../../services/util/queryUtils";
 import { type UserDataModel } from "../../../types";
-import { useProfilePicQuery } from "./hooks/useProfileQueries";
 
 const EditProfile = () => {
   const { user } = useAuth();
@@ -34,6 +34,7 @@ const EditProfile = () => {
   const [editCity, setEditCity] = useState("");
   const [editState, setEditState] = useState("");
   const [image, setImage] = useState("");
+  const [save, setSave] = useState("Save");
 
   const queryClient = useQueryClient();
 
@@ -61,14 +62,12 @@ const EditProfile = () => {
   const refreshMutation = useMutation({
     mutationFn: emptyQuery,
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
-        }),
-      ]);
+      await queryClient.invalidateQueries({
+        queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
+      });
     },
   });
 
@@ -96,7 +95,16 @@ const EditProfile = () => {
     }
   }, [userData]);
 
-  const { data: userIm } = useProfilePicQuery(user?.uid);
+  const { data: userIm } = useQuery({
+    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
+    queryFn: async () => {
+      if (user != null) {
+        return await getUserProfileURL(user.uid);
+      } else {
+        return null;
+      }
+    },
+  });
 
   useEffect(() => {
     if (userIm !== undefined && userIm !== null) {
@@ -121,10 +129,12 @@ const EditProfile = () => {
       console.error("Current user undefined");
     } else {
       newUserData.id = userId;
-      await Promise.all([
-        userMutation.mutateAsync(newUserData),
-        refreshMutation.mutateAsync(),
-      ]);
+      // await Promise.all([
+      //   userMutation.mutateAsync(newUserData),
+      //   refreshMutation.mutateAsync(),
+      // ]);
+      await userMutation.mutateAsync(newUserData);
+      await refreshMutation.mutateAsync();
       router.back();
     }
   };
@@ -138,8 +148,6 @@ const EditProfile = () => {
       setImage(result.assets[0].uri);
     }
   };
-
-  const isSaving = userMutation.isPending || refreshMutation.isPending;
 
   if (isLoadingUserData) {
     return (
@@ -258,20 +266,18 @@ const EditProfile = () => {
               <Text style={styles.buttonText}>{" Close "}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button, isSaving && styles.buttonDisabled]}
-              disabled={isSaving}
+              style={styles.button}
               onPress={() => {
-                handeSaveClick().catch((error) => {
-                  Toast.show({
-                    type: "error",
-                    text2: "Error saving profile: " + error,
+                setSave("Saving...");
+                handeSaveClick()
+                  .then(() => {})
+                  .catch((error) => {
+                    console.error("Error saving profile:", error);
+                    setSave("Save");
                   });
-                });
               }}
             >
-              <Text style={styles.buttonText}>
-                {isSaving ? "Saving..." : "Save"}
-              </Text>
+              <Text style={styles.buttonText}>{save}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -302,9 +308,6 @@ const styles = StyleSheet.create({
     width: "30%",
     alignSelf: "center",
     marginHorizontal: 10,
-  },
-  buttonDisabled: {
-    backgroundColor: "rgba(251, 109, 11, 0.5)",
   },
   buttonText: {
     color: "white", // Ensure text color is white
