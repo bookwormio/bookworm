@@ -335,6 +335,10 @@ export async function fetchUsersBySearch(
   }
   try {
     const normalizedSearchValue = caseFoldNormalize(searchValue);
+    const [first, last] = searchValue.split(" ").map(caseFoldNormalize);
+    console.log("First: ", first, " Last: ", last);
+    const normalizedFirst = first ?? "";
+    const normalizedLast = last ?? "";
     // search for users by their case-folded first or last names.
     const q = query(
       collection(DB, "user_collection"),
@@ -347,6 +351,12 @@ export async function fetchUsersBySearch(
         and(
           where("last_casefold", ">=", normalizedSearchValue),
           where("last_casefold", "<=", normalizedSearchValue + "\uf8ff"),
+        ),
+        and(
+          where("first_casefold", ">=", normalizedFirst),
+          where("first_casefold", "<=", normalizedFirst + "\uf8ff"),
+          where("last_casefold", ">=", normalizedLast),
+          where("last_casefold", "<=", normalizedLast + "\uf8ff"),
         ),
       ),
     );
