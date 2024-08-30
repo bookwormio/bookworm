@@ -336,7 +336,6 @@ export async function fetchUsersBySearch(
   try {
     const normalizedSearchValue = caseFoldNormalize(searchValue);
     const [first, last] = searchValue.split(" ").map(caseFoldNormalize);
-    console.log("First: ", first, " Last: ", last);
     const normalizedFirst = first ?? "";
     const normalizedLast = last ?? "";
     // search for users by their case-folded first or last names.
