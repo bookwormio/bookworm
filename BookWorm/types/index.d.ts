@@ -40,8 +40,8 @@ interface CreatePostModel {
   booktitle: string; // TODO: Potentially remove
   text: string;
   images: string[];
-  oldBookmark: number | undefined;
-  newBookmark: number | undefined;
+  oldBookmark?: number;
+  newBookmark?: number;
 }
 
 interface ConnectionModel {
@@ -62,8 +62,8 @@ interface BookVolumeInfo {
   categories?: string[];
   maturityRating?: string;
   previewLink?: string;
-  averageRating?: string;
-  ratingsCount?: string;
+  averageRating?: number;
+  ratingsCount?: number;
   language?: string;
   mainCategory?: string;
 
@@ -148,12 +148,31 @@ interface FlatBookItemModel {
   // TODO change this to use new expo images
   image: string;
   author: string;
-  pageCount: number | undefined;
+  pageCount?: number;
 }
+
 interface BookShelfBookModel {
   id: string;
   created: Timestamp;
-  volumeInfo?: BookVolumeInfo; // Optional property for detailed information
+  volumeInfo: BookshelfVolumeInfo;
+}
+
+interface BookshelfVolumeInfo {
+  title?: string;
+  subtitle?: string;
+  authors?: string[];
+  publisher?: string;
+  publishedDate?: string;
+  description?: string;
+  pageCount?: number;
+  categories?: string[];
+  maturityRating?: string;
+  previewLink?: string;
+  averageRating?: number;
+  ratingsCount?: number;
+  language?: string;
+  mainCategory?: string;
+  thumbnail?: string;
 }
 
 type UserBookShelvesModel = Record<string, BookShelfBookModel[]>;

@@ -1,7 +1,7 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
-import { router, useNavigation } from "expo-router";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,14 +12,16 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
+import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBookShelves";
+import ViewData from "../../../components/profile/Data/ViewData";
 import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
 import {
   fetchUserData,
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
-  getUserProfileURL,
 } from "../../../services/firebase-services/UserQueries";
 import { type UserDataModel } from "../../../types";
+import { useProfilePicQuery } from "./hooks/useProfileQueries";
 
 const Profile = () => {
   // const navigation = useNavigation();
@@ -30,15 +32,13 @@ const Profile = () => {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [image, setImage] = useState("");
-  const [profileLoading, setProfileLoading] = useState(false);
-  const navigation = useNavigation();
+  const [profileTab, setProfileTab] = useState("shelf"); // Default to bookshelf
 
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
     queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
     queryFn: async () => {
       if (user != null) {
         const userdata = await fetchUserData(user);
-        setProfileLoading(false);
         return userdata;
       } else {
         // Return default value when user is null
@@ -47,16 +47,7 @@ const Profile = () => {
     },
   });
 
-  const { data: userIm, isLoading: isLoadingIm } = useQuery({
-    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
-    queryFn: async () => {
-      if (user != null) {
-        return await getUserProfileURL(user.uid);
-      } else {
-        return null;
-      }
-    },
-  });
+  const { data: userIm } = useProfilePicQuery(user?.uid);
 
   const { data: followersCount } = useQuery({
     queryKey: user != null ? ["followersdata", user.uid] : ["followersdata"],
@@ -109,11 +100,7 @@ const Profile = () => {
     }
   }, [userData]);
 
-  useEffect(() => {
-    setProfileLoading(true);
-  }, [navigation]);
-
-  if (isLoadingUserData || profileLoading || isLoadingIm) {
+  if (isLoadingUserData) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />
@@ -122,7 +109,7 @@ const Profile = () => {
   }
 
   return (
-    <ScrollView style={styles.scrollContainer}>
+    <ScrollView stickyHeaderIndices={[4]} style={styles.scrollContainer}>
       <View style={styles.imageTextContainer}>
         <View style={styles.defaultImageContainer}>
           {
@@ -169,7 +156,6 @@ const Profile = () => {
             } else {
               console.error("User DNE");
             }
-            setProfileLoading(true);
           }}
         >
           <Text style={styles.buttonText}>{"Edit Profile"}</Text>
@@ -178,20 +164,18 @@ const Profile = () => {
           <Text style={styles.buttonText}>{"Log Out"}</Text>
         </TouchableOpacity>
       </View>
-      {/* <View style={styles.outerButtonsContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            if (user != null) {
-              router.push({ pathname: "AddData" });
-            } else {
-              console.error("User DNE");
-            }
-          }}
-        >
-          <Text style={styles.buttonText}>{"Add Entry"}</Text>
-      </View> */}
-      <ProfileTabSelector></ProfileTabSelector>
+
+      <ProfileTabSelector
+        profileTab={profileTab}
+        setProfileTab={setProfileTab}
+      ></ProfileTabSelector>
+      {profileTab === "shelf" ? (
+        <ProfileBookShelves />
+      ) : profileTab === "post" ? (
+        <Text>PUT THE POSTS HERE</Text>
+      ) : (
+        <ViewData></ViewData>
+      )}
     </ScrollView>
   );
 };

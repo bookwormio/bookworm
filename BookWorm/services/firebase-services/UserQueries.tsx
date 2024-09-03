@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   and,
   collection,
@@ -19,12 +18,11 @@ import {
   where,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { BOOKS_API_KEY } from "../../constants/constants";
 import { ServerBookShelfName } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
   type BookShelfBookModel,
-  type BookVolumeInfo,
+  type BookshelfVolumeInfo,
   type UserBookShelvesModel,
   type UserDataModel,
   type UserModel,
@@ -418,6 +416,7 @@ export async function getNumberOfFollowingByUserID(
  * Adds a book to the user's bookshelf.
  * @param {string} userID - The ID of the user.
  * @param {string} bookID - The ID of the book to be added.
+ * @param {BookshelfVolumeInfo} bookVolumeInfo - The book's volume information.
  * @param {string} bookshelfName - The name of the bookshelf where the book will be added.
  * @returns {Promise<{ success: boolean; book?: BookShelfBookModel }>} A promise that resolves with an object containing the success status and, if successful, the book information.
  * @throws {Error} Throws an error if user ID is null or book ID is undefined.
@@ -425,15 +424,30 @@ export async function getNumberOfFollowingByUserID(
 export async function addBookToUserBookshelf(
   userID: string,
   bookID: string,
+  bookVolumeInfo: BookshelfVolumeInfo,
   bookshelfName: string,
 ): Promise<{ success: boolean; book?: BookShelfBookModel }> {
   try {
     const userDocRef = doc(collection(DB, "bookshelf_collection"), userID);
     const bookshelfRef = doc(collection(userDocRef, bookshelfName), bookID);
 
-    // Add the book document with the bookID as its ID and created timestamp field
-    await setDoc(bookshelfRef, {
+    // Create a new book document with the book data
+    const bookData: Record<string, unknown> = {
       created: serverTimestamp(),
+    };
+
+    // Add fields to bookData only if they are defined in bookVolumeInfo
+    (Object.keys(bookVolumeInfo) as Array<keyof BookshelfVolumeInfo>).forEach(
+      (key) => {
+        if (bookVolumeInfo[key] !== undefined) {
+          bookData[key] = bookVolumeInfo[key];
+        }
+      },
+    );
+
+    // Add the book document with the bookID as its ID
+    await setDoc(bookshelfRef, {
+      ...bookData,
     });
 
     // Fetch the book data after adding it to the user's bookshelf
@@ -443,6 +457,23 @@ export async function addBookToUserBookshelf(
       const book: BookShelfBookModel = {
         id: bookSnapshot.id,
         created: bookData.created,
+        volumeInfo: {
+          title: bookData?.title,
+          subtitle: bookData?.subtitle,
+          authors: bookData?.authors,
+          publisher: bookData?.publisher,
+          publishedDate: bookData?.publishedDate,
+          description: bookData?.description,
+          pageCount: bookData?.pageCount,
+          categories: bookData?.categories,
+          maturityRating: bookData?.maturityRating,
+          previewLink: bookData?.previewLink,
+          averageRating: bookData?.averageRating,
+          ratingsCount: bookData?.ratingsCount,
+          language: bookData?.language,
+          mainCategory: bookData?.mainCategory,
+          thumbnail: bookData?.thumbnail,
+        },
       };
 
       return { success: true, book };
@@ -509,6 +540,23 @@ export async function getBooksFromUserBookShelves(
         userBookShelves[shelf].push({
           id: doc.id,
           created: bookData.created,
+          volumeInfo: {
+            title: bookData?.title,
+            subtitle: bookData?.subtitle,
+            authors: bookData?.authors,
+            publisher: bookData?.publisher,
+            publishedDate: bookData?.publishedDate,
+            description: bookData?.description,
+            pageCount: bookData?.pageCount,
+            categories: bookData?.categories,
+            maturityRating: bookData?.maturityRating,
+            previewLink: bookData?.previewLink,
+            averageRating: bookData?.averageRating,
+            ratingsCount: bookData?.ratingsCount,
+            language: bookData?.language,
+            mainCategory: bookData?.mainCategory,
+            thumbnail: bookData?.thumbnail,
+          },
         });
       });
     }
@@ -552,50 +600,6 @@ export async function getShelvesContainingBook(
     return shelvesContainingBook;
   } catch (e) {
     console.error("Failed to check shelves for book:", e);
-    return [];
-  }
-}
-
-/**
- * Fetches book information for a list of book volume IDs using Google Books API.
- *
- * @param {string[]} volumeIDs An array of volume IDs for which to retrieve book information.
- * @returns {Promise<BookVolumeInfo[]>} A promise that resolves to an array of book volume information, or an empty array if no valid IDs are provided or an error occurs.
- */
-export async function getBooksByBookIDs(
-  volumeIDs: string[],
-): Promise<BookVolumeInfo[]> {
-  // Filter out empty volume IDs
-  const validVolumeIDs = volumeIDs.filter((id) => id.trim() !== "");
-
-  // If there are no valid volume IDs, return an empty array
-  if (validVolumeIDs.length === 0) {
-    return [];
-  }
-
-  try {
-    // Create an array to store promises for each request
-    const requests = validVolumeIDs.map(
-      async (volumeID: string) =>
-        await axios.get<{
-          volumeInfo: BookVolumeInfo;
-        }>("https://www.googleapis.com/books/v1/volumes/" + volumeID, {
-          params: {
-            key: BOOKS_API_KEY,
-            projection: "lite",
-          },
-        }),
-    );
-
-    // Use Promise.all to execute all requests in parallel
-    const responses = await Promise.all(requests);
-
-    // Extract volume info from each response
-    const volumeInfos = responses.map((response) => response.data.volumeInfo);
-
-    return volumeInfos;
-  } catch (error) {
-    console.error("Error fetching books by volume IDs", error);
     return [];
   }
 }
