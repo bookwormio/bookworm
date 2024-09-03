@@ -247,7 +247,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         const uData = userData as UserDataModel;
         const FRnotify: BasicNotification = {
           user: friendUserID,
-          message: "followed you on",
           sender: user?.uid,
           sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
           sender_img: userIm ?? "",

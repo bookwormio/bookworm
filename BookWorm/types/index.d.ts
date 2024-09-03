@@ -181,13 +181,20 @@ type UserBookShelvesModel = Record<string, BookShelfBookModel[]>;
 
 interface BasicNotification {
   user: string;
-  message: string;
   sender: string;
   sender_name: string;
   sender_img: string;
 }
 
-interface FRNotification {
+interface BasicNotificationOnPost {
+  user: string;
+  sender: string;
+  sender_name: string;
+  sender_img: string;
+  postID;
+}
+
+interface FullNotification {
   user: string;
   message: string;
   sender: string;
@@ -195,5 +202,6 @@ interface FRNotification {
   sender_img: string;
   created: Timestamp;
   read: Timestamp;
-  type: "FRIEND_REQUEST";
+  postID: string;
+  type: string;
 }

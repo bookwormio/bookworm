@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { Button, FlatList, Image, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../../../components/auth/context";
-import { getAllFRNotifications } from "../../../services/firebase-services/NotificationQueries";
+import { getAllFullNotifications } from "../../../services/firebase-services/NotificationQueries";
 
 const NotificationsScreen = () => {
   const handlePress = () => {
@@ -16,7 +16,7 @@ const NotificationsScreen = () => {
     queryKey: user != null ? ["notifications", user.uid] : ["notifications"],
     queryFn: async () => {
       if (user != null) {
-        return await getAllFRNotifications(user.uid);
+        return await getAllFullNotifications(user.uid);
       } else {
         return [];
       }
@@ -26,12 +26,6 @@ const NotificationsScreen = () => {
   if (!notifIsLoading) {
     // console.log(notifdata);
     if (notifdata !== null && notifdata !== undefined) {
-      console.log("here");
-      console.log(notifdata[0].created);
-      const date: Date = notifdata[0].created.toDate();
-      console.log(date);
-      const not = notifdata;
-      console.log(not[0]);
       return (
         <View style={styles.container}>
           <FlatList

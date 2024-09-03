@@ -9,8 +9,13 @@ import {
   where,
 } from "firebase/firestore";
 import { DB } from "../../firebase.config";
-import { type BasicNotification, type FRNotification } from "../../types";
+import {
+  type BasicNotificationOnPost,
+  type BasicNotification,
+  type FullNotification,
+} from "../../types";
 
+// needs friend ID
 export async function createFriendRequestNotification(
   notif: BasicNotification,
 ) {
@@ -18,12 +23,13 @@ export async function createFriendRequestNotification(
     try {
       await addDoc(collection(DB, "notifications"), {
         user: notif.user,
-        message: notif.message,
+        message: "followed you on",
         sender: notif.sender,
         sender_name: notif.sender_name,
         sender_img: notif.sender_img,
         created: serverTimestamp(),
         read: null,
+        postID: null,
         type: "FRIEND_REQUEST",
       });
     } catch (error) {
@@ -32,11 +38,55 @@ export async function createFriendRequestNotification(
   }
 }
 
-export async function getAllFRNotifications(
+// needs post ID
+export async function createLikeNotification(notif: BasicNotificationOnPost) {
+  if (notif.user != null) {
+    try {
+      await addDoc(collection(DB, "notifications"), {
+        user: notif.user,
+        message: "liked your post",
+        sender: notif.sender,
+        sender_name: notif.sender_name,
+        sender_img: notif.sender_img,
+        created: serverTimestamp(),
+        read: null,
+        postID: null,
+        type: "LIKE",
+      });
+    } catch (error) {
+      console.error("Error creating friend request notification: ", error);
+    }
+  }
+}
+
+// needs post ID
+export async function createCommentNotification(
+  notif: BasicNotificationOnPost,
+) {
+  if (notif.user != null) {
+    try {
+      await addDoc(collection(DB, "notifications"), {
+        user: notif.user,
+        message: "liked your post",
+        sender: notif.sender,
+        sender_name: notif.sender_name,
+        sender_img: notif.sender_img,
+        created: serverTimestamp(),
+        read: null,
+        postID: null,
+        type: "LIKE",
+      });
+    } catch (error) {
+      console.error("Error creating friend request notification: ", error);
+    }
+  }
+}
+
+export async function getAllFullNotifications(
   userID: string,
-): Promise<FRNotification[]> {
+): Promise<FullNotification[]> {
   try {
-    const notifdata: FRNotification[] = [];
+    const notifdata: FullNotification[] = [];
     const q = query(
       collection(DB, "notifications"),
       where("user", "==", userID),
@@ -55,6 +105,7 @@ export async function getAllFRNotifications(
         sender_img: notDoc.data().sender_img,
         created: notDoc.data().created as Timestamp,
         read: notDoc.data().read,
+        postID: notDoc.data().read,
         type: notDoc.data().type,
       };
       console.log(notif);
