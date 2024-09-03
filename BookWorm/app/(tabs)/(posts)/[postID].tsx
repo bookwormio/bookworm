@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -11,6 +11,7 @@ import {
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import Post from "../../../components/post/post";
+import { usePosts } from "../../../components/post/PostsContext";
 import { POSTS_ROUTE_PREFIX } from "../../../constants/constants";
 import { fetchPostByPostID } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
@@ -20,59 +21,41 @@ const ViewPost = () => {
   const { postID } = useLocalSearchParams();
   const [post, setPost] = useState<PostModel | null>(null);
   const [preLoad, setPreLoading] = useState(true);
+  const { posts } = usePosts();
 
-  const { data: postData, isLoading: postLoading } = useQuery({
-    queryKey:
-      postID !== null && typeof postID === "string"
-        ? ["postdata", postID]
-        : ["postdata"],
-    queryFn: async () => {
+  const postMutation = useMutation({
+    mutationFn: async () => {
       if (postID !== undefined && typeof postID === "string") {
         return await fetchPostByPostID(postID);
       } else {
-        // Return default value when user is null
         return null;
       }
     },
-    staleTime: 60000, // Set stale time to 1 minute
+    onSuccess: (fetchedPost) => {
+      setPost(fetchedPost);
+      setPreLoading(false);
+    },
   });
 
   useEffect(() => {
-    setPreLoading(postLoading);
-  }, [postLoading]);
-
-  useEffect(() => {
-    if (!preLoad) {
-      try {
-        if (postData == null) {
-          Toast.show({
-            type: "error",
-            text1: "Error: Couldn't Find Post",
-            onShow: () => {
-              setTimeout(() => {
-                router.back();
-              }, 1500);
-            },
-          });
-        } else {
-          setPost(postData);
-        }
-      } catch (error) {
-        console.error("Error fetching post", error);
-      }
+    const findPost = posts.find((p) => p.id === postID);
+    if (findPost !== undefined) {
+      setPost(findPost);
+      setPreLoading(false);
+    } else {
+      postMutation.mutate();
     }
-  }, [preLoad]);
+  }, [postID, posts, postMutation]);
 
   return (
     <View style={styles.container}>
       <Toast />
-      {postLoading && (
+      {preLoad && (
         <View style={styles.feedLoading}>
           <ActivityIndicator size="large" color="black" />
         </View>
       )}
-      {/* TODO: Down the user's name should just be clickable instead of a button */}
-      {post != null && !postLoading && (
+      {post != null && !preLoad && (
         <View style={styles.postContainer}>
           <Post
             post={post}
