@@ -19,12 +19,13 @@ import React from "react";
 import { BLURHASH } from "../../constants/constants";
 import { DB, STORAGE } from "../../firebase.config";
 import {
+  type CommentModel,
   type CreatePostModel,
   type PostModel,
   type UserModel,
 } from "../../types";
 import { getAllFollowing } from "./FriendQueries";
-import { fetchUsersByIDs } from "./UserQueries";
+import { fetchUser, fetchUsersByIDs } from "./UserQueries";
 
 /**
  * Follows a user by updating the relationship document between the current user and the friend user.
@@ -150,6 +151,8 @@ export async function fetchPostsByUserIDs(
             images,
             oldBookmark: postDoc.data().oldBookmark,
             newBookmark: postDoc.data().newBookmark,
+            likes: postDoc.data().likes ?? [],
+            comments: (postDoc.data().comments as CommentModel[]) ?? [],
           };
           postsData.push(post);
         }
@@ -228,6 +231,8 @@ export async function fetchPostByPostID(
             text: postSnap.data().text,
             user,
             images,
+            likes: postSnap.data().likes ?? [],
+            comments: (postSnap.data().comments as CommentModel[]) ?? [],
             oldBookmark: postSnap.data().oldBookmark,
             newBookmark: postSnap.data().newBookmark,
           };
@@ -273,5 +278,80 @@ export async function fetchPostsForUserFeed(
   } catch (error) {
     console.error("Error fetching users feed", error);
     return { posts: [], newLastVisible: null };
+  }
+}
+
+/**
+ * Either removes or adds a like to a post
+ * @param {string} userID - The ID of the user liking/unliking.
+ * @param {string} postID - The ID of post being liked/unliked.
+ * @returns {Promise<string[] | null>} A promise that resolves to an object containing the updated likes or null if the post doesnt exist.
+ */
+export async function likeUnlikePost(
+  userID: string,
+  postID: string,
+): Promise<string[] | null> {
+  try {
+    const post = await fetchPostByPostID(postID);
+    let updatedLikes: string[] | null = null;
+    if (post != null) {
+      const postRef = doc(DB, "posts", postID);
+      await runTransaction(DB, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        if (postSnap.exists()) {
+          const likes = (postSnap.data().likes as string[]) ?? [];
+          if (likes.includes(userID)) {
+            likes.splice(likes.indexOf(userID), 1);
+          } else {
+            likes.push(userID);
+          }
+          transaction.update(postRef, { likes });
+          updatedLikes = likes;
+        }
+      });
+    }
+    return updatedLikes;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+/**
+ * Updates a post by adding a new comment.
+ * @param {string} userID - The ID of the user commenting.
+ * @param {string} postID - The ID of post being commented on.
+ * @param {string} commentText - The text being commented.
+ * @returns {Promise<CommentModel[] | null>} A promise that resolves to an object containing the updated comments or null if the post doesnt exist.
+ */
+export async function addCommentToPost(
+  userID: string,
+  postID: string,
+  commentText: string,
+): Promise<CommentModel[] | null> {
+  try {
+    const user = await fetchUser(userID);
+    if (user != null) {
+      const postRef = doc(DB, "posts", postID);
+      let updatedComments: CommentModel[] | null = null;
+      await runTransaction(DB, async (transaction) => {
+        const postSnap = await transaction.get(postRef);
+        if (postSnap.exists()) {
+          const comments = (postSnap.data().comments as CommentModel[]) ?? [];
+          comments.push({
+            userID,
+            first: user.first,
+            text: commentText,
+          });
+          transaction.update(postRef, { comments });
+          updatedComments = comments;
+        }
+      });
+      return updatedComments;
+    }
+    return null;
+  } catch (error) {
+    console.error(error);
+    return null;
   }
 }
