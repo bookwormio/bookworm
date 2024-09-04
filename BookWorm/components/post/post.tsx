@@ -51,17 +51,20 @@ const Post = ({
       <Text style={styles.title}>
         {post.user.first} {post.user.last} was reading {post.booktitle}
       </Text>
-      {areValidPageNumbers(
-        post.oldBookmark,
-        post.newBookmark,
-        post.totalPages,
-      ) && (
-        <PagesProgressBar
-          oldBookmark={post.oldBookmark}
-          newBookmark={post.newBookmark}
-          totalPages={post.totalPages}
-        />
-      )}
+      {post.oldBookmark != null &&
+        post.newBookmark != null &&
+        post.totalPages != null &&
+        areValidPageNumbers(
+          post.oldBookmark,
+          post.newBookmark,
+          post.totalPages,
+        ) && (
+          <PagesProgressBar
+            oldBookmark={post.oldBookmark}
+            newBookmark={post.newBookmark}
+            totalPages={post.totalPages}
+          />
+        )}
       <Text style={styles.time}>{formattedDate}</Text>
       <Text style={styles.body}>{post.text}</Text>
       {post.images.length > 0 && (

@@ -104,9 +104,9 @@ interface PostModel {
   images: JSX.Element[];
   likes: string[];
   comments: CommentModel[];
-  oldBookmark: number;
-  newBookmark: number;
-  totalPages: number;
+  oldBookmark?: number;
+  newBookmark?: number;
+  totalPages?: number;
 }
 
 interface CommentModel {
