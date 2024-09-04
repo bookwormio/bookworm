@@ -14,7 +14,7 @@ import { DAYS_OF_WEEK, MONTHS_OF_YEAR } from "../../constants/constants";
 import { type PostModel } from "../../types";
 import { useAuth } from "../auth/context";
 import Comment from "../comment/comment";
-import { usePosts } from "./PostsContext";
+import { usePostsContext } from "./PostsContext";
 
 interface PostProps {
   post: PostModel;
@@ -56,7 +56,7 @@ const Post = ({
   presentComments,
 }: PostProps) => {
   const { user } = useAuth();
-  const { posts, likePost, commentOnPost } = usePosts();
+  const { posts, likePost, isLikePending, commentOnPost } = usePostsContext();
   const [showCommentSection, setShowComments] = useState(individualPage);
   const [newComment, setNewComment] = useState("");
   const formattedDate = formatDate(created, currentDate);
@@ -82,7 +82,8 @@ const Post = ({
       )}
       <View style={styles.buttonrow}>
         <TouchableOpacity
-          style={styles.likebutton}
+          disabled={isLikePending}
+          style={[styles.likebutton, isLikePending && styles.pendingOpacity]}
           onPress={() => {
             likePost(post.id);
           }}
@@ -93,7 +94,9 @@ const Post = ({
             <FontAwesome5 name="heart" size={15} />
           )}
         </TouchableOpacity>
-        <Text style={{ paddingRight: 10 }}>
+        <Text
+          style={[styles.textPadding, isLikePending && styles.pendingOpacity]}
+        >
           {post.likes.length}
           {post.likes.length === 1 ? " Like" : " Likes"}
         </Text>
@@ -181,6 +184,9 @@ const styles = StyleSheet.create({
     paddingRight: 5,
     alignItems: "center",
   },
+  pendingOpacity: {
+    opacity: 0.5,
+  },
   commentInputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -207,5 +213,8 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  textPadding: {
+    paddingRight: 10,
   },
 });

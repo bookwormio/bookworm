@@ -1,5 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React, {
+  createContext,
+  type ReactNode,
+  useContext,
+  useState,
+} from "react";
 import {
   addCommentToPost,
   likeUnlikePost,
@@ -8,31 +13,33 @@ import { fetchUser } from "../../services/firebase-services/UserQueries";
 import { type CommentModel, type PostModel } from "../../types";
 import { useAuth } from "../auth/context";
 
-const PostsContext = React.createContext<{
+const PostsContext = createContext<{
   posts: PostModel[];
   setPosts: (posts: PostModel[]) => void;
   likePost: (postID: string) => void;
+  isLikePending: boolean;
   commentOnPost: (postID: string, comment: string) => void;
 }>({
   posts: [],
   setPosts: () => null,
   likePost: () => null,
+  isLikePending: false,
   commentOnPost: () => null,
 });
 
-export function usePosts() {
-  return React.useContext(PostsContext);
+export function usePostsContext() {
+  return useContext(PostsContext);
 }
 
 interface PostsProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-interface LikeMutationProps {
+interface LikePostMutationProps {
   postID: string;
 }
 
-interface CommentMutationProps {
+interface AddCommentMutationProps {
   postID: string;
   comment: string;
 }
@@ -41,8 +48,8 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   const { user } = useAuth();
   const [posts, setPosts] = useState<PostModel[]>([]);
 
-  const likeMutation = useMutation({
-    mutationFn: async ({ postID }: LikeMutationProps) => {
+  const likePostMutation = useMutation({
+    mutationFn: async ({ postID }: LikePostMutationProps) => {
       if (user != null) {
         const postToUpdate = posts.find((post) => post.id === postID);
         if (postToUpdate !== undefined) {
@@ -82,8 +89,8 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
     },
   });
 
-  const commentMutation = useMutation({
-    mutationFn: async ({ postID, comment }: CommentMutationProps) => {
+  const addCommentMutation = useMutation({
+    mutationFn: async ({ postID, comment }: AddCommentMutationProps) => {
       if (user != null) {
         const currentUser = await fetchUser(user.uid);
         if (currentUser != null) {
@@ -136,10 +143,11 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
           setPosts(newPosts);
         },
         likePost: (postID: string) => {
-          likeMutation.mutate({ postID });
+          likePostMutation.mutate({ postID });
         },
+        isLikePending: likePostMutation.isPending,
         commentOnPost: (postID: string, comment: string) => {
-          commentMutation.mutate({ postID, comment });
+          addCommentMutation.mutate({ postID, comment });
         },
       }}
     >

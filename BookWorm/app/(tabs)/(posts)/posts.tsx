@@ -29,7 +29,7 @@ import {
 import { useAuth } from "../../../components/auth/context";
 import Comment from "../../../components/comment/comment";
 import Post from "../../../components/post/post";
-import { usePosts } from "../../../components/post/PostsContext";
+import { usePostsContext } from "../../../components/post/PostsContext";
 import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
 
@@ -68,8 +68,8 @@ const Posts = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [activePost, setActivePost] = useState<PostModel | null>(null);
-  const { posts, setPosts, commentOnPost } = usePosts();
-  const snapPoints = useMemo(() => ["25%", "50%"], []);
+  const { posts, setPosts, commentOnPost } = usePostsContext();
+  const snapPoints = useMemo(() => ["25%", "50%", "100%"], []);
   const queryClient = useQueryClient();
   const currentDate = new Date();
 

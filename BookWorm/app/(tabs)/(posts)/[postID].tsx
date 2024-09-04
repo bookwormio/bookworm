@@ -11,7 +11,7 @@ import {
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import Post from "../../../components/post/post";
-import { usePosts } from "../../../components/post/PostsContext";
+import { usePostsContext } from "../../../components/post/PostsContext";
 import { POSTS_ROUTE_PREFIX } from "../../../constants/constants";
 import { fetchPostByPostID } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
@@ -21,7 +21,7 @@ const ViewPost = () => {
   const { postID } = useLocalSearchParams();
   const [post, setPost] = useState<PostModel | null>(null);
   const [preLoad, setPreLoading] = useState(true);
-  const { posts } = usePosts();
+  const { posts } = usePostsContext();
 
   const postMutation = useMutation({
     mutationFn: async () => {
