@@ -15,6 +15,7 @@ import { type PostModel } from "../../types";
 import { useAuth } from "../auth/context";
 import Comment from "../comment/comment";
 import { usePostsContext } from "./PostsContext";
+import PagesProgressBar from "./ProgressBar/PagesProgressBar";
 
 interface PostProps {
   post: PostModel;
@@ -65,12 +66,27 @@ const Post = ({
   if (currentPost !== undefined) {
     post = currentPost;
   }
+  // TODO take this
+  const FAKE_NUM_PAGES = 200;
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
         {post.user.first} {post.user.last} was reading {post.booktitle}
       </Text>
+      {/* TODO put this check into a function that maybe throws an error */}
+      {typeof post.oldBookmark === "number" &&
+        typeof post.newBookmark === "number" &&
+        typeof FAKE_NUM_PAGES === "number" &&
+        !Number.isNaN(post.oldBookmark) &&
+        !Number.isNaN(post.newBookmark) &&
+        !Number.isNaN(FAKE_NUM_PAGES) && (
+          <PagesProgressBar
+            oldBookmark={post.oldBookmark}
+            newBookmark={post.newBookmark}
+            totalPages={FAKE_NUM_PAGES}
+          />
+        )}
       <Text style={styles.time}>{formattedDate}</Text>
       <Text style={styles.body}>{post.text}</Text>
       {post.images.length > 0 && (
