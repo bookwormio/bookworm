@@ -1,9 +1,14 @@
+/**
+ * @fileoverview
+ * SHOULD NOT NEED TO MODIFY THIS FILE
+ *
+ * This is based on the following code:
+ * https://github.com/abaktiar/rn-multi-progress-bar/blob/master/src/ProgressBar/ProgressBar.js
+ * But it is now a functional component that uses typescript
+ */
+
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, View } from "react-native";
-
-// This is based on the following code:
-// https://github.com/abaktiar/rn-multi-progress-bar/blob/master/src/ProgressBar/ProgressBar.js
-// But it is now a functional component that uses typescript
 
 interface ProgressBarProps {
   data: Array<{ progress: number; color: string }>;

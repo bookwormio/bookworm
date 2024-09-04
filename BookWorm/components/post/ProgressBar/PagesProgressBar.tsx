@@ -8,8 +8,10 @@ interface PagesProgressBarProps {
   totalPages: number;
 }
 
-// TODO PASS IN PROGRESS LENGTH
-const TOTAL_PROGRESS_LENGTH = 25;
+const FIRST_PROGRESS_COLOR = "rgb(88, 166, 92)";
+const SECOND_PROGRESS_COLOR = "rgb(169, 207, 96)";
+const BACKWARDS_PROGRESS_COLOR = "rgb(255, 99, 71)";
+const REMAINING_PROGRESS_COLOR = "rgb(229, 232, 249)";
 
 const PagesProgressBar = ({
   oldBookmark,
@@ -17,25 +19,30 @@ const PagesProgressBar = ({
   totalPages,
 }: PagesProgressBarProps) => {
   const pagesRead = newBookmark - oldBookmark;
+  const isBackwards = pagesRead < 0;
 
-  // TODO: make these calculations safe
-  const firstProgress = (oldBookmark / totalPages) * TOTAL_PROGRESS_LENGTH;
-  const secondProgress = (pagesRead / totalPages) * TOTAL_PROGRESS_LENGTH;
-  const thirdProgress =
-    TOTAL_PROGRESS_LENGTH - firstProgress - secondProgress - 1;
+  const firstProgress = Math.min(oldBookmark, newBookmark) / totalPages;
+  const secondProgress = Math.abs(pagesRead) / totalPages;
+  const remainingProgress = 1 - firstProgress - secondProgress;
 
   return (
     <View style={styles.progressContainer}>
-      <Text>Read {newBookmark - oldBookmark} pages</Text>
+      <Text>
+        {isBackwards ? "Moved back" : "Read"} {Math.abs(pagesRead)} pages
+      </Text>
       <ProgressBar
-        // add useNativeDriver: true to animated.timing in ProgressBar.js
-        shouldAnimate={true} // to enable animation, default false
-        animateDuration={1000} // if animation enabled TODO make this shorter
-        barHeight={15} // height of the progress bar
+        shouldAnimate={true}
+        animateDuration={500}
+        barHeight={15}
         data={[
-          { progress: firstProgress, color: "#FB6D0B" },
-          { progress: secondProgress, color: "rgb(236, 178, 138)" },
-          { progress: thirdProgress, color: "rgb(229, 232, 249)" },
+          { progress: firstProgress, color: FIRST_PROGRESS_COLOR },
+          {
+            progress: secondProgress,
+            color: isBackwards
+              ? BACKWARDS_PROGRESS_COLOR
+              : SECOND_PROGRESS_COLOR,
+          },
+          { progress: remainingProgress, color: REMAINING_PROGRESS_COLOR },
         ]}
       />
     </View>
@@ -45,6 +52,7 @@ const PagesProgressBar = ({
 const styles = StyleSheet.create({
   progressContainer: {
     marginVertical: 10,
+    marginHorizontal: 10,
   },
 });
 
