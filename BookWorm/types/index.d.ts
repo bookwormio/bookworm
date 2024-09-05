@@ -42,6 +42,7 @@ interface CreatePostModel {
   images: string[];
   oldBookmark?: number;
   newBookmark?: number;
+  totalPages?: number;
 }
 
 interface ConnectionModel {
@@ -103,8 +104,9 @@ interface PostModel {
   images: JSX.Element[];
   likes: string[];
   comments: CommentModel[];
-  oldBookmark: number;
-  newBookmark: number;
+  oldBookmark?: number;
+  newBookmark?: number;
+  totalPages?: number;
 }
 
 interface CommentModel {

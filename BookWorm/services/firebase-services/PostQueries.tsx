@@ -48,6 +48,7 @@ export async function createPost(post: CreatePostModel) {
       image: post.images.length,
       oldBookmark: post.oldBookmark,
       newBookmark: post.newBookmark,
+      totalPages: post.totalPages,
     })
       .then(async (docRef) => {
         if (post.images.length > 0) {
@@ -153,6 +154,7 @@ export async function fetchPostsByUserIDs(
             newBookmark: postDoc.data().newBookmark,
             likes: postDoc.data().likes ?? [],
             comments: (postDoc.data().comments as CommentModel[]) ?? [],
+            totalPages: postDoc.data().totalPages,
           };
           postsData.push(post);
         }
@@ -235,6 +237,7 @@ export async function fetchPostByPostID(
             comments: (postSnap.data().comments as CommentModel[]) ?? [],
             oldBookmark: postSnap.data().oldBookmark,
             newBookmark: postSnap.data().newBookmark,
+            totalPages: postSnap.data().totalPages,
           };
         }
       }

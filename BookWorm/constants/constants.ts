@@ -36,3 +36,8 @@ export const MINUTES = Array.from({ length: 11 }, (_, index) => ({
 export const POSTS_ROUTE_PREFIX = "(posts)";
 export const SEARCH_ROUTE_PREFIX = "(search)";
 export const BLURHASH = "LBN-4dMwIUWC~WRj%M^+-;4n4nWC";
+
+export const FIRST_PROGRESS_COLOR = "rgb(88, 166, 92)";
+export const SECOND_PROGRESS_COLOR = "rgb(169, 207, 96)";
+export const BACKWARDS_PROGRESS_COLOR = "rgb(255, 99, 71)";
+export const REMAINING_PROGRESS_COLOR = "rgb(229, 232, 249)";
