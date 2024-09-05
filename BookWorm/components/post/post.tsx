@@ -43,8 +43,6 @@ const Post = ({
   if (currentPost !== undefined) {
     post = currentPost;
   }
-  // TODO take this
-  const FAKE_NUM_PAGES = 200;
 
   return (
     <View style={styles.container}>
