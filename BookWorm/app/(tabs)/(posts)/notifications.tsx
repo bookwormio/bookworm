@@ -55,9 +55,17 @@ const NotificationsScreen = () => {
                   style={styles.notif_container}
                   onPress={() => {
                     // TODO: Trying to route to the post page from the notification, not working :(
-                    router.push({
-                      pathname: `/${item.postID}`,
-                    });
+                    console.log(item);
+                    console.log("postID: ", item.postID);
+                    if (item.type === "LIKE" || item.type === "COMMENT") {
+                      router.push({
+                        pathname: `/${item.postID}`,
+                      });
+                    } else if (item.type === "FRIEND_REQUEST") {
+                      router.push({
+                        pathname: `/user/${item.sender}`,
+                      });
+                    }
                   }}
                 >
                   <Text

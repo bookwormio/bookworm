@@ -117,7 +117,7 @@ export async function getAllFullNotifications(
         sender_img: notDoc.data().sender_img,
         created: notDoc.data().created as Timestamp,
         read: notDoc.data().read,
-        postID: notDoc.data().read,
+        postID: notDoc.data().postID,
         type: notDoc.data().type,
       };
       console.log(notif);
