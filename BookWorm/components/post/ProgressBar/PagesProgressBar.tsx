@@ -1,5 +1,11 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import {
+  BACKWARDS_PROGRESS_COLOR,
+  FIRST_PROGRESS_COLOR,
+  REMAINING_PROGRESS_COLOR,
+  SECOND_PROGRESS_COLOR,
+} from "../../../constants/constants";
 import ProgressBar from "./ProgressBar";
 
 interface PagesProgressBarProps {
@@ -7,11 +13,6 @@ interface PagesProgressBarProps {
   newBookmark: number;
   totalPages: number;
 }
-
-const FIRST_PROGRESS_COLOR = "rgb(88, 166, 92)";
-const SECOND_PROGRESS_COLOR = "rgb(169, 207, 96)";
-const BACKWARDS_PROGRESS_COLOR = "rgb(255, 99, 71)";
-const REMAINING_PROGRESS_COLOR = "rgb(229, 232, 249)";
 
 const PagesProgressBar = ({
   oldBookmark,
