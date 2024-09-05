@@ -250,6 +250,8 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           sender: user?.uid,
           sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
           sender_img: userIm ?? "",
+          comment: "",
+          postID: "",
         };
         notifyMutation.mutate(FRnotify);
       }

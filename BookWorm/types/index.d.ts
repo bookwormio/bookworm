@@ -184,19 +184,14 @@ interface BasicNotification {
   sender: string;
   sender_name: string;
   sender_img: string;
-}
-
-interface BasicNotificationOnPost {
-  user: string;
-  sender: string;
-  sender_name: string;
-  sender_img: string;
-  postID;
+  comment: string;
+  postID: string;
 }
 
 interface FullNotification {
   user: string;
   message: string;
+  comment: string;
   sender: string;
   sender_name: string;
   sender_img: string;
