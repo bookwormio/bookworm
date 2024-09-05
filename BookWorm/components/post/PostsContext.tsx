@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, {
   createContext,
   type ReactNode,
@@ -6,11 +6,24 @@ import React, {
   useState,
 } from "react";
 import {
+  createCommentNotification,
+  createLikeNotification,
+} from "../../services/firebase-services/NotificationQueries";
+import {
   addCommentToPost,
   likeUnlikePost,
 } from "../../services/firebase-services/PostQueries";
-import { fetchUser } from "../../services/firebase-services/UserQueries";
-import { type CommentModel, type PostModel } from "../../types";
+import {
+  fetchUser,
+  fetchUserData,
+  getUserProfileURL,
+} from "../../services/firebase-services/UserQueries";
+import {
+  type BasicNotification,
+  type CommentModel,
+  type PostModel,
+  type UserDataModel,
+} from "../../types";
 import { useAuth } from "../auth/context";
 
 const PostsContext = createContext<{
@@ -47,6 +60,85 @@ interface AddCommentMutationProps {
 const PostsProvider = ({ children }: PostsProviderProps) => {
   const { user } = useAuth();
   const [posts, setPosts] = useState<PostModel[]>([]);
+
+  // getting userdata
+  const { data: userData } = useQuery({
+    queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+    queryFn: async () => {
+      if (user != null) {
+        const userdata = await fetchUserData(user);
+        return userdata;
+      } else {
+        // Return default value when user is null
+        return {};
+      }
+    },
+  });
+
+  // getting userIm
+  const { data: userIm } = useQuery({
+    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
+    queryFn: async () => {
+      if (user != null) {
+        return await getUserProfileURL(user.uid);
+      } else {
+        return "";
+      }
+    },
+  });
+
+  const queryClient = useQueryClient();
+  const commentNotifyMutation = useMutation({
+    mutationFn: createCommentNotification,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["notifications", ""],
+      });
+    },
+  });
+
+  const likeNotifyMutation = useMutation({
+    mutationFn: createLikeNotification,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["notifications", ""],
+      });
+    },
+  });
+
+  const handleComment = (postID: string, comment: string) => {
+    addCommentMutation.mutate({ postID, comment });
+    const postToUpdate = posts.find((post) => post.id === postID);
+    const uData = userData as UserDataModel;
+    if (postToUpdate !== undefined && user?.uid !== undefined) {
+      const BNotify: BasicNotification = {
+        user: postToUpdate.user.id,
+        sender: user?.uid,
+        sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+        sender_img: userIm ?? "",
+        comment: " " + comment,
+        postID,
+      };
+      commentNotifyMutation.mutate(BNotify);
+    }
+  };
+
+  const handleLike = (postID: string) => {
+    likePostMutation.mutate({ postID });
+    const postToUpdate = posts.find((post) => post.id === postID);
+    const uData = userData as UserDataModel;
+    if (postToUpdate !== undefined && user?.uid !== undefined) {
+      const BNotify: BasicNotification = {
+        user: postToUpdate.user.id,
+        sender: user?.uid,
+        sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+        sender_img: userIm ?? "",
+        comment: "",
+        postID,
+      };
+      likeNotifyMutation.mutate(BNotify);
+    }
+  };
 
   const likePostMutation = useMutation({
     mutationFn: async ({ postID }: LikePostMutationProps) => {
@@ -143,11 +235,11 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
           setPosts(newPosts);
         },
         likePost: (postID: string) => {
-          likePostMutation.mutate({ postID });
+          handleLike(postID);
         },
         isLikePending: likePostMutation.isPending,
         commentOnPost: (postID: string, comment: string) => {
-          addCommentMutation.mutate({ postID, comment });
+          handleComment(postID, comment);
         },
       }}
     >

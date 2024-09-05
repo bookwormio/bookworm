@@ -1,7 +1,16 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
 import React from "react";
-import { Button, FlatList, Image, StyleSheet, Text, View } from "react-native";
+import {
+  Button,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import { getAllFullNotifications } from "../../../services/firebase-services/NotificationQueries";
 
@@ -41,45 +50,49 @@ const NotificationsScreen = () => {
                 minute: "numeric",
                 hour12: true,
               });
-              if (item.type === "FRIEND_REQUEST") {
-                return (
-                  <View style={styles.notif_container}>
-                    <Text
-                      style={{
-                        fontWeight: "bold",
-                        fontSize: 18,
-                        paddingLeft: 20,
-                      }}
-                    >
-                      New Follower
-                    </Text>
-                    <View style={styles.imageTextContainer}>
-                      <View style={styles.defaultImageContainer}>
-                        {item.sender_img !== "" ? (
-                          <Image
-                            style={styles.defaultImage}
-                            source={{ uri: item.sender_img }}
-                            resizeMode="cover"
-                          />
-                        ) : (
-                          <FontAwesome5 name="user" size={40} color="black" />
-                        )}
-                      </View>
-                      <Text
-                        style={{ paddingLeft: 20, flexWrap: "wrap", flex: 1 }}
-                      >
-                        {item.sender_name} {item.message} on {formattedDate}
-                      </Text>
+              return (
+                <TouchableOpacity
+                  style={styles.notif_container}
+                  onPress={() => {
+                    // TODO: Trying to route to the post page from the notification, not working :(
+                    router.push({
+                      pathname: `/${item.postID}`,
+                    });
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      fontSize: 18,
+                      paddingLeft: 20,
+                    }}
+                  >
+                    {item.type === "FRIEND_REQUEST" ? "NEW FOLLOWER" : ""}
+                    {item.type === "COMMENT" ? "NEW COMMENT" : ""}
+                    {item.type === "LIKE" ? "NEW LIKE" : ""}
+                  </Text>
+                  <View style={styles.imageTextContainer}>
+                    <View style={styles.defaultImageContainer}>
+                      {item.sender_img !== "" ? (
+                        <Image
+                          style={styles.defaultImage}
+                          source={{ uri: item.sender_img }}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <FontAwesome5 name="user" size={40} color="black" />
+                      )}
                     </View>
+                    <Text
+                      style={{ paddingLeft: 20, flexWrap: "wrap", flex: 1 }}
+                    >
+                      {item.sender_name} {item.message}
+                      {item.type === "COMMENT" ? item.comment : ""} on{" "}
+                      {formattedDate}
+                    </Text>
                   </View>
-                );
-              } else {
-                return (
-                  <View>
-                    <Text>Not implemented yet</Text>
-                  </View>
-                );
-              }
+                </TouchableOpacity>
+              );
             }}
             keyExtractor={(item, index) => index.toString()}
           />
@@ -109,6 +122,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     paddingBottom: 10,
     paddingTop: 10,
+    paddingRight: 10,
     borderBottomWidth: 2,
     borderBottomColor: "rgba(0, 0, 0, 0.1)",
   },

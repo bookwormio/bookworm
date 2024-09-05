@@ -39,20 +39,34 @@ export async function createFriendRequestNotification(
 export async function createLikeNotification(notif: BasicNotification) {
   if (notif.user != null) {
     try {
-      await addDoc(collection(DB, "notifications"), {
-        user: notif.user,
-        message: "liked your post",
-        comment: null,
-        sender: notif.sender,
-        sender_name: notif.sender_name,
-        sender_img: notif.sender_img,
-        created: serverTimestamp(),
-        read: null,
-        postID: notif.postID,
-        type: "LIKE",
-      });
+      const notificationsRef = collection(DB, "notifications");
+      const q = query(
+        notificationsRef,
+        where("postID", "==", notif.postID),
+        where("sender", "==", notif.sender),
+        where("type", "==", "LIKE"),
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        // No existing like notification, so create a new one
+        await addDoc(notificationsRef, {
+          user: notif.user,
+          message: "liked your post",
+          comment: null,
+          sender: notif.sender,
+          sender_name: notif.sender_name,
+          sender_img: notif.sender_img,
+          created: serverTimestamp(),
+          read: null,
+          postID: notif.postID,
+          type: "LIKE",
+        });
+      } else {
+        console.log("Like notification already exists.");
+      }
     } catch (error) {
-      console.error("Error creating friend request notification: ", error);
+      console.error("Error creating like notification: ", error);
     }
   }
 }
