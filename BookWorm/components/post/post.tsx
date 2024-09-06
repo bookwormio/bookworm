@@ -19,6 +19,7 @@ import { areValidPageNumbers, formatDate } from "./util/postUtils";
 
 interface PostProps {
   post: PostModel;
+  key: string;
   created: Timestamp;
   currentDate: Date;
   individualPage: boolean;
@@ -37,6 +38,8 @@ const Post = ({
   const { posts, likePost, isLikePending, commentOnPost } = usePostsContext();
   const [showCommentSection, setShowComments] = useState(individualPage);
   const [newComment, setNewComment] = useState("");
+  const [shouldAnimateProgress, setShouldAnimateProgress] = useState(true);
+
   const formattedDate = formatDate(created, currentDate);
   const currentPost = posts.find((p) => p.id === post.id);
 
@@ -61,6 +64,8 @@ const Post = ({
             oldBookmark={post.oldBookmark}
             newBookmark={post.newBookmark}
             totalPages={post.totalPages}
+            shouldAnimate={shouldAnimateProgress}
+            setShouldAnimate={setShouldAnimateProgress}
           />
         )}
       <Text style={styles.time}>{formattedDate}</Text>

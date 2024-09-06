@@ -59,6 +59,7 @@ const ViewPost = () => {
         <View style={styles.postContainer}>
           <Post
             post={post}
+            key={`${post.id}-${post.comments.length}-${post.likes.length}`}
             created={post.created}
             currentDate={new Date()}
             individualPage={true}

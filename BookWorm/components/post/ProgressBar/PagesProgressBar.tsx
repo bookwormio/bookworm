@@ -12,12 +12,16 @@ interface PagesProgressBarProps {
   oldBookmark: number;
   newBookmark: number;
   totalPages: number;
+  shouldAnimate: boolean;
+  setShouldAnimate: (shouldAnimate: boolean) => void;
 }
 
 const PagesProgressBar = ({
   oldBookmark,
   newBookmark,
   totalPages,
+  shouldAnimate = false,
+  setShouldAnimate,
 }: PagesProgressBarProps) => {
   const pagesRead = newBookmark - oldBookmark;
   const isBackwards = pagesRead < 0;
@@ -32,7 +36,8 @@ const PagesProgressBar = ({
         {isBackwards ? "Moved back" : "Read"} {Math.abs(pagesRead)} pages
       </Text>
       <ProgressBar
-        shouldAnimate={true}
+        shouldAnimate={shouldAnimate}
+        setShouldAnimate={setShouldAnimate}
         animateDuration={500}
         barHeight={15}
         data={[

@@ -148,6 +148,7 @@ const Posts = () => {
             >
               <Post
                 post={post}
+                key={`${post.id}-${post.comments.length}-${post.likes.length}`}
                 created={post.created}
                 currentDate={currentDate}
                 individualPage={false}

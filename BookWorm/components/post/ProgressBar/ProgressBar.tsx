@@ -7,13 +7,14 @@
  * But it is now a functional component that uses typescript
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Animated, Easing, View } from "react-native";
 
 interface ProgressBarProps {
   data: Array<{ progress: number; color: string }>;
   barHeight?: number;
   shouldAnimate?: boolean;
+  setShouldAnimate?: (shouldAnimate: boolean) => void;
   animateDuration?: number;
 }
 
@@ -25,21 +26,15 @@ interface IPProps {
 const ProgressBar = ({
   data,
   barHeight = 8,
-  shouldAnimate = true,
+  shouldAnimate = false,
+  setShouldAnimate,
   animateDuration = 1000,
 }: ProgressBarProps) => {
   const [progressData, setProgressData] = useState<IPProps[]>([]);
-  const [animatedValue] = useState(new Animated.Value(0));
+  const animatedValue = useRef(new Animated.Value(0)).current;
+  const hasAnimated = useRef(false);
 
-  // this is like componentDidMount
   useEffect(() => {
-    Animated.timing(animatedValue, {
-      toValue: 1,
-      duration: animateDuration,
-      easing: Easing.linear,
-      useNativeDriver: false, // This is the only functional change
-    }).start();
-
     const totalProgress = data.reduce((acc, d) => acc + d.progress, 0);
     let value = 0;
     const newProgressData = data
@@ -53,7 +48,28 @@ const ProgressBar = ({
       .reverse();
 
     setProgressData(newProgressData);
-  }, [data, animateDuration, animatedValue]);
+
+    if (shouldAnimate && !hasAnimated.current) {
+      hasAnimated.current = true;
+      Animated.timing(animatedValue, {
+        toValue: 1,
+        duration: animateDuration,
+        easing: Easing.linear,
+        useNativeDriver: false,
+      }).start(({ finished }) => {
+        // Only animate once
+        if (finished && setShouldAnimate != null) {
+          setShouldAnimate(false);
+        }
+      });
+    } else {
+      animatedValue.setValue(1);
+    }
+
+    return () => {
+      animatedValue.stopAnimation();
+    };
+  }, [data, animateDuration, shouldAnimate, setShouldAnimate, animatedValue]);
 
   const animatedValues = progressData.map((d) =>
     animatedValue.interpolate({
@@ -77,7 +93,7 @@ const ProgressBar = ({
           style={{
             position: "absolute",
             height: barHeight,
-            width: shouldAnimate ? animatedValues[i] : `${d.progress}%`,
+            width: animatedValues[i],
             backgroundColor: d.color,
             borderRadius: 5,
           }}
