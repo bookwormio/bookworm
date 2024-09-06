@@ -41,7 +41,6 @@ const NotificationsScreen = () => {
       </View>
     );
   } else {
-    // console.log(notifdata);
     if (notifdata !== null && notifdata !== undefined) {
       return (
         <View style={styles.container}>
@@ -49,22 +48,30 @@ const NotificationsScreen = () => {
             style={{ flex: 1, width: "100%" }}
             data={notifdata}
             renderItem={({ item }) => {
-              const createdDate: Date = item.created.toDate();
-              const formattedDate = createdDate.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true,
-              });
+              const diffTime = Math.abs(
+                new Date().getTime() - item.created.toDate().getTime(),
+              );
+              const seconds = diffTime / 1000;
+              const minutes = diffTime / (1000 * 60);
+              const hours = diffTime / (1000 * 60 * 60);
+              const days = diffTime / (1000 * 60 * 60 * 24);
+              const weeks = diffTime / (1000 * 60 * 60 * 24 * 7);
+              let time = "";
+              if (seconds <= 60) {
+                time = Math.round(seconds).toString() + "s";
+              } else if (minutes <= 60) {
+                time = Math.round(minutes).toString() + "m";
+              } else if (hours <= 24) {
+                time = Math.round(hours).toString() + "h";
+              } else if (days <= 7) {
+                time = Math.round(days).toString() + "d";
+              } else {
+                time = Math.round(weeks).toString() + "w";
+              }
               return (
                 <TouchableOpacity
                   style={styles.notif_container}
                   onPress={() => {
-                    // TODO: Trying to route to the post page from the notification, not working :(
-                    console.log(item);
-                    console.log("postID: ", item.postID);
                     if (
                       item.type === NotificationType.LIKE ||
                       item.type === NotificationType.COMMENT
@@ -79,21 +86,6 @@ const NotificationsScreen = () => {
                     }
                   }}
                 >
-                  <Text
-                    style={{
-                      fontWeight: "bold",
-                      fontSize: 18,
-                      paddingLeft: 20,
-                    }}
-                  >
-                    {item.type === NotificationType.FRIEND_REQUEST
-                      ? "NEW FOLLOWER"
-                      : ""}
-                    {item.type === NotificationType.COMMENT
-                      ? "NEW COMMENT"
-                      : ""}
-                    {item.type === NotificationType.LIKE ? "NEW LIKE" : ""}
-                  </Text>
                   <View style={styles.imageTextContainer}>
                     <View style={styles.defaultImageContainer}>
                       {item.sender_img !== "" ? (
@@ -106,15 +98,30 @@ const NotificationsScreen = () => {
                         <FontAwesome5 name="user" size={40} color="black" />
                       )}
                     </View>
-                    <Text
-                      style={{ paddingLeft: 20, flexWrap: "wrap", flex: 1 }}
-                    >
-                      {item.sender_name} {item.message}
-                      {item.type === NotificationType.COMMENT
-                        ? item.comment
-                        : ""}{" "}
-                      on {formattedDate}
-                    </Text>
+                    <View style={styles.notifTextContainer}>
+                      <Text style={styles.notifTitle}>
+                        {item.type === NotificationType.FRIEND_REQUEST
+                          ? "NEW FOLLOWER"
+                          : ""}
+                        {item.type === NotificationType.COMMENT
+                          ? "NEW COMMENT"
+                          : ""}
+                        {item.type === NotificationType.LIKE ? "NEW LIKE" : ""}
+                      </Text>
+                      <Text style={styles.notifMessage}>
+                        <Text style={{ fontWeight: "bold" }}>
+                          {item.sender_name}
+                        </Text>
+                        <Text>
+                          {" "}
+                          {item.message}
+                          {item.type === NotificationType.COMMENT
+                            ? item.comment
+                            : ""}{" "}
+                        </Text>
+                        <Text style={{ color: "grey" }}>{time}</Text>
+                      </Text>
+                    </View>
                   </View>
                 </TouchableOpacity>
               );
@@ -124,7 +131,7 @@ const NotificationsScreen = () => {
         </View>
       );
     } else {
-      console.log("something wrong");
+      alert("Something went wrong, return to home page");
       return (
         <View style={styles.container}>
           <Text style={styles.title}>Notifications Page</Text>
@@ -146,8 +153,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     paddingBottom: 10,
-    paddingTop: 10,
-    paddingRight: 10,
+    paddingTop: 5,
+    paddingRight: 40,
     borderBottomWidth: 2,
     borderBottomColor: "rgba(0, 0, 0, 0.1)",
   },
@@ -165,8 +172,8 @@ const styles = StyleSheet.create({
   },
   defaultImageContainer: {
     backgroundColor: "#d3d3d3",
-    height: 60,
-    width: 60,
+    height: 55,
+    width: 55,
     borderColor: "black",
     borderRadius: 30,
     borderWidth: 1,
@@ -190,6 +197,22 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  notifTextContainer: {
+    flexDirection: "column",
+    flex: 1,
+  },
+  notifTitle: {
+    fontWeight: "bold",
+    fontSize: 18,
+    paddingLeft: 20,
+    paddingBottom: 5,
+  },
+  notifMessage: {
+    paddingLeft: 20,
+    flexWrap: "wrap",
+    flex: 1,
+    fontSize: 16,
   },
 });
 

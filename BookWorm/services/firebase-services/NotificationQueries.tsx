@@ -78,7 +78,7 @@ export async function createCommentNotification(notif: BasicNotification) {
     try {
       await addDoc(collection(DB, "notifications"), {
         user: notif.user,
-        message: "commented on your post",
+        message: "commented on your post:",
         comment: notif.comment,
         sender: notif.sender,
         sender_name: notif.sender_name,
@@ -105,7 +105,6 @@ export async function getAllFullNotifications(
       orderBy("created", "desc"),
     );
 
-    console.log("got inside AllFR");
     const querySnap = await getDocs(q);
 
     for (const notDoc of querySnap.docs) {
@@ -121,10 +120,7 @@ export async function getAllFullNotifications(
         postID: notDoc.data().postID,
         type: notDoc.data().type,
       };
-      console.log(notif);
       notifdata.push(notif);
-      console.log("nxT");
-      console.log(notifdata);
     }
     return notifdata;
   } catch (error) {
