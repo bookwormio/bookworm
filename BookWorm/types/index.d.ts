@@ -4,6 +4,8 @@ import {
   type Timestamp,
 } from "firebase/firestore";
 
+import { type NotificationType } from "../enums/Enums";
+
 interface LineDataPointModel {
   x: number; // time in seconds
   y: number; // pages or minutes
@@ -198,5 +200,5 @@ interface FullNotification {
   created: Timestamp;
   read: Timestamp;
   postID: string;
-  type: string;
+  type: NotificationType;
 }

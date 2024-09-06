@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React from "react";
 import {
+  ActivityIndicator,
   Button,
   FlatList,
   Image,
@@ -12,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
+import { NotificationType } from "../../../enums/Enums";
 import { getAllFullNotifications } from "../../../services/firebase-services/NotificationQueries";
 
 const NotificationsScreen = () => {
@@ -32,7 +34,13 @@ const NotificationsScreen = () => {
     },
   });
 
-  if (!notifIsLoading) {
+  if (notifIsLoading) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#000000" />
+      </View>
+    );
+  } else {
     // console.log(notifdata);
     if (notifdata !== null && notifdata !== undefined) {
       return (
@@ -57,11 +65,14 @@ const NotificationsScreen = () => {
                     // TODO: Trying to route to the post page from the notification, not working :(
                     console.log(item);
                     console.log("postID: ", item.postID);
-                    if (item.type === "LIKE" || item.type === "COMMENT") {
+                    if (
+                      item.type === NotificationType.LIKE ||
+                      item.type === NotificationType.COMMENT
+                    ) {
                       router.push({
                         pathname: `/${item.postID}`,
                       });
-                    } else if (item.type === "FRIEND_REQUEST") {
+                    } else if (item.type === NotificationType.FRIEND_REQUEST) {
                       router.push({
                         pathname: `/user/${item.sender}`,
                       });
@@ -75,9 +86,13 @@ const NotificationsScreen = () => {
                       paddingLeft: 20,
                     }}
                   >
-                    {item.type === "FRIEND_REQUEST" ? "NEW FOLLOWER" : ""}
-                    {item.type === "COMMENT" ? "NEW COMMENT" : ""}
-                    {item.type === "LIKE" ? "NEW LIKE" : ""}
+                    {item.type === NotificationType.FRIEND_REQUEST
+                      ? "NEW FOLLOWER"
+                      : ""}
+                    {item.type === NotificationType.COMMENT
+                      ? "NEW COMMENT"
+                      : ""}
+                    {item.type === NotificationType.LIKE ? "NEW LIKE" : ""}
                   </Text>
                   <View style={styles.imageTextContainer}>
                     <View style={styles.defaultImageContainer}>
@@ -95,8 +110,10 @@ const NotificationsScreen = () => {
                       style={{ paddingLeft: 20, flexWrap: "wrap", flex: 1 }}
                     >
                       {item.sender_name} {item.message}
-                      {item.type === "COMMENT" ? item.comment : ""} on{" "}
-                      {formattedDate}
+                      {item.type === NotificationType.COMMENT
+                        ? item.comment
+                        : ""}{" "}
+                      on {formattedDate}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -163,6 +180,16 @@ const styles = StyleSheet.create({
     height: "100%", // Adjust the size of the image as needed
     width: "100%", // Adjust the size of the image as needed
     borderRadius: 30, // Make the image circular
+  },
+  loading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });
 

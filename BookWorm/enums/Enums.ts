@@ -22,3 +22,9 @@ export const bookShelfDisplayMap: StringMap = {
   [ServerBookShelfName.FINISHED]: "Finished",
   [ServerBookShelfName.LENDING_LIBRARY]: "Lending Library",
 };
+
+export enum NotificationType {
+  FRIEND_REQUEST = "FRIEND_REQUEST",
+  LIKE = "LIKE",
+  COMMENT = "COMMENT",
+}
