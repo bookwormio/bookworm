@@ -40,7 +40,7 @@ const NotificationsScreen = () => {
       });
   }, [refetch]);
 
-  if (notifIsLoading) {
+  if (notifIsLoading || notifdata === null || notifdata === undefined) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" />
@@ -55,27 +55,22 @@ const NotificationsScreen = () => {
       </View>
     );
   }
-
-  if (notifdata !== null && notifdata !== undefined) {
-    return (
-      <View style={styles.container}>
-        <ScrollView
-          style={{ flex: 1, width: "100%" }}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
-          {notifdata.map((notif) => {
-            return (
-              <NotificationItem key={notif.created.toString()} notif={notif} />
-            );
-          })}
-        </ScrollView>
-      </View>
-    );
-  } else {
-    alert("Something went wrong, return to home page");
-  }
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        style={{ flex: 1, width: "100%" }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {notifdata.map((notif) => {
+          return (
+            <NotificationItem key={notif.created.toString()} notif={notif} />
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
