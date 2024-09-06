@@ -8,7 +8,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useProfilePicQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
+import {
+  useProfilePicQuery,
+  useUserDataQuery,
+} from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import {
   followUserByID,
   getIsFollowing,
@@ -17,7 +20,6 @@ import {
 import { createFriendRequestNotification } from "../../services/firebase-services/NotificationQueries";
 import {
   fetchFriendData,
-  fetchUserData,
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
   getUserProfileURL,
@@ -68,18 +70,9 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   });
 
   // getting userdata
-  const { data: userData, isLoading: isLoadingUserData } = useQuery({
-    queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
-    queryFn: async () => {
-      if (user != null) {
-        const userdata = await fetchUserData(user);
-        return userdata;
-      } else {
-        // Return default value when user is null
-        return {};
-      }
-    },
-  });
+  const { data: userData, isLoading: isLoadingUserData } = useUserDataQuery(
+    user ?? undefined,
+  );
 
   const { data: userIm, isLoading: isLoadingUserIm } = useProfilePicQuery(
     user?.uid,

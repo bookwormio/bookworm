@@ -1,6 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllFullNotifications } from "../../../services/firebase-services/NotificationQueries";
 
+/**
+ * Custom hook to fetch the notificatioons for a given user.
+ *
+ * @param {string | undefined} userId - The ID of the user whose notifications are being fetched.
+ * @returns {UseQueryResult<string | null>} The result of the query, containing the notifications or null.
+ */
 export const useGetAllFullNotifications = (userID: string) => {
   return useQuery({
     queryKey: ["notifications", userID],
