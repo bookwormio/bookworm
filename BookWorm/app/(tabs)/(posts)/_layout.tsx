@@ -1,7 +1,7 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { PostsProvider } from "../../../components/post/PostsContext";
 
 const PostsLayout = () => {
@@ -23,21 +23,6 @@ const PostsLayout = () => {
               >
                 <FontAwesome5 name="bell" size={20} color="#FB6D0B" />
               </TouchableOpacity>
-            ),
-            headerLeft: () => (
-              <View>
-                {router.canGoBack() && (
-                  <TouchableOpacity
-                    style={{ paddingLeft: 20 }}
-                    disabled={!router.canGoBack()}
-                    onPress={() => {
-                      router.back();
-                    }}
-                  >
-                    <FontAwesome5 name="arrow-left" size={20} />
-                  </TouchableOpacity>
-                )}
-              </View>
             ),
           }}
         />

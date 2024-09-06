@@ -1,144 +1,141 @@
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import React from "react";
+import React, { useCallback } from "react";
 import {
   ActivityIndicator,
-  Button,
-  FlatList,
   Image,
+  RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
+import { useGetAllFullNotifications } from "../../../components/notifications/hooks/useNotificationQueries";
+import { calculateTimeSinceNotification } from "../../../components/notifications/util/notificationUtils";
 import { NotificationType } from "../../../enums/Enums";
-import { getAllFullNotifications } from "../../../services/firebase-services/NotificationQueries";
 
 const NotificationsScreen = () => {
-  const handlePress = () => {
-    alert("Hello World! This is a notification.");
-  };
-
   const { user } = useAuth();
+  const [refreshing, setRefreshing] = React.useState(false);
 
-  const { data: notifdata, isLoading: notifIsLoading } = useQuery({
-    queryKey: user != null ? ["notifications", user.uid] : ["notifications"],
-    queryFn: async () => {
-      if (user != null) {
-        return await getAllFullNotifications(user.uid);
-      } else {
-        return [];
-      }
-    },
-  });
+  const {
+    data: notifdata,
+    isLoading: notifIsLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetAllFullNotifications(user?.uid ?? "");
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    refetch()
+      .then(() => {
+        setRefreshing(false);
+      })
+      .catch(() => {
+        setRefreshing(false);
+        Toast.show({
+          type: "error",
+          text1: "Error Loading Notifications",
+          text2: "Please return to the home page.",
+        });
+      });
+  }, [refetch]);
 
   if (notifIsLoading) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#000000" />
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={styles.container}>
+        <Text>Error: {error.message}</Text>
+      </View>
+    );
+  }
+
+  if (notifdata !== null && notifdata !== undefined) {
+    return (
+      <View style={styles.container}>
+        <ScrollView
+          style={{ flex: 1, width: "100%" }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {notifdata.map((notif) => {
+            const time = calculateTimeSinceNotification(notif.created.toDate());
+            return (
+              <TouchableOpacity
+                key={notif.created.toString()}
+                style={styles.notif_container}
+                onPress={() => {
+                  if (
+                    notif.type === NotificationType.LIKE ||
+                    notif.type === NotificationType.COMMENT
+                  ) {
+                    router.push({
+                      pathname: `/${notif.postID}`,
+                    });
+                  } else if (notif.type === NotificationType.FRIEND_REQUEST) {
+                    router.push({
+                      pathname: `/user/${notif.sender}`,
+                    });
+                  }
+                }}
+              >
+                <View style={styles.imageTextContainer}>
+                  <View style={styles.defaultImageContainer}>
+                    {notif.sender_img !== "" ? (
+                      <Image
+                        style={styles.defaultImage}
+                        source={{ uri: notif.sender_img }}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <FontAwesome5 name="user" size={40} color="black" />
+                    )}
+                  </View>
+                  <View style={styles.notifTextContainer}>
+                    <Text style={styles.notifTitle}>
+                      {notif.type === NotificationType.FRIEND_REQUEST
+                        ? "NEW FOLLOWER"
+                        : ""}
+                      {notif.type === NotificationType.COMMENT
+                        ? "NEW COMMENT"
+                        : ""}
+                      {notif.type === NotificationType.LIKE ? "NEW LIKE" : ""}
+                    </Text>
+                    <Text style={styles.notifMessage}>
+                      <Text style={{ fontWeight: "bold" }}>
+                        {notif.sender_name}
+                      </Text>
+                      <Text>
+                        {" "}
+                        {notif.message}
+                        {notif.type === NotificationType.COMMENT
+                          ? notif.comment
+                          : ""}{" "}
+                      </Text>
+                      <Text style={{ color: "grey" }}>{time}</Text>
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
       </View>
     );
   } else {
-    if (notifdata !== null && notifdata !== undefined) {
-      return (
-        <View style={styles.container}>
-          <FlatList
-            style={{ flex: 1, width: "100%" }}
-            data={notifdata}
-            renderItem={({ item }) => {
-              const diffTime = Math.abs(
-                new Date().getTime() - item.created.toDate().getTime(),
-              );
-              const seconds = diffTime / 1000;
-              const minutes = diffTime / (1000 * 60);
-              const hours = diffTime / (1000 * 60 * 60);
-              const days = diffTime / (1000 * 60 * 60 * 24);
-              const weeks = diffTime / (1000 * 60 * 60 * 24 * 7);
-              let time = "";
-              if (seconds <= 60) {
-                time = Math.round(seconds).toString() + "s";
-              } else if (minutes <= 60) {
-                time = Math.round(minutes).toString() + "m";
-              } else if (hours <= 24) {
-                time = Math.round(hours).toString() + "h";
-              } else if (days <= 7) {
-                time = Math.round(days).toString() + "d";
-              } else {
-                time = Math.round(weeks).toString() + "w";
-              }
-              return (
-                <TouchableOpacity
-                  style={styles.notif_container}
-                  onPress={() => {
-                    if (
-                      item.type === NotificationType.LIKE ||
-                      item.type === NotificationType.COMMENT
-                    ) {
-                      router.push({
-                        pathname: `/${item.postID}`,
-                      });
-                    } else if (item.type === NotificationType.FRIEND_REQUEST) {
-                      router.push({
-                        pathname: `/user/${item.sender}`,
-                      });
-                    }
-                  }}
-                >
-                  <View style={styles.imageTextContainer}>
-                    <View style={styles.defaultImageContainer}>
-                      {item.sender_img !== "" ? (
-                        <Image
-                          style={styles.defaultImage}
-                          source={{ uri: item.sender_img }}
-                          resizeMode="cover"
-                        />
-                      ) : (
-                        <FontAwesome5 name="user" size={40} color="black" />
-                      )}
-                    </View>
-                    <View style={styles.notifTextContainer}>
-                      <Text style={styles.notifTitle}>
-                        {item.type === NotificationType.FRIEND_REQUEST
-                          ? "NEW FOLLOWER"
-                          : ""}
-                        {item.type === NotificationType.COMMENT
-                          ? "NEW COMMENT"
-                          : ""}
-                        {item.type === NotificationType.LIKE ? "NEW LIKE" : ""}
-                      </Text>
-                      <Text style={styles.notifMessage}>
-                        <Text style={{ fontWeight: "bold" }}>
-                          {item.sender_name}
-                        </Text>
-                        <Text>
-                          {" "}
-                          {item.message}
-                          {item.type === NotificationType.COMMENT
-                            ? item.comment
-                            : ""}{" "}
-                        </Text>
-                        <Text style={{ color: "grey" }}>{time}</Text>
-                      </Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            }}
-            keyExtractor={(item, index) => index.toString()}
-          />
-        </View>
-      );
-    } else {
-      alert("Something went wrong, return to home page");
-      return (
-        <View style={styles.container}>
-          <Text style={styles.title}>Notifications Page</Text>
-          <Button title="Show Alert" onPress={handlePress} />
-        </View>
-      );
-    }
+    alert("Something went wrong, return to home page");
   }
 };
 
