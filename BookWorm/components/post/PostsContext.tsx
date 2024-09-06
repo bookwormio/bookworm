@@ -9,10 +9,8 @@ import {
   useProfilePicQuery,
   useUserDataQuery,
 } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
-import {
-  createCommentNotification,
-  createLikeNotification,
-} from "../../services/firebase-services/NotificationQueries";
+import { ServerNotificationType } from "../../enums/Enums";
+import { createNotification } from "../../services/firebase-services/NotificationQueries";
 import {
   addCommentToPost,
   likeUnlikePost,
@@ -69,7 +67,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
 
   const queryClient = useQueryClient();
   const commentNotifyMutation = useMutation({
-    mutationFn: createCommentNotification,
+    mutationFn: createNotification,
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["notifications", ""],
@@ -78,7 +76,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   });
 
   const likeNotifyMutation = useMutation({
-    mutationFn: createLikeNotification,
+    mutationFn: createNotification,
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["notifications", ""],
@@ -98,6 +96,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
         sender_img: userIm ?? "",
         comment: " " + comment,
         postID,
+        type: ServerNotificationType.COMMENT,
       };
       commentNotifyMutation.mutate(BNotify);
     }
@@ -115,6 +114,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
         sender_img: userIm ?? "",
         comment: "",
         postID,
+        type: ServerNotificationType.LIKE,
       };
       likeNotifyMutation.mutate(BNotify);
     }

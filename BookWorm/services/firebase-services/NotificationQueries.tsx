@@ -19,93 +19,47 @@ import {
 } from "../../types";
 
 /**
- * Adds a Friend Request Notification to the notifications collection for that user.
+ * Adds a notification to the notifications collection for that user.
  * @param {BasicNotification} notif - The basic info of the notification.
  */
-export async function createFriendRequestNotification(
-  notif: BasicNotificationModel,
-) {
+export async function createNotification(notif: BasicNotificationModel) {
   if (notif.user != null) {
-    try {
-      await addDoc(collection(DB, "notifications"), {
-        user: notif.user,
-        message: notificationMessageMap[ServerNotificationType.FRIEND_REQUEST],
-        comment: null,
-        sender: notif.sender,
-        sender_name: notif.sender_name,
-        sender_img: notif.sender_img,
-        created: serverTimestamp(),
-        read: null,
-        postID: null,
-        type: ServerNotificationType.FRIEND_REQUEST,
-      });
-    } catch (error) {
-      console.error("Error creating friend request notification: ", error);
-    }
-  }
-}
+    const notificationsRef = collection(DB, "notifications");
+    if (notif.type === ServerNotificationType.LIKE) {
+      try {
+        const q = query(
+          notificationsRef,
+          where("postID", "==", notif.postID),
+          where("sender", "==", notif.sender),
+          where("type", "==", ServerNotificationType.LIKE),
+        );
+        const querySnapshot = await getDocs(q);
 
-/**
- * Adds a Like Notification to the notifications collection for that user.
- * @param {BasicNotification} notif - The basic info of the notification.
- */
-export async function createLikeNotification(notif: BasicNotificationModel) {
-  if (notif.user != null) {
-    try {
-      const notificationsRef = collection(DB, "notifications");
-      const q = query(
-        notificationsRef,
-        where("postID", "==", notif.postID),
-        where("sender", "==", notif.sender),
-        where("type", "==", "LIKE"),
-      );
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
-        // No existing like notification, so create a new one
-        await addDoc(notificationsRef, {
-          user: notif.user,
-          message: notificationMessageMap[ServerNotificationType.LIKE],
-          comment: null,
-          sender: notif.sender,
-          sender_name: notif.sender_name,
-          sender_img: notif.sender_img,
-          created: serverTimestamp(),
-          read: null,
-          postID: notif.postID,
-          type: ServerNotificationType.LIKE,
-        });
-      } else {
-        console.log("Like notification already exists.");
+        if (!querySnapshot.empty) {
+          console.log("Like notification already exists");
+          return;
+        }
+      } catch (error) {
+        console.log("Firebase error");
       }
-    } catch (error) {
-      console.error("Error creating like notification: ", error);
     }
-  }
-}
-
-/**
- * Adds a Comment Notification to the notifications collection for that user.
- * @param {BasicNotification} notif - The basic info of the notification.
- */
-export async function createCommentNotification(notif: BasicNotificationModel) {
-  if (notif.user != null) {
-    try {
-      await addDoc(collection(DB, "notifications"), {
-        user: notif.user,
-        message: notificationMessageMap[ServerNotificationType.COMMENT],
-        comment: notif.comment,
-        sender: notif.sender,
-        sender_name: notif.sender_name,
-        sender_img: notif.sender_img,
-        created: serverTimestamp(),
-        read: null,
-        postID: notif.postID,
-        type: ServerNotificationType.COMMENT,
-      });
-    } catch (error) {
-      console.error("Error creating friend request notification: ", error);
-    }
+    await addDoc(notificationsRef, {
+      user: notif.user,
+      message: notificationMessageMap[notif.type],
+      comment: notif.comment,
+      sender: notif.sender,
+      sender_name: notif.sender_name,
+      sender_img: notif.sender_img,
+      created: serverTimestamp(),
+      read: null,
+      postID:
+        notif.type === ServerNotificationType.FRIEND_REQUEST
+          ? null
+          : notif.postID,
+      type: notif.type,
+    });
+  } else {
+    console.log("user DNE");
   }
 }
 

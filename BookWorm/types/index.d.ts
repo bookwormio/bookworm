@@ -4,7 +4,7 @@ import {
   type Timestamp,
 } from "firebase/firestore";
 
-import { type NotificationType } from "../enums/Enums";
+import { type ServerNotificationType } from "../enums/Enums";
 
 interface LineDataPointModel {
   x: number; // time in seconds
@@ -188,6 +188,7 @@ interface BasicNotificationModel {
   sender_img: string;
   comment: string;
   postID: string;
+  type: ServerNotificationType;
 }
 
 interface FullNotificationModel {
@@ -200,5 +201,5 @@ interface FullNotificationModel {
   created: Timestamp;
   read: Timestamp;
   postID: string;
-  type: NotificationType;
+  type: ServerNotificationType;
 }

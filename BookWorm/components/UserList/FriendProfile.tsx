@@ -12,12 +12,13 @@ import {
   useProfilePicQuery,
   useUserDataQuery,
 } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
+import { ServerNotificationType } from "../../enums/Enums";
 import {
   followUserByID,
   getIsFollowing,
   unfollowUserByID,
 } from "../../services/firebase-services/FriendQueries";
-import { createFriendRequestNotification } from "../../services/firebase-services/NotificationQueries";
+import { createNotification } from "../../services/firebase-services/NotificationQueries";
 import {
   fetchFriendData,
   getNumberOfFollowersByUserID,
@@ -146,7 +147,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   });
 
   const notifyMutation = useMutation({
-    mutationFn: createFriendRequestNotification,
+    mutationFn: createNotification,
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["notifications", friendUserID],
@@ -239,6 +240,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           sender_img: userIm ?? "",
           comment: "",
           postID: "",
+          type: ServerNotificationType.FRIEND_REQUEST,
         };
         notifyMutation.mutate(FRnotify);
       }
