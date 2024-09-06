@@ -40,7 +40,7 @@ const NotificationsScreen = () => {
       });
   }, [refetch]);
 
-  if (notifIsLoading || notifdata === null || notifdata === undefined) {
+  if (notifIsLoading) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" />
@@ -55,22 +55,31 @@ const NotificationsScreen = () => {
       </View>
     );
   }
-  return (
-    <View style={styles.container}>
-      <ScrollView
-        style={{ flex: 1, width: "100%" }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        {notifdata.map((notif) => {
-          return (
-            <NotificationItem key={notif.created.toString()} notif={notif} />
-          );
-        })}
-      </ScrollView>
-    </View>
-  );
+
+  if (notifdata !== null && notifdata !== undefined) {
+    return (
+      <View style={styles.container}>
+        <ScrollView
+          style={{ flex: 1, width: "100%" }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {notifdata.map((notif) => {
+            return (
+              <NotificationItem key={notif.created.toString()} notif={notif} />
+            );
+          })}
+        </ScrollView>
+      </View>
+    );
+  } else {
+    Toast.show({
+      type: "error",
+      text1: "Error Loading Notifications",
+      text2: "Please return to the home page.",
+    });
+  }
 };
 
 const styles = StyleSheet.create({
