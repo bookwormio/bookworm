@@ -34,3 +34,9 @@ export const notificationTypeMap: StringMap = {
   [ServerNotificationType.LIKE]: "New Like",
   [ServerNotificationType.COMMENT]: "New Comment",
 };
+
+export const notificationMessageMap: StringMap = {
+  [ServerNotificationType.FRIEND_REQUEST]: "followed you",
+  [ServerNotificationType.LIKE]: "liked your post",
+  [ServerNotificationType.COMMENT]: "commented on your post:",
+};

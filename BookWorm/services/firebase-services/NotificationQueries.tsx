@@ -8,7 +8,10 @@ import {
   type Timestamp,
   where,
 } from "firebase/firestore";
-import { ServerNotificationType } from "../../enums/Enums";
+import {
+  notificationMessageMap,
+  ServerNotificationType,
+} from "../../enums/Enums";
 import { DB } from "../../firebase.config";
 import { type BasicNotification, type FullNotification } from "../../types";
 
@@ -23,7 +26,7 @@ export async function createFriendRequestNotification(
     try {
       await addDoc(collection(DB, "notifications"), {
         user: notif.user,
-        message: "followed you on",
+        message: notificationMessageMap[ServerNotificationType.FRIEND_REQUEST],
         comment: null,
         sender: notif.sender,
         sender_name: notif.sender_name,
@@ -59,7 +62,7 @@ export async function createLikeNotification(notif: BasicNotification) {
         // No existing like notification, so create a new one
         await addDoc(notificationsRef, {
           user: notif.user,
-          message: "liked your post",
+          message: notificationMessageMap[ServerNotificationType.LIKE],
           comment: null,
           sender: notif.sender,
           sender_name: notif.sender_name,
@@ -87,7 +90,7 @@ export async function createCommentNotification(notif: BasicNotification) {
     try {
       await addDoc(collection(DB, "notifications"), {
         user: notif.user,
-        message: "commented on your post:",
+        message: notificationMessageMap[ServerNotificationType.COMMENT],
         comment: notif.comment,
         sender: notif.sender,
         sender_name: notif.sender_name,
