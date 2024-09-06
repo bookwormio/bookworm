@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useProfilePicQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import {
   followUserByID,
   getIsFollowing,
@@ -80,17 +81,9 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     },
   });
 
-  // getting userIm
-  const { data: userIm, isLoading: isLoadingUserIm } = useQuery({
-    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
-    queryFn: async () => {
-      if (user != null) {
-        return await getUserProfileURL(user.uid);
-      } else {
-        return "";
-      }
-    },
-  });
+  const { data: userIm, isLoading: isLoadingUserIm } = useProfilePicQuery(
+    user?.uid,
+  );
 
   const { data: isFollowingData } = useQuery({
     queryKey:
