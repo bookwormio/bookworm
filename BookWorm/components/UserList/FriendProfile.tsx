@@ -25,7 +25,7 @@ import {
   getUserProfileURL,
 } from "../../services/firebase-services/UserQueries";
 import {
-  type BasicNotification,
+  type BasicNotificationModel,
   type ConnectionModel,
   type UserDataModel,
 } from "../../types";
@@ -74,6 +74,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     user ?? undefined,
   );
 
+  // getting user profile pic
   const { data: userIm, isLoading: isLoadingUserIm } = useProfilePicQuery(
     user?.uid,
   );
@@ -231,7 +232,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       followMutation.mutate(connection);
       if (user !== undefined && user !== null) {
         const uData = userData as UserDataModel;
-        const FRnotify: BasicNotification = {
+        const FRnotify: BasicNotificationModel = {
           user: friendUserID,
           sender: user?.uid,
           sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined

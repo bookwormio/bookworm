@@ -13,14 +13,17 @@ import {
   ServerNotificationType,
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
-import { type BasicNotification, type FullNotification } from "../../types";
+import {
+  type BasicNotificationModel,
+  type FullNotificationModel,
+} from "../../types";
 
 /**
  * Adds a Friend Request Notification to the notifications collection for that user.
  * @param {BasicNotification} notif - The basic info of the notification.
  */
 export async function createFriendRequestNotification(
-  notif: BasicNotification,
+  notif: BasicNotificationModel,
 ) {
   if (notif.user != null) {
     try {
@@ -46,7 +49,7 @@ export async function createFriendRequestNotification(
  * Adds a Like Notification to the notifications collection for that user.
  * @param {BasicNotification} notif - The basic info of the notification.
  */
-export async function createLikeNotification(notif: BasicNotification) {
+export async function createLikeNotification(notif: BasicNotificationModel) {
   if (notif.user != null) {
     try {
       const notificationsRef = collection(DB, "notifications");
@@ -85,7 +88,7 @@ export async function createLikeNotification(notif: BasicNotification) {
  * Adds a Comment Notification to the notifications collection for that user.
  * @param {BasicNotification} notif - The basic info of the notification.
  */
-export async function createCommentNotification(notif: BasicNotification) {
+export async function createCommentNotification(notif: BasicNotificationModel) {
   if (notif.user != null) {
     try {
       await addDoc(collection(DB, "notifications"), {
@@ -113,9 +116,9 @@ export async function createCommentNotification(notif: BasicNotification) {
  */
 export async function getAllFullNotifications(
   userID: string,
-): Promise<FullNotification[]> {
+): Promise<FullNotificationModel[]> {
   try {
-    const notifdata: FullNotification[] = [];
+    const notifdata: FullNotificationModel[] = [];
     const q = query(
       collection(DB, "notifications"),
       where("user", "==", userID),

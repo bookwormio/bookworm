@@ -181,7 +181,7 @@ interface BookshelfVolumeInfo {
 
 type UserBookShelvesModel = Record<string, BookShelfBookModel[]>;
 
-interface BasicNotification {
+interface BasicNotificationModel {
   user: string;
   sender: string;
   sender_name: string;
@@ -190,7 +190,7 @@ interface BasicNotification {
   postID: string;
 }
 
-interface FullNotification {
+interface FullNotificationModel {
   user: string;
   message: string;
   comment: string;

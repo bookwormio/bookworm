@@ -1,10 +1,14 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, {
   createContext,
   type ReactNode,
   useContext,
   useState,
 } from "react";
+import {
+  useProfilePicQuery,
+  useUserDataQuery,
+} from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import {
   createCommentNotification,
   createLikeNotification,
@@ -13,13 +17,9 @@ import {
   addCommentToPost,
   likeUnlikePost,
 } from "../../services/firebase-services/PostQueries";
+import { fetchUser } from "../../services/firebase-services/UserQueries";
 import {
-  fetchUser,
-  fetchUserData,
-  getUserProfileURL,
-} from "../../services/firebase-services/UserQueries";
-import {
-  type BasicNotification,
+  type BasicNotificationModel,
   type CommentModel,
   type PostModel,
   type UserDataModel,
@@ -62,30 +62,10 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   const [posts, setPosts] = useState<PostModel[]>([]);
 
   // getting userdata
-  const { data: userData } = useQuery({
-    queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
-    queryFn: async () => {
-      if (user != null) {
-        const userdata = await fetchUserData(user);
-        return userdata;
-      } else {
-        // Return default value when user is null
-        return {};
-      }
-    },
-  });
+  const { data: userData } = useUserDataQuery(user ?? undefined);
 
-  // getting userIm
-  const { data: userIm } = useQuery({
-    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
-    queryFn: async () => {
-      if (user != null) {
-        return await getUserProfileURL(user.uid);
-      } else {
-        return "";
-      }
-    },
-  });
+  // getting user profile pic
+  const { data: userIm } = useProfilePicQuery(user?.uid);
 
   const queryClient = useQueryClient();
   const commentNotifyMutation = useMutation({
@@ -111,7 +91,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
     const postToUpdate = posts.find((post) => post.id === postID);
     const uData = userData as UserDataModel;
     if (postToUpdate !== undefined && user?.uid !== undefined) {
-      const BNotify: BasicNotification = {
+      const BNotify: BasicNotificationModel = {
         user: postToUpdate.user.id,
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
@@ -128,7 +108,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
     const postToUpdate = posts.find((post) => post.id === postID);
     const uData = userData as UserDataModel;
     if (postToUpdate !== undefined && user?.uid !== undefined) {
-      const BNotify: BasicNotification = {
+      const BNotify: BasicNotificationModel = {
         user: postToUpdate.user.id,
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined

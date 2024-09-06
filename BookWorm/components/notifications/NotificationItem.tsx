@@ -3,11 +3,11 @@ import { router } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { notificationTypeMap, ServerNotificationType } from "../../enums/Enums";
-import { type FullNotification } from "../../types";
+import { type FullNotificationModel } from "../../types";
 import { calculateTimeSinceNotification } from "./util/notificationUtils";
 
 interface NotifProp {
-  notif: FullNotification;
+  notif: FullNotificationModel;
 }
 
 const NotificationItem = ({ notif }: NotifProp) => {
