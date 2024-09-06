@@ -5,14 +5,6 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { PostsProvider } from "../../../components/post/PostsContext";
 
 const PostsLayout = () => {
-  const styles = StyleSheet.create({
-    newPost: {
-      alignItems: "center",
-      justifyContent: "center",
-      paddingRight: 2,
-    },
-  });
-
   return (
     <PostsProvider>
       <Stack>
@@ -65,5 +57,13 @@ const PostsLayout = () => {
     </PostsProvider>
   );
 };
+
+const styles = StyleSheet.create({
+  newPost: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingRight: 2,
+  },
+});
 
 export default PostsLayout;

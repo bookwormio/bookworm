@@ -12,7 +12,10 @@ import { NotificationType } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
 import { type BasicNotification, type FullNotification } from "../../types";
 
-// needs friend ID
+/**
+ * Adds a Friend Request Notification to the notifications collection for that user.
+ * @param {BasicNotification} notif - The basic info of the notification.
+ */
 export async function createFriendRequestNotification(
   notif: BasicNotification,
 ) {
@@ -36,7 +39,10 @@ export async function createFriendRequestNotification(
   }
 }
 
-// needs post ID
+/**
+ * Adds a Like Notification to the notifications collection for that user.
+ * @param {BasicNotification} notif - The basic info of the notification.
+ */
 export async function createLikeNotification(notif: BasicNotification) {
   if (notif.user != null) {
     try {
@@ -72,7 +78,10 @@ export async function createLikeNotification(notif: BasicNotification) {
   }
 }
 
-// needs post ID
+/**
+ * Adds a Comment Notification to the notifications collection for that user.
+ * @param {BasicNotification} notif - The basic info of the notification.
+ */
 export async function createCommentNotification(notif: BasicNotification) {
   if (notif.user != null) {
     try {
@@ -94,6 +103,11 @@ export async function createCommentNotification(notif: BasicNotification) {
   }
 }
 
+/**
+ * Returns all the notifications of all types for a user.
+ * @param {string} userID - the userID of the user that helps us to retrieve their notifications.
+ * @returns {Promise<FullNotification[]>} - returns a list of notifications.
+ */
 export async function getAllFullNotifications(
   userID: string,
 ): Promise<FullNotification[]> {
