@@ -8,7 +8,7 @@ import {
   type Timestamp,
   where,
 } from "firebase/firestore";
-import { NotificationType } from "../../enums/Enums";
+import { ServerNotificationType } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
 import { type BasicNotification, type FullNotification } from "../../types";
 
@@ -31,7 +31,7 @@ export async function createFriendRequestNotification(
         created: serverTimestamp(),
         read: null,
         postID: null,
-        type: NotificationType.FRIEND_REQUEST,
+        type: ServerNotificationType.FRIEND_REQUEST,
       });
     } catch (error) {
       console.error("Error creating friend request notification: ", error);
@@ -67,7 +67,7 @@ export async function createLikeNotification(notif: BasicNotification) {
           created: serverTimestamp(),
           read: null,
           postID: notif.postID,
-          type: NotificationType.LIKE,
+          type: ServerNotificationType.LIKE,
         });
       } else {
         console.log("Like notification already exists.");
@@ -95,7 +95,7 @@ export async function createCommentNotification(notif: BasicNotification) {
         created: serverTimestamp(),
         read: null,
         postID: notif.postID,
-        type: NotificationType.COMMENT,
+        type: ServerNotificationType.COMMENT,
       });
     } catch (error) {
       console.error("Error creating friend request notification: ", error);

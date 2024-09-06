@@ -2,7 +2,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { NotificationType, notificationTypeMap } from "../../enums/Enums";
+import { notificationTypeMap, ServerNotificationType } from "../../enums/Enums";
 import { type FullNotification } from "../../types";
 import { calculateTimeSinceNotification } from "./util/notificationUtils";
 
@@ -12,19 +12,20 @@ interface NotifProp {
 
 const NotificationItem = ({ notif }: NotifProp) => {
   const time = calculateTimeSinceNotification(notif.created.toDate());
-  const notifDisplay = notificationTypeMap[notif.type as NotificationType];
+  const notifDisplay =
+    notificationTypeMap[notif.type as ServerNotificationType];
   return (
     <TouchableOpacity
       style={styles.notif_container}
       onPress={() => {
         if (
-          notif.type === NotificationType.LIKE ||
-          notif.type === NotificationType.COMMENT
+          notif.type === ServerNotificationType.LIKE ||
+          notif.type === ServerNotificationType.COMMENT
         ) {
           router.push({
             pathname: `/${notif.postID}`,
           });
-        } else if (notif.type === NotificationType.FRIEND_REQUEST) {
+        } else if (notif.type === ServerNotificationType.FRIEND_REQUEST) {
           router.push({
             pathname: `/user/${notif.sender}`,
           });
@@ -50,7 +51,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
             <Text>
               {" "}
               {notif.message}
-              {notif.type === NotificationType.COMMENT
+              {notif.type === ServerNotificationType.COMMENT
                 ? notif.comment
                 : ""}{" "}
             </Text>
