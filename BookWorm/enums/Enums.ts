@@ -28,3 +28,9 @@ export enum NotificationType {
   LIKE = "LIKE",
   COMMENT = "COMMENT",
 }
+
+export const notificationTypeMap: StringMap = {
+  [NotificationType.FRIEND_REQUEST]: "New Friend Request",
+  [NotificationType.LIKE]: "New Like",
+  [NotificationType.COMMENT]: "New Comment",
+};

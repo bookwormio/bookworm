@@ -2,7 +2,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { NotificationType } from "../../enums/Enums";
+import { NotificationType, notificationTypeMap } from "../../enums/Enums";
 import { type FullNotification } from "../../types";
 import { calculateTimeSinceNotification } from "./util/notificationUtils";
 
@@ -12,6 +12,7 @@ interface NotifProp {
 
 const NotificationItem = ({ notif }: NotifProp) => {
   const time = calculateTimeSinceNotification(notif.created.toDate());
+  const notifDisplay = notificationTypeMap[notif.type as NotificationType];
   return (
     <TouchableOpacity
       style={styles.notif_container}
@@ -43,13 +44,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
           )}
         </View>
         <View style={styles.notifTextContainer}>
-          <Text style={styles.notifTitle}>
-            {notif.type === NotificationType.FRIEND_REQUEST
-              ? "NEW FOLLOWER"
-              : ""}
-            {notif.type === NotificationType.COMMENT ? "NEW COMMENT" : ""}
-            {notif.type === NotificationType.LIKE ? "NEW LIKE" : ""}
-          </Text>
+          <Text style={styles.notifTitle}>{notifDisplay}</Text>
           <Text style={styles.notifMessage}>
             <Text style={{ fontWeight: "bold" }}>{notif.sender_name}</Text>
             <Text>
@@ -118,6 +113,6 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     flexWrap: "wrap",
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
   },
 });
