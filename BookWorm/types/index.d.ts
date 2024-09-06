@@ -182,7 +182,7 @@ interface BookshelfVolumeInfo {
 type UserBookShelvesModel = Record<string, BookShelfBookModel[]>;
 
 interface BasicNotificationModel {
-  user: string;
+  receiver: string;
   sender: string;
   sender_name: string;
   sender_img: string;
@@ -192,14 +192,14 @@ interface BasicNotificationModel {
 }
 
 interface FullNotificationModel {
-  user: string;
+  receiver: string;
   message: string;
   comment: string;
   sender: string;
   sender_name: string;
   sender_img: string;
   created: Timestamp;
-  read: Timestamp;
+  read_at: Timestamp;
   postID: string;
   type: ServerNotificationType;
 }

@@ -23,7 +23,7 @@ import {
  * @param {BasicNotification} notif - The basic info of the notification.
  */
 export async function createNotification(notif: BasicNotificationModel) {
-  if (notif.user != null) {
+  if (notif.receiver != null) {
     const notificationsRef = collection(DB, "notifications");
     if (notif.type === ServerNotificationType.LIKE) {
       try {
@@ -44,14 +44,14 @@ export async function createNotification(notif: BasicNotificationModel) {
       }
     }
     await addDoc(notificationsRef, {
-      user: notif.user,
+      receiver: notif.receiver,
       message: notificationMessageMap[notif.type],
       comment: notif.comment,
       sender: notif.sender,
       sender_name: notif.sender_name,
       sender_img: notif.sender_img,
       created: serverTimestamp(),
-      read: null,
+      read_at: null,
       postID:
         notif.type === ServerNotificationType.FRIEND_REQUEST
           ? null
@@ -75,7 +75,7 @@ export async function getAllFullNotifications(
     const notifdata: FullNotificationModel[] = [];
     const q = query(
       collection(DB, "notifications"),
-      where("user", "==", userID),
+      where("receiver", "==", userID),
       orderBy("created", "desc"),
     );
 
@@ -83,14 +83,14 @@ export async function getAllFullNotifications(
 
     for (const notDoc of querySnap.docs) {
       const notif = {
-        user: notDoc.data().user,
+        receiver: notDoc.data().receiver,
         message: notDoc.data().message,
         comment: notDoc.data().comment,
         sender: notDoc.data().sender,
         sender_name: notDoc.data().sender_name,
         sender_img: notDoc.data().sender_img,
         created: notDoc.data().created as Timestamp,
-        read: notDoc.data().read,
+        read_at: notDoc.data().read_at,
         postID: notDoc.data().postID,
         type: notDoc.data().type,
       };

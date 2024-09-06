@@ -90,7 +90,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
     const uData = userData as UserDataModel;
     if (postToUpdate !== undefined && user?.uid !== undefined) {
       const BNotify: BasicNotificationModel = {
-        user: postToUpdate.user.id,
+        receiver: postToUpdate.user.id,
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
         sender_img: userIm ?? "",
@@ -108,7 +108,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
     const uData = userData as UserDataModel;
     if (postToUpdate !== undefined && user?.uid !== undefined) {
       const BNotify: BasicNotificationModel = {
-        user: postToUpdate.user.id,
+        receiver: postToUpdate.user.id,
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
         sender_img: userIm ?? "",
