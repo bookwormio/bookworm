@@ -10,11 +10,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { DAYS_OF_WEEK, MONTHS_OF_YEAR } from "../../constants/constants";
 import { type PostModel } from "../../types";
 import { useAuth } from "../auth/context";
 import Comment from "../comment/comment";
 import { usePostsContext } from "./PostsContext";
+import PagesProgressBar from "./ProgressBar/PagesProgressBar";
+import { areValidPageNumbers, formatDate } from "./util/postUtils";
 
 interface PostProps {
   post: PostModel;
@@ -23,29 +24,6 @@ interface PostProps {
   individualPage: boolean;
   presentComments: (postID: string) => void;
 }
-
-const formatDate = (created: Timestamp, currentDate: Date) => {
-  const date = created.toDate();
-  const day = DAYS_OF_WEEK[date.getDay()];
-  const month = MONTHS_OF_YEAR[date.getMonth()];
-  const dayNumber = date.getDate();
-  const isToday =
-    date.getFullYear() === currentDate.getFullYear() &&
-    date.getMonth() === currentDate.getMonth() &&
-    date.getDate() === currentDate.getDate();
-
-  return isToday
-    ? `Today at ${date.toLocaleString("en-US", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      })}`
-    : `${day}, ${month} ${dayNumber} at ${date.toLocaleString("en-US", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      })}`;
-};
 
 // Using memo here makes it so it re-renders only when the props passed to it change
 const Post = ({
@@ -71,6 +49,20 @@ const Post = ({
       <Text style={styles.title}>
         {post.user.first} {post.user.last} was reading {post.booktitle}
       </Text>
+      {post.oldBookmark != null &&
+        post.newBookmark != null &&
+        post.totalPages != null &&
+        areValidPageNumbers(
+          post.oldBookmark,
+          post.newBookmark,
+          post.totalPages,
+        ) && (
+          <PagesProgressBar
+            oldBookmark={post.oldBookmark}
+            newBookmark={post.newBookmark}
+            totalPages={post.totalPages}
+          />
+        )}
       <Text style={styles.time}>{formattedDate}</Text>
       <Text style={styles.body}>{post.text}</Text>
       {post.images.length > 0 && (

@@ -69,6 +69,7 @@ const NewPost = () => {
         images,
         oldBookmark,
         newBookmark: currentBookmark,
+        totalPages: selectedBook?.pageCount ?? 0,
       };
       postMutation.mutate(post);
       resetForm();

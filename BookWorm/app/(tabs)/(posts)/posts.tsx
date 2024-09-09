@@ -69,7 +69,7 @@ const Posts = () => {
   const [newComment, setNewComment] = useState("");
   const [activePost, setActivePost] = useState<PostModel | null>(null);
   const { posts, setPosts, commentOnPost } = usePostsContext();
-  const snapPoints = useMemo(() => ["25%", "50%", "100%"], []);
+  const snapPoints = useMemo(() => ["25%", "50%"], []);
   const queryClient = useQueryClient();
   const currentDate = new Date();
 
