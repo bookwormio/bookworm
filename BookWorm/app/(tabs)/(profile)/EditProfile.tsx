@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
+import BookWormButton from "../../../components/button/BookWormButton";
 import {
   getUserProfileURL,
   newFetchUserInfo,
@@ -256,17 +257,16 @@ const EditProfile = () => {
             />
           </View>
           <View style={styles.outerButtonsContainer}>
-            <TouchableOpacity
-              style={styles.button}
+            <BookWormButton
+              title="Close"
               onPress={() => {
                 refreshMutation.mutate();
                 router.back();
               }}
-            >
-              <Text style={styles.buttonText}>{" Close "}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
+              style={{ marginHorizontal: 20 }}
+            />
+            <BookWormButton
+              title={save}
               onPress={() => {
                 setSave("Saving...");
                 handeSaveClick()
@@ -276,9 +276,8 @@ const EditProfile = () => {
                     setSave("Save");
                   });
               }}
-            >
-              <Text style={styles.buttonText}>{save}</Text>
-            </TouchableOpacity>
+              style={{ marginHorizontal: 20 }}
+            />
           </View>
         </View>
       </ScrollView>
@@ -356,5 +355,6 @@ const styles = StyleSheet.create({
   outerButtonsContainer: {
     flexDirection: "row",
     justifyContent: "center",
+    padding: 10,
   },
 });

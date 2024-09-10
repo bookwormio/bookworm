@@ -8,10 +8,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
+import BookWormButton from "../../../components/button/BookWormButton";
 import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBookShelves";
 import ViewData from "../../../components/profile/Data/ViewData";
 import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
@@ -146,8 +146,8 @@ const Profile = () => {
         </View>
       </View>
       <View style={styles.outerButtonsContainer}>
-        <TouchableOpacity
-          style={styles.button}
+        <BookWormButton
+          title="Edit Profile"
           onPress={() => {
             if (user != null) {
               router.push({
@@ -157,12 +157,8 @@ const Profile = () => {
               console.error("User DNE");
             }
           }}
-        >
-          <Text style={styles.buttonText}>{"Edit Profile"}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={signOut}>
-          <Text style={styles.buttonText}>{"Log Out"}</Text>
-        </TouchableOpacity>
+        />
+        <BookWormButton title="Log Out" onPress={signOut} />
       </View>
 
       <ProfileTabSelector
