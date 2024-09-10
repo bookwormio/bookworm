@@ -188,6 +188,8 @@ interface BasicNotificationModel {
   sender_img: string;
   comment: string;
   postID: string;
+  bookID: string;
+  bookTitle: string;
   type: ServerNotificationType;
 }
 
@@ -201,5 +203,7 @@ interface FullNotificationModel {
   created: Timestamp;
   read_at: Timestamp;
   postID: string | null;
+  bookID: string;
+  bookTitle: string;
   type: ServerNotificationType;
 }

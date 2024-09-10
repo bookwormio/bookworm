@@ -95,8 +95,10 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
         sender_img: userIm ?? "",
-        comment: " " + comment,
+        comment,
         postID,
+        bookID: "",
+        bookTitle: "",
         type: ServerNotificationType.COMMENT,
       };
       commentNotifyMutation.mutate(BNotify);
@@ -115,6 +117,8 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
         sender_img: userIm ?? "",
         comment: "",
         postID,
+        bookID: "",
+        bookTitle: "",
         type: ServerNotificationType.LIKE,
       };
       likeNotifyMutation.mutate(BNotify);

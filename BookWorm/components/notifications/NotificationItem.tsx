@@ -29,6 +29,13 @@ const NotificationItem = ({ notif }: NotifProp) => {
           router.push({
             pathname: `/user/${notif.sender}`,
           });
+        } else if (notif.type === ServerNotificationType.RECOMMENDATION) {
+          router.push({
+            pathname: "bookviewpage",
+            params: {
+              bookID: notif.bookID,
+            },
+          });
         }
       }}
     >
@@ -52,7 +59,10 @@ const NotificationItem = ({ notif }: NotifProp) => {
               {" "}
               {notif.message}
               {notif.type === ServerNotificationType.COMMENT
-                ? notif.comment
+                ? " " + notif.comment
+                : ""}
+              {notif.type === ServerNotificationType.RECOMMENDATION
+                ? " " + notif.bookTitle
                 : ""}{" "}
             </Text>
             <Text style={{ color: "grey" }}>{time}</Text>
