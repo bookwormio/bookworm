@@ -1,15 +1,14 @@
-import { Image } from "expo-image";
 import { type Timestamp } from "firebase/firestore";
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { useProfilePicQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { type PostModel } from "../../types";
 
-import { FontAwesome5 } from "@expo/vector-icons";
+import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
+import { usePageValidation } from "./hooks/usePageValidation";
 import LikeComment from "./LikeComment";
 import { usePostsContext } from "./PostsContext";
 import PagesProgressBar from "./ProgressBar/PagesProgressBar";
-import { areValidPageNumbers, formatDate } from "./util/postUtils";
+import { formatDate } from "./util/postUtils";
 
 interface PostProps {
   post: PostModel;
@@ -30,21 +29,18 @@ const Post = ({
   const formattedDate = formatDate(created, currentDate);
   const currentPost = posts.find((p) => p.id === post.id);
 
-  const {
-    data: profilePic,
-    isPending: profilePicPending,
-    isError: profilePicError,
-  } = useProfilePicQuery(currentPost?.user?.id);
+  const validatePageNumbers = usePageValidation();
 
-  // TODO make this a function
-  const allPagesValid =
-    post.oldBookmark != null &&
-    post.newBookmark != null &&
-    post.totalPages != null &&
-    areValidPageNumbers(post.oldBookmark, post.newBookmark, post.totalPages);
+  const pagesObject = validatePageNumbers(
+    post.oldBookmark,
+    post.newBookmark,
+    post.totalPages,
+  );
 
-  // TODO make pages check valid here
-  const pagesRead = allPagesValid ? post.newBookmark - post.oldBookmark : null;
+  const pagesRead =
+    pagesObject != null
+      ? pagesObject.newBookmark - pagesObject.oldBookmark
+      : null;
   const isBackwards = pagesRead != null && pagesRead < 0;
 
   if (currentPost !== undefined) {
@@ -54,19 +50,14 @@ const Post = ({
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <View style={styles.defaultImageContainer}>
-          {!profilePicPending && !profilePicError && profilePic !== null ? (
-            <Image style={styles.defaultImage} source={{ uri: profilePic }} />
-          ) : (
-            <FontAwesome5 name="user" size={40} />
-          )}
+        <View style={styles.profilePicContainer}>
+          <ProfilePicture userID={post.user.id} size={40} />
         </View>
         <View style={styles.textContainer}>
-          {allPagesValid ? (
+          {pagesObject != null && pagesRead != null ? (
             <Text style={styles.title}>
               {post.user.first} {post.user.last}
               {isBackwards ? " moved back " : " read "}
-              {/* TODO type safety */}
               <Text style={styles.numPages}>{Math.abs(pagesRead)}</Text>
               {" pages"}
               {isBackwards ? " in " : " of "}
@@ -80,16 +71,16 @@ const Post = ({
           <Text style={styles.time}>{formattedDate}</Text>
         </View>
       </View>
-      {/* TODO type safety */}
-      {allPagesValid && (
+      {pagesObject != null && pagesRead != null && (
         <PagesProgressBar
-          oldBookmark={post.oldBookmark}
-          newBookmark={post.newBookmark}
-          totalPages={post.totalPages}
+          oldBookmark={pagesObject.oldBookmark}
+          newBookmark={pagesObject.newBookmark}
+          totalPages={pagesObject.totalPages}
+          pagesRead={pagesRead}
+          isBackwards={isBackwards}
         />
       )}
       <Text style={styles.body}>{post.text}</Text>
-      {/* TODO: add the book cover as the first image */}
       {post.images.length > 0 && (
         <View style={{ marginTop: 10, height: 270 }}>
           <ScrollView
@@ -181,21 +172,10 @@ const styles = StyleSheet.create({
   numPages: {
     fontWeight: "bold",
   },
-  defaultImageContainer: {
-    backgroundColor: "#d3d3d3",
-    height: 40,
-    width: 40,
-    borderRadius: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "flex-start",
+  profilePicContainer: {
     marginRight: 10,
   },
-  defaultImage: {
-    height: 40,
-    width: 40,
-    borderRadius: 50,
-  },
+
   headerContainer: {
     flexDirection: "row",
     alignItems: "flex-start",

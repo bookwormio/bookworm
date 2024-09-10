@@ -120,7 +120,6 @@ export async function fetchPostsByUserIDs(
             const promise = getDownloadURL(storageRef)
               .then((url) => {
                 images[index] = (
-                  // TODO Move this outta here
                   <Image
                     key={index}
                     source={{ uri: url }}

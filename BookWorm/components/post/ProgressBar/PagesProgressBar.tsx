@@ -12,17 +12,17 @@ interface PagesProgressBarProps {
   oldBookmark: number;
   newBookmark: number;
   totalPages: number;
+  pagesRead: number;
+  isBackwards: boolean;
 }
 
 const PagesProgressBar = ({
   oldBookmark,
   newBookmark,
   totalPages,
+  pagesRead,
+  isBackwards,
 }: PagesProgressBarProps) => {
-  // TODO pass in this data
-  const pagesRead = newBookmark - oldBookmark;
-  const isBackwards = pagesRead < 0;
-
   const firstProgress = Math.min(oldBookmark, newBookmark) / totalPages;
   const secondProgress = Math.abs(pagesRead) / totalPages;
   const remainingProgress = 1 - firstProgress - secondProgress;
