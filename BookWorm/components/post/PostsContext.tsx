@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, {
   createContext,
   type ReactNode,
@@ -6,11 +6,22 @@ import React, {
   useState,
 } from "react";
 import {
+  useProfilePicQuery,
+  useUserDataQuery,
+} from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
+import { ServerNotificationType } from "../../enums/Enums";
+import { createNotification } from "../../services/firebase-services/NotificationQueries";
+import {
   addCommentToPost,
   likeUnlikePost,
 } from "../../services/firebase-services/PostQueries";
 import { fetchUser } from "../../services/firebase-services/UserQueries";
-import { type CommentModel, type PostModel } from "../../types";
+import {
+  type BasicNotificationModel,
+  type CommentModel,
+  type PostModel,
+  type UserDataModel,
+} from "../../types";
 import { useAuth } from "../auth/context";
 
 const PostsContext = createContext<{
@@ -48,6 +59,67 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   const { user } = useAuth();
   const [posts, setPosts] = useState<PostModel[]>([]);
   const [pendingLikes, setPendingLikes] = useState<Set<string>>(new Set());
+
+  // getting userdata
+  const { data: userData } = useUserDataQuery(user ?? undefined);
+
+  // getting user profile pic
+  const { data: userIm } = useProfilePicQuery(user?.uid);
+
+  const queryClient = useQueryClient();
+  const commentNotifyMutation = useMutation({
+    mutationFn: createNotification,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["notifications", ""],
+      });
+    },
+  });
+
+  const likeNotifyMutation = useMutation({
+    mutationFn: createNotification,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["notifications", ""],
+      });
+    },
+  });
+
+  const handleComment = (postID: string, comment: string) => {
+    addCommentMutation.mutate({ postID, comment });
+    const postToUpdate = posts.find((post) => post.id === postID);
+    const uData = userData as UserDataModel;
+    if (postToUpdate !== undefined && user?.uid !== undefined) {
+      const BNotify: BasicNotificationModel = {
+        receiver: postToUpdate.user.id,
+        sender: user?.uid,
+        sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+        sender_img: userIm ?? "",
+        comment: " " + comment,
+        postID,
+        type: ServerNotificationType.COMMENT,
+      };
+      commentNotifyMutation.mutate(BNotify);
+    }
+  };
+
+  const handleLike = (postID: string) => {
+    likePostMutation.mutate({ postID });
+    const postToUpdate = posts.find((post) => post.id === postID);
+    const uData = userData as UserDataModel;
+    if (postToUpdate !== undefined && user?.uid !== undefined) {
+      const BNotify: BasicNotificationModel = {
+        receiver: postToUpdate.user.id,
+        sender: user?.uid,
+        sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+        sender_img: userIm ?? "",
+        comment: "",
+        postID,
+        type: ServerNotificationType.LIKE,
+      };
+      likeNotifyMutation.mutate(BNotify);
+    }
+  };
 
   const likePostMutation = useMutation({
     mutationFn: async ({ postID }: LikePostMutationProps) => {
@@ -154,11 +226,11 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
           setPosts(newPosts);
         },
         likePost: (postID: string) => {
-          likePostMutation.mutate({ postID });
+          handleLike(postID);
         },
         isLikePending: (postID: string) => pendingLikes.has(postID),
         commentOnPost: (postID: string, comment: string) => {
-          addCommentMutation.mutate({ postID, comment });
+          handleComment(postID, comment);
         },
       }}
     >

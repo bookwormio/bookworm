@@ -4,6 +4,8 @@ import {
   type Timestamp,
 } from "firebase/firestore";
 
+import { type ServerNotificationType } from "../enums/Enums";
+
 interface LineDataPointModel {
   x: number; // time in seconds
   y: number; // pages or minutes
@@ -178,3 +180,26 @@ interface BookshelfVolumeInfo {
 }
 
 type UserBookShelvesModel = Record<string, BookShelfBookModel[]>;
+
+interface BasicNotificationModel {
+  receiver: string;
+  sender: string;
+  sender_name: string;
+  sender_img: string;
+  comment: string;
+  postID: string;
+  type: ServerNotificationType;
+}
+
+interface FullNotificationModel {
+  receiver: string;
+  message: string;
+  comment: string;
+  sender: string;
+  sender_name: string;
+  sender_img: string;
+  created: Timestamp;
+  read_at: Timestamp;
+  postID: string | null;
+  type: ServerNotificationType;
+}

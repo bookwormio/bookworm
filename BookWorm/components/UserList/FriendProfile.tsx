@@ -9,17 +9,27 @@ import {
   View,
 } from "react-native";
 import {
+  useProfilePicQuery,
+  useUserDataQuery,
+} from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
+import { ServerNotificationType } from "../../enums/Enums";
+import {
   followUserByID,
   getIsFollowing,
   unfollowUserByID,
 } from "../../services/firebase-services/FriendQueries";
+import { createNotification } from "../../services/firebase-services/NotificationQueries";
 import {
   fetchFriendData,
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
   getUserProfileURL,
 } from "../../services/firebase-services/UserQueries";
-import { type ConnectionModel, type UserDataModel } from "../../types";
+import {
+  type BasicNotificationModel,
+  type ConnectionModel,
+  type UserDataModel,
+} from "../../types";
 import { useAuth } from "../auth/context";
 
 enum LocalFollowStatus {
@@ -59,6 +69,16 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     },
     staleTime: 60000, // Set stale time to 1 minute
   });
+
+  // getting userdata
+  const { data: userData, isLoading: isLoadingUserData } = useUserDataQuery(
+    user ?? undefined,
+  );
+
+  // getting user profile pic
+  const { data: userIm, isLoading: isLoadingUserIm } = useProfilePicQuery(
+    user?.uid,
+  );
 
   const { data: isFollowingData } = useQuery({
     queryKey:
@@ -123,6 +143,15 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       });
       await queryClient.invalidateQueries({ queryKey: ["followersdata"] });
       setFollowStatusFetched(true);
+    },
+  });
+
+  const notifyMutation = useMutation({
+    mutationFn: createNotification,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["notifications", friendUserID],
+      });
     },
   });
 
@@ -202,6 +231,19 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         friendUserID,
       };
       followMutation.mutate(connection);
+      if (user !== undefined && user !== null) {
+        const uData = userData as UserDataModel;
+        const FRnotify: BasicNotificationModel = {
+          receiver: friendUserID,
+          sender: user?.uid,
+          sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+          sender_img: userIm ?? "",
+          comment: "",
+          postID: "",
+          type: ServerNotificationType.FRIEND_REQUEST,
+        };
+        notifyMutation.mutate(FRnotify);
+      }
     } catch (error) {
       setFollowStatus("not following");
       console.error("Error occurred while following user:", error);
@@ -231,7 +273,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     }
   };
 
-  if (friendIsLoading || isLoadingIm) {
+  if (friendIsLoading || isLoadingIm || isLoadingUserData || isLoadingUserIm) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />

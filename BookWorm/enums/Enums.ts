@@ -22,3 +22,21 @@ export const bookShelfDisplayMap: StringMap = {
   [ServerBookShelfName.FINISHED]: "Finished",
   [ServerBookShelfName.LENDING_LIBRARY]: "Lending Library",
 };
+
+export enum ServerNotificationType {
+  FRIEND_REQUEST = "FRIEND_REQUEST",
+  LIKE = "LIKE",
+  COMMENT = "COMMENT",
+}
+
+export const NotificationTypeMap: StringMap = {
+  [ServerNotificationType.FRIEND_REQUEST]: "New Friend Request",
+  [ServerNotificationType.LIKE]: "New Like",
+  [ServerNotificationType.COMMENT]: "New Comment",
+};
+
+export const NotificationMessageMap: StringMap = {
+  [ServerNotificationType.FRIEND_REQUEST]: "followed you",
+  [ServerNotificationType.LIKE]: "liked your post",
+  [ServerNotificationType.COMMENT]: "commented on your post:",
+};
