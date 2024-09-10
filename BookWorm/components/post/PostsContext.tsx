@@ -17,13 +17,13 @@ const PostsContext = createContext<{
   posts: PostModel[];
   setPosts: (posts: PostModel[]) => void;
   likePost: (postID: string) => void;
-  isLikePending: boolean;
+  isLikePending: (postID: string) => boolean;
   commentOnPost: (postID: string, comment: string) => void;
 }>({
   posts: [],
   setPosts: () => null,
   likePost: () => null,
-  isLikePending: false,
+  isLikePending: () => false,
   commentOnPost: () => null,
 });
 
@@ -47,6 +47,7 @@ interface AddCommentMutationProps {
 const PostsProvider = ({ children }: PostsProviderProps) => {
   const { user } = useAuth();
   const [posts, setPosts] = useState<PostModel[]>([]);
+  const [pendingLikes, setPendingLikes] = useState<Set<string>>(new Set());
 
   const likePostMutation = useMutation({
     mutationFn: async ({ postID }: LikePostMutationProps) => {
@@ -83,6 +84,16 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
           );
         }
       }
+    },
+    onMutate: ({ postID }) => {
+      setPendingLikes((prev) => new Set(prev).add(postID));
+    },
+    onSettled: (_, __, { postID }) => {
+      setPendingLikes((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(postID);
+        return newSet;
+      });
     },
     onError: () => {
       console.error("Error liking post");
@@ -145,7 +156,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
         likePost: (postID: string) => {
           likePostMutation.mutate({ postID });
         },
-        isLikePending: likePostMutation.isPending,
+        isLikePending: (postID: string) => pendingLikes.has(postID),
         commentOnPost: (postID: string, comment: string) => {
           addCommentMutation.mutate({ postID, comment });
         },
