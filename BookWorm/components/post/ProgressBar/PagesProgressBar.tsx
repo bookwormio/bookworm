@@ -1,5 +1,4 @@
 import React from "react";
-import { View } from "react-native";
 import {
   BACKWARDS_PROGRESS_COLOR,
   FIRST_PROGRESS_COLOR,
@@ -28,25 +27,19 @@ const PagesProgressBar = ({
   const remainingProgress = 1 - firstProgress - secondProgress;
 
   return (
-    <View>
-      <View>
-        <ProgressBar
-          shouldAnimate={true}
-          animateDuration={500}
-          barHeight={15}
-          data={[
-            { progress: firstProgress, color: FIRST_PROGRESS_COLOR },
-            {
-              progress: secondProgress,
-              color: isBackwards
-                ? BACKWARDS_PROGRESS_COLOR
-                : SECOND_PROGRESS_COLOR,
-            },
-            { progress: remainingProgress, color: REMAINING_PROGRESS_COLOR },
-          ]}
-        />
-      </View>
-    </View>
+    <ProgressBar
+      shouldAnimate={true}
+      animateDuration={500}
+      barHeight={15}
+      data={[
+        { progress: firstProgress, color: FIRST_PROGRESS_COLOR },
+        {
+          progress: secondProgress,
+          color: isBackwards ? BACKWARDS_PROGRESS_COLOR : SECOND_PROGRESS_COLOR,
+        },
+        { progress: remainingProgress, color: REMAINING_PROGRESS_COLOR },
+      ]}
+    />
   );
 };
 

@@ -58,7 +58,7 @@ const Post = ({
             <Text style={styles.title}>
               {post.user.first} {post.user.last}
               {isBackwards ? " moved back " : " read "}
-              <Text style={styles.numPages}>{Math.abs(pagesRead)}</Text>
+              <Text>{Math.abs(pagesRead)}</Text>
               {" pages"}
               {isBackwards ? " in " : " of "}
               {post.booktitle}
@@ -125,52 +125,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     paddingTop: 10,
     paddingBottom: 10,
-  },
-  buttonrow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingTop: 10,
-  },
-  likebutton: {
-    flexDirection: "row",
-    paddingRight: 5,
-    alignItems: "center",
-  },
-  pendingOpacity: {
-    opacity: 0.5,
-  },
-  commentInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 10,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-  },
-  commentInput: {
-    flex: 1,
-    paddingVertical: 8,
-  },
-  button: {
-    marginLeft: 10,
-    backgroundColor: "#FB6D0B",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    justifyContent: "center",
-  },
-  buttonDisabled: {
-    backgroundColor: "#fb6d0b80",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  textPadding: {
-    paddingRight: 10,
-  },
-  numPages: {
-    fontWeight: "bold",
   },
   profilePicContainer: {
     marginRight: 10,

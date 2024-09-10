@@ -1,6 +1,15 @@
 import { useCallback } from "react";
 import { areValidPageNumbers } from "../util/postUtils";
 
+/**
+ * A custom hook that provides a memoized function for validating page numbers in a book reading context.
+ *
+ * @returns A memoized function that validates page numbers.
+ *
+ * @example
+ * const validatePageNumbers = usePageValidation();
+ * const result = validatePageNumbers(10, 20, 100);
+ */
 export const usePageValidation = () => {
   const validatePageNumbers = useCallback(
     (
