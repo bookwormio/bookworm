@@ -12,9 +12,14 @@ const BOOK_SEARCH_PLACEHOLDER = "Search for books";
 interface BookSearchProps {
   searchPhrase: string;
   setSearchPhrase: (searchString: string) => void;
+  friendUserID?: string;
 }
 
-const BookSearch = ({ searchPhrase, setSearchPhrase }: BookSearchProps) => {
+const BookSearch = ({
+  searchPhrase,
+  setSearchPhrase,
+  friendUserID,
+}: BookSearchProps) => {
   const [books, setBooks] = useState<BookVolumeItem[]>([]);
   const [searchClicked, setSearchClicked] = useState<boolean>(
     searchPhrase !== "",
@@ -60,7 +65,7 @@ const BookSearch = ({ searchPhrase, setSearchPhrase }: BookSearchProps) => {
       >
         {books.map((book, index) => (
           <View style={styles.bookContainer} key={index}>
-            <BookList volumes={[book]} />
+            <BookList volumes={[book]} friendUserID={friendUserID} />
           </View>
         ))}
       </ScrollView>

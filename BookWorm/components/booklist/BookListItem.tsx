@@ -1,15 +1,20 @@
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type BookVolumeInfo } from "../../types";
 
 interface BookListItemProps {
   bookID: string;
   volumeInfo: BookVolumeInfo;
+  friendUserID?: string;
 }
 
-const BookListItem = ({ bookID, volumeInfo }: BookListItemProps) => {
+const BookListItem = ({
+  bookID,
+  volumeInfo,
+  friendUserID,
+}: BookListItemProps) => {
   const handleClick = ({ bookID }: { bookID: string }) => {
     router.push({
       pathname: "bookviewpage",
@@ -19,11 +24,42 @@ const BookListItem = ({ bookID, volumeInfo }: BookListItemProps) => {
     });
   };
 
+  const handleRecommendation = ({
+    bookID,
+    friendUserID,
+  }: {
+    bookID: string;
+    friendUserID: string;
+  }) => {
+    console.log("yo", bookID, friendUserID);
+  };
+
   return (
     <TouchableOpacity
       style={styles.container}
       onPress={() => {
-        handleClick({ bookID });
+        if (friendUserID === null || friendUserID === undefined) {
+          handleClick({ bookID });
+        } else {
+          Alert.alert(
+            "Confirm",
+            `Send Recommendation to read ${volumeInfo.title}`,
+            [
+              {
+                text: "No",
+                onPress: () => {},
+                style: "cancel",
+              },
+              {
+                text: "Yes",
+                onPress: () => {
+                  handleRecommendation({ bookID, friendUserID });
+                },
+              },
+            ],
+            { cancelable: true }, // user can click outside of box and it will close
+          );
+        }
       }}
     >
       <View style={styles.imageContainer}>

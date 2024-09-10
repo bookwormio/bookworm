@@ -5,9 +5,10 @@ import BookListItem from "./BookListItem";
 
 interface BookListProps {
   volumes: BookVolumeItem[];
+  friendUserID?: string;
 }
 
-const BookList = ({ volumes }: BookListProps) => {
+const BookList = ({ volumes, friendUserID }: BookListProps) => {
   return (
     <View>
       {/* TODO: potentially need to modify this key assignment */}
@@ -16,6 +17,7 @@ const BookList = ({ volumes }: BookListProps) => {
           key={index}
           bookID={value.id}
           volumeInfo={value.volumeInfo}
+          friendUserID={friendUserID}
         ></BookListItem>
       ))}
     </View>

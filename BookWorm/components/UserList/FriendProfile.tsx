@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -301,6 +302,16 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
                   : "Follow"}
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              router.push({
+                pathname: `/recommendation/${friendUserID}`,
+              });
+            }}
+          >
+            <Text style={styles.buttonText}>Recommend</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -347,8 +358,9 @@ const styles = StyleSheet.create({
   buttoncontainer: {
     alignItems: "flex-end",
     justifyContent: "center",
-    paddingRight: 160,
+    paddingRight: 20,
     width: "100%",
+    flex: 1,
   },
   button: {
     paddingVertical: 2,
