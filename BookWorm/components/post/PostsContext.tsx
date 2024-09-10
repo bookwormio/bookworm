@@ -99,6 +99,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
         postID,
         bookID: "",
         bookTitle: "",
+        custom_message: "",
         type: ServerNotificationType.COMMENT,
       };
       commentNotifyMutation.mutate(BNotify);
@@ -119,6 +120,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
         postID,
         bookID: "",
         bookTitle: "",
+        custom_message: "",
         type: ServerNotificationType.LIKE,
       };
       likeNotifyMutation.mutate(BNotify);

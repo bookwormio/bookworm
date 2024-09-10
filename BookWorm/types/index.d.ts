@@ -190,6 +190,7 @@ interface BasicNotificationModel {
   postID: string;
   bookID: string;
   bookTitle: string;
+  custom_message: string;
   type: ServerNotificationType;
 }
 
@@ -205,5 +206,6 @@ interface FullNotificationModel {
   postID: string | null;
   bookID: string;
   bookTitle: string;
+  custom_message: string;
   type: ServerNotificationType;
 }

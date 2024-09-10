@@ -29,11 +29,6 @@ const BookListItem = ({
 }: BookListItemProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const handleClick = ({ bookID }: { bookID: string }) => {
-    router.push({
-      pathname: `/searchbook/${bookID}`,
-    });
-  };
 
   // getting userdata
   const { data: userData } = useUserDataQuery(user ?? undefined);
@@ -50,12 +45,20 @@ const BookListItem = ({
     },
   });
 
+  const handleClick = ({ bookID }: { bookID: string }) => {
+    router.push({
+      pathname: `/searchbook/${bookID}`,
+    });
+  };
+
   const handleRecommendation = ({
     bookID,
     friendUserID,
+    message,
   }: {
     bookID: string;
     friendUserID: string;
+    message?: string;
   }) => {
     // send book title and bookID
     if (user !== undefined && user !== null) {
@@ -69,6 +72,7 @@ const BookListItem = ({
         postID: "",
         bookID,
         bookTitle: volumeInfo.title,
+        custom_message: message ?? "",
         type: ServerNotificationType.RECOMMENDATION,
       };
       notifyMutation.mutate(FRnotify);
@@ -95,7 +99,30 @@ const BookListItem = ({
               {
                 text: "Yes",
                 onPress: () => {
-                  handleRecommendation({ bookID, friendUserID });
+                  Alert.prompt(
+                    "Custom Message",
+                    "Would you like to send a custom message?",
+                    [
+                      {
+                        text: "No",
+                        onPress: () => {
+                          handleRecommendation({ bookID, friendUserID });
+                        },
+                        style: "cancel",
+                      },
+                      {
+                        text: "Send",
+                        onPress: (message) => {
+                          handleRecommendation({
+                            bookID,
+                            friendUserID,
+                            message,
+                          });
+                        },
+                      },
+                    ],
+                    "plain-text",
+                  );
                 },
               },
             ],
