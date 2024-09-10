@@ -71,6 +71,7 @@ export async function createNotification(
         notif.type === ServerNotificationType.RECOMMENDATION
           ? notif.bookTitle
           : null,
+      custom_message: notif.custom_message,
       type: notif.type,
     });
 
@@ -112,6 +113,7 @@ export async function getAllFullNotifications(
         postID: notDoc.data().postID,
         bookID: notDoc.data().bookID,
         bookTitle: notDoc.data().bookTitle,
+        custom_message: notDoc.data().custom_message,
         type: notDoc.data().type,
       };
       notifdata.push(notif);

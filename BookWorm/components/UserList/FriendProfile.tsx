@@ -223,6 +223,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           postID: "",
           bookID: "",
           bookTitle: "",
+          custom_message: "",
           type: ServerNotificationType.FRIEND_REQUEST,
         };
         notifyMutation.mutate(FRnotify);
