@@ -7,9 +7,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { useAuth } from "../../components/auth/context";
+import BookWormButton from "../../components/button/BookWormButton";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -62,15 +63,13 @@ const Login = () => {
             setPassword(text);
           }}
         />
-        <TouchableOpacity
-          style={styles.button}
+        <BookWormButton
+          title="Login"
           onPress={() => {
             signIn(email, password);
             router.replace("/post");
           }}
-        >
-          <Text style={styles.buttonText}>{"Login"}</Text>
-        </TouchableOpacity>
+        />
         <View style={styles.accountContainer}>
           <Text style={styles.question}>{"Don't have an account?"}</Text>
           <TouchableOpacity

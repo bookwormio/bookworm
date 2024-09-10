@@ -258,6 +258,7 @@ const EditProfile = () => {
           </View>
           <View style={styles.outerButtonsContainer}>
             <BookWormButton
+              // have to adjust marginHorizontal to make smaller buttons
               title="Close"
               onPress={() => {
                 refreshMutation.mutate();
@@ -266,6 +267,7 @@ const EditProfile = () => {
               style={{ marginHorizontal: 20 }}
             />
             <BookWormButton
+              // have to adjust marginHorizontal to make smaller buttons
               title={save}
               onPress={() => {
                 setSave("Saving...");

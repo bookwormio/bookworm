@@ -31,13 +31,21 @@ const BookWormButton: React.FC<CustomButtonProps> = ({
   return (
     // [style1, style2] will combine styles
     <TouchableOpacity
-      style={[styles.button, style]}
+      style={[styles.button, style, disabled && styles.buttonDisabled]}
       onPress={disabled ? undefined : onPress}
       disabled={disabled}
       activeOpacity={activeOpacity}
       {...rest}
     >
-      <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+      <Text
+        style={[
+          styles.buttonText,
+          textStyle,
+          disabled && styles.buttonTextDisabled,
+        ]}
+      >
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -56,6 +64,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  buttonDisabled: {
+    backgroundColor: "rgba(251, 109, 11, 0.5)", // 50% opacity of original color
+  },
+  buttonTextDisabled: {
+    color: "rgba(255, 255, 255, 0.7)", // 70% opacity white
   },
 });
 
