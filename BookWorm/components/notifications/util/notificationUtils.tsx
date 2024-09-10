@@ -1,3 +1,15 @@
+/**
+ * Calculates the time elapsed since a notification was created and returns it in a human-readable format.
+ *
+ * @param {Date} createdDate - The date when the notification was created.
+ * @returns {string} A string representing the time elapsed in the most appropriate unit:
+ *                   - Seconds (s) if less than a minute
+ *                   - Minutes (m) if less than an hour
+ *                   - Hours (h) if less than a day
+ *                   - Days (d) if less than a week
+ *                   - Weeks (w) if a week or more
+ *
+ */
 export function calculateTimeSinceNotification(createdDate: Date) {
   const diffTime = Math.abs(new Date().getTime() - createdDate.getTime());
   const seconds = diffTime / 1000;

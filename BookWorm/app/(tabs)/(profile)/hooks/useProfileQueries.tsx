@@ -31,10 +31,9 @@ export const useProfilePicQuery = (userId: string | undefined) => {
 /**
  * Custom hook to fetch User Data for a given user.
  *
- * @param {string | undefined} userId - The ID of the user whose User Data is being fetched.
- * @returns {UseQueryResult<string | null>} The result of the query, containing the User Data or null.
- *
- * */
+ * @param {User | undefined} user - The user object whose User Data is being fetched.
+ * @returns {UseQueryResult<UserData | null>} The result of the query, containing the User Data or null.
+ */
 export const useUserDataQuery = (user: User | undefined) => {
   return useQuery({
     queryKey: user != null ? ["userdata", user.uid] : ["userdata"],

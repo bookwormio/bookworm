@@ -9,7 +9,7 @@ import {
   where,
 } from "firebase/firestore";
 import {
-  notificationMessageMap,
+  NotificationMessageMap,
   ServerNotificationType,
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
@@ -20,32 +20,38 @@ import {
 
 /**
  * Adds a notification to the notifications collection for that user.
- * @param {BasicNotification} notif - The basic info of the notification.
+ * @param {BasicNotificationModel} notif - The basic info of the notification.
+ * @returns {Promise<boolean>} A promise that resolves to true if the notification was successfully created, false otherwise.
  */
-export async function createNotification(notif: BasicNotificationModel) {
-  if (notif.receiver != null) {
-    const notificationsRef = collection(DB, "notifications");
-    if (notif.type === ServerNotificationType.LIKE) {
-      try {
-        const q = query(
-          notificationsRef,
-          where("postID", "==", notif.postID),
-          where("sender", "==", notif.sender),
-          where("type", "==", ServerNotificationType.LIKE),
-        );
-        const querySnapshot = await getDocs(q);
+export async function createNotification(
+  notif: BasicNotificationModel,
+): Promise<boolean> {
+  if (notif.receiver == null) {
+    console.log("User does not exist");
+    return false;
+  }
 
-        if (!querySnapshot.empty) {
-          console.log("Like notification already exists");
-          return;
-        }
-      } catch (error) {
-        console.log("Firebase error");
+  const notificationsRef = collection(DB, "notifications");
+
+  try {
+    if (notif.type === ServerNotificationType.LIKE) {
+      const q = query(
+        notificationsRef,
+        where("postID", "==", notif.postID),
+        where("sender", "==", notif.sender),
+        where("type", "==", ServerNotificationType.LIKE),
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        // Like notification already exists
+        return false;
       }
     }
+
     await addDoc(notificationsRef, {
       receiver: notif.receiver,
-      message: notificationMessageMap[notif.type],
+      message: NotificationMessageMap[notif.type],
       comment: notif.comment,
       sender: notif.sender,
       sender_name: notif.sender_name,
@@ -58,8 +64,11 @@ export async function createNotification(notif: BasicNotificationModel) {
           : notif.postID,
       type: notif.type,
     });
-  } else {
-    console.log("user DNE");
+
+    return true;
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    return false;
   }
 }
 

@@ -200,6 +200,6 @@ interface FullNotificationModel {
   sender_img: string;
   created: Timestamp;
   read_at: Timestamp;
-  postID: string;
+  postID: string | null;
   type: ServerNotificationType;
 }

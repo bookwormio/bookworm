@@ -2,7 +2,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { notificationTypeMap, ServerNotificationType } from "../../enums/Enums";
+import { NotificationTypeMap, ServerNotificationType } from "../../enums/Enums";
 import { type FullNotificationModel } from "../../types";
 import { calculateTimeSinceNotification } from "./util/notificationUtils";
 
@@ -13,7 +13,7 @@ interface NotifProp {
 const NotificationItem = ({ notif }: NotifProp) => {
   const time = calculateTimeSinceNotification(notif.created.toDate());
   const notifDisplay =
-    notificationTypeMap[notif.type as ServerNotificationType];
+    NotificationTypeMap[notif.type as ServerNotificationType];
   return (
     <TouchableOpacity
       style={styles.notif_container}
