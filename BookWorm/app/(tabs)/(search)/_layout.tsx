@@ -11,6 +11,13 @@ const SearchLayout = () => {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="recommendation/[friendUserID]"
+        options={{
+          presentation: "modal",
+          headerTitle: "Leave a Recommendation",
+        }}
+      />
       <Stack.Screen name="bookviewpage" options={{ headerShown: false }} />
     </Stack>
   );
