@@ -38,6 +38,10 @@ const PostsLayout = () => {
           name="notifications"
           options={{ headerShown: true, headerTitle: "Notifications" }}
         />
+        <Stack.Screen
+          name="postsbook/[bookID]"
+          options={{ headerShown: true, headerTitle: "Book" }}
+        />
       </Stack>
     </PostsProvider>
   );

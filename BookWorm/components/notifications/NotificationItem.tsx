@@ -31,10 +31,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
           });
         } else if (notif.type === ServerNotificationType.RECOMMENDATION) {
           router.push({
-            pathname: "bookviewpage",
-            params: {
-              bookID: notif.bookID,
-            },
+            pathname: `/postsbook/${notif.bookID}`,
           });
         }
       }}

@@ -4,11 +4,15 @@ import React from "react";
 const SearchLayout = () => {
   return (
     <Stack>
-      <Stack.Screen name="search" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="search"
+        options={{ headerShown: true, headerTitle: "Search" }}
+      />
       <Stack.Screen
         name="user/[friendUserID]"
         options={{
-          headerShown: false,
+          headerShown: true,
+          headerTitle: "User",
         }}
       />
       <Stack.Screen
@@ -18,7 +22,10 @@ const SearchLayout = () => {
           headerTitle: "Leave a Recommendation",
         }}
       />
-      <Stack.Screen name="bookviewpage" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="searchbook/[bookID]"
+        options={{ headerShown: true, headerTitle: "Book" }}
+      />
     </Stack>
   );
 };

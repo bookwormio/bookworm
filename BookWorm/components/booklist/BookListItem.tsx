@@ -31,10 +31,7 @@ const BookListItem = ({
   const queryClient = useQueryClient();
   const handleClick = ({ bookID }: { bookID: string }) => {
     router.push({
-      pathname: "bookviewpage",
-      params: {
-        bookID,
-      },
+      pathname: `/searchbook/${bookID}`,
     });
   };
 
