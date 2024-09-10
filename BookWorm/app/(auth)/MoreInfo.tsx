@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
+import BookWormButton from "../../components/button/BookWormButton";
 import { updateUser } from "../../services/firebase-services/UserQueries";
 import { type UserDataModel } from "../../types";
 
@@ -195,16 +196,14 @@ const MoreInfo = () => {
             setState(text);
           }}
         />
-        <TouchableOpacity
-          style={styles.button}
+        <BookWormButton
+          title="Let's Go"
           onPress={() => {
             if (validFields()) {
               createNewTracking();
             }
           }}
-        >
-          <Text style={styles.buttonText}>{"Let's Go"}</Text>
-        </TouchableOpacity>
+        />
       </View>
     </ScrollView>
   );

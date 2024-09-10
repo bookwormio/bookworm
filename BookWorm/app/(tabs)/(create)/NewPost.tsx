@@ -21,6 +21,7 @@ import {
   useSetBookmarkForBook,
 } from "../../../components/bookmark/hooks/useBookmarkQueries";
 import BookDropdownSelect from "../../../components/bookselect/BookDropdownSelect";
+import BookWormButton from "../../../components/button/BookWormButton";
 import { createPost } from "../../../services/firebase-services/PostQueries";
 import { type CreatePostModel, type FlatBookItemModel } from "../../../types";
 
@@ -48,7 +49,7 @@ const NewPost = () => {
   const [currentBookmark, setCurrentBookmark] = useState(0);
 
   useEffect(() => {
-    setCurrentBookmark(isBookmarkLoadedSuccess ? oldBookmark ?? 0 : 0);
+    setCurrentBookmark(isBookmarkLoadedSuccess ? (oldBookmark ?? 0) : 0);
   }, [isBookmarkLoadedSuccess, oldBookmark, selectedBook]);
 
   useEffect(() => {
@@ -246,20 +247,11 @@ const NewPost = () => {
         </TouchableOpacity>
       </ScrollView>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.button, shareDisabled && styles.buttonDisabled]}
+        <BookWormButton
+          title="Share!"
           onPress={handleShareClicked}
           disabled={shareDisabled}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              shareDisabled && styles.buttonTextDisabled,
-            ]}
-          >
-            Share!
-          </Text>
-        </TouchableOpacity>
+        />
       </View>
       <Toast />
     </View>
