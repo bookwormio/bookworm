@@ -120,19 +120,19 @@ export async function fetchPostsByUserIDs(
             const promise = getDownloadURL(storageRef)
               .then((url) => {
                 images[index] = (
+                  // TODO Move this outta here
                   <Image
                     key={index}
                     source={{ uri: url }}
                     cachePolicy={"memory-disk"}
                     placeholder={BLURHASH}
                     style={{
-                      height: 100,
-                      width: 100,
-                      borderColor: "black",
-                      borderRadius: 10,
-                      borderWidth: 1,
+                      height: 250,
+                      width: 200,
+                      borderRadius: 3,
                       marginRight: 10,
                     }}
+                    contentFit="fill"
                   />
                 );
               })

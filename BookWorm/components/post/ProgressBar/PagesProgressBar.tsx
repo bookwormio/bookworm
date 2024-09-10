@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { View } from "react-native";
 import {
   BACKWARDS_PROGRESS_COLOR,
   FIRST_PROGRESS_COLOR,
@@ -19,6 +19,7 @@ const PagesProgressBar = ({
   newBookmark,
   totalPages,
 }: PagesProgressBarProps) => {
+  // TODO pass in this data
   const pagesRead = newBookmark - oldBookmark;
   const isBackwards = pagesRead < 0;
 
@@ -27,34 +28,26 @@ const PagesProgressBar = ({
   const remainingProgress = 1 - firstProgress - secondProgress;
 
   return (
-    <View style={styles.progressContainer}>
-      <Text>
-        {isBackwards ? "Moved back" : "Read"} {Math.abs(pagesRead)} pages
-      </Text>
-      <ProgressBar
-        shouldAnimate={true}
-        animateDuration={500}
-        barHeight={15}
-        data={[
-          { progress: firstProgress, color: FIRST_PROGRESS_COLOR },
-          {
-            progress: secondProgress,
-            color: isBackwards
-              ? BACKWARDS_PROGRESS_COLOR
-              : SECOND_PROGRESS_COLOR,
-          },
-          { progress: remainingProgress, color: REMAINING_PROGRESS_COLOR },
-        ]}
-      />
+    <View>
+      <View>
+        <ProgressBar
+          shouldAnimate={true}
+          animateDuration={500}
+          barHeight={15}
+          data={[
+            { progress: firstProgress, color: FIRST_PROGRESS_COLOR },
+            {
+              progress: secondProgress,
+              color: isBackwards
+                ? BACKWARDS_PROGRESS_COLOR
+                : SECOND_PROGRESS_COLOR,
+            },
+            { progress: remainingProgress, color: REMAINING_PROGRESS_COLOR },
+          ]}
+        />
+      </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  progressContainer: {
-    marginVertical: 10,
-    marginHorizontal: 10,
-  },
-});
 
 export default PagesProgressBar;
