@@ -54,28 +54,11 @@ const AppLayout = () => {
           name="(search)"
           options={{
             tabBarLabel: "Search",
-            headerTitle: "Search",
+            headerShown: false,
             tabBarActiveTintColor: "#FB6D0B",
             tabBarInactiveTintColor: "grey",
             tabBarIcon: ({ size, color }) => (
               <FontAwesome5 name="search" size={size} color={color} />
-            ),
-            headerLeft: () => (
-              <View>
-                {router.canGoBack() &&
-                  // ensure not at base search page
-                  segments[segments.length - 1] !== "search" && (
-                    <TouchableOpacity
-                      style={{ paddingLeft: 20 }}
-                      disabled={!router.canGoBack()}
-                      onPress={() => {
-                        router.back();
-                      }}
-                    >
-                      <FontAwesome5 name="arrow-left" size={20} />
-                    </TouchableOpacity>
-                  )}
-              </View>
             ),
           }}
         />

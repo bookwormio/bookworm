@@ -7,7 +7,6 @@ import {
 } from "@gorhom/bottom-sheet";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
-import { useLocalSearchParams } from "expo-router";
 import React, {
   useCallback,
   useEffect,
@@ -26,21 +25,24 @@ import {
 } from "react-native";
 import RenderHtml from "react-native-render-html";
 import Toast from "react-native-toast-message";
-import { useAuth } from "../../../components/auth/context";
-import BookshelfAddButtons from "../../../components/profile/BookShelf/BookshelfAddButtons";
+import { type ServerBookShelfName } from "../../enums/Enums";
+import { fetchBookByVolumeID } from "../../services/books-services/BookQueries";
+import { type BookVolumeInfo } from "../../types";
+import { useAuth } from "../auth/context";
+import BookshelfAddButtons from "../profile/BookShelf/BookshelfAddButtons";
 import {
   useAddBookToShelf,
   useGetShelvesForBook,
   useRemoveBookFromShelf,
-} from "../../../components/profile/hooks/useBookshelfQueries";
-import { type ServerBookShelfName } from "../../../enums/Enums";
-import { fetchBookByVolumeID } from "../../../services/books-services/BookQueries";
-import { type BookVolumeInfo } from "../../../types";
+} from "../profile/hooks/useBookshelfQueries";
 
-const BookViewPage = () => {
+interface BookViewProps {
+  bookID: string;
+}
+
+const BookViewPage = ({ bookID }: BookViewProps) => {
   const { user } = useAuth();
   const [bookData, setBookData] = useState<BookVolumeInfo | null>(null);
-  const { bookID } = useLocalSearchParams<{ bookID: string }>();
   const [selectedShelves, setSelectedShelves] = useState<ServerBookShelfName[]>(
     [],
   );
@@ -164,7 +166,6 @@ const BookViewPage = () => {
       setPendingChanges({ add: [], remove: [] });
     }
   };
-
   // callbacks
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
