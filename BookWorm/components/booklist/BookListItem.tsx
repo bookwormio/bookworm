@@ -1,8 +1,20 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { type BookVolumeInfo } from "../../types";
+import {
+  useProfilePicQuery,
+  useUserDataQuery,
+} from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
+import { ServerNotificationType } from "../../enums/Enums";
+import { createNotification } from "../../services/firebase-services/NotificationQueries";
+import {
+  type BasicNotificationModel,
+  type BookVolumeInfo,
+  type UserDataModel,
+} from "../../types";
+import { useAuth } from "../auth/context";
 
 interface BookListItemProps {
   bookID: string;
@@ -15,6 +27,8 @@ const BookListItem = ({
   volumeInfo,
   friendUserID,
 }: BookListItemProps) => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const handleClick = ({ bookID }: { bookID: string }) => {
     router.push({
       pathname: "bookviewpage",
@@ -24,6 +38,21 @@ const BookListItem = ({
     });
   };
 
+  // getting userdata
+  const { data: userData } = useUserDataQuery(user ?? undefined);
+
+  // getting user profile pic
+  const { data: userIm } = useProfilePicQuery(user?.uid);
+
+  const notifyMutation = useMutation({
+    mutationFn: createNotification,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["notifications", friendUserID],
+      });
+    },
+  });
+
   const handleRecommendation = ({
     bookID,
     friendUserID,
@@ -31,7 +60,23 @@ const BookListItem = ({
     bookID: string;
     friendUserID: string;
   }) => {
-    console.log("yo", bookID, friendUserID);
+    // send book title and bookID
+    if (user !== undefined && user !== null) {
+      const uData = userData as UserDataModel;
+      const FRnotify: BasicNotificationModel = {
+        receiver: friendUserID,
+        sender: user?.uid,
+        sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+        sender_img: userIm ?? "",
+        comment: "",
+        postID: "",
+        bookID,
+        bookTitle: volumeInfo.title,
+        type: ServerNotificationType.RECOMMENDATION,
+      };
+      notifyMutation.mutate(FRnotify);
+    }
+    router.back();
   };
 
   return (

@@ -221,6 +221,8 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           sender_img: userIm ?? "",
           comment: "",
           postID: "",
+          bookID: "",
+          bookTitle: "",
           type: ServerNotificationType.FRIEND_REQUEST,
         };
         notifyMutation.mutate(FRnotify);

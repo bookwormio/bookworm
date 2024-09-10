@@ -59,9 +59,18 @@ export async function createNotification(
       created: serverTimestamp(),
       read_at: null,
       postID:
-        notif.type === ServerNotificationType.FRIEND_REQUEST
-          ? null
-          : notif.postID,
+        notif.type === ServerNotificationType.LIKE ||
+        notif.type === ServerNotificationType.COMMENT
+          ? notif.postID
+          : null,
+      bookID:
+        notif.type === ServerNotificationType.RECOMMENDATION
+          ? notif.bookID
+          : null,
+      bookTitle:
+        notif.type === ServerNotificationType.RECOMMENDATION
+          ? notif.bookTitle
+          : null,
       type: notif.type,
     });
 
@@ -101,6 +110,8 @@ export async function getAllFullNotifications(
         created: notDoc.data().created as Timestamp,
         read_at: notDoc.data().read_at,
         postID: notDoc.data().postID,
+        bookID: notDoc.data().bookID,
+        bookTitle: notDoc.data().bookTitle,
         type: notDoc.data().type,
       };
       notifdata.push(notif);
