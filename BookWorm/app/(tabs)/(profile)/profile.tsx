@@ -14,6 +14,7 @@ import {
 import { useAuth } from "../../../components/auth/context";
 import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBookShelves";
 import ViewData from "../../../components/profile/Data/ViewData";
+import ProfilePosts from "../../../components/profile/ProfilePosts";
 import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
 import {
   fetchUserData,
@@ -164,7 +165,6 @@ const Profile = () => {
           <Text style={styles.buttonText}>{"Log Out"}</Text>
         </TouchableOpacity>
       </View>
-
       <ProfileTabSelector
         profileTab={profileTab}
         setProfileTab={setProfileTab}
@@ -172,7 +172,7 @@ const Profile = () => {
       {profileTab === "shelf" ? (
         <ProfileBookShelves />
       ) : profileTab === "post" ? (
-        <Text>PUT THE POSTS HERE</Text>
+        <ProfilePosts />
       ) : (
         <ViewData></ViewData>
       )}

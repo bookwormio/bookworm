@@ -16,12 +16,16 @@ import { useAuth } from "../auth/context";
 const PostsContext = createContext<{
   posts: PostModel[];
   setPosts: (posts: PostModel[]) => void;
+  profilePosts: PostModel[];
+  setProfilePosts: (posts: PostModel[]) => void;
   likePost: (postID: string) => void;
   isLikePending: boolean;
   commentOnPost: (postID: string, comment: string) => void;
 }>({
   posts: [],
   setPosts: () => null,
+  profilePosts: [],
+  setProfilePosts: () => null,
   likePost: () => null,
   isLikePending: false,
   commentOnPost: () => null,
@@ -47,27 +51,12 @@ interface AddCommentMutationProps {
 const PostsProvider = ({ children }: PostsProviderProps) => {
   const { user } = useAuth();
   const [posts, setPosts] = useState<PostModel[]>([]);
+  const [profilePosts, setProfilePosts] = useState<PostModel[]>([]);
 
   const likePostMutation = useMutation({
     mutationFn: async ({ postID }: LikePostMutationProps) => {
       if (user != null) {
-        const postToUpdate = posts.find((post) => post.id === postID);
-        if (postToUpdate !== undefined) {
-          const likesToUpdate = postToUpdate.likes;
-          if (likesToUpdate.includes(user.uid)) {
-            likesToUpdate.splice(likesToUpdate.indexOf(user.uid), 1);
-          } else {
-            likesToUpdate.push(user.uid);
-          }
-          setPosts((prevPosts) =>
-            prevPosts.map((post) =>
-              post.id === postToUpdate.id
-                ? { ...post, likes: likesToUpdate }
-                : post,
-            ),
-          );
-          return await likeUnlikePost(user.uid, postID);
-        }
+        return await likeUnlikePost(user.uid, postID);
       }
     },
     onSuccess: (updatedLikes, variables) => {
@@ -77,6 +66,18 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
           setPosts((prevPosts) =>
             prevPosts.map((post) =>
               post.id === updatedPost.id
+                ? { ...post, likes: updatedLikes }
+                : post,
+            ),
+          );
+        }
+        const updatedProfilePost = profilePosts.find(
+          (post) => post.id === variables.postID,
+        );
+        if (updatedProfilePost !== undefined) {
+          setProfilePosts((prevPosts) =>
+            prevPosts.map((post) =>
+              post.id === updatedProfilePost.id
                 ? { ...post, likes: updatedLikes }
                 : post,
             ),
@@ -92,27 +93,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   const addCommentMutation = useMutation({
     mutationFn: async ({ postID, comment }: AddCommentMutationProps) => {
       if (user != null) {
-        const currentUser = await fetchUser(user.uid);
-        if (currentUser != null) {
-          const postToUpdate = posts.find((post) => post.id === postID);
-          if (postToUpdate !== undefined) {
-            const commentsToUpdate = postToUpdate.comments;
-            const temporaryComment: CommentModel = {
-              userID: user.uid,
-              first: currentUser.first,
-              text: comment,
-            };
-            commentsToUpdate.push(temporaryComment);
-            setPosts((prevPosts) =>
-              prevPosts.map((post) =>
-                post.id === postToUpdate.id
-                  ? { ...post, comments: commentsToUpdate }
-                  : post,
-              ),
-            );
-            return await addCommentToPost(user.uid, postID, comment);
-          }
-        }
+        return await addCommentToPost(user.uid, postID, comment);
       }
     },
     onSuccess: async (updatedComments, variables) => {
@@ -123,6 +104,19 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
           setPosts((prevPosts) =>
             prevPosts.map((post) =>
               post.id === updatedPost.id
+                ? { ...post, comments: updatedComments }
+                : post,
+            ),
+          );
+        }
+        const updatedProfilePost = profilePosts.find(
+          (post) => post.id === variables.postID,
+        );
+        if (updatedProfilePost !== undefined) {
+          updatedProfilePost.comments = updatedComments;
+          setProfilePosts((prevPosts) =>
+            prevPosts.map((post) =>
+              post.id === updatedProfilePost.id
                 ? { ...post, comments: updatedComments }
                 : post,
             ),
@@ -142,11 +136,97 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
         setPosts: (newPosts: PostModel[]) => {
           setPosts(newPosts);
         },
+        profilePosts,
+        setProfilePosts(newPosts: PostModel[]) {
+          setProfilePosts(newPosts);
+        },
         likePost: (postID: string) => {
-          likePostMutation.mutate({ postID });
+          if (user != null) {
+            const postToUpdate = posts.find((post) => post.id === postID);
+            if (postToUpdate !== undefined) {
+              const likesToUpdate = postToUpdate.likes;
+              if (likesToUpdate.includes(user.uid)) {
+                likesToUpdate.splice(likesToUpdate.indexOf(user.uid), 1);
+              } else {
+                likesToUpdate.push(user.uid);
+              }
+              setPosts((prevPosts) =>
+                prevPosts.map((post) =>
+                  post.id === postToUpdate.id
+                    ? { ...post, likes: likesToUpdate }
+                    : post,
+                ),
+              );
+            }
+            const profilePostToUpdate = profilePosts.find(
+              (post) => post.id === postID,
+            );
+            if (profilePostToUpdate !== undefined) {
+              const likesToUpdate = profilePostToUpdate.likes;
+              if (likesToUpdate.includes(user.uid)) {
+                likesToUpdate.splice(likesToUpdate.indexOf(user.uid), 1);
+              } else {
+                likesToUpdate.push(user.uid);
+              }
+              setProfilePosts((prevPosts) =>
+                prevPosts.map((post) =>
+                  post.id === profilePostToUpdate.id
+                    ? { ...post, likes: likesToUpdate }
+                    : post,
+                ),
+              );
+            }
+            likePostMutation.mutate({ postID });
+          }
         },
         isLikePending: likePostMutation.isPending,
         commentOnPost: (postID: string, comment: string) => {
+          if (user != null) {
+            fetchUser(user.uid)
+              .then((currentUser) => {
+                if (currentUser != null) {
+                  const postToUpdate = posts.find((post) => post.id === postID);
+                  if (postToUpdate !== undefined) {
+                    const commentsToUpdate = postToUpdate.comments;
+                    const temporaryComment: CommentModel = {
+                      userID: user.uid,
+                      first: currentUser.first,
+                      text: comment,
+                    };
+                    commentsToUpdate.push(temporaryComment);
+                    setPosts((prevPosts) =>
+                      prevPosts.map((post) =>
+                        post.id === postToUpdate.id
+                          ? { ...post, comments: commentsToUpdate }
+                          : post,
+                      ),
+                    );
+                  }
+                  const profilePostToUpdate = profilePosts.find(
+                    (post) => post.id === postID,
+                  );
+                  if (profilePostToUpdate !== undefined) {
+                    const commentsToUpdate = profilePostToUpdate.comments;
+                    const temporaryComment: CommentModel = {
+                      userID: user.uid,
+                      first: currentUser.first,
+                      text: comment,
+                    };
+                    commentsToUpdate.push(temporaryComment);
+                    setProfilePosts((prevPosts) =>
+                      prevPosts.map((post) =>
+                        post.id === profilePostToUpdate.id
+                          ? { ...post, comments: commentsToUpdate }
+                          : post,
+                      ),
+                    );
+                  }
+                }
+              })
+              .catch(() => {
+                console.error("Error fetching user");
+              });
+          }
           addCommentMutation.mutate({ postID, comment });
         },
       }}

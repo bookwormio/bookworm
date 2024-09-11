@@ -171,6 +171,90 @@ export async function fetchPostsByUserIDs(
 }
 
 /**
+ * Fetches posts for the specified user IDs with pagination support.
+ * If a last visible document snapshot is provided, it fetches the next page of posts.
+ * @param {string[]} userIDs - The user IDs for which to fetch posts.
+ * @param {QueryDocumentSnapshot<DocumentData, DocumentData> | null} [lastVisible=null] - The last visible document snapshot.
+ * @returns {Promise<{
+ *   posts: PostModel[]; // The array of fetched posts.
+ *   newLastVisible: QueryDocumentSnapshot<DocumentData, DocumentData> | null; // The new last visible document snapshot.
+ * }>} A promise that resolves to an object containing the fetched posts and the new last visible document snapshot.
+ */
+export async function fetchPostsByUserID(
+  userID: string | undefined,
+): Promise<PostModel[]> {
+  if (userID !== undefined) {
+    try {
+      const postsQuery = query(
+        collection(DB, "posts"),
+        where("user", "==", userID),
+        orderBy("created", "desc"),
+      );
+      const postsSnapshot = await getDocs(postsQuery);
+      const postsData: PostModel[] = [];
+      const userModel = await fetchUser(userID);
+      for (const postDoc of postsSnapshot.docs) {
+        if (userModel !== null) {
+          try {
+            const downloadPromises: Array<Promise<void>> = [];
+            const images: JSX.Element[] = [];
+            for (let index = 0; index < postDoc.data().image; index++) {
+              const storageRef = ref(STORAGE, `posts/${postDoc.id}/${index}`);
+              const promise = getDownloadURL(storageRef)
+                .then((url) => {
+                  images[index] = (
+                    <Image
+                      key={index}
+                      source={{ uri: url }}
+                      cachePolicy={"memory-disk"}
+                      placeholder={BLURHASH}
+                      style={{
+                        height: 100,
+                        width: 100,
+                        borderColor: "black",
+                        borderRadius: 10,
+                        borderWidth: 1,
+                        marginRight: 10,
+                      }}
+                    />
+                  );
+                })
+                .catch((error) => {
+                  console.error("Error fetching image ", error);
+                });
+              downloadPromises.push(promise);
+            }
+            await Promise.all(downloadPromises);
+            const post: PostModel = {
+              id: postDoc.id,
+              bookid: postDoc.data().bookid,
+              booktitle: postDoc.data().booktitle,
+              created: postDoc.data().created,
+              text: postDoc.data().text,
+              user: userModel,
+              images,
+              oldBookmark: postDoc.data().oldBookmark,
+              newBookmark: postDoc.data().newBookmark,
+              likes: postDoc.data().likes ?? [],
+              comments: (postDoc.data().comments as CommentModel[]) ?? [],
+              totalPages: postDoc.data().totalPages,
+            };
+            postsData.push(post);
+          } catch (error) {
+            console.error("Error fetching user", error);
+          }
+        }
+      }
+      return postsData;
+    } catch (error) {
+      console.error("Error fetching posts by User ID", error);
+      return [] as PostModel[];
+    }
+  }
+  return [] as PostModel[];
+}
+
+/**
  * Retrieves a post by it's postID.
  * @param {string} postID - The ID of the post to be retrieved.
  * @returns {Promise<PostModel | null>} A promise that resolves to the PostModel if found.
