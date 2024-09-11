@@ -5,13 +5,13 @@ import { useProfilePicQuery } from "../../../app/(tabs)/(profile)/hooks/useProfi
 interface ProfilePictureProps {
   userID: string;
   size: number;
-  newProfilePic?: string;
+  overrideProfilePic?: string;
 }
 
 const ProfilePicture = ({
   userID,
   size,
-  newProfilePic,
+  overrideProfilePic,
 }: ProfilePictureProps) => {
   const {
     data: profilePic,
@@ -32,11 +32,11 @@ const ProfilePicture = ({
 
   return (
     <View style={[styles.container, dynamicStyles.container]}>
-      {newProfilePic != null && newProfilePic !== "" ? (
+      {overrideProfilePic != null && overrideProfilePic !== "" ? (
         // Manually pass in newProfilePic
         <Image
           style={[styles.image, dynamicStyles.image]}
-          source={{ uri: newProfilePic }}
+          source={{ uri: overrideProfilePic }}
         />
       ) : !profilePicPending && !profilePicError && profilePic !== null ? (
         // Stored user profile pic

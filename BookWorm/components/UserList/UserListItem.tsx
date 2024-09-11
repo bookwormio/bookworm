@@ -27,7 +27,7 @@ const UserListItem = ({ user, routePrefix }: UserListItemProps) => {
         <ProfilePicture
           userID={user.id}
           size={40}
-          newProfilePic={user.profilePicURL}
+          overrideProfilePic={user.profilePicURL}
         />
       </View>
 

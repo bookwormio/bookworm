@@ -167,7 +167,7 @@ const EditProfile = () => {
             <ProfilePicture
               userID={user?.uid ?? ""}
               size={100}
-              newProfilePic={newProfilePic}
+              overrideProfilePic={newProfilePic}
             />
           </TouchableOpacity>
           <View>
