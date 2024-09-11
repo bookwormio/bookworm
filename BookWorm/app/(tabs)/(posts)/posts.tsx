@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: 10,
+    paddingLeft: 10,
   },
   scrollContainer: {
     flex: 1,

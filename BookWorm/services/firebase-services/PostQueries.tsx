@@ -16,7 +16,12 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import React from "react";
-import { BLURHASH } from "../../constants/constants";
+import {
+  BLURHASH,
+  POST_IMAGE_BORDER_RADIUS,
+  POST_IMAGE_HEIGHT,
+  POST_IMAGE_WIDTH,
+} from "../../constants/constants";
 import { DB, STORAGE } from "../../firebase.config";
 import {
   type CommentModel,
@@ -126,13 +131,12 @@ export async function fetchPostsByUserIDs(
                     cachePolicy={"memory-disk"}
                     placeholder={BLURHASH}
                     style={{
-                      height: 100,
-                      width: 100,
-                      borderColor: "black",
-                      borderRadius: 10,
-                      borderWidth: 1,
+                      height: POST_IMAGE_HEIGHT,
+                      width: POST_IMAGE_WIDTH,
+                      borderRadius: POST_IMAGE_BORDER_RADIUS,
                       marginRight: 10,
                     }}
+                    contentFit="fill"
                   />
                 );
               })

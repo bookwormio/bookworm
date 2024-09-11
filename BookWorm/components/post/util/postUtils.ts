@@ -31,20 +31,11 @@ export function formatDate(created: Timestamp, currentDate: Date) {
 }
 
 /**
- * Checks if all provided values are valid page numbers.
- * @param {...unknown} values - The values to check.
- * @returns {boolean} True if all values are valid page numbers, false otherwise.
- */
-export function areValidPageNumbers(...values: unknown[]): boolean {
-  return values.every(isValidPageNumber);
-}
-
-/**
  * Type guard to check if a value is a valid page number.
  * @param {unknown} value - The value to check.
  * @returns {boolean} True if the value is a valid page number, false otherwise.
  */
-function isValidPageNumber(value: unknown): value is number {
+export function isValidPageNumber(value: unknown): value is number {
   return (
     typeof value === "number" &&
     !Number.isNaN(value) &&

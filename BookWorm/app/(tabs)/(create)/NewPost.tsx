@@ -67,7 +67,11 @@ const NewPost = () => {
         bookid: selectedBook !== null ? selectedBook.id : "",
         booktitle: selectedBook !== null ? selectedBook.title : "",
         text,
-        images,
+        images:
+          // Append book image to the images array if it exists
+          selectedBook?.image != null
+            ? [selectedBook.image, ...images]
+            : images,
         oldBookmark,
         newBookmark: currentBookmark,
         totalPages: selectedBook?.pageCount ?? 0,

@@ -1,11 +1,9 @@
-import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -18,8 +16,8 @@ import {
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import BookWormButton from "../../../components/button/BookWormButton";
+import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
 import {
-  getUserProfileURL,
   newFetchUserInfo,
   updateUser,
 } from "../../../services/firebase-services/UserQueries";
@@ -34,7 +32,7 @@ const EditProfile = () => {
   const [editBio, setEditBio] = useState("");
   const [editCity, setEditCity] = useState("");
   const [editState, setEditState] = useState("");
-  const [image, setImage] = useState("");
+  const [newProfilePic, setNewProfilePic] = useState("");
   const [save, setSave] = useState("Save");
 
   const queryClient = useQueryClient();
@@ -96,22 +94,11 @@ const EditProfile = () => {
     }
   }, [userData]);
 
-  const { data: userIm } = useQuery({
-    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
-    queryFn: async () => {
-      if (user != null) {
-        return await getUserProfileURL(user.uid);
-      } else {
-        return null;
-      }
-    },
-  });
-
   useEffect(() => {
-    if (userIm !== undefined && userIm !== null) {
-      setImage(userIm);
+    if (newProfilePic != null) {
+      setNewProfilePic(newProfilePic);
     }
-  }, [userIm]);
+  }, [newProfilePic]);
 
   const handeSaveClick = async () => {
     const userId = user?.uid;
@@ -123,8 +110,8 @@ const EditProfile = () => {
     newUserData.bio = editBio;
     newUserData.city = editCity;
     newUserData.state = editState;
-    if (image !== "" && image !== undefined && image !== null) {
-      newUserData.profilepic = image;
+    if (newProfilePic !== "" && newProfilePic != null) {
+      newUserData.profilepic = newProfilePic;
     }
     if (userId === undefined) {
       console.error("Current user undefined");
@@ -146,7 +133,7 @@ const EditProfile = () => {
       quality: 1,
     });
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setNewProfilePic(result.assets[0].uri);
     }
   };
 
@@ -177,11 +164,11 @@ const EditProfile = () => {
               });
             }}
           >
-            {image !== "" ? (
-              <Image source={{ uri: image }} style={styles.defaultImage} />
-            ) : (
-              <FontAwesome5 name="user" size={40} />
-            )}
+            <ProfilePicture
+              userID={user?.uid ?? ""}
+              size={100}
+              overrideProfilePic={newProfilePic}
+            />
           </TouchableOpacity>
           <View>
             <Text style={styles.regtext}>First Name</Text>
@@ -325,9 +312,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#d3d3d3",
     height: 100,
     width: 100,
-    borderColor: "black",
     borderRadius: 50,
-    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 40,
