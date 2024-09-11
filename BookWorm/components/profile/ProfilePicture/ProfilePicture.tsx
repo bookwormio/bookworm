@@ -1,9 +1,7 @@
-import { FontAwesome5 } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { useProfilePicQuery } from "../../../app/(tabs)/(profile)/hooks/useProfileQueries";
-
 interface ProfilePictureProps {
   userID: string;
   size: number;
@@ -48,7 +46,10 @@ const ProfilePicture = ({
         />
       ) : (
         // Default user profile pic
-        <FontAwesome5 name="user" size={size * 0.6} />
+        <Image
+          style={[styles.image, dynamicStyles.image]}
+          source={require("../../../assets/default_profile.png")}
+        />
       )}
     </View>
   );
