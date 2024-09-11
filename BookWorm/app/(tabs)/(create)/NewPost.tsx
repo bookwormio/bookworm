@@ -341,19 +341,8 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
   },
-  button: {
-    backgroundColor: "#FB6D0B",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-  },
   buttonDisabled: {
     backgroundColor: "rgba(251, 109, 11, 0.5)", // 50% opacity of original color
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "white",
   },
   buttonTextDisabled: {
     color: "rgba(255, 255, 255, 0.7)", // 70% opacity white

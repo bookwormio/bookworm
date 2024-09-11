@@ -188,20 +188,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 2,
   },
-  button: {
-    backgroundColor: "#FB6D0B",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginVertical: 10,
-    marginHorizontal: 10,
-    flex: 1,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
   main: {
     flex: 1,
     justifyContent: "center",
