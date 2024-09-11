@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { areValidPageNumbers } from "../util/postUtils";
+import { isValidPageNumber } from "../util/postUtils";
 
 /**
  * A custom hook that provides a memoized function for validating page numbers in a book reading context.
@@ -21,7 +21,9 @@ export const usePageValidation = () => {
         oldBookmark != null &&
         newBookmark != null &&
         totalPages != null &&
-        areValidPageNumbers(oldBookmark, newBookmark, totalPages)
+        isValidPageNumber(oldBookmark) &&
+        isValidPageNumber(newBookmark) &&
+        isValidPageNumber(totalPages)
       ) {
         return {
           oldBookmark,
