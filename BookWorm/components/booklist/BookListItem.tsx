@@ -92,7 +92,7 @@ const BookListItem = ({
             "Include a custom message",
             [
               {
-                text: "No",
+                text: "Cancel",
                 onPress: () => {},
                 style: "cancel",
               },
