@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
+import BookWormButton from "../../../components/button/BookWormButton";
 import {
   getUserProfileURL,
   newFetchUserInfo,
@@ -256,17 +257,18 @@ const EditProfile = () => {
             />
           </View>
           <View style={styles.outerButtonsContainer}>
-            <TouchableOpacity
-              style={styles.button}
+            <BookWormButton
+              // have to adjust marginHorizontal to make smaller buttons
+              title="Close"
               onPress={() => {
                 refreshMutation.mutate();
                 router.back();
               }}
-            >
-              <Text style={styles.buttonText}>{" Close "}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
+              style={{ marginHorizontal: 20 }}
+            />
+            <BookWormButton
+              // have to adjust marginHorizontal to make smaller buttons
+              title={save}
               onPress={() => {
                 setSave("Saving...");
                 handeSaveClick()
@@ -276,9 +278,8 @@ const EditProfile = () => {
                     setSave("Save");
                   });
               }}
-            >
-              <Text style={styles.buttonText}>{save}</Text>
-            </TouchableOpacity>
+              style={{ marginHorizontal: 20 }}
+            />
           </View>
         </View>
       </ScrollView>
@@ -298,21 +299,6 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
     fontSize: 16,
     marginLeft: 10,
-  },
-  button: {
-    backgroundColor: "#FB6D0B",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginVertical: 10,
-    width: "30%",
-    alignSelf: "center",
-    marginHorizontal: 10,
-  },
-  buttonText: {
-    color: "white", // Ensure text color is white
-    fontSize: 16,
-    fontWeight: "bold",
   },
   keyAvoidContainer: {
     flex: 1,
@@ -356,5 +342,6 @@ const styles = StyleSheet.create({
   outerButtonsContainer: {
     flexDirection: "row",
     justifyContent: "center",
+    padding: 10,
   },
 });

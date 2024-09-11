@@ -8,10 +8,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
+import BookWormButton from "../../../components/button/BookWormButton";
 import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBookShelves";
 import ViewData from "../../../components/profile/Data/ViewData";
 import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
@@ -146,8 +146,8 @@ const Profile = () => {
         </View>
       </View>
       <View style={styles.outerButtonsContainer}>
-        <TouchableOpacity
-          style={styles.button}
+        <BookWormButton
+          title="Edit Profile"
           onPress={() => {
             if (user != null) {
               router.push({
@@ -157,12 +157,8 @@ const Profile = () => {
               console.error("User DNE");
             }
           }}
-        >
-          <Text style={styles.buttonText}>{"Edit Profile"}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={signOut}>
-          <Text style={styles.buttonText}>{"Log Out"}</Text>
-        </TouchableOpacity>
+        />
+        <BookWormButton title="Log Out" onPress={signOut} />
       </View>
 
       <ProfileTabSelector
@@ -191,20 +187,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     paddingHorizontal: 2,
-  },
-  button: {
-    backgroundColor: "#FB6D0B",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginVertical: 10,
-    marginHorizontal: 10,
-    flex: 1,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
   },
   main: {
     flex: 1,
