@@ -89,7 +89,7 @@ const BookListItem = ({
         } else {
           Alert.prompt(
             "Send Book Recommendation",
-            "Include a custom message",
+            "Include a custom message (Optional)",
             [
               {
                 text: "Cancel",
