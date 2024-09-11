@@ -87,9 +87,9 @@ const BookListItem = ({
         if (friendUserID === null || friendUserID === undefined) {
           handleClick({ bookID });
         } else {
-          Alert.alert(
-            "Confirm",
-            `Send Recommendation to read ${volumeInfo.title}`,
+          Alert.prompt(
+            "Send Book Recommendation",
+            "Include a custom message",
             [
               {
                 text: "No",
@@ -97,36 +97,21 @@ const BookListItem = ({
                 style: "cancel",
               },
               {
-                text: "Yes",
-                onPress: () => {
-                  Alert.prompt(
-                    "Custom Message",
-                    "Would you like to send a custom message?",
-                    [
-                      {
-                        text: "No",
-                        onPress: () => {
-                          handleRecommendation({ bookID, friendUserID });
-                        },
-                        style: "cancel",
-                      },
-                      {
-                        text: "Send",
-                        onPress: (message) => {
-                          handleRecommendation({
-                            bookID,
-                            friendUserID,
-                            message,
-                          });
-                        },
-                      },
-                    ],
-                    "plain-text",
-                  );
+                text: "Send",
+                onPress: (message) => {
+                  if (message === "") {
+                    handleRecommendation({ bookID, friendUserID });
+                  } else {
+                    handleRecommendation({
+                      bookID,
+                      friendUserID,
+                      message,
+                    });
+                  }
                 },
               },
             ],
-            { cancelable: true }, // user can click outside of box and it will close
+            "plain-text",
           );
         }
       }}
