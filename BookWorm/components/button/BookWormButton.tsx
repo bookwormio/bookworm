@@ -19,7 +19,7 @@ interface CustomButtonProps extends TouchableOpacityProps {
   textStyle?: TextStyle;
 }
 
-const BookWormButton: React.FC<CustomButtonProps> = ({
+const BookWormButton = ({
   title,
   onPress,
   style,
@@ -27,7 +27,7 @@ const BookWormButton: React.FC<CustomButtonProps> = ({
   disabled = false,
   activeOpacity = 0.8,
   ...rest
-}) => {
+}: CustomButtonProps) => {
   return (
     // [style1, style2] will combine styles
     <TouchableOpacity
