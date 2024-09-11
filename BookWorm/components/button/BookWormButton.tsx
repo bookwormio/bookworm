@@ -1,11 +1,11 @@
 import React from "react";
 import {
-    StyleSheet,
-    Text,
-    type TextStyle,
-    TouchableOpacity,
-    type TouchableOpacityProps,
-    type ViewStyle,
+  StyleSheet,
+  Text,
+  type TextStyle,
+  TouchableOpacity,
+  type TouchableOpacityProps,
+  type ViewStyle,
 } from "react-native";
 
 /*

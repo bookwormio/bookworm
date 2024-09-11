@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../components/auth/context";
@@ -72,13 +71,14 @@ const Login = () => {
         />
         <View style={styles.accountContainer}>
           <Text style={styles.question}>{"Don't have an account?"}</Text>
-          <TouchableOpacity
+          <BookWormButton
+            title="Create Account"
+            style={{ backgroundColor: "#f2f2f2", flex: 1 }}
+            textStyle={styles.createButtonText}
             onPress={() => {
               router.push("/CreateAccount");
             }}
-          >
-            <Text style={styles.createButtonText}>{"Create Account"}</Text>
-          </TouchableOpacity>
+          />
         </View>
       </View>
     </ScrollView>
@@ -92,7 +92,8 @@ const styles = StyleSheet.create({
     flexDirection: "row", // Horizontal layout
     alignItems: "center", // Align items vertically
     justifyContent: "space-between", // Space between the inputs
-    paddingHorizontal: 16, // Padding for the container
+    paddingHorizontal: 2, // Padding for the container
+    flex: 1,
   },
   keyAvoidContainer: {
     flex: 1,
@@ -100,20 +101,6 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "center",
-  },
-  button: {
-    backgroundColor: "#FB6D0B",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginVertical: 10,
-    marginTop: 15,
-    marginBottom: 8,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
   },
   createButtonText: {
     color: "#FB6D0B",

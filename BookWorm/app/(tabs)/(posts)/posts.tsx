@@ -27,6 +27,7 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
+import BookWormButton from "../../../components/button/BookWormButton";
 import Comment from "../../../components/comment/comment";
 import Post from "../../../components/post/post";
 import { usePostsContext } from "../../../components/post/PostsContext";
@@ -202,17 +203,16 @@ const Posts = () => {
             autoCapitalize="none"
             onChangeText={setNewComment}
           />
-          <TouchableOpacity
-            style={[styles.button]}
+          <BookWormButton
+            title="Comment"
             onPress={() => {
               if (activePost != null) {
                 setNewComment("");
                 commentOnPost(activePost.id, newComment);
               }
             }}
-          >
-            <Text style={styles.buttonText}>Comment</Text>
-          </TouchableOpacity>
+            style={{ paddingHorizontal: 0, maxWidth: 100 }}
+          />
         </View>
       </BottomSheetModal>
     </BottomSheetModalProvider>
@@ -264,23 +264,6 @@ const styles = StyleSheet.create({
   commentInput: {
     flex: 1,
     paddingVertical: 8,
-  },
-  button: {
-    marginLeft: 10,
-    backgroundColor: "#FB6D0B",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  buttonDisabled: {
-    backgroundColor: "#fb6d0b80",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
   },
   commentTitle: {
     fontSize: 20,

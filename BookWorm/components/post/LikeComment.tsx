@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { type PostModel } from "../../types";
 import { useAuth } from "../auth/context";
+import BookWormButton from "../button/BookWormButton";
 import Comment from "../comment/comment";
 import { usePostsContext } from "./PostsContext";
 
@@ -93,19 +94,15 @@ export const LikeComment = ({
                 setNewComment(text);
               }}
             />
-            <TouchableOpacity
-              style={[
-                styles.button,
-                newComment.trim() === "" && styles.buttonDisabled,
-              ]}
+            <BookWormButton
+              title="Comment"
               onPress={() => {
                 commentOnPost(post.id, newComment);
                 setNewComment("");
               }}
               disabled={newComment.trim() === ""}
-            >
-              <Text style={styles.buttonText}>Comment</Text>
-            </TouchableOpacity>
+              style={{ paddingHorizontal: 0, maxWidth: 100 }}
+            />
           </View>
         </>
       )}
@@ -139,22 +136,6 @@ const styles = StyleSheet.create({
   commentInput: {
     flex: 1,
     paddingVertical: 8,
-  },
-  button: {
-    marginLeft: 10,
-    backgroundColor: "#FB6D0B",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    justifyContent: "center",
-  },
-  buttonDisabled: {
-    backgroundColor: "#fb6d0b80",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
   },
   textPadding: {
     paddingRight: 10,
