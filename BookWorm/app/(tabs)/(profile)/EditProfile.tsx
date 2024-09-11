@@ -300,21 +300,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 10,
   },
-  button: {
-    backgroundColor: "#FB6D0B",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginVertical: 10,
-    width: "30%",
-    alignSelf: "center",
-    marginHorizontal: 10,
-  },
-  buttonText: {
-    color: "white", // Ensure text color is white
-    fontSize: 16,
-    fontWeight: "bold",
-  },
   keyAvoidContainer: {
     flex: 1,
   },

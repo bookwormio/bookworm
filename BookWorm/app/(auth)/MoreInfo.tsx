@@ -219,18 +219,6 @@ const styles = StyleSheet.create({
   subheader: {
     fontSize: 16,
   },
-  button: {
-    backgroundColor: "#FB6D0B",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
   keyAvoidContainer: {
     flex: 1,
   },
