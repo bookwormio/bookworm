@@ -360,10 +360,10 @@ const styles = StyleSheet.create({
   },
   buttoncontainer: {
     alignItems: "flex-end",
-    justifyContent: "center",
+    justifyContent: "space-between",
     paddingRight: 20,
-    width: "100%",
     flex: 1,
+    flexDirection: "column",
   },
   button: {
     paddingVertical: 2,
@@ -371,6 +371,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#FB6D0B",
+    marginBottom: 10,
   },
   buttonText: {
     color: "#FB6D0B",
