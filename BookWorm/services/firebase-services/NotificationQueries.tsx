@@ -109,7 +109,6 @@ export async function getAllFullNotifications(
       };
       notifdata.push(notif);
     }
-    console.log(notifdata);
     return notifdata;
   } catch (error) {
     console.error("Error getting all notifications: ", error);
