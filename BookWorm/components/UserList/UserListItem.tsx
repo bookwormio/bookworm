@@ -1,8 +1,8 @@
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type UserSearchDisplayModel } from "../../types";
+import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 
 interface UserListItemProps {
   user: UserSearchDisplayModel;
@@ -24,14 +24,10 @@ const UserListItem = ({ user, routePrefix }: UserListItemProps) => {
       }}
     >
       <View style={styles.imageContainer}>
-        <Image
-          source={
-            user.profilePicURL !== ""
-              ? user.profilePicURL
-              : require("../../assets/default_profile.png")
-          }
-          style={styles.image}
-          contentFit={"cover"}
+        <ProfilePicture
+          userID={user.id}
+          size={40}
+          overrideProfilePic={user.profilePicURL}
         />
       </View>
 

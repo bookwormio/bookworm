@@ -33,14 +33,6 @@ const AppLayout = () => {
     );
   }
 
-  const styles = StyleSheet.create({
-    newPost: {
-      alignItems: "center",
-      justifyContent: "center",
-      marginRight: 20,
-    },
-  });
-
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -52,29 +44,9 @@ const AppLayout = () => {
             name="(posts)"
             options={{
               tabBarLabel: "Posts",
-              headerTitle: "Posts",
+              headerShown: false,
               tabBarActiveTintColor: "#FB6D0B",
               tabBarInactiveTintColor: "grey",
-              headerRight: () => (
-                <TouchableOpacity style={styles.newPost} onPress={() => {}}>
-                  <FontAwesome5 name="bell" size={20} color="#FB6D0B" />
-                </TouchableOpacity>
-              ),
-              headerLeft: () => (
-                <View>
-                  {router.canGoBack() && (
-                    <TouchableOpacity
-                      style={{ paddingLeft: 20 }}
-                      disabled={!router.canGoBack()}
-                      onPress={() => {
-                        router.back();
-                      }}
-                    >
-                      <FontAwesome5 name="arrow-left" size={20} />
-                    </TouchableOpacity>
-                  )}
-                </View>
-              ),
               tabBarIcon: ({ size, color }) => (
                 <FontAwesome5 name="stream" size={size} color={color} />
               ),

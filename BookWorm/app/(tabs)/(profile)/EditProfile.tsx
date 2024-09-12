@@ -1,11 +1,9 @@
-import { FontAwesome5 } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -17,8 +15,9 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
+import BookWormButton from "../../../components/button/BookWormButton";
+import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
 import {
-  getUserProfileURL,
   newFetchUserInfo,
   updateUser,
 } from "../../../services/firebase-services/UserQueries";
@@ -33,7 +32,7 @@ const EditProfile = () => {
   const [editBio, setEditBio] = useState("");
   const [editCity, setEditCity] = useState("");
   const [editState, setEditState] = useState("");
-  const [image, setImage] = useState("");
+  const [newProfilePic, setNewProfilePic] = useState("");
   const [save, setSave] = useState("Save");
 
   const queryClient = useQueryClient();
@@ -95,22 +94,11 @@ const EditProfile = () => {
     }
   }, [userData]);
 
-  const { data: userIm } = useQuery({
-    queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
-    queryFn: async () => {
-      if (user != null) {
-        return await getUserProfileURL(user.uid);
-      } else {
-        return null;
-      }
-    },
-  });
-
   useEffect(() => {
-    if (userIm !== undefined && userIm !== null) {
-      setImage(userIm);
+    if (newProfilePic != null) {
+      setNewProfilePic(newProfilePic);
     }
-  }, [userIm]);
+  }, [newProfilePic]);
 
   const handeSaveClick = async () => {
     const userId = user?.uid;
@@ -122,8 +110,8 @@ const EditProfile = () => {
     newUserData.bio = editBio;
     newUserData.city = editCity;
     newUserData.state = editState;
-    if (image !== "" && image !== undefined && image !== null) {
-      newUserData.profilepic = image;
+    if (newProfilePic !== "" && newProfilePic != null) {
+      newUserData.profilepic = newProfilePic;
     }
     if (userId === undefined) {
       console.error("Current user undefined");
@@ -145,7 +133,7 @@ const EditProfile = () => {
       quality: 1,
     });
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setNewProfilePic(result.assets[0].uri);
     }
   };
 
@@ -176,11 +164,11 @@ const EditProfile = () => {
               });
             }}
           >
-            {image !== "" ? (
-              <Image source={{ uri: image }} style={styles.defaultImage} />
-            ) : (
-              <FontAwesome5 name="user" size={40} />
-            )}
+            <ProfilePicture
+              userID={user?.uid ?? ""}
+              size={100}
+              overrideProfilePic={newProfilePic}
+            />
           </TouchableOpacity>
           <View>
             <Text style={styles.regtext}>First Name</Text>
@@ -256,17 +244,18 @@ const EditProfile = () => {
             />
           </View>
           <View style={styles.outerButtonsContainer}>
-            <TouchableOpacity
-              style={styles.button}
+            <BookWormButton
+              // have to adjust marginHorizontal to make smaller buttons
+              title="Close"
               onPress={() => {
                 refreshMutation.mutate();
                 router.back();
               }}
-            >
-              <Text style={styles.buttonText}>{" Close "}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
+              style={{ marginHorizontal: 20 }}
+            />
+            <BookWormButton
+              // have to adjust marginHorizontal to make smaller buttons
+              title={save}
               onPress={() => {
                 setSave("Saving...");
                 handeSaveClick()
@@ -276,9 +265,8 @@ const EditProfile = () => {
                     setSave("Save");
                   });
               }}
-            >
-              <Text style={styles.buttonText}>{save}</Text>
-            </TouchableOpacity>
+              style={{ marginHorizontal: 20 }}
+            />
           </View>
         </View>
       </ScrollView>
@@ -298,21 +286,6 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
     fontSize: 16,
     marginLeft: 10,
-  },
-  button: {
-    backgroundColor: "#FB6D0B",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginVertical: 10,
-    width: "30%",
-    alignSelf: "center",
-    marginHorizontal: 10,
-  },
-  buttonText: {
-    color: "white", // Ensure text color is white
-    fontSize: 16,
-    fontWeight: "bold",
   },
   keyAvoidContainer: {
     flex: 1,
@@ -339,9 +312,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#d3d3d3",
     height: 100,
     width: 100,
-    borderColor: "black",
     borderRadius: 50,
-    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 40,
@@ -356,5 +327,6 @@ const styles = StyleSheet.create({
   outerButtonsContainer: {
     flexDirection: "row",
     justifyContent: "center",
+    padding: 10,
   },
 });

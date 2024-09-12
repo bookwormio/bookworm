@@ -1,15 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
+import BookWormButton from "../../../components/button/BookWormButton";
 import Post from "../../../components/post/post";
 import { usePostsContext } from "../../../components/post/PostsContext";
 import { POSTS_ROUTE_PREFIX } from "../../../constants/constants";
@@ -68,8 +63,8 @@ const ViewPost = () => {
           />
           {post?.user.id !== user?.uid && (
             <View style={styles.outerButtonsContainer}>
-              <TouchableOpacity
-                style={styles.button}
+              <BookWormButton
+                title="View Profile"
                 onPress={() => {
                   if (user != null) {
                     router.push({
@@ -79,9 +74,7 @@ const ViewPost = () => {
                     console.error("User DNE");
                   }
                 }}
-              >
-                <Text style={styles.buttonText}>{"View Profile"}</Text>
-              </TouchableOpacity>
+              />
             </View>
           )}
         </View>
@@ -106,20 +99,6 @@ const styles = StyleSheet.create({
   postContainer: {
     flex: 1,
     width: "100%",
-  },
-  button: {
-    backgroundColor: "#FB6D0B",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: "center",
-    marginVertical: 10,
-    marginHorizontal: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
   },
   outerButtonsContainer: {
     flexDirection: "row",

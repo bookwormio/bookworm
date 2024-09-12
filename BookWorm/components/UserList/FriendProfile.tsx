@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -9,18 +8,28 @@ import {
   View,
 } from "react-native";
 import {
+  useProfilePicQuery,
+  useUserDataQuery,
+} from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
+import { ServerNotificationType } from "../../enums/Enums";
+import {
   followUserByID,
   getIsFollowing,
   unfollowUserByID,
 } from "../../services/firebase-services/FriendQueries";
+import { createNotification } from "../../services/firebase-services/NotificationQueries";
 import {
   fetchFriendData,
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
-  getUserProfileURL,
 } from "../../services/firebase-services/UserQueries";
-import { type ConnectionModel, type UserDataModel } from "../../types";
+import {
+  type BasicNotificationModel,
+  type ConnectionModel,
+  type UserDataModel,
+} from "../../types";
 import { useAuth } from "../auth/context";
+import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 
 enum LocalFollowStatus {
   FOLLOWING = "following",
@@ -36,7 +45,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
-  const [image, setImage] = useState("");
   const { user } = useAuth();
   const [followStatus, setFollowStatus] = useState<string>(
     LocalFollowStatus.LOADING,
@@ -59,6 +67,16 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     },
     staleTime: 60000, // Set stale time to 1 minute
   });
+
+  // getting userdata
+  const { data: userData, isLoading: isLoadingUserData } = useUserDataQuery(
+    user ?? undefined,
+  );
+
+  // getting user profile pic
+  const { data: userIm, isLoading: isLoadingUserIm } = useProfilePicQuery(
+    user?.uid,
+  );
 
   const { data: isFollowingData } = useQuery({
     queryKey:
@@ -126,6 +144,15 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     },
   });
 
+  const notifyMutation = useMutation({
+    mutationFn: createNotification,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["notifications", friendUserID],
+      });
+    },
+  });
+
   useEffect(() => {
     if (user?.uid !== undefined && friendUserID !== undefined) {
       if (isFollowingData !== null && isFollowingData !== undefined) {
@@ -153,24 +180,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       }
     }
   }, [friendData]);
-
-  const { data: friendIm, isLoading: isLoadingIm } = useQuery({
-    queryKey:
-      friendUserID != null ? ["profilepic", friendUserID] : ["profilepic"],
-    queryFn: async () => {
-      if (friendUserID != null && friendUserID !== "") {
-        return await getUserProfileURL(friendUserID);
-      } else {
-        return null;
-      }
-    },
-  });
-
-  useEffect(() => {
-    if (friendIm !== undefined && friendIm !== null) {
-      setImage(friendIm);
-    }
-  }, [friendIm]);
 
   const handleFollowButtonPressed = () => {
     if (followStatus === LocalFollowStatus.LOADING) {
@@ -202,6 +211,19 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         friendUserID,
       };
       followMutation.mutate(connection);
+      if (user !== undefined && user !== null) {
+        const uData = userData as UserDataModel;
+        const FRnotify: BasicNotificationModel = {
+          receiver: friendUserID,
+          sender: user?.uid,
+          sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+          sender_img: userIm ?? "",
+          comment: "",
+          postID: "",
+          type: ServerNotificationType.FRIEND_REQUEST,
+        };
+        notifyMutation.mutate(FRnotify);
+      }
     } catch (error) {
       setFollowStatus("not following");
       console.error("Error occurred while following user:", error);
@@ -231,7 +253,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     }
   };
 
-  if (friendIsLoading || isLoadingIm) {
+  if (friendIsLoading || isLoadingUserData || isLoadingUserIm) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />
@@ -243,14 +265,8 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     <View>
       <View style={styles.buttonwrapper}></View>
       <View style={styles.imageTextContainer}>
-        <View style={styles.defaultImageContainer}>
-          <Image
-            source={
-              image !== "" ? image : require("../../assets/default_profile.png")
-            }
-            style={styles.defaultImage}
-            cachePolicy={"memory-disk"}
-          />
+        <View style={styles.profilePicContainer}>
+          <ProfilePicture userID={friendUserID} size={60} />
         </View>
         <View>
           <Text style={styles.nameText}>
@@ -355,22 +371,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     alignItems: "flex-start",
   },
-  defaultImageContainer: {
-    backgroundColor: "#d3d3d3",
-    height: 60,
-    width: 60,
-    borderColor: "black",
-    borderRadius: 50,
-    borderWidth: 1,
+  profilePicContainer: {
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
     alignSelf: "flex-start",
     marginLeft: 5,
-  },
-  defaultImage: {
-    height: 60, // Adjust the size of the image as needed
-    width: 60, // Adjust the size of the image as needed
-    borderRadius: 50, // Make the image circular
   },
 });

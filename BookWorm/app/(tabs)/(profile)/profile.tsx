@@ -1,6 +1,4 @@
-import { FontAwesome5 } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -8,12 +6,13 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
+import BookWormButton from "../../../components/button/BookWormButton";
 import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBookShelves";
 import ViewData from "../../../components/profile/Data/ViewData";
+import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
 import ProfilePosts from "../../../components/profile/ProfilePosts";
 import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
 import {
@@ -22,17 +21,14 @@ import {
   getNumberOfFollowingByUserID,
 } from "../../../services/firebase-services/UserQueries";
 import { type UserDataModel } from "../../../types";
-import { useProfilePicQuery } from "./hooks/useProfileQueries";
 
 const Profile = () => {
-  // const navigation = useNavigation();
   const { signOut, user } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
-  const [image, setImage] = useState("");
   const [profileTab, setProfileTab] = useState("shelf"); // Default to bookshelf
 
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
@@ -47,8 +43,6 @@ const Profile = () => {
       }
     },
   });
-
-  const { data: userIm } = useProfilePicQuery(user?.uid);
 
   const { data: followersCount } = useQuery({
     queryKey: user != null ? ["followersdata", user.uid] : ["followersdata"],
@@ -73,12 +67,6 @@ const Profile = () => {
       }
     },
   });
-
-  useEffect(() => {
-    if (userIm !== undefined && userIm !== null) {
-      setImage(userIm);
-    }
-  }, [userIm]);
 
   useEffect(() => {
     if (userData !== undefined && userData != null) {
@@ -113,14 +101,7 @@ const Profile = () => {
     <ScrollView stickyHeaderIndices={[4]} style={styles.scrollContainer}>
       <View style={styles.imageTextContainer}>
         <View style={styles.defaultImageContainer}>
-          {
-            // TODO: use a default profile pic
-            image !== "" ? (
-              <Image style={styles.defaultImage} source={{ uri: image }} />
-            ) : (
-              <FontAwesome5 name="user" size={40} />
-            )
-          }
+          <ProfilePicture userID={user?.uid ?? ""} size={60} />
         </View>
         <View>
           <Text style={styles.nameText}>
@@ -147,8 +128,8 @@ const Profile = () => {
         </View>
       </View>
       <View style={styles.outerButtonsContainer}>
-        <TouchableOpacity
-          style={styles.button}
+        <BookWormButton
+          title="Edit Profile"
           onPress={() => {
             if (user != null) {
               router.push({
@@ -158,12 +139,8 @@ const Profile = () => {
               console.error("User DNE");
             }
           }}
-        >
-          <Text style={styles.buttonText}>{"Edit Profile"}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={signOut}>
-          <Text style={styles.buttonText}>{"Log Out"}</Text>
-        </TouchableOpacity>
+        />
+        <BookWormButton title="Log Out" onPress={signOut} />
       </View>
       <ProfileTabSelector
         profileTab={profileTab}
@@ -191,20 +168,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     paddingHorizontal: 2,
-  },
-  button: {
-    backgroundColor: "#FB6D0B",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginVertical: 10,
-    marginHorizontal: 10,
-    flex: 1,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
   },
   main: {
     flex: 1,
@@ -253,27 +216,11 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   defaultImageContainer: {
-    backgroundColor: "#d3d3d3",
-    height: 60,
-    width: 60,
-    borderColor: "black",
     borderRadius: 50,
-    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
     alignSelf: "flex-start",
     marginLeft: 5,
-  },
-  defaultImage: {
-    height: 60, // Adjust the size of the image as needed
-    width: 60, // Adjust the size of the image as needed
-    borderRadius: 50, // Make the image circular
-  },
-  image: {
-    width: 200,
-    height: 200,
-    resizeMode: "cover",
-    borderRadius: 100, // Make it circular for profile picture
   },
 });

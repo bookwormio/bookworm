@@ -21,6 +21,7 @@ import {
   useSetBookmarkForBook,
 } from "../../../components/bookmark/hooks/useBookmarkQueries";
 import BookDropdownSelect from "../../../components/bookselect/BookDropdownSelect";
+import BookWormButton from "../../../components/button/BookWormButton";
 import { createPost } from "../../../services/firebase-services/PostQueries";
 import { type CreatePostModel, type FlatBookItemModel } from "../../../types";
 
@@ -48,7 +49,7 @@ const NewPost = () => {
   const [currentBookmark, setCurrentBookmark] = useState(0);
 
   useEffect(() => {
-    setCurrentBookmark(isBookmarkLoadedSuccess ? oldBookmark ?? 0 : 0);
+    setCurrentBookmark(isBookmarkLoadedSuccess ? (oldBookmark ?? 0) : 0);
   }, [isBookmarkLoadedSuccess, oldBookmark, selectedBook]);
 
   useEffect(() => {
@@ -66,7 +67,11 @@ const NewPost = () => {
         bookid: selectedBook !== null ? selectedBook.id : "",
         booktitle: selectedBook !== null ? selectedBook.title : "",
         text,
-        images,
+        images:
+          // Append book image to the images array if it exists
+          selectedBook?.image != null
+            ? [selectedBook.image, ...images]
+            : images,
         oldBookmark,
         newBookmark: currentBookmark,
         totalPages: selectedBook?.pageCount ?? 0,
@@ -246,20 +251,11 @@ const NewPost = () => {
         </TouchableOpacity>
       </ScrollView>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.button, shareDisabled && styles.buttonDisabled]}
+        <BookWormButton
+          title="Share!"
           onPress={handleShareClicked}
           disabled={shareDisabled}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              shareDisabled && styles.buttonTextDisabled,
-            ]}
-          >
-            Share!
-          </Text>
-        </TouchableOpacity>
+        />
       </View>
       <Toast />
     </View>
@@ -349,19 +345,8 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
   },
-  button: {
-    backgroundColor: "#FB6D0B",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-  },
   buttonDisabled: {
     backgroundColor: "rgba(251, 109, 11, 0.5)", // 50% opacity of original color
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "white",
   },
   buttonTextDisabled: {
     color: "rgba(255, 255, 255, 0.7)", // 70% opacity white

@@ -1,15 +1,9 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, TextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
+import BookWormButton from "../../components/button/BookWormButton";
 
 const CreateAccount = () => {
   const [email, setEmail] = useState("");
@@ -116,8 +110,8 @@ const CreateAccount = () => {
             }
           }}
         />
-        <TouchableOpacity
-          style={styles.button}
+        <BookWormButton
+          title="Create Account"
           onPress={() => {
             if (validFields()) {
               try {
@@ -129,9 +123,7 @@ const CreateAccount = () => {
               }
             }
           }}
-        >
-          <Text style={styles.buttonText}>{"Create Account"}</Text>
-        </TouchableOpacity>
+        />
       </View>
       <Toast />
     </ScrollView>
@@ -141,18 +133,6 @@ const CreateAccount = () => {
 export default CreateAccount;
 
 const styles = StyleSheet.create({
-  button: {
-    backgroundColor: "#FB6D0B",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
   keyAvoidContainer: {
     flex: 1,
   },
