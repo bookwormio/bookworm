@@ -25,8 +25,8 @@ import {
   getNumberOfFollowingByUserID,
 } from "../../services/firebase-services/UserQueries";
 import {
-  type BasicNotificationModel,
   type ConnectionModel,
+  type FriendRequestNotification,
   type UserDataModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
@@ -214,16 +214,11 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       followMutation.mutate(connection);
       if (user !== undefined && user !== null) {
         const uData = userData as UserDataModel;
-        const FRnotify: BasicNotificationModel = {
+        const FRnotify: FriendRequestNotification = {
           receiver: friendUserID,
           sender: user?.uid,
           sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
           sender_img: userIm ?? "",
-          comment: "",
-          postID: "",
-          bookID: "",
-          bookTitle: "",
-          custom_message: "",
           type: ServerNotificationType.FRIEND_REQUEST,
         };
         notifyMutation.mutate(FRnotify);

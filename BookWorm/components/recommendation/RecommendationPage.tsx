@@ -9,8 +9,8 @@ import {
 import { ServerNotificationType } from "../../enums/Enums";
 import { createNotification } from "../../services/firebase-services/NotificationQueries";
 import {
-  type BasicNotificationModel,
   type BookVolumeInfo,
+  type RecommendationNotification,
   type UserDataModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
@@ -54,13 +54,11 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
     // send book title and bookID
     if (user !== undefined && user !== null) {
       const uData = userData as UserDataModel;
-      const FRnotify: BasicNotificationModel = {
+      const FRnotify: RecommendationNotification = {
         receiver: friendUserID,
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
         sender_img: userIm ?? "",
-        comment: "",
-        postID: "",
         bookID,
         bookTitle: volumeInfo.title,
         custom_message: message ?? "",

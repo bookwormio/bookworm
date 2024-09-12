@@ -8,15 +8,9 @@ import {
   type Timestamp,
   where,
 } from "firebase/firestore";
-import {
-  NotificationMessageMap,
-  ServerNotificationType,
-} from "../../enums/Enums";
+import { ServerNotificationType } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
-import {
-  type BasicNotificationModel,
-  type FullNotificationModel,
-} from "../../types";
+import { type FullNotificationModel, type Notification } from "../../types";
 
 /**
  * Adds a notification to the notifications collection for that user.
@@ -24,7 +18,7 @@ import {
  * @returns {Promise<boolean>} A promise that resolves to true if the notification was successfully created, false otherwise.
  */
 export async function createNotification(
-  notif: BasicNotificationModel,
+  notif: Notification,
 ): Promise<boolean> {
   if (notif.receiver == null) {
     console.log("User does not exist");
@@ -51,27 +45,25 @@ export async function createNotification(
 
     await addDoc(notificationsRef, {
       receiver: notif.receiver,
-      message: NotificationMessageMap[notif.type],
-      comment: notif.comment,
       sender: notif.sender,
       sender_name: notif.sender_name,
       sender_img: notif.sender_img,
       created: serverTimestamp(),
+      // haven't implement read_at yet
       read_at: null,
-      postID:
-        notif.type === ServerNotificationType.LIKE ||
-        notif.type === ServerNotificationType.COMMENT
-          ? notif.postID
-          : null,
-      bookID:
-        notif.type === ServerNotificationType.RECOMMENDATION
-          ? notif.bookID
-          : null,
-      bookTitle:
-        notif.type === ServerNotificationType.RECOMMENDATION
-          ? notif.bookTitle
-          : null,
-      custom_message: notif.custom_message,
+      /// ... used to conditionally add fields to an object
+      ...(notif.type === ServerNotificationType.LIKE && {
+        postID: notif.postID,
+      }),
+      ...(notif.type === ServerNotificationType.COMMENT && {
+        postID: notif.postID,
+        comment: notif.comment,
+      }),
+      ...(notif.type === ServerNotificationType.RECOMMENDATION && {
+        bookID: notif.bookID,
+        bookTitle: notif.bookTitle,
+        custom_message: notif.custom_message ?? "",
+      }),
       type: notif.type,
     });
 
@@ -103,7 +95,6 @@ export async function getAllFullNotifications(
     for (const notifDoc of querySnap.docs) {
       const notif = {
         receiver: notifDoc.data().receiver,
-        message: notifDoc.data().message,
         comment: notifDoc.data().comment,
         sender: notifDoc.data().sender,
         sender_name: notifDoc.data().sender_name,
@@ -118,6 +109,7 @@ export async function getAllFullNotifications(
       };
       notifdata.push(notif);
     }
+    console.log(notifdata);
     return notifdata;
   } catch (error) {
     console.error("Error getting all notifications: ", error);

@@ -17,8 +17,9 @@ import {
 } from "../../services/firebase-services/PostQueries";
 import { fetchUser } from "../../services/firebase-services/UserQueries";
 import {
-  type BasicNotificationModel,
   type CommentModel,
+  type CommentNotification,
+  type LikeNotification,
   type PostModel,
   type UserDataModel,
 } from "../../types";
@@ -90,17 +91,14 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
     const postToUpdate = posts.find((post) => post.id === postID);
     const uData = userData as UserDataModel;
     if (postToUpdate !== undefined && user?.uid !== undefined) {
-      const BNotify: BasicNotificationModel = {
+      const BNotify: CommentNotification = {
         receiver: postToUpdate.user.id,
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
         sender_img: userIm ?? "",
-        comment,
-        postID,
-        bookID: "",
-        bookTitle: "",
-        custom_message: "",
         type: ServerNotificationType.COMMENT,
+        postID,
+        comment,
       };
       commentNotifyMutation.mutate(BNotify);
     }
@@ -111,16 +109,12 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
     const postToUpdate = posts.find((post) => post.id === postID);
     const uData = userData as UserDataModel;
     if (postToUpdate !== undefined && user?.uid !== undefined) {
-      const BNotify: BasicNotificationModel = {
+      const BNotify: LikeNotification = {
         receiver: postToUpdate.user.id,
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
         sender_img: userIm ?? "",
-        comment: "",
         postID,
-        bookID: "",
-        bookTitle: "",
-        custom_message: "",
         type: ServerNotificationType.LIKE,
       };
       likeNotifyMutation.mutate(BNotify);
