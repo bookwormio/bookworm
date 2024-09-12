@@ -100,21 +100,21 @@ export async function getAllFullNotifications(
 
     const querySnap = await getDocs(q);
 
-    for (const notDoc of querySnap.docs) {
+    for (const notifDoc of querySnap.docs) {
       const notif = {
-        receiver: notDoc.data().receiver,
-        message: notDoc.data().message,
-        comment: notDoc.data().comment,
-        sender: notDoc.data().sender,
-        sender_name: notDoc.data().sender_name,
-        sender_img: notDoc.data().sender_img,
-        created: notDoc.data().created as Timestamp,
-        read_at: notDoc.data().read_at,
-        postID: notDoc.data().postID,
-        bookID: notDoc.data().bookID,
-        bookTitle: notDoc.data().bookTitle,
-        custom_message: notDoc.data().custom_message,
-        type: notDoc.data().type,
+        receiver: notifDoc.data().receiver,
+        message: notifDoc.data().message,
+        comment: notifDoc.data().comment,
+        sender: notifDoc.data().sender,
+        sender_name: notifDoc.data().sender_name,
+        sender_img: notifDoc.data().sender_img,
+        created: notifDoc.data().created as Timestamp,
+        read_at: notifDoc.data().read_at,
+        postID: notifDoc.data().postID,
+        bookID: notifDoc.data().bookID,
+        bookTitle: notifDoc.data().bookTitle,
+        custom_message: notifDoc.data().custom_message,
+        type: notifDoc.data().type,
       };
       notifdata.push(notif);
     }
