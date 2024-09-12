@@ -1,118 +1,40 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import {
-  useProfilePicQuery,
-  useUserDataQuery,
-} from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
-import { ServerNotificationType } from "../../enums/Enums";
-import { createNotification } from "../../services/firebase-services/NotificationQueries";
-import {
-  type BasicNotificationModel,
-  type BookVolumeInfo,
-  type UserDataModel,
-} from "../../types";
-import { useAuth } from "../auth/context";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { type BookVolumeInfo } from "../../types";
 
 interface BookListItemProps {
   bookID: string;
   volumeInfo: BookVolumeInfo;
-  friendUserID?: string;
+  handleBookClickOverride?: (
+    bookID: string,
+    volumeInfo: BookVolumeInfo,
+  ) => void;
 }
 
 const BookListItem = ({
   bookID,
   volumeInfo,
-  friendUserID,
+  handleBookClickOverride,
 }: BookListItemProps) => {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-
-  // getting userdata
-  const { data: userData } = useUserDataQuery(user ?? undefined);
-
-  // getting user profile pic
-  const { data: userIm } = useProfilePicQuery(user?.uid);
-
-  const notifyMutation = useMutation({
-    mutationFn: createNotification,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["notifications", friendUserID],
-      });
-    },
-  });
-
   const handleClick = ({ bookID }: { bookID: string }) => {
     router.push({
       pathname: `/searchbook/${bookID}`,
     });
   };
 
-  const handleRecommendation = ({
-    bookID,
-    friendUserID,
-    message,
-  }: {
-    bookID: string;
-    friendUserID: string;
-    message?: string;
-  }) => {
-    // send book title and bookID
-    if (user !== undefined && user !== null) {
-      const uData = userData as UserDataModel;
-      const FRnotify: BasicNotificationModel = {
-        receiver: friendUserID,
-        sender: user?.uid,
-        sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
-        sender_img: userIm ?? "",
-        comment: "",
-        postID: "",
-        bookID,
-        bookTitle: volumeInfo.title,
-        custom_message: message ?? "",
-        type: ServerNotificationType.RECOMMENDATION,
-      };
-      notifyMutation.mutate(FRnotify);
-    }
-    router.back();
-  };
-
   return (
     <TouchableOpacity
       style={styles.container}
       onPress={() => {
-        if (friendUserID === null || friendUserID === undefined) {
-          handleClick({ bookID });
+        if (
+          handleBookClickOverride !== null &&
+          handleBookClickOverride !== undefined
+        ) {
+          handleBookClickOverride(bookID, volumeInfo);
         } else {
-          Alert.prompt(
-            "Send Book Recommendation",
-            "Include a custom message (Optional)",
-            [
-              {
-                text: "Cancel",
-                onPress: () => {},
-                style: "cancel",
-              },
-              {
-                text: "Send",
-                onPress: (message) => {
-                  if (message === "") {
-                    handleRecommendation({ bookID, friendUserID });
-                  } else {
-                    handleRecommendation({
-                      bookID,
-                      friendUserID,
-                      message,
-                    });
-                  }
-                },
-              },
-            ],
-            "plain-text",
-          );
+          handleClick({ bookID });
         }
       }}
     >
