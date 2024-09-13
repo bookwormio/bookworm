@@ -229,4 +229,4 @@ type Notification =
   | FriendRequestNotification
   | LikeNotification
   | CommentNotification
-  | RecommendationNotificatio;
+  | RecommendationNotification;
