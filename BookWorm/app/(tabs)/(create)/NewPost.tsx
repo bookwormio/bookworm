@@ -49,7 +49,7 @@ const NewPost = () => {
   const [currentBookmark, setCurrentBookmark] = useState(0);
 
   useEffect(() => {
-    setCurrentBookmark(isBookmarkLoadedSuccess ? (oldBookmark ?? 0) : 0);
+    setCurrentBookmark(isBookmarkLoadedSuccess ? oldBookmark ?? 0 : 0);
   }, [isBookmarkLoadedSuccess, oldBookmark, selectedBook]);
 
   useEffect(() => {
@@ -166,23 +166,40 @@ const NewPost = () => {
         />
       </View>
       {selectedBook?.pageCount != null && !bookmarkLoading && (
-        <>
+        <View style={styles.bookmarkContainer}>
           <Text style={styles.bookmark}>Bookmark</Text>
-          <Slider
-            containerStyle={styles.sliderContainer}
-            value={[currentBookmark]}
-            onValueChange={(value: number[]) => {
-              setCurrentBookmark(value[0]);
-            }}
-            minimumValue={0}
-            maximumValue={selectedBook.pageCount}
-            renderThumbComponent={() => (
-              <BookmarkSliderThumb currentBookmark={currentBookmark} />
-            )}
-            step={1}
-            minimumTrackTintColor="#FB6D0B"
-          />
-        </>
+          <View style={styles.sliderRow}>
+            <TouchableOpacity
+              style={styles.undoButton}
+              onPress={() => {
+                setCurrentBookmark(oldBookmark ?? 0);
+              }}
+              disabled={oldBookmark === currentBookmark}
+            >
+              <FontAwesome5
+                name="undo"
+                size={20}
+                color={oldBookmark === currentBookmark ? "#BDBDBD" : "black"}
+              />
+            </TouchableOpacity>
+            <View style={styles.margin}>
+              <Slider
+                containerStyle={styles.sliderContainer}
+                value={[currentBookmark]}
+                onValueChange={(value: number[]) => {
+                  setCurrentBookmark(value[0]);
+                }}
+                minimumValue={0}
+                maximumValue={selectedBook.pageCount}
+                renderThumbComponent={() => (
+                  <BookmarkSliderThumb currentBookmark={currentBookmark} />
+                )}
+                step={1}
+                minimumTrackTintColor="#FB6D0B"
+              />
+            </View>
+          </View>
+        </View>
       )}
 
       <View style={styles.textInputWrapper}>
@@ -393,6 +410,25 @@ const styles = StyleSheet.create({
   },
   textInputDividerFocused: {
     backgroundColor: "#000000",
+  },
+  bookmarkContainer: {
+    marginBottom: 20,
+  },
+  sliderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  undoButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+  margin: {
+    flexGrow: 1,
   },
 });
 
