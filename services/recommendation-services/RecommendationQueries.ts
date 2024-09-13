@@ -25,3 +25,24 @@ export async function sendPing() {
 }
 
 // TODO: can fill in other API functions here
+/**
+ * Sends book information to be stored in the database
+ * @returns None
+ */
+export async function sendBookInfo(book_dict: {}) {
+  try {
+    const response = await fetch(`${apiUrl}/vectorize_book`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(book_dict) // Convert the book_dict object to a JSON string
+    });
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error sending book info", error);
+    return null;
+  }
+}
+
