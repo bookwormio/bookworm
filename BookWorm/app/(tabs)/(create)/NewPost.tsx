@@ -164,7 +164,6 @@ const NewPost = () => {
           setSearchPhrase={setSearchPhrase}
         />
       </View>
-      {/* TODO: put this in its own component */}
       {selectedBook?.pageCount != null &&
         selectedBook.pageCount > 0 &&
         !bookmarkLoading && (
