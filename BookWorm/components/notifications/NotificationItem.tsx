@@ -2,7 +2,11 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { NotificationTypeMap, ServerNotificationType } from "../../enums/Enums";
+import {
+  NotificationMessageMap,
+  NotificationTypeMap,
+  ServerNotificationType,
+} from "../../enums/Enums";
 import { type FullNotificationModel } from "../../types";
 import { calculateTimeSinceNotification } from "./util/notificationUtils";
 
@@ -33,6 +37,10 @@ const NotificationItem = ({ notif }: NotifProp) => {
           router.push({
             pathname: `/postsbook/${notif.bookID}`,
           });
+        } else if (notif.type === ServerNotificationType.RECOMMENDATION) {
+          router.push({
+            pathname: `/postsbook/${notif.bookID}`,
+          });
         }
       }}
     >
@@ -54,14 +62,16 @@ const NotificationItem = ({ notif }: NotifProp) => {
             <Text style={{ fontWeight: "bold" }}>{notif.sender_name}</Text>
             <Text>
               {" "}
-              {notif.message}
+              {NotificationMessageMap[notif.type]}
               {notif.type === ServerNotificationType.COMMENT
                 ? " " + notif.comment
                 : ""}
               {notif.type === ServerNotificationType.RECOMMENDATION
                 ? " " + notif.bookTitle
                 : ""}
-              {notif.custom_message !== "" ? " - " + notif.custom_message : ""}{" "}
+              {notif.custom_message != null && notif.custom_message !== ""
+                ? " - " + notif.custom_message
+                : ""}{" "}
             </Text>
             <Text style={{ color: "grey" }}>{time}</Text>
           </Text>

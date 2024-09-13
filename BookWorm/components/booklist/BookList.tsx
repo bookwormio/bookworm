@@ -1,14 +1,17 @@
 import React from "react";
 import { View } from "react-native";
-import { type BookVolumeItem } from "../../types";
+import { type BookVolumeInfo, type BookVolumeItem } from "../../types";
 import BookListItem from "./BookListItem";
 
 interface BookListProps {
   volumes: BookVolumeItem[];
-  friendUserID?: string;
+  handleBookClickOverride?: (
+    bookID: string,
+    volumeInfo: BookVolumeInfo,
+  ) => void;
 }
 
-const BookList = ({ volumes, friendUserID }: BookListProps) => {
+const BookList = ({ volumes, handleBookClickOverride }: BookListProps) => {
   return (
     <View>
       {/* TODO: potentially need to modify this key assignment */}
@@ -17,7 +20,7 @@ const BookList = ({ volumes, friendUserID }: BookListProps) => {
           key={index}
           bookID={value.id}
           volumeInfo={value.volumeInfo}
-          friendUserID={friendUserID}
+          handleBookClickOverride={handleBookClickOverride}
         ></BookListItem>
       ))}
     </View>

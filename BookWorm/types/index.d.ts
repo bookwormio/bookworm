@@ -186,17 +186,10 @@ interface BasicNotificationModel {
   sender: string;
   sender_name: string;
   sender_img: string;
-  comment: string;
-  postID: string;
-  bookID: string;
-  bookTitle: string;
-  custom_message: string;
-  type: ServerNotificationType;
 }
 
 interface FullNotificationModel {
   receiver: string;
-  message: string;
   comment: string;
   sender: string;
   sender_name: string;
@@ -209,3 +202,31 @@ interface FullNotificationModel {
   custom_message: string;
   type: ServerNotificationType;
 }
+
+interface FriendRequestNotification extends BasicNotificationModel {
+  type: ServerNotificationType.FRIEND_REQUEST;
+}
+
+interface LikeNotification extends BasicNotificationModel {
+  type: ServerNotificationType.LIKE;
+  postID: string;
+}
+
+interface CommentNotification extends BasicNotificationModel {
+  type: ServerNotificationType.COMMENT;
+  postID: string;
+  comment: string;
+}
+
+interface RecommendationNotification extends BasicNotificationModel {
+  type: ServerNotificationType.RECOMMENDATION;
+  bookID: string;
+  bookTitle: string;
+  custom_message: string;
+}
+
+type Notification =
+  | FriendRequestNotification
+  | LikeNotification
+  | CommentNotification
+  | RecommendationNotification;
