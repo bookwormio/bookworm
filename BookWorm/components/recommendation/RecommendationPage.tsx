@@ -16,10 +16,11 @@ import {
 import { useAuth } from "../auth/context";
 import BookSearch from "../searchbar/booksearch";
 
-interface FriendIDProp {
+interface RecommendationPageProps {
   friendUserID: string;
 }
-const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
+
+const RecommendationPage = ({ friendUserID }: RecommendationPageProps) => {
   const [searchPhrase, setSearchPhrase] = useState("");
   const setParentSearchPhrase = (search: string) => {
     setSearchPhrase(search);
@@ -52,7 +53,7 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
     message?: string;
   }) => {
     // send book title and bookID
-    if (user !== undefined && user !== null) {
+    if (user != null) {
       const uData = userData as UserDataModel;
       const FRnotify: RecommendationNotification = {
         receiver: friendUserID,
@@ -69,7 +70,7 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
     router.back();
   };
 
-  const handleBookClickOverride = (
+  const handleRecommendationClicked = (
     bookID: string,
     volumeInfo: BookVolumeInfo,
   ) => {
@@ -106,7 +107,7 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
       <BookSearch
         searchPhrase={searchPhrase}
         setSearchPhrase={setParentSearchPhrase}
-        handleBookClickOverride={handleBookClickOverride}
+        handleBookClickOverride={handleRecommendationClicked}
       />
     </View>
   );

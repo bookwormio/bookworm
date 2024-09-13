@@ -65,7 +65,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
               {notif.type === ServerNotificationType.RECOMMENDATION
                 ? " " + notif.bookTitle
                 : ""}
-              {notif.custom_message !== "" && notif.custom_message !== undefined
+              {notif.custom_message != null && notif.custom_message !== ""
                 ? " - " + notif.custom_message
                 : ""}{" "}
             </Text>

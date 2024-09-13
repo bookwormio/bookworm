@@ -28,10 +28,7 @@ const BookListItem = ({
     <TouchableOpacity
       style={styles.container}
       onPress={() => {
-        if (
-          handleBookClickOverride !== null &&
-          handleBookClickOverride !== undefined
-        ) {
+        if (handleBookClickOverride != null) {
           handleBookClickOverride(bookID, volumeInfo);
         } else {
           handleClick({ bookID });

@@ -36,11 +36,11 @@ import {
   useRemoveBookFromShelf,
 } from "../profile/hooks/useBookshelfQueries";
 
-interface BookViewProps {
+interface BookViewPageProps {
   bookID: string;
 }
 
-const BookViewPage = ({ bookID }: BookViewProps) => {
+const BookViewPage = ({ bookID }: BookViewPageProps) => {
   const { user } = useAuth();
   const [bookData, setBookData] = useState<BookVolumeInfo | null>(null);
   const [selectedShelves, setSelectedShelves] = useState<ServerBookShelfName[]>(
