@@ -67,6 +67,7 @@ export async function createNotification(
       type: notif.type,
     });
 
+    console.log("added notification");
     return true;
   } catch (error) {
     console.error("Error creating notification:", error);
