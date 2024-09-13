@@ -1,6 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 
-import { Slider } from "@miblanchard/react-native-slider";
 import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
@@ -9,13 +8,13 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
+import BookmarkSlider from "../../../components/bookmark/hooks/BookmarkSlider";
 import {
   useGetBookmarkForBook,
   useSetBookmarkForBook,
@@ -166,42 +165,16 @@ const NewPost = () => {
         />
       </View>
       {/* TODO: put this in its own component */}
-      {selectedBook?.pageCount != null && !bookmarkLoading && (
-        <View style={styles.bookmarkContainer}>
-          <Text style={styles.bookmark}>Bookmark</Text>
-          <View style={styles.sliderRow}>
-            <TouchableOpacity
-              style={styles.undoButton}
-              onPress={() => {
-                setCurrentBookmark(oldBookmark ?? 0);
-              }}
-              disabled={oldBookmark === currentBookmark}
-            >
-              <FontAwesome5
-                name="undo"
-                size={20}
-                color={oldBookmark === currentBookmark ? "#BDBDBD" : "black"}
-              />
-            </TouchableOpacity>
-            <View style={styles.margin}>
-              <Slider
-                containerStyle={styles.sliderContainer}
-                value={[currentBookmark]}
-                onValueChange={(value: number[]) => {
-                  setCurrentBookmark(value[0]);
-                }}
-                minimumValue={0}
-                maximumValue={selectedBook.pageCount}
-                renderThumbComponent={() => (
-                  <BookmarkSliderThumb currentBookmark={currentBookmark} />
-                )}
-                step={1}
-                minimumTrackTintColor="#FB6D0B"
-              />
-            </View>
-          </View>
-        </View>
-      )}
+      {selectedBook?.pageCount != null &&
+        selectedBook.pageCount > 0 &&
+        !bookmarkLoading && (
+          <BookmarkSlider
+            oldBookmark={oldBookmark ?? 0}
+            currentBookmark={currentBookmark}
+            setCurrentBookmark={setCurrentBookmark}
+            pageCount={selectedBook.pageCount}
+          ></BookmarkSlider>
+        )}
 
       <View style={styles.textInputWrapper}>
         <View
@@ -280,18 +253,6 @@ const NewPost = () => {
   );
 };
 
-interface BookmarkSliderThumbProps {
-  currentBookmark: number;
-}
-
-const BookmarkSliderThumb = ({ currentBookmark }: BookmarkSliderThumbProps) => {
-  return (
-    <View style={styles.sliderThumbContainer}>
-      <Text>{currentBookmark}</Text>
-    </View>
-  );
-};
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -300,11 +261,6 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     paddingBottom: 20,
-  },
-  bookmark: {
-    fontSize: 16,
-    marginBottom: 10,
-    fontWeight: "bold",
   },
   slider: {
     marginBottom: 20,
@@ -369,21 +325,6 @@ const styles = StyleSheet.create({
   buttonTextDisabled: {
     color: "rgba(255, 255, 255, 0.7)", // 70% opacity white
   },
-  sliderContainer: {
-    width: "100%",
-    height: 20,
-    alignSelf: "flex-start",
-    paddingVertical: 30,
-  },
-  sliderThumbContainer: {
-    alignItems: "center",
-    backgroundColor: "#F2F2F2",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-    borderColor: "grey",
-  },
   loading: {
     alignItems: "center",
     justifyContent: "center",
@@ -411,25 +352,6 @@ const styles = StyleSheet.create({
   },
   textInputDividerFocused: {
     backgroundColor: "#000000",
-  },
-  bookmarkContainer: {
-    marginBottom: 20,
-  },
-  sliderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  undoButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 10,
-  },
-  margin: {
-    flexGrow: 1,
   },
 });
 
