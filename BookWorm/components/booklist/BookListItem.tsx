@@ -2,12 +2,7 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { ServerNotificationType } from "../../enums/Enums";
-import {
-  type BasicNotificationModel,
-  type BookVolumeInfo,
-  type UserDataModel,
-} from "../../types";
+import { type BookVolumeInfo } from "../../types";
 
 interface BookListItemProps {
   bookID: string;
@@ -27,35 +22,6 @@ const BookListItem = ({
     router.push({
       pathname: `/searchbook/${bookID}`,
     });
-  };
-
-  const handleRecommendation = ({
-    bookID,
-    friendUserID,
-    message,
-  }: {
-    bookID: string;
-    friendUserID: string;
-    message?: string;
-  }) => {
-    // send book title and bookID
-    if (user !== undefined && user !== null) {
-      const uData = userData as UserDataModel;
-      const FRnotify: BasicNotificationModel = {
-        receiver: friendUserID,
-        sender: user?.uid,
-        sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
-        sender_img: userIm ?? "",
-        comment: "",
-        postID: "",
-        bookID,
-        bookTitle: volumeInfo.title,
-        custom_message: message ?? "",
-        type: ServerNotificationType.RECOMMENDATION,
-      };
-      notifyMutation.mutate(FRnotify);
-    }
-    router.back();
   };
 
   return (
