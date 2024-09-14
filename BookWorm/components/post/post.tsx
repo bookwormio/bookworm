@@ -71,15 +71,17 @@ const Post = ({
           <Text style={styles.time}>{formattedDate}</Text>
         </View>
       </View>
-      {pagesObject != null && pagesRead != null && (
-        <PagesProgressBar
-          oldBookmark={pagesObject.oldBookmark}
-          newBookmark={pagesObject.newBookmark}
-          totalPages={pagesObject.totalPages}
-          pagesRead={pagesRead}
-          isBackwards={isBackwards}
-        />
-      )}
+      {pagesObject != null &&
+        pagesRead != null &&
+        pagesObject.totalPages > 0 && (
+          <PagesProgressBar
+            oldBookmark={pagesObject.oldBookmark}
+            newBookmark={pagesObject.newBookmark}
+            totalPages={pagesObject.totalPages}
+            pagesRead={pagesRead}
+            isBackwards={isBackwards}
+          />
+        )}
       <Text style={styles.body}>{post.text}</Text>
       {post.images.length > 0 && (
         <View style={{ marginTop: 10, height: 270 }}>

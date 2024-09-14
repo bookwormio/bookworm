@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useQuery } from "@tanstack/react-query";
 import { fetchBooksByTitleSearch } from "../../services/books-services/BookQueries";
-import { type BookVolumeItem } from "../../types";
+import { type BookVolumeInfo, type BookVolumeItem } from "../../types";
 import BookList from "../booklist/BookList";
 import SearchBar from "./searchbar";
 
@@ -12,9 +12,17 @@ const BOOK_SEARCH_PLACEHOLDER = "Search for books";
 interface BookSearchProps {
   searchPhrase: string;
   setSearchPhrase: (searchString: string) => void;
+  handleBookClickOverride?: (
+    bookID: string,
+    volumeInfo: BookVolumeInfo,
+  ) => void;
 }
 
-const BookSearch = ({ searchPhrase, setSearchPhrase }: BookSearchProps) => {
+const BookSearch = ({
+  searchPhrase,
+  setSearchPhrase,
+  handleBookClickOverride,
+}: BookSearchProps) => {
   const [books, setBooks] = useState<BookVolumeItem[]>([]);
   const [searchClicked, setSearchClicked] = useState<boolean>(
     searchPhrase !== "",
@@ -60,7 +68,10 @@ const BookSearch = ({ searchPhrase, setSearchPhrase }: BookSearchProps) => {
       >
         {books.map((book, index) => (
           <View style={styles.bookContainer} key={index}>
-            <BookList volumes={[book]} />
+            <BookList
+              volumes={[book]}
+              handleBookClickOverride={handleBookClickOverride}
+            />
           </View>
         ))}
       </ScrollView>

@@ -8,15 +8,9 @@ import {
   type Timestamp,
   where,
 } from "firebase/firestore";
-import {
-  NotificationMessageMap,
-  ServerNotificationType,
-} from "../../enums/Enums";
+import { ServerNotificationType } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
-import {
-  type BasicNotificationModel,
-  type FullNotificationModel,
-} from "../../types";
+import { type FullNotificationModel, type Notification } from "../../types";
 
 /**
  * Adds a notification to the notifications collection for that user.
@@ -24,7 +18,7 @@ import {
  * @returns {Promise<boolean>} A promise that resolves to true if the notification was successfully created, false otherwise.
  */
 export async function createNotification(
-  notif: BasicNotificationModel,
+  notif: Notification,
 ): Promise<boolean> {
   if (notif.receiver == null) {
     console.log("User does not exist");
@@ -51,17 +45,25 @@ export async function createNotification(
 
     await addDoc(notificationsRef, {
       receiver: notif.receiver,
-      message: NotificationMessageMap[notif.type],
-      comment: notif.comment,
       sender: notif.sender,
       sender_name: notif.sender_name,
       sender_img: notif.sender_img,
       created: serverTimestamp(),
+      // haven't implement read_at yet
       read_at: null,
-      postID:
-        notif.type === ServerNotificationType.FRIEND_REQUEST
-          ? null
-          : notif.postID,
+      /// ... used to conditionally add fields to an object
+      ...(notif.type === ServerNotificationType.LIKE && {
+        postID: notif.postID,
+      }),
+      ...(notif.type === ServerNotificationType.COMMENT && {
+        postID: notif.postID,
+        comment: notif.comment,
+      }),
+      ...(notif.type === ServerNotificationType.RECOMMENDATION && {
+        bookID: notif.bookID,
+        bookTitle: notif.bookTitle,
+        custom_message: notif.custom_message ?? "",
+      }),
       type: notif.type,
     });
 
@@ -90,18 +92,20 @@ export async function getAllFullNotifications(
 
     const querySnap = await getDocs(q);
 
-    for (const notDoc of querySnap.docs) {
+    for (const notifDoc of querySnap.docs) {
       const notif = {
-        receiver: notDoc.data().receiver,
-        message: notDoc.data().message,
-        comment: notDoc.data().comment,
-        sender: notDoc.data().sender,
-        sender_name: notDoc.data().sender_name,
-        sender_img: notDoc.data().sender_img,
-        created: notDoc.data().created as Timestamp,
-        read_at: notDoc.data().read_at,
-        postID: notDoc.data().postID,
-        type: notDoc.data().type,
+        receiver: notifDoc.data().receiver,
+        comment: notifDoc.data().comment,
+        sender: notifDoc.data().sender,
+        sender_name: notifDoc.data().sender_name,
+        sender_img: notifDoc.data().sender_img,
+        created: notifDoc.data().created as Timestamp,
+        read_at: notifDoc.data().read_at,
+        postID: notifDoc.data().postID,
+        bookID: notifDoc.data().bookID,
+        bookTitle: notifDoc.data().bookTitle,
+        custom_message: notifDoc.data().custom_message,
+        type: notifDoc.data().type,
       };
       notifdata.push(notif);
     }

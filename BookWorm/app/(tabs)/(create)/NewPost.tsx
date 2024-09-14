@@ -49,7 +49,7 @@ const NewPost = () => {
   const [currentBookmark, setCurrentBookmark] = useState(0);
 
   useEffect(() => {
-    setCurrentBookmark(isBookmarkLoadedSuccess ? (oldBookmark ?? 0) : 0);
+    setCurrentBookmark(isBookmarkLoadedSuccess ? oldBookmark ?? 0 : 0);
   }, [isBookmarkLoadedSuccess, oldBookmark, selectedBook]);
 
   useEffect(() => {

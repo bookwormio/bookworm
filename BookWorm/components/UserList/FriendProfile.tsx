@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -24,8 +25,8 @@ import {
   getNumberOfFollowingByUserID,
 } from "../../services/firebase-services/UserQueries";
 import {
-  type BasicNotificationModel,
   type ConnectionModel,
+  type FriendRequestNotification,
   type UserDataModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
@@ -213,13 +214,11 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       followMutation.mutate(connection);
       if (user !== undefined && user !== null) {
         const uData = userData as UserDataModel;
-        const FRnotify: BasicNotificationModel = {
+        const FRnotify: FriendRequestNotification = {
           receiver: friendUserID,
           sender: user?.uid,
           sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
           sender_img: userIm ?? "",
-          comment: "",
-          postID: "",
           type: ServerNotificationType.FRIEND_REQUEST,
         };
         notifyMutation.mutate(FRnotify);
@@ -301,6 +300,16 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
                   : "Follow"}
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              router.push({
+                pathname: `/recommendation/${friendUserID}`,
+              });
+            }}
+          >
+            <Text style={styles.buttonText}>Recommend</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -346,9 +355,10 @@ const styles = StyleSheet.create({
   },
   buttoncontainer: {
     alignItems: "flex-end",
-    justifyContent: "center",
-    paddingRight: 160,
-    width: "100%",
+    justifyContent: "space-between",
+    paddingRight: 20,
+    flex: 1,
+    flexDirection: "column",
   },
   button: {
     paddingVertical: 2,
@@ -356,6 +366,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#FB6D0B",
+    marginBottom: 10,
   },
   buttonText: {
     color: "#FB6D0B",

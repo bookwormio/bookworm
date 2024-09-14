@@ -7,15 +7,20 @@ import { type BookVolumeInfo } from "../../types";
 interface BookListItemProps {
   bookID: string;
   volumeInfo: BookVolumeInfo;
+  handleBookClickOverride?: (
+    bookID: string,
+    volumeInfo: BookVolumeInfo,
+  ) => void;
 }
 
-const BookListItem = ({ bookID, volumeInfo }: BookListItemProps) => {
+const BookListItem = ({
+  bookID,
+  volumeInfo,
+  handleBookClickOverride,
+}: BookListItemProps) => {
   const handleClick = ({ bookID }: { bookID: string }) => {
     router.push({
-      pathname: "bookviewpage",
-      params: {
-        bookID,
-      },
+      pathname: `/searchbook/${bookID}`,
     });
   };
 
@@ -23,7 +28,11 @@ const BookListItem = ({ bookID, volumeInfo }: BookListItemProps) => {
     <TouchableOpacity
       style={styles.container}
       onPress={() => {
-        handleClick({ bookID });
+        if (handleBookClickOverride != null) {
+          handleBookClickOverride(bookID, volumeInfo);
+        } else {
+          handleClick({ bookID });
+        }
       }}
     >
       <View style={styles.imageContainer}>
