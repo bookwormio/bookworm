@@ -16,7 +16,7 @@ const ViewPost = () => {
   const { postID } = useLocalSearchParams();
   const [post, setPost] = useState<PostModel | null>(null);
   const [preLoad, setPreLoading] = useState(true);
-  const { posts, profilePosts } = usePostsContext();
+  const { posts } = usePostsContext();
 
   const postMutation = useMutation({
     mutationFn: async () => {
@@ -33,9 +33,7 @@ const ViewPost = () => {
   });
 
   useEffect(() => {
-    const findPost =
-      posts.find((p) => p.id === postID) ??
-      profilePosts.find((p) => p.id === postID);
+    const findPost = posts.find((p) => p.id === postID);
     if (findPost !== undefined) {
       setPost(findPost);
       setPreLoading(false);
