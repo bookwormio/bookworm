@@ -6,7 +6,6 @@ import { type PostModel } from "../../types";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import { usePageValidation } from "./hooks/usePageValidation";
 import LikeComment from "./LikeComment";
-import { usePostsContext } from "./PostsContext";
 import PagesProgressBar from "./ProgressBar/PagesProgressBar";
 import { formatDate } from "./util/postUtils";
 
@@ -25,9 +24,7 @@ const Post = ({
   individualPage,
   presentComments,
 }: PostProps) => {
-  const { posts } = usePostsContext();
   const formattedDate = formatDate(created, currentDate);
-  const currentPost = posts.find((p) => p.id === post.id);
 
   const validatePageNumbers = usePageValidation();
 
@@ -42,10 +39,6 @@ const Post = ({
       ? pagesObject.newBookmark - pagesObject.oldBookmark
       : null;
   const isBackwards = pagesRead != null && pagesRead < 0;
-
-  if (currentPost !== undefined) {
-    post = currentPost;
-  }
 
   return (
     <View style={styles.container}>

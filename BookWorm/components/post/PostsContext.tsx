@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, {
   createContext,
@@ -259,7 +260,6 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
                 ),
               );
             }
-            likePostMutation.mutate({ postID });
           }
           handleLike(postID);
         },
@@ -311,7 +311,6 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
                 console.error("Error fetching user");
               });
           }
-          addCommentMutation.mutate({ postID, comment });
           handleComment(postID, comment);
         },
       }}

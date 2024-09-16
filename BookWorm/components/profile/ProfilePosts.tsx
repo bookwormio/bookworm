@@ -27,7 +27,7 @@ const ProfilePosts = () => {
   });
   const currentDate = new Date();
 
-  if (loading && profilePosts.length === 0) {
+  if (loading) {
     return (
       <View style={styles.feedLoading}>
         <ActivityIndicator size="large" color="black" />
@@ -40,13 +40,13 @@ const ProfilePosts = () => {
           <TouchableOpacity
             key={post.id}
             onPress={() => {
-              router.replace({
-                pathname: `/${post.id}`,
+              router.push({
+                pathname: `posts/${post.id}`,
               });
             }}
           >
             <Post
-              key={post.id} // assuming each post has a unique id
+              key={post.id}
               post={post}
               created={post.created}
               currentDate={currentDate}
