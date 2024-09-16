@@ -1,5 +1,11 @@
 import { apiUrl } from "../../recommendation.config";
 
+interface BookInfo {
+  volume_id: string;
+  categories: string[] | undefined;
+  description: string | undefined;
+}
+
 /**
  * Send a ping request to the API server
  * @returns {Promise<{ response: string } | null>} - the ping response or null if the request failed
@@ -29,14 +35,14 @@ export async function sendPing() {
  * Sends book information to be stored in the database
  * @returns None
  */
-export async function sendBookInfo(book_dict: {}) {
+export async function sendBookInfo(book_list: BookInfo[]) {
   try {
     const response = await fetch(`${apiUrl}/vectorize_book`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(book_dict) // Convert the book_dict object to a JSON string
+      body: JSON.stringify(book_list) // Convert the book_list object to a JSON string
     });
 
     return await response.json();

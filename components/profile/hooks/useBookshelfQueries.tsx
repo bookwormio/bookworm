@@ -62,7 +62,7 @@ async function fetchBookshelves(userID: string): Promise<UserBookShelvesModel> {
 /**
  * Custom hook to add a book to a user's bookshelf.
  * @returns {UseMutationResult} - The result of the mutation.
- *
+ * TODO - Add vectorize_user endpoint to recalculate user vector when new book is added
  * @example
  * const { mutate: addBook, isPending: isAdding } = useAddBookToShelf();
  * // Invoke the mutation:
