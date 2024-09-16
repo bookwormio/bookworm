@@ -128,6 +128,77 @@ const AppLayout = () => {
           />
         </Tabs>
       </PostsProvider>
+      <Tabs>
+        <Tabs.Screen
+          name="(posts)"
+          options={{
+            tabBarLabel: "Posts",
+            headerShown: false,
+            tabBarActiveTintColor: "#FB6D0B",
+            tabBarInactiveTintColor: "grey",
+            tabBarIcon: ({ size, color }) => (
+              <FontAwesome5 name="stream" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="(search)"
+          options={{
+            tabBarLabel: "Search",
+            headerShown: false,
+            tabBarActiveTintColor: "#FB6D0B",
+            tabBarInactiveTintColor: "grey",
+            tabBarIcon: ({ size, color }) => (
+              <FontAwesome5 name="search" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="(create)"
+          options={{
+            tabBarLabel: "Create",
+            headerTitle: "Create",
+            tabBarActiveTintColor: "#FB6D0B",
+            tabBarInactiveTintColor: "grey",
+            tabBarIcon: ({ size, focused, color }) => (
+              <FontAwesome5 name="book-medical" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="(profile)"
+          options={{
+            tabBarLabel: "Profile",
+            headerTitle: "Profile",
+            tabBarActiveTintColor: "#FB6D0B",
+            tabBarInactiveTintColor: "grey",
+            tabBarIcon: ({ size, color }) => (
+              <FontAwesome5 name="id-card" size={size} color={color} />
+            ),
+            headerLeft: () => (
+              <View>
+                {router.canGoBack() &&
+                  segments[2] !== "profile" &&
+                  segments[2] !== "EditProfile" && (
+                    <TouchableOpacity
+                      style={{ paddingLeft: 20 }}
+                      disabled={!router.canGoBack()}
+                      onPress={() => {
+                        router.back();
+                      }}
+                    >
+                      <FontAwesome5
+                        name="arrow-left"
+                        size={20}
+                        color="#FB6D0B"
+                      />
+                    </TouchableOpacity>
+                  )}
+              </View>
+            ),
+          }}
+        />
+      </Tabs>
     </KeyboardAvoidingView>
   );
 };
