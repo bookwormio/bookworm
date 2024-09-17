@@ -11,7 +11,10 @@ import { type PostModel } from "../../types";
 
 import { router } from "expo-router";
 import { POSTS_BOOK_PREFIX } from "../../constants/constants";
-import { generateUserRoute } from "../../utilities/routeUtils";
+import {
+  generateBookRoute,
+  generateUserRoute,
+} from "../../utilities/routeUtils";
 import { useAuth } from "../auth/context";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import { usePageValidation } from "./hooks/usePageValidation";
@@ -58,29 +61,42 @@ const Post = ({
     post = currentPost;
   }
 
+  const handleNavigateToUser = () => {
+    const userRoute = generateUserRoute(user?.uid, post.user.id, undefined);
+    if (userRoute != null) {
+      router.push(userRoute);
+    }
+  };
+
+  const isCurrentUsersPost = user?.uid === post.user.id;
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity
-          style={styles.profilePicContainer}
-          onPress={() => {
-            const userRoute = generateUserRoute(
-              user?.uid,
-              post.user.id,
-              undefined,
-            );
-            if (userRoute != null) {
-              router.push(userRoute);
-            }
-          }}
-          disabled={post.user.id === user?.uid}
-        >
-          <ProfilePicture userID={post.user.id} size={40} />
-        </TouchableOpacity>
+        <View style={styles.profilePicContainer}>
+          <TouchableOpacity
+            disabled={isCurrentUsersPost}
+            onPress={() => {
+              handleNavigateToUser();
+            }}
+          >
+            <ProfilePicture userID={post.user.id} size={40} />
+          </TouchableOpacity>
+        </View>
         <View style={styles.textContainer}>
-          {pagesObject != null && pagesRead != null ? (
+          {pagesObject != null &&
+          pagesRead != null &&
+          pagesObject.totalPages > 0 ? (
             <Text style={styles.title}>
-              {post.user.first} {post.user.last}
+              <Text
+                style={styles.userName}
+                onPress={() => {
+                  handleNavigateToUser();
+                }}
+                disabled={isCurrentUsersPost}
+              >
+                {post.user.first} {post.user.last}
+              </Text>
               {isBackwards ? " moved back " : " read "}
               <Text>{Math.abs(pagesRead)}</Text>
               {" pages"}
@@ -89,7 +105,16 @@ const Post = ({
             </Text>
           ) : (
             <Text style={styles.title}>
-              {post.user.first} {post.user.last} was reading {post.booktitle}
+              <Text
+                style={styles.userName}
+                onPress={() => {
+                  handleNavigateToUser();
+                }}
+                disabled={isCurrentUsersPost}
+              >
+                {post.user.first} {post.user.last}
+              </Text>
+              {" was reading"} {post.booktitle}
             </Text>
           )}
           <Text style={styles.time}>{formattedDate}</Text>
@@ -120,7 +145,13 @@ const Post = ({
                   <TouchableOpacity
                     key={index}
                     onPress={() => {
-                      handleNavigateToBook(post.bookid, POSTS_BOOK_PREFIX);
+                      const bookRoute = generateBookRoute(
+                        post.bookid,
+                        POSTS_BOOK_PREFIX,
+                      );
+                      if (bookRoute != null) {
+                        router.push(bookRoute);
+                      }
                     }}
                   >
                     {image}
@@ -153,9 +184,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 15,
+  },
+  userName: {
     fontWeight: "bold",
   },
   time: {
+    marginTop: 5,
     fontSize: 13,
     fontWeight: "200",
   },

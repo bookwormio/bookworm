@@ -1,19 +1,14 @@
 import { useMutation } from "@tanstack/react-query";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
-import { useAuth } from "../../../components/auth/context";
-import BookWormButton from "../../../components/button/BookWormButton";
 import Post from "../../../components/post/post";
 import { usePostsContext } from "../../../components/post/PostsContext";
-import { POSTS_ROUTE_PREFIX } from "../../../constants/constants";
 import { fetchPostByPostID } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
-import { generateUserRoute } from "../../../utilities/routeUtils";
 
 const ViewPost = () => {
-  const { user } = useAuth();
   const { postID } = useLocalSearchParams();
   const [post, setPost] = useState<PostModel | null>(null);
   const [preLoad, setPreLoading] = useState(true);
@@ -60,23 +55,6 @@ const ViewPost = () => {
             individualPage={true}
             presentComments={() => {}}
           />
-          {post?.user.id !== user?.uid && (
-            <View style={styles.outerButtonsContainer}>
-              <BookWormButton
-                title="View Profile"
-                onPress={() => {
-                  const userRoute = generateUserRoute(
-                    user?.uid,
-                    post?.user.id,
-                    POSTS_ROUTE_PREFIX,
-                  );
-                  if (userRoute != null) {
-                    router.push(userRoute);
-                  }
-                }}
-              />
-            </View>
-          )}
         </View>
       )}
     </View>
@@ -99,10 +77,5 @@ const styles = StyleSheet.create({
   postContainer: {
     flex: 1,
     width: "100%",
-  },
-  outerButtonsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    paddingHorizontal: 2,
   },
 });
