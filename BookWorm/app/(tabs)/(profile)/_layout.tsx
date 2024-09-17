@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import React from "react";
+import BackButton from "../../../components/backbutton/BackButton";
 
 const ProfileLayout = () => {
   return (
@@ -17,7 +18,11 @@ const ProfileLayout = () => {
       />
       <Stack.Screen
         name="profilebook/[bookID]"
-        options={{ headerShown: true, headerTitle: "Book" }}
+        options={{
+          headerShown: true,
+          headerTitle: "Book",
+          headerLeft: () => <BackButton />,
+        }}
       />
     </Stack>
   );
