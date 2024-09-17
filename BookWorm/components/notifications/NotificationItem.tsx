@@ -56,7 +56,14 @@ const NotificationItem = ({ notif }: NotifProp) => {
         <TouchableOpacity
           style={styles.defaultImageContainer}
           onPress={() => {
-            handleNavigateToUser(user?.uid, notif.sender, undefined);
+            const userRoute = generateUserRoute(
+              user?.uid,
+              notif.sender,
+              undefined,
+            );
+            if (userRoute != null) {
+              router.push(userRoute);
+            }
           }}
         >
           {notif.sender_img !== "" ? (
