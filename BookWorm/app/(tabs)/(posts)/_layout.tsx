@@ -1,7 +1,7 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 
 const PostsLayout = () => {
   return (
@@ -26,24 +26,7 @@ const PostsLayout = () => {
       />
       <Stack.Screen
         name="[postID]"
-        options={{
-          headerShown: true,
-          headerTitle: "Post",
-          headerLeft: () => (
-            <View>
-              {router.canGoBack() && (
-                <TouchableOpacity
-                  disabled={!router.canGoBack()}
-                  onPress={() => {
-                    router.back();
-                  }}
-                >
-                  <FontAwesome5 name="arrow-left" size={20} color="#FB6D0B" />
-                </TouchableOpacity>
-              )}
-            </View>
-          ),
-        }}
+        options={{ headerShown: true, headerTitle: "Post" }}
       />
       <Stack.Screen
         name="user/[friendUserID]"
