@@ -1,5 +1,6 @@
+import { router } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { type CommentModel } from "../../types";
 
 interface PostProps {
@@ -8,10 +9,17 @@ interface PostProps {
 
 const Comment = ({ comment }: PostProps) => {
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => {
+        router.push({
+          pathname: `/user/${comment.userID}`,
+        });
+      }}
+    >
       <Text style={styles.title}>{comment.first}: </Text>
       <Text style={styles.body}>{comment.text}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 

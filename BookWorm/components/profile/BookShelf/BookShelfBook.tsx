@@ -1,14 +1,22 @@
 import { Image } from "expo-image";
+import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type BookshelfVolumeInfo } from "../../../types";
 
 interface BookShelfBookProps {
   book: BookshelfVolumeInfo;
+  bookID: string;
 }
-const BookShelfBook = ({ book }: BookShelfBookProps) => {
+const BookShelfBook = ({ book, bookID }: BookShelfBookProps) => {
   return (
-    <TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => {
+        router.push({
+          pathname: `/profilebook/${bookID}`,
+        });
+      }}
+    >
       <View>
         <View style={styles.imageBox}>
           <Image

@@ -45,7 +45,12 @@ const NotificationItem = ({ notif }: NotifProp) => {
       }}
     >
       <View style={styles.imageTextContainer}>
-        <View style={styles.defaultImageContainer}>
+        <TouchableOpacity
+          style={styles.defaultImageContainer}
+          onPress={() => {
+            router.push({ pathname: `/user/${notif.sender}` });
+          }}
+        >
           {notif.sender_img !== "" ? (
             <Image
               style={styles.defaultImage}
@@ -55,7 +60,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
           ) : (
             <FontAwesome5 name="user" size={40} color="black" />
           )}
-        </View>
+        </TouchableOpacity>
         <View style={styles.notifTextContainer}>
           <Text style={styles.notifTitle}>{notifDisplay}</Text>
           <Text style={styles.notifMessage}>

@@ -3,6 +3,8 @@ import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { type PostModel } from "../../types";
 
+import { router } from "expo-router";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import { usePageValidation } from "./hooks/usePageValidation";
 import LikeComment from "./LikeComment";
@@ -50,9 +52,14 @@ const Post = ({
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <View style={styles.profilePicContainer}>
+        <TouchableOpacity
+          style={styles.profilePicContainer}
+          onPress={() => {
+            router.push({ pathname: `/user/${post.user.id}` });
+          }}
+        >
           <ProfilePicture userID={post.user.id} size={40} />
-        </View>
+        </TouchableOpacity>
         <View style={styles.textContainer}>
           {pagesObject != null && pagesRead != null ? (
             <Text style={styles.title}>
@@ -90,9 +97,21 @@ const Post = ({
             showsHorizontalScrollIndicator={true}
             contentContainerStyle={{ paddingBottom: 1 }}
           >
-            {post.images.map((image, index) => (
-              <View key={index}>{image}</View>
-            ))}
+            {post.images.map((image, index) => {
+              if (index === 0) {
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => {
+                      router.push({ pathname: `postsbook/${post.bookid}` });
+                    }}
+                  >
+                    {image}
+                  </TouchableOpacity>
+                );
+              }
+              return <View key={index}>{image}</View>;
+            })}
           </ScrollView>
         </View>
       )}
