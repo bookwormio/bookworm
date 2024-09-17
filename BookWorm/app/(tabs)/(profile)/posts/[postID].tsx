@@ -1,106 +1,13 @@
-import { useMutation } from "@tanstack/react-query";
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
-import Toast from "react-native-toast-message";
-import { useAuth } from "../../../../components/auth/context";
-import BookWormButton from "../../../../components/button/BookWormButton";
-import Post from "../../../../components/post/post";
-import { usePostsContext } from "../../../../components/post/PostsContext";
-import { POSTS_ROUTE_PREFIX } from "../../../../constants/constants";
-import { fetchPostByPostID } from "../../../../services/firebase-services/PostQueries";
-import { type PostModel } from "../../../../types";
+import { useLocalSearchParams } from "expo-router";
+import React from "react";
+import ViewPost from "../../../../components/post/ViewPost";
 
-const ViewPost = () => {
-  const { user } = useAuth();
+const ViewPostFromProfile = () => {
   const { postID } = useLocalSearchParams();
-  const [post, setPost] = useState<PostModel | null>(null);
-  const [preLoad, setPreLoading] = useState(true);
-  const { profilePosts } = usePostsContext();
 
-  const postMutation = useMutation({
-    mutationFn: async () => {
-      if (postID !== undefined && typeof postID === "string") {
-        return await fetchPostByPostID(postID);
-      } else {
-        return null;
-      }
-    },
-    onSuccess: (fetchedPost) => {
-      setPost(fetchedPost);
-      setPreLoading(false);
-    },
-  });
-
-  useEffect(() => {
-    const findPost = profilePosts.find((p) => p.id === postID);
-    if (findPost !== undefined) {
-      setPost(findPost);
-      setPreLoading(false);
-    } else {
-      postMutation.mutate();
-    }
-  }, [postID, profilePosts]);
-
-  return (
-    <View style={styles.container}>
-      <Toast />
-      {preLoad && (
-        <View style={styles.feedLoading}>
-          <ActivityIndicator size="large" color="black" />
-        </View>
-      )}
-      {post != null && !preLoad && (
-        <View style={styles.postContainer}>
-          <Post
-            post={post}
-            created={post.created}
-            currentDate={new Date()}
-            individualPage={true}
-            presentComments={() => {}}
-          />
-          {post?.user.id !== user?.uid && (
-            <View style={styles.outerButtonsContainer}>
-              <BookWormButton
-                title="View Profile"
-                onPress={() => {
-                  if (user != null) {
-                    router.push({
-                      pathname: `/${POSTS_ROUTE_PREFIX}/user/${post?.user.id}`,
-                    });
-                  } else {
-                    console.error("User DNE");
-                  }
-                }}
-              />
-            </View>
-          )}
-        </View>
-      )}
-    </View>
-  );
+  if (postID !== undefined && typeof postID === "string") {
+    return <ViewPost postID={postID} fromProfile={true} />;
+  }
 };
 
-export default ViewPost;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-  },
-  feedLoading: {
-    alignItems: "center",
-    justifyContent: "center",
-    position: "absolute",
-    top: "50%",
-  },
-  postContainer: {
-    flex: 1,
-    width: "100%",
-  },
-  outerButtonsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    paddingHorizontal: 2,
-  },
-});
+export default ViewPostFromProfile;
