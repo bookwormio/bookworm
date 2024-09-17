@@ -64,7 +64,7 @@ const BookShelf = ({ shelfName, books }: BookShelfProps) => {
           <View>
             <TouchableOpacity>
               {item.volumeInfo != null && (
-                <BookShelfBook book={item.volumeInfo} />
+                <BookShelfBook book={item.volumeInfo} bookID={item.id} />
               )}
             </TouchableOpacity>
             {/* TODO: make this look better with minus sign button */}

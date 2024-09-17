@@ -2,6 +2,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { router, Stack } from "expo-router";
 import React from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
+import BackButton from "../../../components/backbutton/BackButton";
 import { PostsProvider } from "../../../components/post/PostsContext";
 
 const PostsLayout = () => {
@@ -28,19 +29,35 @@ const PostsLayout = () => {
         />
         <Stack.Screen
           name="[postID]"
-          options={{ headerShown: true, headerTitle: "Post" }}
+          options={{
+            headerShown: true,
+            headerTitle: "Post",
+            headerLeft: () => <BackButton />,
+          }}
         />
         <Stack.Screen
           name="user/[friendUserID]"
-          options={{ headerShown: true, headerTitle: "Friend Profile" }}
+          options={{
+            headerShown: true,
+            headerTitle: "Friend Profile",
+            headerLeft: () => <BackButton />,
+          }}
         />
         <Stack.Screen
           name="notifications"
-          options={{ headerShown: true, headerTitle: "Notifications" }}
+          options={{
+            headerShown: true,
+            headerTitle: "Notifications",
+            headerLeft: () => <BackButton />,
+          }}
         />
         <Stack.Screen
           name="postsbook/[bookID]"
-          options={{ headerShown: true, headerTitle: "Book" }}
+          options={{
+            headerShown: true,
+            headerTitle: "Book",
+            headerLeft: () => <BackButton />,
+          }}
         />
       </Stack>
     </PostsProvider>
