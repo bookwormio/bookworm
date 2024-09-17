@@ -185,7 +185,6 @@ interface BasicNotificationModel {
   receiver: string;
   sender: string;
   sender_name: string;
-  sender_img: string;
 }
 
 interface FullNotificationModel {
@@ -193,7 +192,6 @@ interface FullNotificationModel {
   comment: string;
   sender: string;
   sender_name: string;
-  sender_img: string;
   created: Timestamp;
   read_at: Timestamp;
   postID: string | null;

@@ -5,10 +5,7 @@ import React, {
   useContext,
   useState,
 } from "react";
-import {
-  useProfilePicQuery,
-  useUserDataQuery,
-} from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
+import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { ServerNotificationType } from "../../enums/Enums";
 import { createNotification } from "../../services/firebase-services/NotificationQueries";
 import {
@@ -64,9 +61,6 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   // getting userdata
   const { data: userData } = useUserDataQuery(user ?? undefined);
 
-  // getting user profile pic
-  const { data: userIm } = useProfilePicQuery(user?.uid);
-
   const queryClient = useQueryClient();
   const commentNotifyMutation = useMutation({
     mutationFn: createNotification,
@@ -95,7 +89,6 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
         receiver: postToUpdate.user.id,
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
-        sender_img: userIm ?? "",
         type: ServerNotificationType.COMMENT,
         postID,
         comment,
@@ -113,7 +106,6 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
         receiver: postToUpdate.user.id,
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
-        sender_img: userIm ?? "",
         postID,
         type: ServerNotificationType.LIKE,
       };

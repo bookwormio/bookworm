@@ -2,10 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, View } from "react-native";
-import {
-  useProfilePicQuery,
-  useUserDataQuery,
-} from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
+import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { ServerNotificationType } from "../../enums/Enums";
 import { createNotification } from "../../services/firebase-services/NotificationQueries";
 import {
@@ -29,9 +26,6 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
 
   // getting userdata
   const { data: userData } = useUserDataQuery(user ?? undefined);
-
-  // getting user profile pic
-  const { data: userIm } = useProfilePicQuery(user?.uid);
 
   const notifyMutation = useMutation({
     mutationFn: createNotification,
@@ -58,7 +52,6 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
         receiver: friendUserID,
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
-        sender_img: userIm ?? "",
         bookID,
         bookTitle: volumeInfo.title,
         custom_message: message ?? "",

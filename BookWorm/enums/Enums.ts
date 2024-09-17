@@ -31,7 +31,7 @@ export enum ServerNotificationType {
 }
 
 export const NotificationTypeMap: StringMap = {
-  [ServerNotificationType.FRIEND_REQUEST]: "New Friend Request",
+  [ServerNotificationType.FRIEND_REQUEST]: "New Follower",
   [ServerNotificationType.LIKE]: "New Like",
   [ServerNotificationType.COMMENT]: "New Comment",
   [ServerNotificationType.RECOMMENDATION]: "New Recommendation",
