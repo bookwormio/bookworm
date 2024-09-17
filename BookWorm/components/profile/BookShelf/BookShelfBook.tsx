@@ -2,7 +2,9 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { PROFILE_BOOK_PREFIX } from "../../../constants/constants";
 import { type BookshelfVolumeInfo } from "../../../types";
+import { generateBookRoute } from "../../../utilities/routeUtils";
 
 interface BookShelfBookProps {
   book: BookshelfVolumeInfo;
@@ -12,9 +14,10 @@ const BookShelfBook = ({ book, bookID }: BookShelfBookProps) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        router.push({
-          pathname: `/profilebook/${bookID}`,
-        });
+        const bookRoute = generateBookRoute(bookID, PROFILE_BOOK_PREFIX);
+        if (bookRoute != null) {
+          router.push(bookRoute);
+        }
       }}
     >
       <View>

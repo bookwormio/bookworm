@@ -1,10 +1,18 @@
 import { type Timestamp } from "firebase/firestore";
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { type PostModel } from "../../types";
 
 import { router } from "expo-router";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { POSTS_BOOK_PREFIX } from "../../constants/constants";
+import { generateUserRoute } from "../../utilities/routeUtils";
+import { useAuth } from "../auth/context";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import { usePageValidation } from "./hooks/usePageValidation";
 import LikeComment from "./LikeComment";
@@ -28,6 +36,7 @@ const Post = ({
   presentComments,
 }: PostProps) => {
   const { posts } = usePostsContext();
+  const { user } = useAuth();
   const formattedDate = formatDate(created, currentDate);
   const currentPost = posts.find((p) => p.id === post.id);
 
@@ -55,8 +64,16 @@ const Post = ({
         <TouchableOpacity
           style={styles.profilePicContainer}
           onPress={() => {
-            router.push({ pathname: `/user/${post.user.id}` });
+            const userRoute = generateUserRoute(
+              user?.uid,
+              post.user.id,
+              undefined,
+            );
+            if (userRoute != null) {
+              router.push(userRoute);
+            }
           }}
+          disabled={post.user.id === user?.uid}
         >
           <ProfilePicture userID={post.user.id} size={40} />
         </TouchableOpacity>
@@ -103,7 +120,7 @@ const Post = ({
                   <TouchableOpacity
                     key={index}
                     onPress={() => {
-                      router.push({ pathname: `postsbook/${post.bookid}` });
+                      handleNavigateToBook(post.bookid, POSTS_BOOK_PREFIX);
                     }}
                   >
                     {image}

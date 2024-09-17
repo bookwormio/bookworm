@@ -1,0 +1,41 @@
+/**
+ * Generates a book route based on the book ID and prefix.
+ * @param bookID - The ID of the book
+ * @param prefix - The prefix for the route
+ * @returns The generated book route
+ */
+export function generateBookRoute(bookID?: string, prefix?: string): string {
+  if (bookID == null) {
+    throw new Error("Book ID is null or undefined");
+  }
+  const pathName = `/${prefix}/${bookID}`;
+  return pathName;
+}
+
+/**
+ * Generates a user route based on the current user ID and the target user ID.
+ * @param currentUserID - The ID of the current user
+ * @param navigateToUserID - The ID of the user to navigate to
+ * @param prefix - The prefix for the route (optional)
+ * @returns The generated user route or undefined if navigating to the current user
+ * @throws Error if navigateToUserID or currentUserID is null or undefined
+ */
+export function generateUserRoute(
+  currentUserID?: string,
+  navigateToUserID?: string,
+  prefix?: string,
+): string | undefined {
+  if (navigateToUserID == null) {
+    throw new Error("Navigate to User ID is null or undefined");
+  }
+  if (currentUserID == null) {
+    throw new Error("Current User ID is null or undefined");
+  }
+
+  if (currentUserID !== navigateToUserID) {
+    const pathName = `/${prefix ?? ""}user/${navigateToUserID}`;
+    return pathName;
+  }
+
+  return undefined;
+}

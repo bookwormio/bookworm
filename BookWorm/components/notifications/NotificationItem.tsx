@@ -8,6 +8,8 @@ import {
   ServerNotificationType,
 } from "../../enums/Enums";
 import { type FullNotificationModel } from "../../types";
+import { generateUserRoute } from "../../utilities/routeUtils";
+import { useAuth } from "../auth/context";
 import { calculateTimeSinceNotification } from "./util/notificationUtils";
 
 interface NotifProp {
@@ -15,6 +17,7 @@ interface NotifProp {
 }
 
 const NotificationItem = ({ notif }: NotifProp) => {
+  const { user } = useAuth();
   const time = calculateTimeSinceNotification(notif.created.toDate());
   const notifDisplay =
     NotificationTypeMap[notif.type as ServerNotificationType];
@@ -30,9 +33,14 @@ const NotificationItem = ({ notif }: NotifProp) => {
             pathname: `/${notif.postID}`,
           });
         } else if (notif.type === ServerNotificationType.FRIEND_REQUEST) {
-          router.push({
-            pathname: `/user/${notif.sender}`,
-          });
+          const userRoute = generateUserRoute(
+            user?.uid,
+            notif.sender,
+            undefined,
+          );
+          if (userRoute != null) {
+            router.push(userRoute);
+          }
         } else if (notif.type === ServerNotificationType.RECOMMENDATION) {
           router.push({
             pathname: `/postsbook/${notif.bookID}`,
@@ -48,7 +56,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
         <TouchableOpacity
           style={styles.defaultImageContainer}
           onPress={() => {
-            router.push({ pathname: `/user/${notif.sender}` });
+            handleNavigateToUser(user?.uid, notif.sender, undefined);
           }}
         >
           {notif.sender_img !== "" ? (

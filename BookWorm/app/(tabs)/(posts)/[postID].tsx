@@ -10,6 +10,7 @@ import { usePostsContext } from "../../../components/post/PostsContext";
 import { POSTS_ROUTE_PREFIX } from "../../../constants/constants";
 import { fetchPostByPostID } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
+import { generateUserRoute } from "../../../utilities/routeUtils";
 
 const ViewPost = () => {
   const { user } = useAuth();
@@ -64,12 +65,13 @@ const ViewPost = () => {
               <BookWormButton
                 title="View Profile"
                 onPress={() => {
-                  if (user != null) {
-                    router.push({
-                      pathname: `/${POSTS_ROUTE_PREFIX}/user/${post?.user.id}`,
-                    });
-                  } else {
-                    console.error("User DNE");
+                  const userRoute = generateUserRoute(
+                    user?.uid,
+                    post?.user.id,
+                    POSTS_ROUTE_PREFIX,
+                  );
+                  if (userRoute != null) {
+                    router.push(userRoute);
                   }
                 }}
               />

@@ -2,20 +2,30 @@ import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type CommentModel } from "../../types";
+import { generateUserRoute } from "../../utilities/routeUtils";
+import { useAuth } from "../auth/context";
 
 interface PostProps {
   comment: CommentModel;
 }
 
 const Comment = ({ comment }: PostProps) => {
+  const { user } = useAuth();
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
         onPress={() => {
-          router.push({
-            pathname: `/user/${comment.userID}`,
-          });
+          const userRoute = generateUserRoute(
+            user?.uid,
+            comment.userID,
+            undefined,
+          );
+          if (userRoute != null) {
+            router.push(userRoute);
+          }
         }}
+        disabled={comment.userID === user?.uid}
       >
         <Text style={styles.title}>{comment.first}:</Text>
       </TouchableOpacity>
