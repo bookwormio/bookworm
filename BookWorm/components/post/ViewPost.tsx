@@ -1,13 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { router } from "expo-router";
 import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
-import { useAuth } from "../../components/auth/context";
-import BookWormButton from "../../components/button/BookWormButton";
 import Post from "../../components/post/post";
 import { usePostsContext } from "../../components/post/PostsContext";
-import { POSTS_ROUTE_PREFIX } from "../../constants/constants";
 import { fetchPostByPostID } from "../../services/firebase-services/PostQueries";
 
 interface ViewPostProps {
@@ -16,7 +12,6 @@ interface ViewPostProps {
 }
 
 const ViewPost = ({ postID, fromProfile }: ViewPostProps) => {
-  const { user } = useAuth();
   const { posts, profilePosts } = usePostsContext();
 
   const { data: post, isLoading } = useQuery({
@@ -53,22 +48,6 @@ const ViewPost = ({ postID, fromProfile }: ViewPostProps) => {
             individualPage={true}
             presentComments={() => {}}
           />
-          {post?.user.id !== user?.uid && (
-            <View style={styles.outerButtonsContainer}>
-              <BookWormButton
-                title="View Profile"
-                onPress={() => {
-                  if (user != null) {
-                    router.push({
-                      pathname: `/${POSTS_ROUTE_PREFIX}/user/${post?.user.id}`,
-                    });
-                  } else {
-                    console.error("User DNE");
-                  }
-                }}
-              />
-            </View>
-          )}
         </View>
       )}
     </View>
@@ -91,10 +70,5 @@ const styles = StyleSheet.create({
   postContainer: {
     flex: 1,
     width: "100%",
-  },
-  outerButtonsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    paddingHorizontal: 2,
   },
 });

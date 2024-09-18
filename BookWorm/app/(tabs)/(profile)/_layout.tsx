@@ -17,7 +17,14 @@ const ProfileLayout = () => {
         }}
       />
       <Stack.Screen name="AddData" options={{ headerShown: false }} />
-      <Stack.Screen name="posts/[postID]" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="posts/[postID]"
+        options={{
+          headerShown: true,
+          headerTitle: "Post",
+          headerLeft: () => <BackButton />,
+        }}
+      />
       <Stack.Screen
         name="profilebook/[bookID]"
         options={{
