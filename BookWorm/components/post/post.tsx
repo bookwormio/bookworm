@@ -1,11 +1,25 @@
 import { type Timestamp } from "firebase/firestore";
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { type PostModel } from "../../types";
 
+import { router } from "expo-router";
+import { POSTS_BOOK_PREFIX } from "../../constants/constants";
+import {
+  generateBookRoute,
+  generateUserRoute,
+} from "../../utilities/routeUtils";
+import { useAuth } from "../auth/context";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import { usePageValidation } from "./hooks/usePageValidation";
 import LikeComment from "./LikeComment";
+import { usePostsContext } from "./PostsContext";
 import PagesProgressBar from "./ProgressBar/PagesProgressBar";
 import { formatDate } from "./util/postUtils";
 
@@ -24,7 +38,10 @@ const Post = ({
   individualPage,
   presentComments,
 }: PostProps) => {
+  const { posts } = usePostsContext();
+  const { user } = useAuth();
   const formattedDate = formatDate(created, currentDate);
+  const currentPost = posts.find((p) => p.id === post.id);
 
   const validatePageNumbers = usePageValidation();
 
@@ -40,16 +57,46 @@ const Post = ({
       : null;
   const isBackwards = pagesRead != null && pagesRead < 0;
 
+  if (currentPost !== undefined) {
+    post = currentPost;
+  }
+
+  const handleNavigateToUser = () => {
+    const userRoute = generateUserRoute(user?.uid, post.user.id, undefined);
+    if (userRoute != null) {
+      router.push(userRoute);
+    }
+  };
+
+  const isCurrentUsersPost = user?.uid === post.user.id;
+
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <View style={styles.profilePicContainer}>
-          <ProfilePicture userID={post.user.id} size={40} />
+          <TouchableOpacity
+            disabled={isCurrentUsersPost}
+            onPress={() => {
+              handleNavigateToUser();
+            }}
+          >
+            <ProfilePicture userID={post.user.id} size={40} />
+          </TouchableOpacity>
         </View>
         <View style={styles.textContainer}>
-          {pagesObject != null && pagesRead != null ? (
+          {pagesObject != null &&
+          pagesRead != null &&
+          pagesObject.totalPages > 0 ? (
             <Text style={styles.title}>
-              {post.user.first} {post.user.last}
+              <Text
+                style={styles.userName}
+                onPress={() => {
+                  handleNavigateToUser();
+                }}
+                disabled={isCurrentUsersPost}
+              >
+                {post.user.first} {post.user.last}
+              </Text>
               {isBackwards ? " moved back " : " read "}
               <Text>{Math.abs(pagesRead)}</Text>
               {" pages"}
@@ -58,7 +105,16 @@ const Post = ({
             </Text>
           ) : (
             <Text style={styles.title}>
-              {post.user.first} {post.user.last} was reading {post.booktitle}
+              <Text
+                style={styles.userName}
+                onPress={() => {
+                  handleNavigateToUser();
+                }}
+                disabled={isCurrentUsersPost}
+              >
+                {post.user.first} {post.user.last}
+              </Text>
+              {" was reading"} {post.booktitle}
             </Text>
           )}
           <Text style={styles.time}>{formattedDate}</Text>
@@ -83,9 +139,27 @@ const Post = ({
             showsHorizontalScrollIndicator={true}
             contentContainerStyle={{ paddingBottom: 1 }}
           >
-            {post.images.map((image, index) => (
-              <View key={index}>{image}</View>
-            ))}
+            {post.images.map((image, index) => {
+              if (index === 0) {
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => {
+                      const bookRoute = generateBookRoute(
+                        post.bookid,
+                        POSTS_BOOK_PREFIX,
+                      );
+                      if (bookRoute != null) {
+                        router.push(bookRoute);
+                      }
+                    }}
+                  >
+                    {image}
+                  </TouchableOpacity>
+                );
+              }
+              return <View key={index}>{image}</View>;
+            })}
           </ScrollView>
         </View>
       )}
@@ -110,9 +184,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 15,
+  },
+  userName: {
     fontWeight: "bold",
   },
   time: {
+    marginTop: 5,
     fontSize: 13,
     fontWeight: "200",
   },

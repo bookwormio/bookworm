@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import React from "react";
+import BackButton from "../../../components/backbutton/BackButton";
 
 const SearchLayout = () => {
   return (
@@ -10,7 +11,11 @@ const SearchLayout = () => {
       />
       <Stack.Screen
         name="user/[friendUserID]"
-        options={{ headerShown: true, headerTitle: "User" }}
+        options={{
+          headerShown: true,
+          headerTitle: "User",
+          headerLeft: () => <BackButton />,
+        }}
       />
       <Stack.Screen
         name="recommendation/[friendUserID]"
@@ -21,7 +26,11 @@ const SearchLayout = () => {
       />
       <Stack.Screen
         name="searchbook/[bookID]"
-        options={{ headerShown: true, headerTitle: "Book" }}
+        options={{
+          headerShown: true,
+          headerTitle: "Book",
+          headerLeft: () => <BackButton />,
+        }}
       />
     </Stack>
   );

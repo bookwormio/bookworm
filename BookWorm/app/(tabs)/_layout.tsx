@@ -1,12 +1,11 @@
 import { FontAwesome5 } from "@expo/vector-icons";
-import { router, Tabs, useSegments } from "expo-router";
+import { Tabs } from "expo-router/tabs";
 import React from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { useAuth } from "../../components/auth/context";
@@ -14,7 +13,6 @@ import { PostsProvider } from "../../components/post/PostsContext";
 
 const AppLayout = () => {
   const { isLoading } = useAuth();
-  const segments = useSegments();
   if (isLoading) {
     const styles = StyleSheet.create({
       container: {
@@ -79,32 +77,11 @@ const AppLayout = () => {
             name="(profile)"
             options={{
               tabBarLabel: "Profile",
-              headerTitle: "Profile",
+              headerShown: false,
               tabBarActiveTintColor: "#FB6D0B",
               tabBarInactiveTintColor: "grey",
               tabBarIcon: ({ size, color }) => (
                 <FontAwesome5 name="id-card" size={size} color={color} />
-              ),
-              headerLeft: () => (
-                <View>
-                  {router.canGoBack() &&
-                    segments[2] !== "profile" &&
-                    segments[2] !== "EditProfile" && (
-                      <TouchableOpacity
-                        style={{ paddingLeft: 20 }}
-                        disabled={!router.canGoBack()}
-                        onPress={() => {
-                          router.back();
-                        }}
-                      >
-                        <FontAwesome5
-                          name="arrow-left"
-                          size={20}
-                          color="#FB6D0B"
-                        />
-                      </TouchableOpacity>
-                    )}
-                </View>
               ),
             }}
           />
