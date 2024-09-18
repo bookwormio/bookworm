@@ -52,8 +52,8 @@ const ProfilePosts = () => {
               currentDate={currentDate}
               individualPage={false}
               presentComments={() => {
-                router.replace({
-                  pathname: `/${post.id}`,
+                router.push({
+                  pathname: `posts/${post.id}`,
                 });
               }}
             />
