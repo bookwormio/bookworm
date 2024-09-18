@@ -15,8 +15,8 @@ import {
  * // bookmark is of type number
  */
 export const useGetBookmarkForBook = (
-  userID: string | undefined,
-  bookID: string | undefined,
+  userID: string | undefined | null,
+  bookID: string | undefined | null,
 ) => {
   return useQuery({
     queryKey: ["bookmark", userID, bookID],

@@ -19,18 +19,19 @@ import {
   useGetBookmarkForBook,
   useSetBookmarkForBook,
 } from "../../../components/bookmark/hooks/useBookmarkQueries";
-import BookDropdownSelect from "../../../components/bookselect/BookDropdownSelect";
+import BookDropdownButton from "../../../components/bookselect/BookDropdownButton";
 import BookWormButton from "../../../components/button/BookWormButton";
+import { prefetchBooksForBookshelves } from "../../../components/profile/hooks/useBookshelfQueries";
 import { createPost } from "../../../services/firebase-services/PostQueries";
-import { type CreatePostModel, type FlatBookItemModel } from "../../../types";
+import { type CreatePostModel } from "../../../types";
+import { useNewPostContext } from "./NewPostContext";
 
 const NewPost = () => {
   const { user } = useAuth();
   const [text, setText] = useState("");
-  const [selectedBook, setSelectedBook] = useState<FlatBookItemModel | null>(
-    null,
-  );
-  const [searchPhrase, setSearchPhrase] = useState("");
+
+  const { selectedBook, setSelectedBook } = useNewPostContext();
+
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [textboxFocused, setTextboxFocused] = useState(false);
@@ -44,6 +45,8 @@ const NewPost = () => {
     isLoading: bookmarkLoading,
     isSuccess: isBookmarkLoadedSuccess,
   } = useGetBookmarkForBook(user?.uid, selectedBook?.id);
+
+  void prefetchBooksForBookshelves(user?.uid ?? "");
 
   const [currentBookmark, setCurrentBookmark] = useState(0);
 
@@ -91,7 +94,6 @@ const NewPost = () => {
 
   const resetForm = () => {
     setSelectedBook(null);
-    setSearchPhrase("");
     setText("");
     setImages([]);
     setCurrentBookmark(0);
@@ -156,14 +158,8 @@ const NewPost = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.dropdownContainer}>
-        <BookDropdownSelect
-          selectedBook={selectedBook}
-          setSelectedBook={setSelectedBook}
-          searchPhrase={searchPhrase}
-          setSearchPhrase={setSearchPhrase}
-        />
-      </View>
+      <BookDropdownButton selectedBook={selectedBook} />
+
       {selectedBook?.pageCount != null &&
         selectedBook.pageCount > 0 &&
         !bookmarkLoading && (
@@ -257,9 +253,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
-  },
-  dropdownContainer: {
-    paddingBottom: 20,
   },
   slider: {
     marginBottom: 20,

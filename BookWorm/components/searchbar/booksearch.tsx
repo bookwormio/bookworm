@@ -2,9 +2,16 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useQuery } from "@tanstack/react-query";
+import { ServerBookShelfName } from "../../enums/Enums";
 import { fetchBooksByTitleSearch } from "../../services/books-services/BookQueries";
-import { type BookVolumeInfo, type BookVolumeItem } from "../../types";
+import {
+  type BookVolumeInfo,
+  type BookVolumeItem,
+  type UserBookShelvesModel,
+} from "../../types";
+import { useAuth } from "../auth/context";
 import BookList from "../booklist/BookList";
+import { useGetBooksForBookshelves } from "../profile/hooks/useBookshelfQueries";
 import SearchBar from "./searchbar";
 
 const BOOK_SEARCH_PLACEHOLDER = "Search for books";
@@ -23,7 +30,12 @@ const BookSearch = ({
   setSearchPhrase,
   handleBookClickOverride,
 }: BookSearchProps) => {
+  const { user } = useAuth();
   const [books, setBooks] = useState<BookVolumeItem[]>([]);
+  const [flattenedShelfBooks, setFlattenedShelfBooks] = useState<
+    BookVolumeItem[]
+  >([]);
+
   const [searchClicked, setSearchClicked] = useState<boolean>(
     searchPhrase !== "",
   );
@@ -47,11 +59,31 @@ const BookSearch = ({
     staleTime: 60000, // Set stale time to 1 minute
   });
 
+  const { data: preloadedShelfBooks } = useGetBooksForBookshelves(
+    user?.uid ?? "",
+  );
+
   useEffect(() => {
-    if (fetchBookData !== undefined && fetchBookData !== null) {
+    if (preloadedShelfBooks != null) {
+      const sortedBooks = mapAndSortPreloadedBooks(preloadedShelfBooks);
+      setFlattenedShelfBooks(sortedBooks);
+      if (searchPhrase === "") {
+        setBooks(sortedBooks);
+      }
+    }
+  }, [preloadedShelfBooks]);
+
+  useEffect(() => {
+    if (fetchBookData != null) {
       setBooks(fetchBookData);
     }
   }, [fetchBookData]);
+
+  useEffect(() => {
+    if (searchPhrase === "" && flattenedShelfBooks.length > 0) {
+      setBooks(flattenedShelfBooks);
+    }
+  }, [searchPhrase, preloadedShelfBooks]);
 
   return (
     <View style={styles.container}>
@@ -109,3 +141,47 @@ const styles = StyleSheet.create({
     paddingRight: 16, // Adjusted padding to accommodate scroll bar
   },
 });
+
+function mapAndSortPreloadedBooks(
+  preloadedShelfBooks: UserBookShelvesModel,
+): BookVolumeItem[] {
+  const shelfOrder = [
+    ServerBookShelfName.CURRENTLY_READING,
+    ServerBookShelfName.WANT_TO_READ,
+    ServerBookShelfName.FINISHED,
+    ServerBookShelfName.LENDING_LIBRARY,
+  ];
+
+  const uniqueBooks = new Map<
+    string,
+    BookVolumeItem & { shelf: ServerBookShelfName }
+  >();
+
+  // Iterate through shelves in priority order
+  for (const shelf of shelfOrder) {
+    if (shelf in preloadedShelfBooks) {
+      const booksInShelf = preloadedShelfBooks[shelf];
+
+      for (const book of booksInShelf) {
+        // Only add the book if it's not already present
+        if (!uniqueBooks.has(book.id)) {
+          uniqueBooks.set(book.id, {
+            id: book.id,
+            shelf,
+            volumeInfo: {
+              ...book.volumeInfo,
+              imageLinks: {
+                smallThumbnail: book?.volumeInfo?.thumbnail ?? "",
+              },
+            },
+          });
+        }
+      }
+    }
+  }
+
+  return Array.from(uniqueBooks.values()).map((book) => ({
+    id: book.id,
+    volumeInfo: book.volumeInfo,
+  }));
+}

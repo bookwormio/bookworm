@@ -1,3 +1,8 @@
+import {
+  NEW_POST_BOOK_FOLDER,
+  NEW_POST_BOOK_SEARCH,
+} from "../constants/constants";
+
 /**
  * Generates a book route based on the book ID and prefix.
  * @param bookID - The ID of the book
@@ -38,4 +43,12 @@ export function generateUserRoute(
   }
 
   return undefined;
+}
+
+/**
+ * Generates a new post book search route.
+ * @returns The generated new post book search route
+ */
+export function generateNewPostBookSearchRoute(): string {
+  return `/${NEW_POST_BOOK_FOLDER}/${NEW_POST_BOOK_SEARCH}`;
 }

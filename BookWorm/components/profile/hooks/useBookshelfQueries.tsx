@@ -23,18 +23,34 @@ import {
 export const useGetBooksForBookshelves = (userID: string) => {
   return useQuery({
     queryKey: ["bookshelves", userID],
-    queryFn: async () => {
-      if (userID === null || userID === "")
-        throw new Error("User not logged in");
-
-      const shelfTypes = Object.values(ServerBookShelfName);
-      const userBooks = await getBooksFromUserBookShelves(userID, shelfTypes);
-      if (userBooks == null) throw new Error("Error fetching user books");
-
-      return userBooks;
-    },
+    queryFn: async () => await fetchBookshelves(userID),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
+
+/**
+ * Prefetch the books for the user's bookshelves.
+ * @param userID
+ * @returns {Promise<void>}
+ */
+export const prefetchBooksForBookshelves = async (userID: string) => {
+  const queryClient = useQueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["bookshelves", userID],
+    queryFn: async () => await fetchBookshelves(userID),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+async function fetchBookshelves(userID: string) {
+  if (userID == null || userID === "") throw new Error("User not logged in");
+
+  const shelfTypes = Object.values(ServerBookShelfName);
+  const userBooks = await getBooksFromUserBookShelves(userID, shelfTypes);
+  if (userBooks == null) throw new Error("Error fetching user books");
+
+  return userBooks;
+}
 
 /**
  * Custom hook to add a book to a user's bookshelf.
