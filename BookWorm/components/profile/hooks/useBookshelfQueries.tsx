@@ -42,7 +42,13 @@ export const prefetchBooksForBookshelves = async (userID: string) => {
   });
 };
 
-async function fetchBookshelves(userID: string) {
+/**
+ * Helper Query Function to fetch the books for the user's bookshelves.
+ *
+ * @param userID
+ * @returns {Promise<UserBookShelvesModel>}
+ */
+async function fetchBookshelves(userID: string): Promise<UserBookShelvesModel> {
   if (userID == null || userID === "") throw new Error("User not logged in");
 
   const shelfTypes = Object.values(ServerBookShelfName);

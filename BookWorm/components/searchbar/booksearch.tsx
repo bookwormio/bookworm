@@ -2,17 +2,13 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useQuery } from "@tanstack/react-query";
-import { ServerBookShelfName } from "../../enums/Enums";
 import { fetchBooksByTitleSearch } from "../../services/books-services/BookQueries";
-import {
-  type BookVolumeInfo,
-  type BookVolumeItem,
-  type UserBookShelvesModel,
-} from "../../types";
+import { type BookVolumeInfo, type BookVolumeItem } from "../../types";
 import { useAuth } from "../auth/context";
 import BookList from "../booklist/BookList";
 import { useGetBooksForBookshelves } from "../profile/hooks/useBookshelfQueries";
 import SearchBar from "./searchbar";
+import { mapAndSortPreloadedBooks } from "./util/searchBarUtils";
 
 const BOOK_SEARCH_PLACEHOLDER = "Search for books";
 
@@ -141,47 +137,3 @@ const styles = StyleSheet.create({
     paddingRight: 16, // Adjusted padding to accommodate scroll bar
   },
 });
-
-function mapAndSortPreloadedBooks(
-  preloadedShelfBooks: UserBookShelvesModel,
-): BookVolumeItem[] {
-  const shelfOrder = [
-    ServerBookShelfName.CURRENTLY_READING,
-    ServerBookShelfName.WANT_TO_READ,
-    ServerBookShelfName.FINISHED,
-    ServerBookShelfName.LENDING_LIBRARY,
-  ];
-
-  const uniqueBooks = new Map<
-    string,
-    BookVolumeItem & { shelf: ServerBookShelfName }
-  >();
-
-  // Iterate through shelves in priority order
-  for (const shelf of shelfOrder) {
-    if (shelf in preloadedShelfBooks) {
-      const booksInShelf = preloadedShelfBooks[shelf];
-
-      for (const book of booksInShelf) {
-        // Only add the book if it's not already present
-        if (!uniqueBooks.has(book.id)) {
-          uniqueBooks.set(book.id, {
-            id: book.id,
-            shelf,
-            volumeInfo: {
-              ...book.volumeInfo,
-              imageLinks: {
-                smallThumbnail: book?.volumeInfo?.thumbnail ?? "",
-              },
-            },
-          });
-        }
-      }
-    }
-  }
-
-  return Array.from(uniqueBooks.values()).map((book) => ({
-    id: book.id,
-    volumeInfo: book.volumeInfo,
-  }));
-}
