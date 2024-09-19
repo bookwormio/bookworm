@@ -57,7 +57,7 @@ const Profile = () => {
     },
   });
 
-  if (isLoadingUserData || userData === null || userData === undefined) {
+  if (isLoadingUserData || userData == null) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />

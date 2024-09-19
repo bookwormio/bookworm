@@ -217,7 +217,7 @@ export async function getUserProfileURL(
  * @description
  * Retrieves user information from the Firestore database based on the provided user ID.
  * If the user document exists, it returns an object containing the user data.
- * If the user document doesn't exist or if data is missing, it returns undefined.
+ * If the user document doesn't exist or if data is missing, it returns an empty user.
  */
 export async function newFetchUserInfo(userID: string): Promise<UserDataModel> {
   try {
