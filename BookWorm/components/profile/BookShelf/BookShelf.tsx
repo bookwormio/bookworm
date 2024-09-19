@@ -20,14 +20,14 @@ interface BookShelfProps {
   shelfName: ServerBookShelfName;
   books: BookShelfBookModel[];
   bookRouteOverride?: string;
-  removeOverride?: boolean;
+  removeButtonOverride?: boolean;
 }
 
 const BookShelf = ({
   shelfName,
   books,
   bookRouteOverride,
-  removeOverride = false,
+  removeButtonOverride = false,
 }: BookShelfProps) => {
   const { user } = useAuth();
 
@@ -79,7 +79,7 @@ const BookShelf = ({
               )}
             </TouchableOpacity>
             {/* TODO: make this look better with minus sign button */}
-            {!removeOverride && (
+            {!removeButtonOverride && (
               <Button
                 onPress={() => {
                   handleRemoveBook(item.id);
