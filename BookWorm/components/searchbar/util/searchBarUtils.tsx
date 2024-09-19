@@ -46,3 +46,26 @@ export function mapAndSortPreloadedBooks(
     volumeInfo: book.volumeInfo,
   }));
 }
+
+export function filterBookShelfBooksByTitle(
+  preSortedBookShelves: BookVolumeItem[],
+  searchPhrase: string,
+): BookVolumeItem[] {
+  return preSortedBookShelves.filter((book) =>
+    book.volumeInfo.title?.toLowerCase().startsWith(searchPhrase.toLowerCase()),
+  );
+}
+
+export function removeDuplicateBooks(
+  books: BookVolumeItem[],
+): BookVolumeItem[] {
+  const seenBookIDs: Record<string, boolean> = {};
+  return books.filter((book) => {
+    if (seenBookIDs[book.id]) {
+      return false;
+    } else {
+      seenBookIDs[book.id] = true;
+      return true;
+    }
+  });
+}

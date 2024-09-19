@@ -8,7 +8,11 @@ import { useAuth } from "../auth/context";
 import BookList from "../booklist/BookList";
 import { useGetBooksForBookshelves } from "../profile/hooks/useBookshelfQueries";
 import SearchBar from "./searchbar";
-import { mapAndSortPreloadedBooks } from "./util/searchBarUtils";
+import {
+  filterBookShelfBooksByTitle,
+  mapAndSortPreloadedBooks,
+  removeDuplicateBooks,
+} from "./util/searchBarUtils";
 
 const BOOK_SEARCH_PLACEHOLDER = "Search for books";
 
@@ -29,6 +33,9 @@ const BookSearch = ({
   const { user } = useAuth();
   const [books, setBooks] = useState<BookVolumeItem[]>([]);
   const [flattenedShelfBooks, setFlattenedShelfBooks] = useState<
+    BookVolumeItem[]
+  >([]);
+  const [preSortedBookShelves, setPreSortedBookShelves] = useState<
     BookVolumeItem[]
   >([]);
 
@@ -66,12 +73,27 @@ const BookSearch = ({
       if (searchPhrase === "") {
         setBooks(sortedBooks);
       }
+      setPreSortedBookShelves(sortedBooks);
     }
   }, [preloadedShelfBooks]);
 
   useEffect(() => {
     if (fetchBookData != null) {
-      setBooks(fetchBookData);
+      if (preSortedBookShelves != null) {
+        const searchedBookShelfBooks = filterBookShelfBooksByTitle(
+          preSortedBookShelves,
+          searchPhrase,
+        );
+        if (searchedBookShelfBooks.length === 0) {
+          setBooks(fetchBookData);
+        } else {
+          setBooks(
+            removeDuplicateBooks(searchedBookShelfBooks.concat(fetchBookData)),
+          );
+        }
+      } else {
+        setBooks(fetchBookData);
+      }
     }
   }, [fetchBookData]);
 
