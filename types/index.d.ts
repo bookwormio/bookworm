@@ -18,6 +18,13 @@ interface WeekDataPointModel {
   x: Date; // time as week
   y: number;
 }
+
+interface FlatAPIBookModel {
+  volumeId: string;
+  categories: string[] | undefined;
+  description: string | undefined;
+}
+
 interface UserSearchDisplayModel {
   id: string;
   firstName: string;

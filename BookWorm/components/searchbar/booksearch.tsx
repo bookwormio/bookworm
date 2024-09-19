@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBooksByTitleSearch } from "../../services/books-services/BookQueries";
 import { sendBookInfo } from "../../services/recommendation-services/RecommendationQueries";
-import { type BookVolumeItem } from "../../types";
+import { type BookVolumeInfo, type BookVolumeItem } from "../../types";
 import BookList from "../booklist/BookList";
 import SearchBar from "./searchbar";
 
@@ -45,15 +45,22 @@ const BookSearch = ({ searchPhrase, setSearchPhrase }: BookSearchProps) => {
       setBooks(fetchBookData);
 
       // Create list of dictionaries and pass to the api
-      const bookList = fetchBookData.map(book => {
+      const bookList = fetchBookData.map((book) => {
         return {
-          volume_id: book.id,
+          volumeId: book.id,
           categories: book.volumeInfo.categories,
           description: book.volumeInfo.description,
         };
       });
 
-      sendBookInfo(bookList);
+      const sendBookInfoWithCatch = async () => {
+        try {
+          await sendBookInfo(bookList);
+        } catch (error) {
+          console.error("Error sending book info:", error);
+        }
+      };
+      void sendBookInfoWithCatch();
     }
   }, [fetchBookData]);
 
