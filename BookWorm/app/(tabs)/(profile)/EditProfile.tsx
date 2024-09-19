@@ -21,8 +21,6 @@ import {
   newFetchUserInfo,
   updateUser,
 } from "../../../services/firebase-services/UserQueries";
-import { emptyQuery } from "../../../services/util/queryUtils";
-import { type UserDataModel } from "../../../types";
 
 const EditProfile = () => {
   const { user } = useAuth();
@@ -34,6 +32,7 @@ const EditProfile = () => {
   const [editState, setEditState] = useState("");
   const [newProfilePic, setNewProfilePic] = useState("");
   const [save, setSave] = useState("Save");
+  const [saveDisabled, setSaveDisabled] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -45,52 +44,23 @@ const EditProfile = () => {
       });
     },
   });
-
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
     queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
     queryFn: async () => {
       if (user != null) {
         return await newFetchUserInfo(user.uid);
-      } else {
-        // Return default value when user is null
-        return {};
       }
-    },
-  });
-
-  const refreshMutation = useMutation({
-    mutationFn: emptyQuery,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
-      });
     },
   });
 
   useEffect(() => {
-    if (userData !== undefined) {
-      const userDataTyped = userData as UserDataModel;
-      if (userDataTyped.first !== undefined) {
-        setEditFirst(userDataTyped.first);
-      }
-      if (userDataTyped.last !== undefined) {
-        setEditLast(userDataTyped.last);
-      }
-      if (userDataTyped.number !== undefined) {
-        setEditPhone(userDataTyped.number);
-      }
-      if (userDataTyped.bio !== undefined) {
-        setEditBio(userDataTyped.bio);
-      }
-      if (userDataTyped.city !== undefined) {
-        setEditCity(userDataTyped.city);
-      }
-      if (userDataTyped.state !== undefined) {
-        setEditState(userDataTyped.state);
-      }
+    if (!(userData == null)) {
+      setEditFirst(userData.first ?? editFirst);
+      setEditLast(userData.last ?? editLast);
+      setEditPhone(userData.number ?? editPhone);
+      setEditBio(userData.bio ?? editBio);
+      setEditCity(userData.city ?? editCity);
+      setEditState(userData.state ?? editState);
     }
   }, [userData]);
 
@@ -102,27 +72,25 @@ const EditProfile = () => {
 
   const handeSaveClick = async () => {
     const userId = user?.uid;
-
-    const newUserData = userData as UserDataModel;
-    newUserData.first = editFirst;
-    newUserData.last = editLast;
-    newUserData.number = editPhone;
-    newUserData.bio = editBio;
-    newUserData.city = editCity;
-    newUserData.state = editState;
-    if (newProfilePic !== "" && newProfilePic != null) {
-      newUserData.profilepic = newProfilePic;
-    }
-    if (userId === undefined) {
-      console.error("Current user undefined");
-    } else {
+    if (userData !== undefined && userId !== undefined) {
+      const newUserData = userData;
+      newUserData.first = editFirst;
+      newUserData.last = editLast;
+      newUserData.number = editPhone;
+      newUserData.bio = editBio;
+      newUserData.city = editCity;
+      newUserData.state = editState;
+      if (newProfilePic !== "" && newProfilePic != null) {
+        newUserData.profilepic = newProfilePic;
+      }
       newUserData.id = userId;
-      // await Promise.all([
-      //   userMutation.mutateAsync(newUserData),
-      //   refreshMutation.mutateAsync(),
-      // ]);
       await userMutation.mutateAsync(newUserData);
-      await refreshMutation.mutateAsync();
+      await queryClient.invalidateQueries({
+        queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+      });
       router.back();
     }
   };
@@ -248,7 +216,6 @@ const EditProfile = () => {
               // have to adjust marginHorizontal to make smaller buttons
               title="Close"
               onPress={() => {
-                refreshMutation.mutate();
                 router.back();
               }}
               style={{ marginHorizontal: 20 }}
@@ -256,13 +223,16 @@ const EditProfile = () => {
             <BookWormButton
               // have to adjust marginHorizontal to make smaller buttons
               title={save}
+              disabled={saveDisabled}
               onPress={() => {
                 setSave("Saving...");
+                setSaveDisabled(true);
                 handeSaveClick()
                   .then(() => {})
                   .catch((error) => {
                     console.error("Error saving profile:", error);
                     setSave("Save");
+                    setSaveDisabled(false);
                   });
               }}
               style={{ marginHorizontal: 20 }}

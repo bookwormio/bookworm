@@ -1,7 +1,6 @@
-import { FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   NotificationMessageMap,
   NotificationTypeMap,
@@ -10,6 +9,7 @@ import {
 import { type FullNotificationModel } from "../../types";
 import { generateUserRoute } from "../../utilities/routeUtils";
 import { useAuth } from "../auth/context";
+import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import { calculateTimeSinceNotification } from "./util/notificationUtils";
 
 interface NotifProp {
@@ -54,7 +54,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
     >
       <View style={styles.imageTextContainer}>
         <TouchableOpacity
-          style={styles.defaultImageContainer}
+         
           onPress={() => {
             const userRoute = generateUserRoute(
               user?.uid,
@@ -66,15 +66,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
             }
           }}
         >
-          {notif.sender_img !== "" ? (
-            <Image
-              style={styles.defaultImage}
-              source={{ uri: notif.sender_img }}
-              resizeMode="cover"
-            />
-          ) : (
-            <FontAwesome5 name="user" size={40} color="black" />
-          )}
+          <ProfilePicture userID={notif.sender} size={50} />
         </TouchableOpacity>
         <View style={styles.notifTextContainer}>
           <Text style={styles.notifTitle}>{notifDisplay}</Text>
@@ -107,8 +99,8 @@ const styles = StyleSheet.create({
   notif_container: {
     flex: 1,
     flexDirection: "column",
-    paddingBottom: 10,
-    paddingTop: 5,
+    paddingBottom: 15,
+    paddingTop: 15,
     paddingRight: 40,
     borderBottomWidth: 2,
     borderBottomColor: "rgba(0, 0, 0, 0.1)",
@@ -117,7 +109,6 @@ const styles = StyleSheet.create({
     flexDirection: "row", // Arrange children horizontally
     alignItems: "center", // Align children vertically in the center
     marginLeft: 20, // Adjust as needed
-    marginTop: 20,
     flexWrap: "wrap",
   },
   defaultImageContainer: {

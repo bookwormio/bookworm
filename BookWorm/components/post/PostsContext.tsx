@@ -73,6 +73,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   const { data: userData } = useUserDataQuery(user ?? undefined);
   // getting user profile pic
   const { data: userIm } = useProfilePicQuery(user?.uid);
+
   const queryClient = useQueryClient();
 
   /**
@@ -204,7 +205,6 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
         receiver: postToUpdate.user.id,
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
-        sender_img: userIm ?? "",
         type: ServerNotificationType.COMMENT,
         postID,
         comment,
