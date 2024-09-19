@@ -677,15 +677,22 @@ export async function setBookmarkForBook(
       DB,
       `bookmark_collection/${userID}/bookmarks/${bookID}`,
     );
-    await setDoc(
-      bookmarkRef,
-      {
+    if (!(await getDoc(bookmarkRef)).exists()) {
+      await setDoc(bookmarkRef, {
         bookmark: newBookmark,
         created: serverTimestamp(),
         updated: serverTimestamp(),
-      },
-      { merge: true },
-    );
+      });
+    } else {
+      await setDoc(
+        bookmarkRef,
+        {
+          bookmark: newBookmark,
+          updated: serverTimestamp(),
+        },
+        { merge: true },
+      );
+    }
     return true;
   } catch (error) {
     console.error("Error adding new bookmark", error);
