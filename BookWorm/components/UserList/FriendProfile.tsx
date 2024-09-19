@@ -8,10 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  useProfilePicQuery,
-  useUserDataQuery,
-} from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
+import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { ServerNotificationType } from "../../enums/Enums";
 import {
   followUserByID,
@@ -72,11 +69,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   // getting userdata
   const { data: userData, isLoading: isLoadingUserData } = useUserDataQuery(
     user ?? undefined,
-  );
-
-  // getting user profile pic
-  const { data: userIm, isLoading: isLoadingUserIm } = useProfilePicQuery(
-    user?.uid,
   );
 
   const { data: isFollowingData } = useQuery({
@@ -218,7 +210,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           receiver: friendUserID,
           sender: user?.uid,
           sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
-          sender_img: userIm ?? "",
           type: ServerNotificationType.FRIEND_REQUEST,
         };
         notifyMutation.mutate(FRnotify);
@@ -252,7 +243,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     }
   };
 
-  if (friendIsLoading || isLoadingUserData || isLoadingUserIm) {
+  if (friendIsLoading || isLoadingUserData) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />

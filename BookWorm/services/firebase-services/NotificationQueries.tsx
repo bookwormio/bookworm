@@ -47,7 +47,6 @@ export async function createNotification(
       receiver: notif.receiver,
       sender: notif.sender,
       sender_name: notif.sender_name,
-      sender_img: notif.sender_img,
       created: serverTimestamp(),
       // haven't implement read_at yet
       read_at: null,
@@ -98,7 +97,6 @@ export async function getAllFullNotifications(
         comment: notifDoc.data().comment,
         sender: notifDoc.data().sender,
         sender_name: notifDoc.data().sender_name,
-        sender_img: notifDoc.data().sender_img,
         created: notifDoc.data().created as Timestamp,
         read_at: notifDoc.data().read_at,
         postID: notifDoc.data().postID,
