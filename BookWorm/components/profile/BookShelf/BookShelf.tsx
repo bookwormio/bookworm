@@ -14,24 +14,19 @@ import {
 import { type BookShelfBookModel } from "../../../types";
 import { useAuth } from "../../auth/context";
 import { useRemoveBookFromShelf } from "../hooks/useBookshelfQueries";
+import { useIsProfileRoute } from "../hooks/useRouteHooks";
 import BookShelfBook from "./BookShelfBook";
 
 interface BookShelfProps {
   shelfName: ServerBookShelfName;
   books: BookShelfBookModel[];
-  bookRouteOverride?: string;
-  removeButtonOverride?: boolean;
 }
 
-const BookShelf = ({
-  shelfName,
-  books,
-  bookRouteOverride,
-  removeButtonOverride = false,
-}: BookShelfProps) => {
+const BookShelf = ({ shelfName, books }: BookShelfProps) => {
   const { user } = useAuth();
 
   const { mutate: removeBook } = useRemoveBookFromShelf();
+  const profileroute = useIsProfileRoute();
 
   // Function to call the mutation
   const handleRemoveBook = (bookID: string) => {
@@ -71,15 +66,11 @@ const BookShelf = ({
           <View>
             <TouchableOpacity>
               {item.volumeInfo != null && (
-                <BookShelfBook
-                  book={item.volumeInfo}
-                  bookID={item.id}
-                  bookRouteOverride={bookRouteOverride}
-                />
+                <BookShelfBook book={item.volumeInfo} bookID={item.id} />
               )}
             </TouchableOpacity>
             {/* TODO: make this look better with minus sign button */}
-            {!removeButtonOverride && (
+            {profileroute && (
               <Button
                 onPress={() => {
                   handleRemoveBook(item.id);

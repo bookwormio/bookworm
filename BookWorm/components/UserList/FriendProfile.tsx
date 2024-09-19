@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
-import { SEARCH_BOOK_PREFIX } from "../../constants/constants";
 import { ServerNotificationType } from "../../enums/Enums";
 import {
   followUserByID,
@@ -258,7 +257,10 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   }
 
   return (
-    <ScrollView>
+    <ScrollView
+      stickyHeaderIndices={[4]}
+      style={{ flexGrow: 1, height: "100%" }}
+    >
       <View style={styles.buttonwrapper}></View>
       <View style={styles.imageTextContainer}>
         <View style={styles.profilePicContainer}>
@@ -314,11 +316,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         setProfileTab={setProfileTab}
       ></FriendProfileTabSelector>
       {profileTab === "shelf" ? (
-        <ProfileBookShelves
-          userID={friendUserID}
-          bookRouteOverride={SEARCH_BOOK_PREFIX}
-          removeButtonOverride={true}
-        />
+        <ProfileBookShelves userID={friendUserID} />
       ) : profileTab === "post" ? (
         <Text>PUT THE POSTS HERE</Text>
       ) : (

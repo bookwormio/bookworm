@@ -2,24 +2,26 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { PROFILE_BOOK_PREFIX } from "../../../constants/constants";
+import {
+  PROFILE_BOOK_PREFIX,
+  SEARCH_BOOK_PREFIX,
+} from "../../../constants/constants";
 import { type BookshelfVolumeInfo } from "../../../types";
 import { generateBookRoute } from "../../../utilities/routeUtils";
+import { useIsFriendProfileRoute } from "../hooks/useRouteHooks";
 
 interface BookShelfBookProps {
   book: BookshelfVolumeInfo;
   bookID: string;
-  bookRouteOverride?: string;
 }
-const BookShelfBook = ({
-  book,
-  bookID,
-  bookRouteOverride,
-}: BookShelfBookProps) => {
+const BookShelfBook = ({ book, bookID }: BookShelfBookProps) => {
+  const friendroute = useIsFriendProfileRoute();
   return (
     <TouchableOpacity
       onPress={() => {
-        const prefixBookRoute = bookRouteOverride ?? PROFILE_BOOK_PREFIX;
+        const prefixBookRoute = friendroute
+          ? SEARCH_BOOK_PREFIX
+          : PROFILE_BOOK_PREFIX;
         const bookRoute = generateBookRoute(bookID, prefixBookRoute);
         if (bookRoute != null) {
           router.push(bookRoute);
