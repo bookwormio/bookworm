@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
+import { SEARCH_BOOK_PREFIX } from "../../constants/constants";
 import { ServerNotificationType } from "../../enums/Enums";
 import {
   followUserByID,
@@ -27,6 +29,9 @@ import {
   type UserDataModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
+import FriendProfileTabSelector from "../friendprofile/FriendProfileTabSelector";
+import ProfileBookShelves from "../profile/BookShelf/ProfileBookShelves";
+import ViewData from "../profile/Data/ViewData";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 
 enum LocalFollowStatus {
@@ -44,6 +49,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
   const { user } = useAuth();
+  const [profileTab, setProfileTab] = useState("shelf");
   const [followStatus, setFollowStatus] = useState<string>(
     LocalFollowStatus.LOADING,
   );
@@ -252,7 +258,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   }
 
   return (
-    <View>
+    <ScrollView>
       <View style={styles.buttonwrapper}></View>
       <View style={styles.imageTextContainer}>
         <View style={styles.profilePicContainer}>
@@ -303,7 +309,21 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+      <FriendProfileTabSelector
+        profileTab={profileTab}
+        setProfileTab={setProfileTab}
+      ></FriendProfileTabSelector>
+      {profileTab === "shelf" ? (
+        <ProfileBookShelves
+          userID={friendUserID}
+          bookRouteOverride={SEARCH_BOOK_PREFIX}
+        />
+      ) : profileTab === "post" ? (
+        <Text>PUT THE POSTS HERE</Text>
+      ) : (
+        <ViewData></ViewData>
+      )}
+    </ScrollView>
   );
 };
 export default FriendProfile;

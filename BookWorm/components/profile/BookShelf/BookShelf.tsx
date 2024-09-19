@@ -19,9 +19,10 @@ import BookShelfBook from "./BookShelfBook";
 interface BookShelfProps {
   shelfName: ServerBookShelfName;
   books: BookShelfBookModel[];
+  bookRouteOverride?: string;
 }
 
-const BookShelf = ({ shelfName, books }: BookShelfProps) => {
+const BookShelf = ({ shelfName, books, bookRouteOverride }: BookShelfProps) => {
   const { user } = useAuth();
 
   const { mutate: removeBook } = useRemoveBookFromShelf();
@@ -64,7 +65,11 @@ const BookShelf = ({ shelfName, books }: BookShelfProps) => {
           <View>
             <TouchableOpacity>
               {item.volumeInfo != null && (
-                <BookShelfBook book={item.volumeInfo} bookID={item.id} />
+                <BookShelfBook
+                  book={item.volumeInfo}
+                  bookID={item.id}
+                  bookRouteOverride={bookRouteOverride}
+                />
               )}
             </TouchableOpacity>
             {/* TODO: make this look better with minus sign button */}

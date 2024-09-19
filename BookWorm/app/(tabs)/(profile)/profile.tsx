@@ -115,8 +115,8 @@ const Profile = () => {
         profileTab={profileTab}
         setProfileTab={setProfileTab}
       ></ProfileTabSelector>
-      {profileTab === "shelf" ? (
-        <ProfileBookShelves />
+      {profileTab === "shelf" && user !== null ? (
+        <ProfileBookShelves userID={user?.uid} />
       ) : profileTab === "post" ? (
         <ProfilePosts />
       ) : (

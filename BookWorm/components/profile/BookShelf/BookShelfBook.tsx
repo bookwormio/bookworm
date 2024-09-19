@@ -9,12 +9,18 @@ import { generateBookRoute } from "../../../utilities/routeUtils";
 interface BookShelfBookProps {
   book: BookshelfVolumeInfo;
   bookID: string;
+  bookRouteOverride?: string;
 }
-const BookShelfBook = ({ book, bookID }: BookShelfBookProps) => {
+const BookShelfBook = ({
+  book,
+  bookID,
+  bookRouteOverride,
+}: BookShelfBookProps) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        const bookRoute = generateBookRoute(bookID, PROFILE_BOOK_PREFIX);
+        const prefixBookRoute = bookRouteOverride ?? PROFILE_BOOK_PREFIX;
+        const bookRoute = generateBookRoute(bookID, prefixBookRoute);
         if (bookRoute != null) {
           router.push(bookRoute);
         }
