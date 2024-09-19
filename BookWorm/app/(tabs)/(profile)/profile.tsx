@@ -120,7 +120,7 @@ const Profile = () => {
       ) : profileTab === "post" ? (
         <ProfilePosts />
       ) : (
-        <ViewData></ViewData>
+        <ViewData userID={user?.uid ?? ""}></ViewData>
       )}
     </ScrollView>
   );

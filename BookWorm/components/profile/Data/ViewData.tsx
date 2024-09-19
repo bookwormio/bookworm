@@ -13,7 +13,6 @@ import {
   type LineDataPointModel,
   type WeekDataPointModel,
 } from "../../../types";
-import { useAuth } from "../../auth/context";
 import ViewDataChart from "../../chart/ViewDataChart";
 
 // TODO: Combine these functions into a single generic
@@ -52,22 +51,20 @@ function aggregatePagesDataByWeek(
   return aggregatedArray;
 }
 
-const ViewData = () => {
-  const { user } = useAuth();
+interface ViewDataProps {
+  userID: string;
+}
 
+const ViewData = ({ userID }: ViewDataProps) => {
   const {
     data: pagesData,
     isLoading: isLoadingPagesData,
     isError: isErrorPages,
   } = useQuery({
-    queryKey: user != null ? ["pagesData", user.uid] : ["pagesData"],
+    queryKey: ["pagesData", userID],
     queryFn: async () => {
-      if (user != null) {
-        const pagesReadData = await fetchPagesReadData(user.uid);
-        return pagesReadData;
-      } else {
-        return [];
-      }
+      const pagesReadData = await fetchPagesReadData(userID);
+      return pagesReadData;
     },
   });
 
