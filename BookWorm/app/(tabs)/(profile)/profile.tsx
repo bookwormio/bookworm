@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -15,30 +15,20 @@ import ViewData from "../../../components/profile/Data/ViewData";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
 import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
 import {
-  fetchUserData,
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
+  newFetchUserInfo,
 } from "../../../services/firebase-services/UserQueries";
-import { type UserDataModel } from "../../../types";
 
 const Profile = () => {
   const { signOut, user } = useAuth();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [bio, setBio] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
   const [profileTab, setProfileTab] = useState("shelf"); // Default to bookshelf
 
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
     queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
     queryFn: async () => {
       if (user != null) {
-        const userdata = await fetchUserData(user);
-        return userdata;
-      } else {
-        // Return default value when user is null
-        return {};
+        return await newFetchUserInfo(user.uid);
       }
     },
   });
@@ -67,28 +57,7 @@ const Profile = () => {
     },
   });
 
-  useEffect(() => {
-    if (userData !== undefined && userData != null) {
-      const userDataTyped = userData as UserDataModel;
-      if (userDataTyped.first !== undefined) {
-        setFirstName(userDataTyped.first);
-      }
-      if (userDataTyped.last !== undefined) {
-        setLastName(userDataTyped.last);
-      }
-      if (userDataTyped.bio !== undefined) {
-        setBio(userDataTyped.bio);
-      }
-      if (userDataTyped.city !== undefined) {
-        setCity(userDataTyped.city);
-      }
-      if (userDataTyped.state !== undefined) {
-        setState(userDataTyped.state);
-      }
-    }
-  }, [userData]);
-
-  if (isLoadingUserData) {
+  if (isLoadingUserData || userData == null) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#000000" />
@@ -104,17 +73,17 @@ const Profile = () => {
         </View>
         <View>
           <Text style={styles.nameText}>
-            {firstName} {lastName}
+            {userData.first} {userData.last}
           </Text>
           <Text style={styles.locText}>
-            {city === "" ? "" : city}
-            {city !== "" && state !== "" ? ", " : ""}
-            {state === "" ? "" : state}
+            {userData.city === "" ? "" : userData.city}
+            {userData.city !== "" && userData.state !== "" ? ", " : ""}
+            {userData.state === "" ? "" : userData.state}
           </Text>
         </View>
       </View>
       <View>
-        <Text style={styles.bioPad}>{bio}</Text>
+        <Text style={styles.bioPad}>{userData.bio}</Text>
       </View>
       <View style={styles.imageTextContainer}>
         <View style={styles.locText}>
