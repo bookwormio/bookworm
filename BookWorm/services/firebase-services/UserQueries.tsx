@@ -650,36 +650,33 @@ export async function getBookmarkForBook(
 export async function setBookmarkForBook(
   userID: string,
   bookID: string,
-  bookmark: number,
+  newBookmark: number,
+  oldBookmark: number,
 ): Promise<boolean> {
   try {
+    // no history if the book hasn't been started
+    if (oldBookmark > 0) {
+      const pageProgress = newBookmark - oldBookmark;
+      // add new page progress to history
+      await addDoc(collection(DB, `user_collection/${userID}/history`), {
+        bookID,
+        pages: pageProgress,
+        added_at: serverTimestamp(),
+      });
+    }
     const bookmarkRef = doc(
       DB,
       `bookmark_collection/${userID}/bookmarks/${bookID}`,
     );
-    const docSnap = await getDoc(bookmarkRef);
-    if (docSnap.exists()) {
-      const oldBookmark: number = docSnap.data().bookmark;
-      const updated = docSnap.data().updated;
-      const subColHistoryRef = collection(docSnap.ref, "history");
-      await addDoc(subColHistoryRef, {
-        added_at: updated,
-        pages: bookmark - oldBookmark,
-      });
-      const updatedBookmark = {
-        bookmark,
-        created: docSnap.data().created,
-        updated: serverTimestamp(),
-      };
-      await updateDoc(bookmarkRef, updatedBookmark);
-    } else {
-      const newBookmarkData = {
-        bookmark,
+    await setDoc(
+      bookmarkRef,
+      {
+        bookmark: newBookmark,
         created: serverTimestamp(),
         updated: serverTimestamp(),
-      };
-      await setDoc(bookmarkRef, newBookmarkData);
-    }
+      },
+      { merge: true },
+    );
     return true;
   } catch (error) {
     console.error("Error adding new bookmark", error);

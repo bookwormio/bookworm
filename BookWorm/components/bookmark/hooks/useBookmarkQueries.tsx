@@ -48,15 +48,22 @@ export const useSetBookmarkForBook = () => {
       userID,
       bookID,
       bookmark,
+      oldBookmark,
     }: {
       userID: string | undefined;
       bookID: string | undefined;
       bookmark: number;
+      oldBookmark: number | undefined;
     }) => {
       if (userID == null || bookID == null) {
         throw new Error("User ID or Book ID is missing");
       }
-      return await setBookmarkForBook(userID, bookID, bookmark);
+      return await setBookmarkForBook(
+        userID,
+        bookID,
+        bookmark,
+        oldBookmark ?? 0,
+      );
     },
     onMutate: async ({ userID, bookID, bookmark }) => {
       // Cancel any outgoing refetches for this bookmark

@@ -124,6 +124,7 @@ const NewPost = () => {
         userID: user?.uid,
         bookID: selectedBook?.id,
         bookmark: currentBookmark,
+        oldBookmark,
       });
     }
   };

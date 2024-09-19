@@ -1,10 +1,4 @@
-import {
-  collection,
-  getDoc,
-  getDocs,
-  orderBy,
-  query,
-} from "firebase/firestore";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { DB } from "../../firebase.config";
 import { type LineDataPointModel } from "../../types";
 
@@ -18,44 +12,33 @@ export async function fetchPagesReadData(
 ): Promise<LineDataPointModel[]> {
   const dataPoints: LineDataPointModel[] = [];
   try {
-    const bookmarksRef = collection(
+    const historyRef = collection(DB, `user_collection/${userID}/history`);
+    const historyQuery = query(historyRef, orderBy("added_at", "desc"));
+    const historySnap = await getDocs(historyQuery);
+
+    const currentRef = collection(
       DB,
       `bookmark_collection/${userID}/bookmarks`,
     );
-    const q = query(bookmarksRef);
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      for (const doc of querySnapshot.docs) {
-        const docSnap = await getDoc(doc.ref);
-        if (docSnap.exists()) {
-          const currentPage = docSnap.data().bookmark;
-          const currentDate = docSnap.data().updated;
-          const subColHistoryRef = collection(docSnap.ref, "history");
-          const subColHistoryQuery = query(
-            subColHistoryRef,
-            orderBy("added_at", "desc"),
-          );
-          const subColHistorySnap = await getDocs(subColHistoryQuery);
-          if (!subColHistorySnap.empty) {
-            subColHistorySnap.docs.forEach((subDoc, index) => {
-              if (index === 0) {
-                dataPoints.push({
-                  x: currentDate.seconds,
-                  y: currentPage - subDoc.data().pages,
-                });
-              }
-              dataPoints.push({
-                x: subDoc.data().added_at.seconds,
-                y: subDoc.data().pages,
-              });
-            });
-          } else {
-            dataPoints.push({
-              x: currentDate.seconds,
-              y: currentPage,
-            });
-          }
-        }
+    const currentQuery = query(currentRef);
+    const currentSnap = await getDocs(currentQuery);
+
+    if (!currentSnap.empty) {
+      for (const currentDoc of currentSnap.docs) {
+        const mostRecentHistory = historySnap.docs.find(
+          (historyDoc) => historyDoc.data().bookID === currentDoc.id,
+        );
+        dataPoints.push({
+          x: currentDoc.data().updated.seconds,
+          y:
+            currentDoc.data().bookmark - (mostRecentHistory?.data().pages ?? 0),
+        });
+      }
+      for (const historyDoc of historySnap.docs) {
+        dataPoints.push({
+          x: historyDoc.data().added_at.seconds,
+          y: historyDoc.data().pages,
+        });
       }
     }
     return dataPoints;
