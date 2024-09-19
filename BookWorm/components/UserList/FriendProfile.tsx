@@ -317,6 +317,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         <ProfileBookShelves
           userID={friendUserID}
           bookRouteOverride={SEARCH_BOOK_PREFIX}
+          removeOverride={true}
         />
       ) : profileTab === "post" ? (
         <Text>PUT THE POSTS HERE</Text>

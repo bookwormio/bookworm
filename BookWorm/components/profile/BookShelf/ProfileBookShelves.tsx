@@ -7,9 +7,14 @@ import BookShelf from "./BookShelf";
 interface BookShelvesProp {
   userID: string;
   bookRouteOverride?: string;
+  removeOverride?: boolean;
 }
 
-const ProfileBookShelves = ({ userID, bookRouteOverride }: BookShelvesProp) => {
+const ProfileBookShelves = ({
+  userID,
+  bookRouteOverride,
+  removeOverride = false,
+}: BookShelvesProp) => {
   // Initialize the bookShelves state with all shelves empty
 
   // TODO FIX NULL USERID
@@ -44,6 +49,7 @@ const ProfileBookShelves = ({ userID, bookRouteOverride }: BookShelvesProp) => {
           shelfName={shelfName as ServerBookShelfName}
           books={books}
           bookRouteOverride={bookRouteOverride}
+          removeOverride={removeOverride}
         />
       ))}
     </View>

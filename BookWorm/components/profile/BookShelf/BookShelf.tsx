@@ -20,9 +20,15 @@ interface BookShelfProps {
   shelfName: ServerBookShelfName;
   books: BookShelfBookModel[];
   bookRouteOverride?: string;
+  removeOverride?: boolean;
 }
 
-const BookShelf = ({ shelfName, books, bookRouteOverride }: BookShelfProps) => {
+const BookShelf = ({
+  shelfName,
+  books,
+  bookRouteOverride,
+  removeOverride = false,
+}: BookShelfProps) => {
   const { user } = useAuth();
 
   const { mutate: removeBook } = useRemoveBookFromShelf();
@@ -73,13 +79,15 @@ const BookShelf = ({ shelfName, books, bookRouteOverride }: BookShelfProps) => {
               )}
             </TouchableOpacity>
             {/* TODO: make this look better with minus sign button */}
-            <Button
-              onPress={() => {
-                handleRemoveBook(item.id);
-              }}
-              title="Remove from shelf"
-              // TODO: ADD THIS disabled={isRemoving}
-            />
+            {!removeOverride && (
+              <Button
+                onPress={() => {
+                  handleRemoveBook(item.id);
+                }}
+                title="Remove from shelf"
+                // TODO: ADD THIS disabled={isRemoving}
+              />
+            )}
           </View>
         )}
         ListEmptyComponent={() => (
