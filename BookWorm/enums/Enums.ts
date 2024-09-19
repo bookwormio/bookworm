@@ -35,13 +35,18 @@ export enum ServerNotificationType {
   LIKE = "LIKE",
   COMMENT = "COMMENT",
   RECOMMENDATION = "RECOMMENDATION",
+  BOOK_REQUEST = "BOOK_REQUEST",
+  BOOK_REQUEST_RESPONSE = "BOOK_REQUEST_RESPONSE",
 }
 
+// TODO make this into a function instead of a map
+// because book request response has different messages based on status
 export const NotificationTypeMap: StringMap = {
   [ServerNotificationType.FRIEND_REQUEST]: "New Follower",
   [ServerNotificationType.LIKE]: "New Like",
   [ServerNotificationType.COMMENT]: "New Comment",
   [ServerNotificationType.RECOMMENDATION]: "New Recommendation",
+  [ServerNotificationType.BOOK_REQUEST]: "New Book Request",
 };
 
 export const NotificationMessageMap: StringMap = {
@@ -49,7 +54,27 @@ export const NotificationMessageMap: StringMap = {
   [ServerNotificationType.LIKE]: "liked your post",
   [ServerNotificationType.COMMENT]: "commented on your post:",
   [ServerNotificationType.RECOMMENDATION]: "thinks you should read",
+  [ServerNotificationType.BOOK_REQUEST]: "requested to borrow",
 };
+
+// TODO: do i need this?
+// export const SERVER_LENDING_STATUS = {
+//   LENDING: "lending",
+//   AVAILABLE: "available",
+// };
+
+export enum BookRequestNotificationStatus {
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  DENIED = "denied",
+}
+
+export enum BookRequestActionDisplay {
+  ACCEPT = "Accept",
+  DENY = "Deny",
+  ACCEPTED = "Accepted",
+  DENIED = "Denied",
+}
 
 export enum TabNames {
   BOOKSHELVES = "shelf",

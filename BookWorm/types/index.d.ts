@@ -4,7 +4,10 @@ import {
   type Timestamp,
 } from "firebase/firestore";
 
-import { type ServerNotificationType } from "../enums/Enums";
+import {
+  type BookRequestNotificationStatus,
+  type ServerNotificationType,
+} from "../enums/Enums";
 
 interface LineDataPointModel {
   x: number; // time in seconds
@@ -205,6 +208,7 @@ interface FullNotificationModel {
   bookTitle: string;
   custom_message: string;
   type: ServerNotificationType;
+  status: BookRequestNotificationStatus; // TODO maybe give this a better name
 }
 
 interface FriendRequestNotification extends BasicNotificationModel {
@@ -229,8 +233,26 @@ interface RecommendationNotification extends BasicNotificationModel {
   custom_message: string;
 }
 
+interface BookRequestNotification extends BasicNotificationModel {
+  type: ServerNotificationType.BOOK_REQUEST;
+  bookID: string;
+  bookTitle: string;
+  custom_message: string;
+}
+
+interface BookRequestResponseNotification extends BasicNotificationModel {
+  type: ServerNotificationType.BOOK_REQUEST_RESPONSE;
+  bookID: string;
+  bookTitle: string;
+  custom_message: string;
+  // TODO: maybe add response status here ??
+}
+
 type Notification =
   | FriendRequestNotification
   | LikeNotification
   | CommentNotification
-  | RecommendationNotification;
+  | RecommendationNotification
+  | BookRequestNotification
+  | BookRequestAcceptedNotification
+  | BookRequestDeniedNotification;
