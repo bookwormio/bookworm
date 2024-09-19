@@ -32,6 +32,7 @@ const EditProfile = () => {
   const [editState, setEditState] = useState("");
   const [newProfilePic, setNewProfilePic] = useState("");
   const [save, setSave] = useState("Save");
+  const [saveDisabled, setSaveDisabled] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -53,26 +54,13 @@ const EditProfile = () => {
   });
 
   useEffect(() => {
-    if (userData !== undefined) {
-      const userDataTyped = userData;
-      if (userDataTyped.first !== undefined) {
-        setEditFirst(userDataTyped.first);
-      }
-      if (userDataTyped.last !== undefined) {
-        setEditLast(userDataTyped.last);
-      }
-      if (userDataTyped.number !== undefined) {
-        setEditPhone(userDataTyped.number);
-      }
-      if (userDataTyped.bio !== undefined) {
-        setEditBio(userDataTyped.bio);
-      }
-      if (userDataTyped.city !== undefined) {
-        setEditCity(userDataTyped.city);
-      }
-      if (userDataTyped.state !== undefined) {
-        setEditState(userDataTyped.state);
-      }
+    if (!(userData == null)) {
+      setEditFirst(userData.first ?? editFirst);
+      setEditLast(userData.last ?? editLast);
+      setEditPhone(userData.number ?? editPhone);
+      setEditBio(userData.bio ?? editBio);
+      setEditCity(userData.city ?? editCity);
+      setEditState(userData.state ?? editState);
     }
   }, [userData]);
 
@@ -96,10 +84,6 @@ const EditProfile = () => {
         newUserData.profilepic = newProfilePic;
       }
       newUserData.id = userId;
-      // await Promise.all([
-      //   userMutation.mutateAsync(newUserData),
-      //   refreshMutation.mutateAsync(),
-      // ]);
       await userMutation.mutateAsync(newUserData);
       await queryClient.invalidateQueries({
         queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
@@ -239,13 +223,16 @@ const EditProfile = () => {
             <BookWormButton
               // have to adjust marginHorizontal to make smaller buttons
               title={save}
+              disabled={saveDisabled}
               onPress={() => {
                 setSave("Saving...");
+                setSaveDisabled(true);
                 handeSaveClick()
                   .then(() => {})
                   .catch((error) => {
                     console.error("Error saving profile:", error);
                     setSave("Save");
+                    setSaveDisabled(false);
                   });
               }}
               style={{ marginHorizontal: 20 }}
