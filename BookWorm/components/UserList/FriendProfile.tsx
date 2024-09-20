@@ -309,67 +309,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     }
   };
 
-  const handleBookRequestClicked = (bookID: string, bookTitle: string) => {
-    // TODO: optimistic update the button
-    // Create an alert for book request message
-    Alert.prompt(
-      "Request " + bookTitle + " from " + firstName,
-      "Include a custom message (Optional)",
-      [
-        {
-          text: "Cancel",
-          onPress: () => {},
-          style: "cancel",
-        },
-        {
-          text: "Request",
-          onPress: (message) => {
-            // TODO: uncomment this
-            // handleSendBookRequestNotification({
-            //   bookID: "FAKE BOOK ID",
-            //   bookTitle: "FAKE BOOK TITLE",
-            //   message: message ?? "",
-            // });
-          },
-        },
-      ],
-      "plain-text",
-    );
-  };
-
-  // TODO clean up these parameters
-  const handleSendBookRequestNotification = ({
-    bookID,
-    bookTitle,
-    message,
-  }: {
-    bookID: string;
-    bookTitle: string;
-    message?: string;
-  }) => {
-    // TODO handle all the type checks here
-    if (user == null || userData == null) {
-      console.error("User is null");
-    }
-    if (bookID == null || bookTitle == null) {
-      console.error("Book ID or book title is null");
-    }
-    if (user != null) {
-      const uData = userData as UserDataModel;
-      const bookRequestNotification: BookRequestNotification = {
-        receiver: friendUserID,
-        sender: user?.uid,
-        sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
-        sender_img: userIm ?? "",
-        bookID,
-        bookTitle,
-        custom_message: message ?? "",
-        type: ServerNotificationType.BOOK_REQUEST,
-      };
-      notifyMutation.mutate(bookRequestNotification);
-    }
-  };
-
   if (friendIsLoading || isLoadingUserData) {
     return (
       <View style={styles.loading}>
