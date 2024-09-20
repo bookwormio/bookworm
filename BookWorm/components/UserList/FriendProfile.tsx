@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
-import { ServerNotificationType } from "../../enums/Enums";
+import { ServerNotificationType, TabNames } from "../../enums/Enums";
 import {
   followUserByID,
   getIsFollowing,
@@ -28,10 +28,9 @@ import {
   type UserDataModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
-import FriendProfileTabSelector from "../friendprofile/FriendProfileTabSelector";
 import ProfileBookShelves from "../profile/BookShelf/ProfileBookShelves";
-import ViewData from "../profile/Data/ViewData";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
+import ProfileTabSelector from "../profile/ProfileTabSelector";
 
 enum LocalFollowStatus {
   FOLLOWING = "following",
@@ -311,16 +310,19 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           </TouchableOpacity>
         </View>
       </View>
-      <FriendProfileTabSelector
+      <ProfileTabSelector
         profileTab={profileTab}
         setProfileTab={setProfileTab}
-      ></FriendProfileTabSelector>
-      {profileTab === "shelf" ? (
+        tabs={[TabNames.BOOKSHELVES, TabNames.POSTS, TabNames.DATA]}
+      ></ProfileTabSelector>
+      {profileTab === TabNames.BOOKSHELVES ? (
         <ProfileBookShelves userID={friendUserID} />
-      ) : profileTab === "post" ? (
+      ) : profileTab === TabNames.POSTS ? (
         <Text>PUT THE POSTS HERE</Text>
+      ) : profileTab === TabNames.DATA ? (
+        <Text>PUT DATA HERE</Text>
       ) : (
-        <ViewData></ViewData>
+        <Text>Tab DNE</Text>
       )}
     </ScrollView>
   );

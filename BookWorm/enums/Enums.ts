@@ -50,3 +50,15 @@ export const NotificationMessageMap: StringMap = {
   [ServerNotificationType.COMMENT]: "commented on your post:",
   [ServerNotificationType.RECOMMENDATION]: "thinks you should read",
 };
+
+export enum TabNames {
+  BOOKSHELVES = "shelf",
+  POSTS = "post",
+  DATA = "data",
+}
+
+export const TabsTitleMap: StringMap = {
+  [TabNames.BOOKSHELVES]: "Shelves",
+  [TabNames.POSTS]: "Posts",
+  [TabNames.DATA]: "Data",
+};
