@@ -3,64 +3,61 @@ import { router, Stack } from "expo-router";
 import React from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import BackButton from "../../../components/backbutton/BackButton";
-import { PostsProvider } from "../../../components/post/PostsContext";
 
 const PostsLayout = () => {
   return (
-    <PostsProvider>
-      <Stack>
-        <Stack.Screen
-          name="posts"
-          options={{
-            headerTitle: "Posts",
-            headerShown: true,
-            headerRight: () => (
-              <TouchableOpacity
-                style={styles.newPost}
-                onPress={() => {
-                  router.push({ pathname: "notifications" });
-                }}
-                disabled={false}
-              >
-                <FontAwesome5 name="bell" size={20} color="#FB6D0B" />
-              </TouchableOpacity>
-            ),
-          }}
-        />
-        <Stack.Screen
-          name="[postID]"
-          options={{
-            headerShown: true,
-            headerTitle: "Post",
-            headerLeft: () => <BackButton />,
-          }}
-        />
-        <Stack.Screen
-          name="user/[friendUserID]"
-          options={{
-            headerShown: true,
-            headerTitle: "Friend Profile",
-            headerLeft: () => <BackButton />,
-          }}
-        />
-        <Stack.Screen
-          name="notifications"
-          options={{
-            headerShown: true,
-            headerTitle: "Notifications",
-            headerLeft: () => <BackButton />,
-          }}
-        />
-        <Stack.Screen
-          name="postsbook/[bookID]"
-          options={{
-            headerShown: true,
-            headerTitle: "Book",
-            headerLeft: () => <BackButton />,
-          }}
-        />
-      </Stack>
-    </PostsProvider>
+    <Stack>
+      <Stack.Screen
+        name="posts"
+        options={{
+          headerTitle: "Posts",
+          headerShown: true,
+          headerRight: () => (
+            <TouchableOpacity
+              style={styles.newPost}
+              onPress={() => {
+                router.push({ pathname: "notifications" });
+              }}
+              disabled={false}
+            >
+              <FontAwesome5 name="bell" size={20} color="#FB6D0B" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="[postID]"
+        options={{
+          headerShown: true,
+          headerTitle: "Post",
+          headerLeft: () => <BackButton />,
+        }}
+      />
+      <Stack.Screen
+        name="user/[friendUserID]"
+        options={{
+          headerShown: true,
+          headerTitle: "Friend Profile",
+          headerLeft: () => <BackButton />,
+        }}
+      />
+      <Stack.Screen
+        name="notifications"
+        options={{
+          headerShown: true,
+          headerTitle: "Notifications",
+          headerLeft: () => <BackButton />,
+        }}
+      />
+      <Stack.Screen
+        name="postsbook/[bookID]"
+        options={{
+          headerShown: true,
+          headerTitle: "Book",
+          headerLeft: () => <BackButton />,
+        }}
+      />
+    </Stack>
   );
 };
 

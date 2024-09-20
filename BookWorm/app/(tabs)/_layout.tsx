@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "../../components/auth/context";
+import { PostsProvider } from "../../components/post/PostsContext";
 
 const AppLayout = () => {
   const { isLoading } = useAuth();
@@ -34,56 +35,58 @@ const AppLayout = () => {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <Tabs>
-        <Tabs.Screen
-          name="(posts)"
-          options={{
-            tabBarLabel: "Posts",
-            headerShown: false,
-            tabBarActiveTintColor: "#FB6D0B",
-            tabBarInactiveTintColor: "grey",
-            tabBarIcon: ({ size, color }) => (
-              <FontAwesome5 name="stream" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="(search)"
-          options={{
-            tabBarLabel: "Search",
-            headerShown: false,
-            tabBarActiveTintColor: "#FB6D0B",
-            tabBarInactiveTintColor: "grey",
-            tabBarIcon: ({ size, color }) => (
-              <FontAwesome5 name="search" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="(create)"
-          options={{
-            tabBarLabel: "Create",
-            headerTitle: "Create",
-            tabBarActiveTintColor: "#FB6D0B",
-            tabBarInactiveTintColor: "grey",
-            tabBarIcon: ({ size, focused, color }) => (
-              <FontAwesome5 name="book-medical" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="(profile)"
-          options={{
-            tabBarLabel: "Profile",
-            headerShown: false,
-            tabBarActiveTintColor: "#FB6D0B",
-            tabBarInactiveTintColor: "grey",
-            tabBarIcon: ({ size, color }) => (
-              <FontAwesome5 name="id-card" size={size} color={color} />
-            ),
-          }}
-        />
-      </Tabs>
+      <PostsProvider>
+        <Tabs>
+          <Tabs.Screen
+            name="(posts)"
+            options={{
+              tabBarLabel: "Posts",
+              headerShown: false,
+              tabBarActiveTintColor: "#FB6D0B",
+              tabBarInactiveTintColor: "grey",
+              tabBarIcon: ({ size, color }) => (
+                <FontAwesome5 name="stream" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="(search)"
+            options={{
+              tabBarLabel: "Search",
+              headerShown: false,
+              tabBarActiveTintColor: "#FB6D0B",
+              tabBarInactiveTintColor: "grey",
+              tabBarIcon: ({ size, color }) => (
+                <FontAwesome5 name="search" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="(create)"
+            options={{
+              tabBarLabel: "Create",
+              headerTitle: "Create",
+              tabBarActiveTintColor: "#FB6D0B",
+              tabBarInactiveTintColor: "grey",
+              tabBarIcon: ({ size, focused, color }) => (
+                <FontAwesome5 name="book-medical" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="(profile)"
+            options={{
+              tabBarLabel: "Profile",
+              headerShown: false,
+              tabBarActiveTintColor: "#FB6D0B",
+              tabBarInactiveTintColor: "grey",
+              tabBarIcon: ({ size, color }) => (
+                <FontAwesome5 name="id-card" size={size} color={color} />
+              ),
+            }}
+          />
+        </Tabs>
+      </PostsProvider>
     </KeyboardAvoidingView>
   );
 };

@@ -13,6 +13,7 @@ import BookWormButton from "../../../components/button/BookWormButton";
 import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBookShelves";
 import ViewData from "../../../components/profile/Data/ViewData";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
+import ProfilePosts from "../../../components/profile/ProfilePosts";
 import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
 import {
   getNumberOfFollowersByUserID,
@@ -110,7 +111,6 @@ const Profile = () => {
         />
         <BookWormButton title="Log Out" onPress={signOut} />
       </View>
-
       <ProfileTabSelector
         profileTab={profileTab}
         setProfileTab={setProfileTab}
@@ -118,9 +118,9 @@ const Profile = () => {
       {profileTab === "shelf" ? (
         <ProfileBookShelves />
       ) : profileTab === "post" ? (
-        <Text>PUT THE POSTS HERE</Text>
+        <ProfilePosts />
       ) : (
-        <ViewData></ViewData>
+        <ViewData userID={user?.uid ?? ""}></ViewData>
       )}
     </ScrollView>
   );

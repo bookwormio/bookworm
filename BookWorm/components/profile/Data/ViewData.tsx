@@ -8,15 +8,11 @@ import {
   View,
 } from "react-native";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {
-  fetchPagesReadData,
-  fetchTimeReadData,
-} from "../../../services/firebase-services/DataQueries";
+import { fetchPagesReadData } from "../../../services/firebase-services/DataQueries";
 import {
   type LineDataPointModel,
   type WeekDataPointModel,
 } from "../../../types";
-import { useAuth } from "../../auth/context";
 import ViewDataChart from "../../chart/ViewDataChart";
 
 // TODO: Combine these functions into a single generic
@@ -55,77 +51,24 @@ function aggregatePagesDataByWeek(
   return aggregatedArray;
 }
 
-function aggregateTimeDataByWeek(
-  data: LineDataPointModel[],
-): WeekDataPointModel[] {
-  const aggregatedTimeData: Record<string, number> = {};
-
-  data.forEach(({ x, y }) => {
-    const date = new Date(x * 1000); // multiply by 1000 for milliseconds
-
-    const startOfWeek = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate() - date.getDay(),
-    );
-
-    const weekKey = startOfWeek.toISOString();
-
-    if (aggregatedTimeData[weekKey] === undefined) {
-      aggregatedTimeData[weekKey] = 0;
-    }
-
-    aggregatedTimeData[weekKey] += y;
-  });
-
-  const aggregatedArray: WeekDataPointModel[] = Object.entries(
-    aggregatedTimeData,
-  ).map(([weekKey, sum]) => ({
-    x: new Date(weekKey),
-    y: sum,
-  }));
-
-  // Sort the aggregated data by week in ascending order
-  aggregatedArray.sort((a, b) => a.x.getTime() - b.x.getTime());
-  return aggregatedArray;
+interface ViewDataProps {
+  userID: string;
 }
 
-const ViewData = () => {
-  const { user } = useAuth();
-
+const ViewData = ({ userID }: ViewDataProps) => {
   const {
     data: pagesData,
     isLoading: isLoadingPagesData,
     isError: isErrorPages,
   } = useQuery({
-    queryKey: user != null ? ["pagesData", user.uid] : ["pagesData"],
+    queryKey: ["pagesData", userID],
     queryFn: async () => {
-      if (user != null) {
-        const pagesReadData = await fetchPagesReadData(user.uid);
-        return pagesReadData;
-      } else {
-        return [];
-      }
+      const pagesReadData = await fetchPagesReadData(userID);
+      return pagesReadData;
     },
   });
 
-  const {
-    data: timeData,
-    isLoading: isLoadingTimeData,
-    isError: isErrorTime,
-  } = useQuery({
-    queryKey: user != null ? ["timeData", user.uid] : ["timeData"],
-    queryFn: async () => {
-      if (user != null) {
-        const timeReadData = await fetchTimeReadData(user.uid);
-        return timeReadData;
-      } else {
-        return [];
-      }
-    },
-  });
-
-  if (isLoadingPagesData || isLoadingTimeData) {
+  if (isLoadingPagesData) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" />
@@ -133,7 +76,7 @@ const ViewData = () => {
     );
   }
 
-  if (isErrorPages || isErrorTime) {
+  if (isErrorPages) {
     return (
       <View style={styles.container}>
         <Text>Error loading data</Text>
@@ -144,24 +87,12 @@ const ViewData = () => {
   const aggregatedPagesData =
     pagesData !== undefined ? aggregatePagesDataByWeek(pagesData) : [];
 
-  const aggregatedTimeData =
-    timeData !== undefined ? aggregateTimeDataByWeek(timeData) : [];
-
   return (
     <ScrollView style={{ flex: 1 }}>
       <View>
         <Text style={styles.dataType}>Pages Read:</Text>
         {aggregatedPagesData.length > 0 ? (
           <ViewDataChart aggregatedData={aggregatedPagesData}></ViewDataChart>
-        ) : (
-          <Text>No data to display</Text>
-        )}
-      </View>
-      <View></View>
-      <View>
-        <Text style={styles.dataType}>Minutes Read:</Text>
-        {aggregatedTimeData.length > 0 ? (
-          <ViewDataChart aggregatedData={aggregatedTimeData}></ViewDataChart>
         ) : (
           <Text>No data to display</Text>
         )}
@@ -220,9 +151,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   container: {
-    flexDirection: "row",
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
+    padding: 20,
   },
 });

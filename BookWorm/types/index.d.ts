@@ -179,6 +179,12 @@ interface BookshelfVolumeInfo {
   thumbnail?: string;
 }
 
+interface BookmarkModel {
+  bookmark: number;
+  created: Timestamp;
+  updated: Timestamp;
+}
+
 type UserBookShelvesModel = Record<string, BookShelfBookModel[]>;
 
 interface BasicNotificationModel {

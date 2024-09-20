@@ -73,7 +73,6 @@ const Posts = () => {
   const snapPoints = useMemo(() => ["25%", "50%"], []);
   const queryClient = useQueryClient();
   const currentDate = new Date();
-
   const onRefresh = () => {
     setRefreshing(true);
     // Reset the query data to only the first page

@@ -1,4 +1,5 @@
 import {
+  addDoc,
   and,
   collection,
   deleteDoc,
@@ -11,7 +12,6 @@ import {
   orderBy,
   query,
   type QuerySnapshot,
-  runTransaction,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -659,37 +659,46 @@ export async function getBookmarkForBook(
 export async function setBookmarkForBook(
   userID: string,
   bookID: string,
-  bookmark: number,
+  newBookmark: number,
+  oldBookmark: number,
 ): Promise<boolean> {
-  const bookmarkRef = doc(
-    DB,
-    "bookmark_collection",
-    userID,
-    "bookmarks",
-    bookID,
-  );
   try {
-    await runTransaction(DB, async (transaction) => {
-      const bookmarkDoc = await transaction.get(bookmarkRef);
-
-      if (!bookmarkDoc.exists()) {
-        // If the document doesn't exist, create a new one with created and updated timestamps
-        transaction.set(bookmarkRef, {
-          bookmark,
-          created: serverTimestamp(),
+    // no history if the book hasn't been started
+    if (oldBookmark > 0) {
+      const pageProgress = newBookmark - oldBookmark;
+      // add new page progress to history
+      await addDoc(
+        collection(DB, `user_collection/${userID}/reading_history`),
+        {
+          bookID,
+          pages: pageProgress,
+          added_at: serverTimestamp(),
+        },
+      );
+    }
+    const bookmarkRef = doc(
+      DB,
+      `bookmark_collection/${userID}/bookmarks/${bookID}`,
+    );
+    if (!(await getDoc(bookmarkRef)).exists()) {
+      await setDoc(bookmarkRef, {
+        bookmark: newBookmark,
+        created: serverTimestamp(),
+        updated: serverTimestamp(),
+      });
+    } else {
+      await setDoc(
+        bookmarkRef,
+        {
+          bookmark: newBookmark,
           updated: serverTimestamp(),
-        });
-      } else {
-        // If the document exists, only update the bookmark and the updated timestamp
-        transaction.update(bookmarkRef, {
-          bookmark,
-          updated: serverTimestamp(),
-        });
-      }
-    });
+        },
+        { merge: true },
+      );
+    }
     return true;
-  } catch (e) {
-    console.error("Error setting bookmark for book", e);
+  } catch (error) {
+    console.error("Error adding new bookmark", error);
     return false;
   }
 }

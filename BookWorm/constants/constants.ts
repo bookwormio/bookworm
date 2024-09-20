@@ -1,3 +1,5 @@
+import { type ImageStyle, type StyleProp } from "react-native";
+
 export const BOOKS_API_KEY = "AIzaSyDdLpV4nXjFf-Z62gCpNC9hqK6km6UB58s";
 export const DAYS_OF_WEEK = [
   "Sunday",
@@ -52,3 +54,9 @@ export const REMAINING_PROGRESS_COLOR = "rgb(229, 232, 249)";
 export const POST_IMAGE_HEIGHT = 250;
 export const POST_IMAGE_WIDTH = 200;
 export const POST_IMAGE_BORDER_RADIUS = 3;
+export const IMG_STYLE: StyleProp<ImageStyle> = {
+  height: POST_IMAGE_HEIGHT,
+  width: POST_IMAGE_WIDTH,
+  borderRadius: POST_IMAGE_BORDER_RADIUS,
+  marginRight: 10,
+};
