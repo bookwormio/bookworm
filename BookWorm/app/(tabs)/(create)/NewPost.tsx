@@ -27,6 +27,7 @@ import {
   useGetBooksForBookshelves,
   useRemoveBookFromShelf,
 } from "../../../components/profile/hooks/useBookshelfQueries";
+import { ServerBookShelfName } from "../../../enums/Enums";
 import { fetchBookByVolumeID } from "../../../services/books-services/BookQueries";
 import { createPost } from "../../../services/firebase-services/PostQueries";
 import { type BookShelfBookModel, type CreatePostModel } from "../../../types";
@@ -180,42 +181,54 @@ const NewPost = () => {
       });
       if (currentBookmark === selectedBook.pageCount) {
         if (!isBookInFinished(selectedBook.id)) {
-          // addBookMutation.mutate({
-          //   userID: user.uid,
-          //   bookID: selectedBook.id,
-          //   volumeInfo: queryBookData,
-          //   shelfName: ServerBookShelfName.FINISHED,
-          // });
-          console.log("book not in finished yet and this would add it");
+          addBookMutation.mutate({
+            userID: user.uid,
+            bookID: selectedBook.id,
+            volumeInfo: queryBookData,
+            shelfName: ServerBookShelfName.FINISHED,
+          });
+          console.log(
+            selectedBook.id,
+            "book not in finished yet and this would add it",
+          );
         }
         if (isBookInCurrentlyReading(selectedBook.id)) {
-          // removeBookMutation.mutate({
-          //   userID: user.uid,
-          //   bookID: selectedBook.id,
-          //   shelfName: ServerBookShelfName.CURRENTLY_READING,
-          // });
-          console.log("book is in currently reading and this would remove it");
+          removeBookMutation.mutate({
+            userID: user.uid,
+            bookID: selectedBook.id,
+            shelfName: ServerBookShelfName.CURRENTLY_READING,
+          });
+          console.log(
+            selectedBook.id,
+            "book is in currently reading and this would remove it",
+          );
         }
       }
       if (oldBookmark === 0 && currentBookmark !== 0) {
         if (currentBookmark !== selectedBook.pageCount) {
           if (!isBookInCurrentlyReading(selectedBook.id)) {
-            // addBookMutation.mutate({
-            //   userID: user.uid,
-            //   bookID: selectedBook.id,
-            //   volumeInfo: queryBookData,
-            //   shelfName: ServerBookShelfName.FINISHED,
-            // });
-            console.log("book not in currently reading and is getting added");
+            addBookMutation.mutate({
+              userID: user.uid,
+              bookID: selectedBook.id,
+              volumeInfo: queryBookData,
+              shelfName: ServerBookShelfName.CURRENTLY_READING,
+            });
+            console.log(
+              selectedBook.id,
+              "book not in currently reading and is getting added",
+            );
           }
         }
         if (isBookInWantToRead(selectedBook.id)) {
-          // removeBookMutation.mutate({
-          //   userID: user.uid,
-          //   bookID: selectedBook.id,
-          //   shelfName: ServerBookShelfName.WANT_TO_READ,
-          // });
-          console.log("book current in want to read and getting removed");
+          removeBookMutation.mutate({
+            userID: user.uid,
+            bookID: selectedBook.id,
+            shelfName: ServerBookShelfName.WANT_TO_READ,
+          });
+          console.log(
+            selectedBook.id,
+            "book current in want to read and getting removed",
+          );
         }
       }
     }
