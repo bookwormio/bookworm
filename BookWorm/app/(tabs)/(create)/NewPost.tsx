@@ -1,6 +1,6 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
@@ -21,6 +21,12 @@ import {
 } from "../../../components/bookmark/hooks/useBookmarkQueries";
 import BookDropdownSelect from "../../../components/bookselect/BookDropdownSelect";
 import BookWormButton from "../../../components/button/BookWormButton";
+import {
+  useAddBookToShelf,
+  useRemoveBookFromShelf,
+} from "../../../components/profile/hooks/useBookshelfQueries";
+import { ServerBookShelfName } from "../../../enums/Enums";
+import { fetchBookByVolumeID } from "../../../services/books-services/BookQueries";
 import { createPost } from "../../../services/firebase-services/PostQueries";
 import { type CreatePostModel, type FlatBookItemModel } from "../../../types";
 
@@ -45,10 +51,13 @@ const NewPost = () => {
     isSuccess: isBookmarkLoadedSuccess,
   } = useGetBookmarkForBook(user?.uid, selectedBook?.id);
 
+  const addBookMutation = useAddBookToShelf();
+  const removeBookMutation = useRemoveBookFromShelf();
+
   const [currentBookmark, setCurrentBookmark] = useState(0);
 
   useEffect(() => {
-    setCurrentBookmark(isBookmarkLoadedSuccess ? oldBookmark ?? 0 : 0);
+    setCurrentBookmark(isBookmarkLoadedSuccess ? (oldBookmark ?? 0) : 0);
   }, [isBookmarkLoadedSuccess, oldBookmark, selectedBook]);
 
   useEffect(() => {
@@ -117,7 +126,16 @@ const NewPost = () => {
     return false;
   };
 
+  const { data: queryBookData } = useQuery({
+    queryKey: selectedBook !== null ? ["bookdata", selectedBook.id] : ["empty"],
+    queryFn: async () =>
+      selectedBook !== null ? await fetchBookByVolumeID(selectedBook.id) : null,
+    staleTime: 60000,
+  });
+
   const handleShareClicked = () => {
+    if (user?.uid == null || selectedBook == null || queryBookData == null)
+      return;
     if (!fieldsMissing()) {
       createNewPost();
       setBookmark({
@@ -125,6 +143,32 @@ const NewPost = () => {
         bookID: selectedBook?.id,
         bookmark: currentBookmark,
       });
+      if (currentBookmark === selectedBook.pageCount) {
+        addBookMutation.mutate({
+          userID: user.uid,
+          bookID: selectedBook.id,
+          volumeInfo: queryBookData,
+          shelfName: ServerBookShelfName.FINISHED,
+        });
+        removeBookMutation.mutate({
+          userID: user.uid,
+          bookID: selectedBook.id,
+          shelfName: ServerBookShelfName.CURRENTLY_READING,
+        });
+      }
+      if (oldBookmark === 0 && currentBookmark !== 0) {
+        addBookMutation.mutate({
+          userID: user.uid,
+          bookID: selectedBook.id,
+          volumeInfo: queryBookData,
+          shelfName: ServerBookShelfName.FINISHED,
+        });
+        removeBookMutation.mutate({
+          userID: user.uid,
+          bookID: selectedBook.id,
+          shelfName: ServerBookShelfName.WANT_TO_READ,
+        });
+      }
     }
   };
 
