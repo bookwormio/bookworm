@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Button,
   FlatList,
@@ -46,10 +46,6 @@ const BookShelf = ({ shelfName, books }: BookShelfProps) => {
       console.log("User or book ID is not available");
     }
   };
-
-  useEffect(() => {
-    console.log("Pending status:", removeBookPending);
-  }, [removeBookPending]);
 
   const shelfNameDisplay = bookShelfDisplayMap[shelfName];
 
