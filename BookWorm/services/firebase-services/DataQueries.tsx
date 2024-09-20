@@ -12,7 +12,10 @@ export async function fetchPagesReadData(
 ): Promise<LineDataPointModel[]> {
   const dataPoints: LineDataPointModel[] = [];
   try {
-    const historyRef = collection(DB, `user_collection/${userID}/history`);
+    const historyRef = collection(
+      DB,
+      `user_collection/${userID}/reading_history`,
+    );
     const historyQuery = query(historyRef, orderBy("added_at", "desc"));
     const historySnap = await getDocs(historyQuery);
 
