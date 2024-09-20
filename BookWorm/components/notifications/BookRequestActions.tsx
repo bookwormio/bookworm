@@ -13,6 +13,8 @@ interface BookRequestActionsProps {
 }
 
 // TODO: maybe rename to BookRequestResponseActions or BookRequestResponseButtons
+
+// TODO this should display status of requested and be disabled once the request goes through
 const BookRequestActions = ({
   onAccept,
   onDeny,

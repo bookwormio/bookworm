@@ -37,7 +37,8 @@ function useAuthenticatedRoute(user: User | null, newUser: boolean) {
     queryKey: [],
     queryFn: async () => {
       if (user != null) {
-        const userdata = await fetchUserData(user);
+        // TODO fix this error
+        const userdata = await fetchUserData(user.uid);
         if (userdata != null) {
           return true;
         }

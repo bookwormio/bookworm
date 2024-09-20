@@ -10,7 +10,10 @@ import {
 } from "firebase/firestore";
 import { ServerNotificationType } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
-import { type FullNotificationModel, type Notification } from "../../types";
+import {
+  type FullNotificationModel,
+  type NotificationModel,
+} from "../../types";
 
 /**
  * Adds a notification to the notifications collection for that user.
@@ -18,7 +21,7 @@ import { type FullNotificationModel, type Notification } from "../../types";
  * @returns {Promise<boolean>} A promise that resolves to true if the notification was successfully created, false otherwise.
  */
 export async function createNotification(
-  notif: Notification,
+  notif: NotificationModel,
 ): Promise<boolean> {
   if (notif.receiver == null) {
     console.log("User does not exist");
@@ -43,11 +46,12 @@ export async function createNotification(
       }
     }
 
-    await addDoc(notificationsRef, {
+    // TODO fix this type
+    const fullNotif: FullNotificationModel = {
       receiver: notif.receiver,
       sender: notif.sender,
       sender_name: notif.sender_name,
-      created: serverTimestamp(),
+      created: serverTimestamp() as Timestamp,
       // haven't implement read_at yet
       read_at: null,
       /// ... used to conditionally add fields to an object
@@ -63,9 +67,23 @@ export async function createNotification(
         bookTitle: notif.bookTitle,
         custom_message: notif.custom_message ?? "",
       }),
+      ...(notif.type === ServerNotificationType.BOOK_REQUEST && {
+        bookID: notif.bookID,
+        bookTitle: notif.bookTitle,
+        custom_message: notif.custom_message ?? "",
+      }),
+      ...(notif.type === ServerNotificationType.BOOK_REQUEST_RESPONSE && {
+        bookID: notif.bookID,
+        bookTitle: notif.bookTitle,
+        custom_message: notif.custom_message ?? "",
+        bookRequestStatus: notif.bookRequestStatus,
+      }),
       type: notif.type,
-    });
+    };
 
+    await addDoc(notificationsRef, fullNotif);
+
+    console.log("ADDED DOC");
     return true;
   } catch (error) {
     console.error("Error creating notification:", error);
@@ -103,10 +121,12 @@ export async function getAllFullNotifications(
         bookID: notifDoc.data().bookID,
         bookTitle: notifDoc.data().bookTitle,
         custom_message: notifDoc.data().custom_message,
+        bookRequestStatus: notifDoc.data().bookRequestStatus,
         type: notifDoc.data().type,
       };
       notifdata.push(notif);
     }
+    console.log("Notifications: ", notifdata);
     return notifdata;
   } catch (error) {
     console.error("Error getting all notifications: ", error);

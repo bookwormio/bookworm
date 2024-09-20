@@ -1,13 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import {
   BookRequestNotificationStatus,
+  BookRequestResponseOptions,
   NotificationMessageMap,
   NotificationTypeMap,
   ServerNotificationType,
 } from "../../enums/Enums";
-import { type FullNotificationModel } from "../../types";
+import {
+  type BookRequestResponseNotification,
+  type FullNotificationModel,
+} from "../../types";
 import BookRequestActions from "./BookRequestActions";
+import { useCreateNotification } from "./hooks/useNotificationQueries";
 
 interface NotificationItemContentProps {
   // TODO: rename notif to notification
@@ -15,25 +20,53 @@ interface NotificationItemContentProps {
   time: string;
 }
 
+// TODO - Replace with actual name
+const MY_FAKE_NAME = "Riles fake name";
+const MY_FAKE_TITLE = "Fake Title";
+
 const NotificationItemContent = ({
   notif,
   time,
 }: NotificationItemContentProps) => {
-  const handleSendDenial = ({
+  const notifyMutation = useCreateNotification();
+
+  const handleSendBookResponseNotification = ({
     bookID,
     message,
+    requestStatus,
   }: {
     bookID: string;
     message?: string;
+    requestStatus: BookRequestResponseOptions;
   }) => {
     // TODO: fill this in with sending denial notification
+    const bookResponseNotification: BookRequestResponseNotification = {
+      receiver: notif.sender, // TODO ensure correct
+      sender: notif.receiver, // TODO ensure correct
+      sender_name: MY_FAKE_NAME, // TODO fill in with actual name
+      type: ServerNotificationType.BOOK_REQUEST_RESPONSE,
+      bookID,
+      bookTitle: MY_FAKE_TITLE, // TODO fill in with actual book title
+      custom_message: message ?? "",
+      bookRequestStatus: requestStatus,
+    };
+    notifyMutation.mutate({
+      friendUserID: notif.sender,
+      notification: bookResponseNotification,
+    });
   };
 
   const handleAcceptClicked = () => {
-    // TODO: fill this in with sending acceptance notification
-    // also this needs to update the lending status of the book in the bookshelf
+    // TODO: also this needs to update the lending status of the book in the bookshelf
     // also send denial to all other requests for the same book
+    handleSendBookResponseNotification({
+      bookID: notif.bookID,
+      message: "",
+      requestStatus: BookRequestResponseOptions.ACCEPTED,
+    });
+    setFakeBookRequestButtonStatus(BookRequestNotificationStatus.ACCEPTED);
   };
+
   const handleDenyClicked = () => {
     Alert.prompt(
       "Deny Book Request",
@@ -47,10 +80,14 @@ const NotificationItemContent = ({
         {
           text: "Deny",
           onPress: (message) => {
-            handleSendDenial({
+            handleSendBookResponseNotification({
               bookID: "FAKE BOOK ID",
               message: message ?? "",
+              requestStatus: BookRequestResponseOptions.DENIED,
             });
+            setFakeBookRequestButtonStatus(
+              BookRequestNotificationStatus.DENIED,
+            );
           },
         },
       ],
@@ -76,6 +113,7 @@ const NotificationItemContent = ({
     notifStatus: BookRequestNotificationStatus,
   ) => {
     if (notifType === ServerNotificationType.BOOK_REQUEST_RESPONSE) {
+      console.log("notifStatus", notifStatus);
       return notifStatus === BookRequestNotificationStatus.ACCEPTED
         ? "accepted your request to borrow"
         : "denied your request to borrow";
@@ -85,21 +123,21 @@ const NotificationItemContent = ({
   };
 
   // TODO - Replace with actual status
-  const FAKE_NOTIF_STATUS = BookRequestNotificationStatus.PENDING;
+  const [fakeBookRequestButtonStatus, setFakeBookRequestButtonStatus] =
+    useState(BookRequestNotificationStatus.PENDING);
 
-  // TODO: change to notif.type === ServerNotificationType.BOOK_REQUEST
-  const isBookRequest = true;
+  const isBookRequest = notif.type === ServerNotificationType.BOOK_REQUEST;
 
   return (
     <View style={styles.notifTextContainer}>
       <Text style={styles.notifTitle}>
-        {notificationTitle(notif.type, FAKE_NOTIF_STATUS)}
+        {notificationTitle(notif.type, notif.bookRequestStatus)}
       </Text>
       <Text style={styles.notifMessage}>
         <Text style={{ fontWeight: "bold" }}>{notif.sender_name}</Text>
         <Text>
           {" "}
-          {notificationDisplay(notif.type, FAKE_NOTIF_STATUS)}
+          {notificationDisplay(notif.type, notif.bookRequestStatus)}
           {notif.type === ServerNotificationType.COMMENT
             ? " " + notif.comment
             : ""}
@@ -123,7 +161,7 @@ const NotificationItemContent = ({
           <BookRequestActions
             onAccept={handleAcceptClicked}
             onDeny={handleDenyClicked}
-            requestStatus={FAKE_NOTIF_STATUS}
+            requestStatus={fakeBookRequestButtonStatus}
           ></BookRequestActions>
         </View>
       )}

@@ -6,9 +6,15 @@ import BookShelf from "./BookShelf";
 
 interface BookShelvesProp {
   userID: string;
+  userFirstName: string; // TODO clean this up / make optional
+  userLastName: string;
 }
 
-const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
+const ProfileBookShelves = ({
+  userID,
+  userFirstName,
+  userLastName,
+}: BookShelvesProp) => {
   // Initialize the bookShelves state with all shelves empty
 
   // TODO FIX NULL USERID
@@ -42,6 +48,9 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
           key={shelfName}
           shelfName={shelfName as ServerBookShelfName}
           books={books}
+          userID={userID}
+          userFirstName={userFirstName}
+          userLastName={userLastName}
         />
       ))}
     </View>

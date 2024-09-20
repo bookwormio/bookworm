@@ -29,7 +29,6 @@ import {
   type UserSearchDisplayModel,
 } from "../../types";
 
-import { type User } from "firebase/auth";
 import { caseFoldNormalize } from "../util/queryUtils";
 
 /**
@@ -264,7 +263,7 @@ export async function newFetchUserInfo(userID: string): Promise<UserDataModel> {
 
 /**
  * Fetches user information from the Firestore database.
- * @param {User} user - The user to fetch information for.
+ * @param {string} userID - The user to fetch information for.
  * @returns {Promise<UserData | undefined>} A Promise that resolves to the user data if found, otherwise undefined.
  * @throws {Error} If there is an error while fetching the user information.
  * @description
@@ -273,10 +272,14 @@ export async function newFetchUserInfo(userID: string): Promise<UserDataModel> {
  * If the user document doesn't exist or if data is missing, it returns undefined.
  */
 export const fetchUserData = async (
-  user: User,
+  userID: string,
 ): Promise<UserDataModel | null> => {
   try {
-    const userDocRef = doc(DB, "user_collection", user.uid);
+    if (userID == null || userID === "") {
+      return null;
+    }
+
+    const userDocRef = doc(DB, "user_collection", userID);
     const userDocSnap = await getDoc(userDocRef);
     if (userDocSnap.exists()) {
       const userData = userDocSnap.data() as UserDataModel;

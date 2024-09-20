@@ -63,12 +63,19 @@ export const NotificationMessageMap: StringMap = {
 //   AVAILABLE: "available",
 // };
 
+// TODO consolidate all this
 export enum BookRequestNotificationStatus {
   PENDING = "pending",
   ACCEPTED = "accepted",
   DENIED = "denied",
 }
+// TODO: and this
+export enum BookRequestResponseOptions {
+  ACCEPTED = "accepted",
+  DENIED = "denied",
+}
 
+// TODO: and this
 export enum BookRequestActionDisplay {
   ACCEPT = "Accept",
   DENY = "Deny",

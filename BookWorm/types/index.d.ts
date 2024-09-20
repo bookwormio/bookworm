@@ -202,13 +202,13 @@ interface FullNotificationModel {
   sender: string;
   sender_name: string;
   created: Timestamp;
-  read_at: Timestamp;
+  read_at: Timestamp | null;
   postID: string | null;
   bookID: string;
   bookTitle: string;
   custom_message: string;
+  bookRequestStatus: BookRequestNotificationStatus;
   type: ServerNotificationType;
-  status: BookRequestNotificationStatus; // TODO maybe give this a better name
 }
 
 interface FriendRequestNotification extends BasicNotificationModel {
@@ -245,10 +245,10 @@ interface BookRequestResponseNotification extends BasicNotificationModel {
   bookID: string;
   bookTitle: string;
   custom_message: string;
-  // TODO: maybe add response status here ??
+  bookRequestStatus?: BookRequestResponseOptions;
 }
 
-type Notification =
+type NotificationModel =
   | FriendRequestNotification
   | LikeNotification
   | CommentNotification
