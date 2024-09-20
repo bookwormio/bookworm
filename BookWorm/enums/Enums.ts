@@ -23,6 +23,13 @@ export const bookShelfDisplayMap: StringMap = {
   [ServerBookShelfName.LENDING_LIBRARY]: "Lending Library",
 };
 
+export const SEARCH_SHELF_PRIORITY = [
+  ServerBookShelfName.CURRENTLY_READING, // Display first on search results
+  ServerBookShelfName.WANT_TO_READ,
+  ServerBookShelfName.FINISHED,
+  ServerBookShelfName.LENDING_LIBRARY, // Display last on search results
+];
+
 export enum ServerNotificationType {
   FRIEND_REQUEST = "FRIEND_REQUEST",
   LIKE = "LIKE",

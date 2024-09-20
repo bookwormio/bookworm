@@ -55,9 +55,9 @@ interface ConnectionModel {
 // TODO: separate book volume info from book preview info
 // (less information needed for a book preview)
 interface BookVolumeInfo {
-  title: string;
-  subtitle: string;
-  authors: string[];
+  title?: string;
+  subtitle?: string;
+  authors?: string[];
   publisher?: string;
   publishedDate?: string;
   description?: string;
@@ -70,23 +70,23 @@ interface BookVolumeInfo {
   language?: string;
   mainCategory?: string;
 
-  imageLinks: {
-    smallThumbnail: string;
-    thumbnail: string;
-    small: string;
-    medium: string;
-    large: string;
-    extraLarge: string;
+  imageLinks?: {
+    smallThumbnail?: string;
+    thumbnail?: string;
+    small?: string;
+    medium?: string;
+    large?: string;
+    extraLarge?: string;
   };
 
   // TODO: Add more properties as needed
 }
 
 interface BookVolumeItem {
-  kind: string;
+  kind?: string;
   id: string;
-  etag: string;
-  selfLink: string;
+  etag?: string;
+  selfLink?: string;
   volumeInfo: BookVolumeInfo;
 }
 
