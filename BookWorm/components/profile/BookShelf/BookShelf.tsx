@@ -14,6 +14,7 @@ import {
 import { type BookShelfBookModel } from "../../../types";
 import { useAuth } from "../../auth/context";
 import { useRemoveBookFromShelf } from "../hooks/useBookshelfQueries";
+import { useBookRouteInfo } from "../hooks/useRouteHooks";
 import BookShelfBook from "./BookShelfBook";
 
 interface BookShelfProps {
@@ -24,7 +25,9 @@ interface BookShelfProps {
 const BookShelf = ({ shelfName, books }: BookShelfProps) => {
   const { user } = useAuth();
 
-  const { mutate: removeBook } = useRemoveBookFromShelf();
+  const { mutate: removeBook, isPending: removeBookPending } =
+    useRemoveBookFromShelf();
+  const { type: bookRouteType } = useBookRouteInfo();
 
   // Function to call the mutation
   const handleRemoveBook = (bookID: string) => {
@@ -68,13 +71,15 @@ const BookShelf = ({ shelfName, books }: BookShelfProps) => {
               )}
             </TouchableOpacity>
             {/* TODO: make this look better with minus sign button */}
-            <Button
-              onPress={() => {
-                handleRemoveBook(item.id);
-              }}
-              title="Remove from shelf"
-              // TODO: ADD THIS disabled={isRemoving}
-            />
+            {bookRouteType === "PROFILE" && (
+              <Button
+                onPress={() => {
+                  handleRemoveBook(item.id);
+                }}
+                title="Remove from shelf"
+                disabled={removeBookPending}
+              />
+            )}
           </View>
         )}
         ListEmptyComponent={() => (

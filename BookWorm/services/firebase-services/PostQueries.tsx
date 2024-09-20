@@ -202,14 +202,7 @@ export async function fetchPostsByUserID(
                       source={{ uri: url }}
                       cachePolicy={"memory-disk"}
                       placeholder={BLURHASH}
-                      style={{
-                        height: 100,
-                        width: 100,
-                        borderColor: "black",
-                        borderRadius: 10,
-                        borderWidth: 1,
-                        marginRight: 10,
-                      }}
+                      style={IMG_STYLE}
                     />
                   );
                 })
@@ -286,14 +279,7 @@ export async function fetchPostByPostID(
                     source={{ uri: url }}
                     cachePolicy={"memory-disk"}
                     placeholder={BLURHASH}
-                    style={{
-                      height: 100,
-                      width: 100,
-                      borderColor: "black",
-                      borderRadius: 10,
-                      borderWidth: 1,
-                      marginRight: 10,
-                    }}
+                    style={IMG_STYLE}
                   />
                 );
               })

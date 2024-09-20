@@ -1,12 +1,14 @@
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { type ServerBookShelfName } from "../../../enums/Enums";
-import { useAuth } from "../../auth/context";
 import { useGetBooksForBookshelves } from "../hooks/useBookshelfQueries";
 import BookShelf from "./BookShelf";
 
-const ProfileBookShelves = () => {
-  const { user } = useAuth();
+interface BookShelvesProp {
+  userID: string;
+}
+
+const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
   // Initialize the bookShelves state with all shelves empty
 
   // TODO FIX NULL USERID
@@ -15,7 +17,7 @@ const ProfileBookShelves = () => {
     isLoading,
     isError,
     error,
-  } = useGetBooksForBookshelves(user?.uid ?? "");
+  } = useGetBooksForBookshelves(userID ?? "");
 
   if (isLoading) {
     return (

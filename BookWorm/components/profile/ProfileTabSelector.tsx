@@ -6,17 +6,22 @@ import {
   TouchableHighlight,
   View,
 } from "react-native";
+import { TabsTitleMap } from "../../enums/Enums";
 
 interface ProfileTabSelectorProps {
   profileTab: string;
   setProfileTab: (profileTab: string) => void;
+  tabs: string[];
 }
 
 const ProfileTabSelector = ({
   profileTab,
   setProfileTab,
+  tabs,
 }: ProfileTabSelectorProps) => {
   const [underlinePosition] = useState(new Animated.Value(0));
+  const tabWidth = 100 / tabs.length;
+
   const animateUnderline = (toValue: number) => {
     Animated.timing(underlinePosition, {
       toValue,
@@ -27,67 +32,35 @@ const ProfileTabSelector = ({
   return (
     <View>
       <View style={styles.container}>
-        {/* Shelves Button */}
-        <TouchableHighlight
-          style={[
-            styles.button,
-            profileTab === "shelf"
-              ? styles.activeButton
-              : styles.inactiveButton,
-          ]}
-          onPress={() => {
-            setProfileTab("shelf");
-            animateUnderline(0);
-          }}
-          disabled={profileTab === "shelf"}
-          activeOpacity={0.6}
-          underlayColor="#DDDDDD"
-        >
-          <Text style={styles.buttonText}>Shelves</Text>
-        </TouchableHighlight>
-
-        {/* Posts Button */}
-        <TouchableHighlight
-          style={[
-            styles.button,
-            profileTab === "post" ? styles.activeButton : styles.inactiveButton,
-          ]}
-          onPress={() => {
-            setProfileTab("post");
-            animateUnderline(1);
-          }}
-          disabled={profileTab === "post"}
-          activeOpacity={0.6}
-          underlayColor="#DDDDDD"
-        >
-          <Text style={styles.buttonText}>Posts</Text>
-        </TouchableHighlight>
-
-        {/* Data Button */}
-        <TouchableHighlight
-          style={[
-            styles.button,
-            profileTab === "data" ? styles.activeButton : styles.inactiveButton,
-          ]}
-          onPress={() => {
-            setProfileTab("data");
-            animateUnderline(2);
-          }}
-          disabled={profileTab === "data"}
-          activeOpacity={0.6}
-          underlayColor="#DDDDDD"
-        >
-          <Text style={styles.buttonText}>Data</Text>
-        </TouchableHighlight>
+        {tabs.map((tab, index) => (
+          <TouchableHighlight
+            key={index}
+            style={[
+              styles.button,
+              { width: `${tabWidth}%` },
+              profileTab === tab ? styles.activeButton : styles.inactiveButton,
+            ]}
+            onPress={() => {
+              setProfileTab(tab);
+              animateUnderline(0);
+            }}
+            disabled={profileTab === tab}
+            activeOpacity={0.6}
+            underlayColor="#DDDDDD"
+          >
+            <Text style={styles.buttonText}>{TabsTitleMap[tab]}</Text>
+          </TouchableHighlight>
+        ))}
 
         {/* Animated underline */}
         <Animated.View
           style={[
             styles.underline,
             {
+              width: `${tabWidth}%`,
               left: underlinePosition.interpolate({
-                inputRange: [0, 1, 2],
-                outputRange: ["0%", "33.33%", "66.66%"],
+                inputRange: tabs.map((_, i) => i),
+                outputRange: tabs.map((_, i) => `${i * tabWidth}`),
               }),
             },
           ]}

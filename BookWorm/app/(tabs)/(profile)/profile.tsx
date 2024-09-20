@@ -15,6 +15,7 @@ import ViewData from "../../../components/profile/Data/ViewData";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
 import ProfilePosts from "../../../components/profile/ProfilePosts";
 import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
+import { TabNames } from "../../../enums/Enums";
 import {
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
@@ -114,13 +115,16 @@ const Profile = () => {
       <ProfileTabSelector
         profileTab={profileTab}
         setProfileTab={setProfileTab}
+        tabs={[TabNames.BOOKSHELVES, TabNames.POSTS, TabNames.DATA]}
       ></ProfileTabSelector>
-      {profileTab === "shelf" ? (
-        <ProfileBookShelves />
-      ) : profileTab === "post" ? (
+      {profileTab === TabNames.BOOKSHELVES && user !== null ? (
+        <ProfileBookShelves userID={user?.uid} />
+      ) : profileTab === TabNames.POSTS ? (
         <ProfilePosts />
-      ) : (
+      ) : profileTab === TabNames.DATA ? (
         <ViewData userID={user?.uid ?? ""}></ViewData>
+      ) : (
+        <Text>Tab DNE</Text>
       )}
     </ScrollView>
   );

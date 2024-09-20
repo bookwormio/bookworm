@@ -8,8 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
-import { ServerNotificationType } from "../../enums/Enums";
+import { ServerNotificationType, TabNames } from "../../enums/Enums";
 import {
   followUserByID,
   getIsFollowing,
@@ -27,7 +28,9 @@ import {
   type UserDataModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
+import ProfileBookShelves from "../profile/BookShelf/ProfileBookShelves";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
+import ProfileTabSelector from "../profile/ProfileTabSelector";
 
 enum LocalFollowStatus {
   FOLLOWING = "following",
@@ -44,6 +47,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
   const { user } = useAuth();
+  const [profileTab, setProfileTab] = useState("shelf");
   const [followStatus, setFollowStatus] = useState<string>(
     LocalFollowStatus.LOADING,
   );
@@ -252,7 +256,10 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   }
 
   return (
-    <View>
+    <ScrollView
+      stickyHeaderIndices={[4]}
+      style={{ flexGrow: 1, height: "100%" }}
+    >
       <View style={styles.buttonwrapper}></View>
       <View style={styles.imageTextContainer}>
         <View style={styles.profilePicContainer}>
@@ -303,7 +310,21 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+      <ProfileTabSelector
+        profileTab={profileTab}
+        setProfileTab={setProfileTab}
+        tabs={[TabNames.BOOKSHELVES, TabNames.POSTS, TabNames.DATA]}
+      ></ProfileTabSelector>
+      {profileTab === TabNames.BOOKSHELVES ? (
+        <ProfileBookShelves userID={friendUserID} />
+      ) : profileTab === TabNames.POSTS ? (
+        <Text>PUT THE POSTS HERE</Text>
+      ) : profileTab === TabNames.DATA ? (
+        <Text>PUT DATA HERE</Text>
+      ) : (
+        <Text>Tab DNE</Text>
+      )}
+    </ScrollView>
   );
 };
 export default FriendProfile;
