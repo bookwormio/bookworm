@@ -53,7 +53,7 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
         sender: user?.uid,
         sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
         bookID,
-        bookTitle: volumeInfo.title,
+        bookTitle: volumeInfo.title ?? "",
         custom_message: message ?? "",
         type: ServerNotificationType.RECOMMENDATION,
       };
