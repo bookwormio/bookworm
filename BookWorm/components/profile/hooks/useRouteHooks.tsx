@@ -1,4 +1,4 @@
-import { useSegments } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import {
   POSTS_BOOK_PREFIX,
   POSTS_ROUTE_PREFIX,
@@ -7,6 +7,7 @@ import {
   SEARCH_BOOK_PREFIX,
   SEARCH_ROUTE_PREFIX,
 } from "../../../constants/constants";
+import { generateBookRoute } from "../../../utilities/routeUtils";
 
 const BOOK_ROUTE_PREFIXES = {
   SEARCH: SEARCH_BOOK_PREFIX,
@@ -36,4 +37,23 @@ export const useBookRouteInfo = (): RouteInfo => {
     return { type: "PROFILE", prefix: BOOK_ROUTE_PREFIXES.PROFILE };
 
   return { type: null, prefix: "" };
+};
+
+/**
+ * Hook to navigate to a book based on the book ID.
+ * @param bookID - The ID of the book
+ * @returns The function to navigate to the book
+ */
+export const useNavigateToBook = (bookID: string) => {
+  const router = useRouter();
+  const { prefix } = useBookRouteInfo();
+
+  function navigateToBook() {
+    const bookRoute = generateBookRoute(bookID, prefix);
+    if (bookRoute != null) {
+      router.push(bookRoute);
+    }
+  }
+
+  return navigateToBook;
 };

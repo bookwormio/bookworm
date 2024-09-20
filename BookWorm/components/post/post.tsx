@@ -10,12 +10,9 @@ import {
 import { type PostModel } from "../../types";
 
 import { router } from "expo-router";
-import { POSTS_BOOK_PREFIX } from "../../constants/constants";
-import {
-  generateBookRoute,
-  generateUserRoute,
-} from "../../utilities/routeUtils";
+import { generateUserRoute } from "../../utilities/routeUtils";
 import { useAuth } from "../auth/context";
+import { useNavigateToBook } from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import { usePageValidation } from "./hooks/usePageValidation";
 import LikeComment from "./LikeComment";
@@ -67,6 +64,8 @@ const Post = ({
       router.push(userRoute);
     }
   };
+
+  const navigateToBook = useNavigateToBook(post.bookid);
 
   const isCurrentUsersPost = user?.uid === post.user.id;
 
@@ -145,13 +144,7 @@ const Post = ({
                   <TouchableOpacity
                     key={index}
                     onPress={() => {
-                      const bookRoute = generateBookRoute(
-                        post.bookid,
-                        POSTS_BOOK_PREFIX,
-                      );
-                      if (bookRoute != null) {
-                        router.push(bookRoute);
-                      }
+                      navigateToBook();
                     }}
                   >
                     {image}

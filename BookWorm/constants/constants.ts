@@ -37,7 +37,7 @@ export const MINUTES = Array.from({ length: 11 }, (_, index) => ({
 
 export const POSTS_ROUTE_PREFIX = "(posts)";
 export const SEARCH_ROUTE_PREFIX = "(search)";
-export const PROFILE_ROUTE_PREFIX = "profile";
+export const PROFILE_ROUTE_PREFIX = "(profile)";
 
 export const PROFILE_BOOK_PREFIX = "profilebook";
 export const POSTS_BOOK_PREFIX = "postsbook";

@@ -1,28 +1,20 @@
 import { Image } from "expo-image";
-import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type BookshelfVolumeInfo } from "../../../types";
-import { generateBookRoute } from "../../../utilities/routeUtils";
-import { useBookRouteInfo } from "../hooks/useRouteHooks";
+import { useNavigateToBook } from "../hooks/useRouteHooks";
 
 interface BookShelfBookProps {
   book: BookshelfVolumeInfo;
   bookID: string;
 }
 const BookShelfBook = ({ book, bookID }: BookShelfBookProps) => {
-  const { prefix } = useBookRouteInfo();
+  const navigateToBook = useNavigateToBook(bookID);
 
-  const handlePress = () => {
-    const bookRoute = generateBookRoute(bookID, prefix);
-    if (bookRoute != null) {
-      router.push(bookRoute);
-    }
-  };
   return (
     <TouchableOpacity
       onPress={() => {
-        handlePress();
+        navigateToBook();
       }}
     >
       <View>
