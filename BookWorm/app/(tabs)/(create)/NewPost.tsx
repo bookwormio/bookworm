@@ -24,12 +24,12 @@ import BookWormButton from "../../../components/button/BookWormButton";
 import {
   prefetchBooksForBookshelves,
   useAddBookToShelf,
+  useGetBooksForBookshelves,
   useRemoveBookFromShelf,
 } from "../../../components/profile/hooks/useBookshelfQueries";
-import { ServerBookShelfName } from "../../../enums/Enums";
 import { fetchBookByVolumeID } from "../../../services/books-services/BookQueries";
 import { createPost } from "../../../services/firebase-services/PostQueries";
-import { type CreatePostModel } from "../../../types";
+import { type BookShelfBookModel, type CreatePostModel } from "../../../types";
 import { useNewPostContext } from "./NewPostContext";
 
 const NewPost = () => {
@@ -56,6 +56,38 @@ const NewPost = () => {
   } = useGetBookmarkForBook(user?.uid, selectedBook?.id);
 
   void prefetchBooksForBookshelves(user?.uid ?? "");
+
+  const { data: bookshelves } = useGetBooksForBookshelves(user?.uid ?? "");
+
+  const isBookInCurrentlyReading = (bookID: string): boolean => {
+    if (bookshelves == null) {
+      return false;
+    } else {
+      return bookshelves.currently_reading.some(
+        (book: BookShelfBookModel) => book.id === bookID,
+      );
+    }
+  };
+
+  const isBookInWantToRead = (bookID: string): boolean => {
+    if (bookshelves == null) {
+      return false;
+    } else {
+      return bookshelves.want_to_read.some(
+        (book: BookShelfBookModel) => book.id === bookID,
+      );
+    }
+  };
+
+  const isBookInFinished = (bookID: string): boolean => {
+    if (bookshelves == null) {
+      return false;
+    } else {
+      return bookshelves.finished.some(
+        (book: BookShelfBookModel) => book.id === bookID,
+      );
+    }
+  };
 
   const [currentBookmark, setCurrentBookmark] = useState(0);
 
@@ -147,30 +179,44 @@ const NewPost = () => {
         oldBookmark,
       });
       if (currentBookmark === selectedBook.pageCount) {
-        addBookMutation.mutate({
-          userID: user.uid,
-          bookID: selectedBook.id,
-          volumeInfo: queryBookData,
-          shelfName: ServerBookShelfName.FINISHED,
-        });
-        removeBookMutation.mutate({
-          userID: user.uid,
-          bookID: selectedBook.id,
-          shelfName: ServerBookShelfName.CURRENTLY_READING,
-        });
+        if (!isBookInFinished(selectedBook.id)) {
+          // addBookMutation.mutate({
+          //   userID: user.uid,
+          //   bookID: selectedBook.id,
+          //   volumeInfo: queryBookData,
+          //   shelfName: ServerBookShelfName.FINISHED,
+          // });
+          console.log("book not in finished yet and this would add it");
+        }
+        if (isBookInCurrentlyReading(selectedBook.id)) {
+          // removeBookMutation.mutate({
+          //   userID: user.uid,
+          //   bookID: selectedBook.id,
+          //   shelfName: ServerBookShelfName.CURRENTLY_READING,
+          // });
+          console.log("book is in currently reading and this would remove it");
+        }
       }
       if (oldBookmark === 0 && currentBookmark !== 0) {
-        addBookMutation.mutate({
-          userID: user.uid,
-          bookID: selectedBook.id,
-          volumeInfo: queryBookData,
-          shelfName: ServerBookShelfName.FINISHED,
-        });
-        removeBookMutation.mutate({
-          userID: user.uid,
-          bookID: selectedBook.id,
-          shelfName: ServerBookShelfName.WANT_TO_READ,
-        });
+        if (currentBookmark !== selectedBook.pageCount) {
+          if (!isBookInCurrentlyReading(selectedBook.id)) {
+            // addBookMutation.mutate({
+            //   userID: user.uid,
+            //   bookID: selectedBook.id,
+            //   volumeInfo: queryBookData,
+            //   shelfName: ServerBookShelfName.FINISHED,
+            // });
+            console.log("book not in currently reading and is getting added");
+          }
+        }
+        if (isBookInWantToRead(selectedBook.id)) {
+          // removeBookMutation.mutate({
+          //   userID: user.uid,
+          //   bookID: selectedBook.id,
+          //   shelfName: ServerBookShelfName.WANT_TO_READ,
+          // });
+          console.log("book current in want to read and getting removed");
+        }
       }
     }
   };
