@@ -47,25 +47,41 @@ export function mapAndSortPreloadedBooks(
   }));
 }
 
+/**
+ * Filters an array of BookVolumeItems based on a search phrase in the book title.
+ *
+ * @param {BookVolumeItem[]} preSortedBookShelves - The array of books to filter.
+ * @param {string} searchPhrase - The phrase to search for in book titles.
+ * @returns {BookVolumeItem[]} A new array containing only the books whose titles include the search phrase (case-insensitive).
+ */
 export function filterBookShelfBooksByTitle(
   preSortedBookShelves: BookVolumeItem[],
   searchPhrase: string,
 ): BookVolumeItem[] {
-  return preSortedBookShelves.filter((book) =>
-    book.volumeInfo.title?.toLowerCase().startsWith(searchPhrase.toLowerCase()),
-  );
+  const lowerSearchPhrase = searchPhrase.toLowerCase();
+
+  return preSortedBookShelves.filter((book) => {
+    const title = book.volumeInfo.title?.toLowerCase();
+    return title?.includes(lowerSearchPhrase);
+  });
 }
 
+/**
+ * Removes duplicate books from an array of BookVolumeItems based on their IDs.
+ *
+ * @param {BookVolumeItem[]} books - The array of books that may contain duplicates.
+ * @returns {BookVolumeItem[]} A new array containing only unique books (first occurrence is kept).
+ */
 export function removeDuplicateBooks(
   books: BookVolumeItem[],
 ): BookVolumeItem[] {
-  const seenBookIDs: Record<string, boolean> = {};
-  return books.filter((book) => {
-    if (seenBookIDs[book.id]) {
-      return false;
-    } else {
-      seenBookIDs[book.id] = true;
-      return true;
+  const uniqueBooks = new Map<string, BookVolumeItem>();
+
+  books.forEach((book) => {
+    if (!uniqueBooks.has(book.id)) {
+      uniqueBooks.set(book.id, book);
     }
   });
+
+  return Array.from(uniqueBooks.values());
 }

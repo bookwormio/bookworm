@@ -35,9 +35,6 @@ const BookSearch = ({
   const [flattenedShelfBooks, setFlattenedShelfBooks] = useState<
     BookVolumeItem[]
   >([]);
-  const [preSortedBookShelves, setPreSortedBookShelves] = useState<
-    BookVolumeItem[]
-  >([]);
 
   const [searchClicked, setSearchClicked] = useState<boolean>(
     searchPhrase !== "",
@@ -67,41 +64,45 @@ const BookSearch = ({
   );
 
   useEffect(() => {
-    if (preloadedShelfBooks != null) {
-      const sortedBooks = mapAndSortPreloadedBooks(preloadedShelfBooks);
-      setFlattenedShelfBooks(sortedBooks);
-      if (searchPhrase === "") {
-        setBooks(sortedBooks);
-      }
-      setPreSortedBookShelves(sortedBooks);
+    // This useEffect should run ONCE on component mount
+
+    // If there are no preloaded books, then we don't need to do anything
+    if (preloadedShelfBooks == null) {
+      return;
+    }
+
+    const sortedBooks = mapAndSortPreloadedBooks(preloadedShelfBooks);
+    setFlattenedShelfBooks(sortedBooks);
+
+    if (searchPhrase === "") {
+      setBooks(sortedBooks);
     }
   }, [preloadedShelfBooks]);
 
   useEffect(() => {
-    if (fetchBookData != null) {
-      if (preSortedBookShelves != null) {
-        const searchedBookShelfBooks = filterBookShelfBooksByTitle(
-          preSortedBookShelves,
-          searchPhrase,
-        );
-        if (searchedBookShelfBooks.length === 0) {
-          setBooks(fetchBookData);
-        } else {
-          setBooks(
-            removeDuplicateBooks(searchedBookShelfBooks.concat(fetchBookData)),
-          );
-        }
-      } else {
-        setBooks(fetchBookData);
-      }
-    }
-  }, [fetchBookData]);
+    // Filter the pre-sorted book shelves by the search phrase
+    const filteredBookShelfBooks = filterBookShelfBooksByTitle(
+      flattenedShelfBooks,
+      searchPhrase,
+    );
 
-  useEffect(() => {
-    if (searchPhrase === "" && flattenedShelfBooks.length > 0) {
-      setBooks(flattenedShelfBooks);
+    // Filter preloaded books by search phrase if books have not been fetched
+    if (fetchBookData == null) {
+      setBooks(filteredBookShelfBooks);
+      return;
     }
-  }, [searchPhrase, preloadedShelfBooks]);
+
+    // If there are no book shelf books, then we don't need to filter the books
+    if (flattenedShelfBooks == null || flattenedShelfBooks.length === 0) {
+      setBooks(fetchBookData);
+      return;
+    }
+
+    // Remove duplicates and coalesce the fetched books with the filtered book shelf books
+    setBooks(
+      removeDuplicateBooks([...filteredBookShelfBooks, ...fetchBookData]),
+    );
+  }, [fetchBookData, searchPhrase]);
 
   return (
     <View style={styles.container}>
