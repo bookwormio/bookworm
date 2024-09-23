@@ -1,6 +1,5 @@
 import { type ImageStyle, type StyleProp } from "react-native";
 
-export const BOOKS_API_KEY = "AIzaSyDdLpV4nXjFf-Z62gCpNC9hqK6km6UB58s";
 export const DAYS_OF_WEEK = [
   "Sunday",
   "Monday",

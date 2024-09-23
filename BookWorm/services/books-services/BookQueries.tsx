@@ -1,5 +1,4 @@
 import axios from "axios";
-import { BOOKS_API_KEY } from "../../constants/constants";
 import {
   type BookVolumeInfo,
   type BookVolumeItem,
@@ -24,7 +23,7 @@ export async function fetchBooksByTitleSearch(
       {
         params: {
           q: searchValue,
-          key: BOOKS_API_KEY,
+          key: process.env.GOOGLE_BOOKS_API_KEY,
           limit: 10,
         },
       },
@@ -61,7 +60,7 @@ export async function fetchBookByVolumeID(
       volumeInfo: BookVolumeInfo;
     }>("https://www.googleapis.com/books/v1/volumes/" + volumeID, {
       params: {
-        key: BOOKS_API_KEY,
+        key: process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY,
         projection: "full",
       },
     });
