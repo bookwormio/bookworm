@@ -60,7 +60,7 @@ export async function fetchBookByVolumeID(
       volumeInfo: BookVolumeInfo;
     }>("https://www.googleapis.com/books/v1/volumes/" + volumeID, {
       params: {
-        key: process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY,
+        key: process.env.GOOGLE_BOOKS_API_KEY,
         projection: "full",
       },
     });
