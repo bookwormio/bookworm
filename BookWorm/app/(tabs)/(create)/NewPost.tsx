@@ -184,7 +184,23 @@ const NewPost = () => {
           addBookMutation.mutate({
             userID: user.uid,
             bookID: selectedBook.id,
-            volumeInfo: queryBookData,
+            volumeInfo: {
+              title: queryBookData?.title,
+              subtitle: queryBookData?.subtitle,
+              authors: queryBookData?.authors,
+              publisher: queryBookData?.publisher,
+              publishedDate: queryBookData?.publishedDate,
+              description: queryBookData?.description,
+              pageCount: queryBookData?.pageCount,
+              categories: queryBookData?.categories,
+              maturityRating: queryBookData?.maturityRating,
+              previewLink: queryBookData?.previewLink,
+              averageRating: queryBookData?.averageRating,
+              ratingsCount: queryBookData?.ratingsCount,
+              language: queryBookData?.language,
+              mainCategory: queryBookData?.mainCategory,
+              thumbnail: queryBookData?.imageLinks?.thumbnail,
+            },
             shelfName: ServerBookShelfName.FINISHED,
           });
           console.log(
@@ -203,22 +219,6 @@ const NewPost = () => {
             "book is in currently reading and this would remove it",
           );
         }
-      }
-      if (oldBookmark === 0 && currentBookmark !== 0) {
-        if (currentBookmark !== selectedBook.pageCount) {
-          if (!isBookInCurrentlyReading(selectedBook.id)) {
-            addBookMutation.mutate({
-              userID: user.uid,
-              bookID: selectedBook.id,
-              volumeInfo: queryBookData,
-              shelfName: ServerBookShelfName.CURRENTLY_READING,
-            });
-            console.log(
-              selectedBook.id,
-              "book not in currently reading and is getting added",
-            );
-          }
-        }
         if (isBookInWantToRead(selectedBook.id)) {
           removeBookMutation.mutate({
             userID: user.uid,
@@ -227,9 +227,51 @@ const NewPost = () => {
           });
           console.log(
             selectedBook.id,
-            "book current in want to read and getting removed",
+            "book is in want to read and this would remove it",
           );
         }
+      }
+      // if currentBookmark does not equal page count
+      else {
+        if (!isBookInCurrentlyReading(selectedBook.id)) {
+          addBookMutation.mutate({
+            userID: user.uid,
+            bookID: selectedBook.id,
+            volumeInfo: {
+              title: queryBookData?.title,
+              subtitle: queryBookData?.subtitle,
+              authors: queryBookData?.authors,
+              publisher: queryBookData?.publisher,
+              publishedDate: queryBookData?.publishedDate,
+              description: queryBookData?.description,
+              pageCount: queryBookData?.pageCount,
+              categories: queryBookData?.categories,
+              maturityRating: queryBookData?.maturityRating,
+              previewLink: queryBookData?.previewLink,
+              averageRating: queryBookData?.averageRating,
+              ratingsCount: queryBookData?.ratingsCount,
+              language: queryBookData?.language,
+              mainCategory: queryBookData?.mainCategory,
+              thumbnail: queryBookData?.imageLinks?.thumbnail,
+            },
+            shelfName: ServerBookShelfName.CURRENTLY_READING,
+          });
+          console.log(
+            selectedBook.id,
+            "book not in currently reading and is getting added",
+          );
+        }
+      }
+      if (isBookInWantToRead(selectedBook.id)) {
+        removeBookMutation.mutate({
+          userID: user.uid,
+          bookID: selectedBook.id,
+          shelfName: ServerBookShelfName.WANT_TO_READ,
+        });
+        console.log(
+          selectedBook.id,
+          "book current in want to read and getting removed",
+        );
       }
     }
   };
