@@ -1,6 +1,6 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
@@ -25,15 +25,15 @@ import {
   isBookInCurrentlyReading,
   isBookInFinished,
   isBookInWantToRead,
-} from "../../../components/post/util/bookShelfUtils";
+} from "../../../components/newpost/util/bookShelfUtils";
 import {
   prefetchBooksForBookshelves,
   useAddBookToShelf,
+  useFetchBookByVolumeID,
   useGetBooksForBookshelves,
   useRemoveBookFromShelf,
 } from "../../../components/profile/hooks/useBookshelfQueries";
 import { ServerBookShelfName } from "../../../enums/Enums";
-import { fetchBookByVolumeID } from "../../../services/books-services/BookQueries";
 import { createPost } from "../../../services/firebase-services/PostQueries";
 import { type CreatePostModel } from "../../../types";
 import { useNewPostContext } from "./NewPostContext";
@@ -64,6 +64,10 @@ const NewPost = () => {
   void prefetchBooksForBookshelves(user?.uid ?? "");
 
   const { data: bookshelves } = useGetBooksForBookshelves(user?.uid ?? "");
+
+  const { data: queryBookData } = useFetchBookByVolumeID(
+    selectedBook?.id ?? "",
+  );
 
   const [currentBookmark, setCurrentBookmark] = useState(0);
 
@@ -135,13 +139,6 @@ const NewPost = () => {
     }
     return false;
   };
-
-  const { data: queryBookData } = useQuery({
-    queryKey: selectedBook !== null ? ["bookdata", selectedBook.id] : ["empty"],
-    queryFn: async () =>
-      selectedBook !== null ? await fetchBookByVolumeID(selectedBook.id) : null,
-    staleTime: 60000,
-  });
 
   const handleShareClicked = () => {
     if (user?.uid == null || selectedBook == null || queryBookData == null)
