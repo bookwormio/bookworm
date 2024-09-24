@@ -57,6 +57,7 @@ export default BookDropdownButton;
 const styles = StyleSheet.create({
   dropdownContainer: {
     paddingBottom: 20,
+    backgroundColor: "white",
   },
   dropdown: {
     width: "100%",

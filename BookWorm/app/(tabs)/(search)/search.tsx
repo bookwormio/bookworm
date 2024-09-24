@@ -27,7 +27,7 @@ const Search = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
       {/* Toggle buttons */}
       <View style={styles.container}>
         <TouchableOpacity

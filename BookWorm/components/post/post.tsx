@@ -171,7 +171,7 @@ export default Post;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
+    padding: 20,
     borderBottomWidth: 10.0,
     borderBottomColor: "#F2F2F2",
     backgroundColor: "white",

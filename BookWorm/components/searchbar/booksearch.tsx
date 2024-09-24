@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 10,
+    backgroundColor: "white",
   },
   bookContainer: {
     marginBottom: 2,

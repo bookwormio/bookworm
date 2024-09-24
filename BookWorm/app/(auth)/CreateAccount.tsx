@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     paddingBottom: 40,
+    backgroundColor: "white",
   },
   container: {
     alignItems: "center",

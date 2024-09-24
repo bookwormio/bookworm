@@ -258,7 +258,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   return (
     <ScrollView
       stickyHeaderIndices={[4]}
-      style={{ flexGrow: 1, height: "100%" }}
+      style={{ flexGrow: 1, height: "100%", backgroundColor: "white" }}
     >
       <View style={styles.buttonwrapper}></View>
       <View style={styles.imageTextContainer}>
@@ -364,6 +364,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    backgroundColor: "white",
   },
   buttoncontainer: {
     alignItems: "flex-end",

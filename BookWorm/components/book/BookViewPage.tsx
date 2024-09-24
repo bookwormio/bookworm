@@ -270,6 +270,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
   scrollContainer: {
     padding: 20,

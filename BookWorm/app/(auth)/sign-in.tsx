@@ -73,7 +73,7 @@ const Login = () => {
           <Text style={styles.question}>{"Don't have an account?"}</Text>
           <BookWormButton
             title="Create Account"
-            style={{ backgroundColor: "#f2f2f2", flex: 1 }}
+            style={{ backgroundColor: "white", flex: 1 }}
             textStyle={styles.createButtonText}
             onPress={() => {
               router.push("/CreateAccount");
@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "center",
+    backgroundColor: "white",
   },
   createButtonText: {
     color: "#FB6D0B",
