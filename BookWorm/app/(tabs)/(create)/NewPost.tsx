@@ -194,17 +194,6 @@ const NewPost = () => {
             "book is in currently reading and this would remove it",
           );
         }
-        if (isBookInWantToRead(selectedBook.id, bookshelves)) {
-          removeBookMutation.mutate({
-            userID: user.uid,
-            bookID: selectedBook.id,
-            shelfName: ServerBookShelfName.WANT_TO_READ,
-          });
-          console.log(
-            selectedBook.id,
-            "book is in want to read and this would remove it",
-          );
-        }
       }
       // if currentBookmark does not equal page count
       else {
