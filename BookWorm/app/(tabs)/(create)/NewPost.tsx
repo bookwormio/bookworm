@@ -22,6 +22,7 @@ import {
 import BookDropdownButton from "../../../components/bookselect/BookDropdownButton";
 import BookWormButton from "../../../components/button/BookWormButton";
 import {
+  convertFlatBookToBookShelfBook,
   isBookInCurrentlyReading,
   isBookInFinished,
   isBookInWantToRead,
@@ -29,7 +30,6 @@ import {
 import {
   prefetchBooksForBookshelves,
   useAddBookToShelf,
-  useFetchBookByVolumeID,
   useGetBooksForBookshelves,
   useRemoveBookFromShelf,
 } from "../../../components/profile/hooks/useBookshelfQueries";
@@ -65,14 +65,10 @@ const NewPost = () => {
 
   const { data: bookshelves } = useGetBooksForBookshelves(user?.uid ?? "");
 
-  const { data: queryBookData } = useFetchBookByVolumeID(
-    selectedBook?.id ?? "",
-  );
-
   const [currentBookmark, setCurrentBookmark] = useState(0);
 
   useEffect(() => {
-    setCurrentBookmark(isBookmarkLoadedSuccess ? (oldBookmark ?? 0) : 0);
+    setCurrentBookmark(isBookmarkLoadedSuccess ? oldBookmark ?? 0 : 0);
   }, [isBookmarkLoadedSuccess, oldBookmark, selectedBook]);
 
   useEffect(() => {
@@ -141,8 +137,7 @@ const NewPost = () => {
   };
 
   const handleShareClicked = () => {
-    if (user?.uid == null || selectedBook == null || queryBookData == null)
-      return;
+    if (user?.uid == null || selectedBook == null) return;
     if (!fieldsMissing()) {
       createNewPost();
       setBookmark({
@@ -159,29 +154,9 @@ const NewPost = () => {
           addBookMutation.mutate({
             userID: user.uid,
             bookID: selectedBook.id,
-            volumeInfo: {
-              title: queryBookData?.title,
-              subtitle: queryBookData?.subtitle,
-              authors: queryBookData?.authors,
-              publisher: queryBookData?.publisher,
-              publishedDate: queryBookData?.publishedDate,
-              description: queryBookData?.description,
-              pageCount: queryBookData?.pageCount,
-              categories: queryBookData?.categories,
-              maturityRating: queryBookData?.maturityRating,
-              previewLink: queryBookData?.previewLink,
-              averageRating: queryBookData?.averageRating,
-              ratingsCount: queryBookData?.ratingsCount,
-              language: queryBookData?.language,
-              mainCategory: queryBookData?.mainCategory,
-              thumbnail: queryBookData?.imageLinks?.thumbnail,
-            },
+            volumeInfo: convertFlatBookToBookShelfBook(selectedBook),
             shelfName: ServerBookShelfName.FINISHED,
           });
-          console.log(
-            selectedBook.id,
-            "book not in finished yet and this would add it",
-          );
         }
         if (isBookInCurrentlyReading(selectedBook.id, bookshelves)) {
           removeBookMutation.mutate({
@@ -189,10 +164,6 @@ const NewPost = () => {
             bookID: selectedBook.id,
             shelfName: ServerBookShelfName.CURRENTLY_READING,
           });
-          console.log(
-            selectedBook.id,
-            "book is in currently reading and this would remove it",
-          );
         }
       }
       // if currentBookmark does not equal page count
@@ -201,29 +172,9 @@ const NewPost = () => {
           addBookMutation.mutate({
             userID: user.uid,
             bookID: selectedBook.id,
-            volumeInfo: {
-              title: queryBookData?.title,
-              subtitle: queryBookData?.subtitle,
-              authors: queryBookData?.authors,
-              publisher: queryBookData?.publisher,
-              publishedDate: queryBookData?.publishedDate,
-              description: queryBookData?.description,
-              pageCount: queryBookData?.pageCount,
-              categories: queryBookData?.categories,
-              maturityRating: queryBookData?.maturityRating,
-              previewLink: queryBookData?.previewLink,
-              averageRating: queryBookData?.averageRating,
-              ratingsCount: queryBookData?.ratingsCount,
-              language: queryBookData?.language,
-              mainCategory: queryBookData?.mainCategory,
-              thumbnail: queryBookData?.imageLinks?.thumbnail,
-            },
+            volumeInfo: convertFlatBookToBookShelfBook(selectedBook),
             shelfName: ServerBookShelfName.CURRENTLY_READING,
           });
-          console.log(
-            selectedBook.id,
-            "book not in currently reading and is getting added",
-          );
         }
       }
       if (isBookInWantToRead(selectedBook.id, bookshelves)) {
@@ -232,10 +183,6 @@ const NewPost = () => {
           bookID: selectedBook.id,
           shelfName: ServerBookShelfName.WANT_TO_READ,
         });
-        console.log(
-          selectedBook.id,
-          "book currently in want to read and getting removed",
-        );
       }
     }
   };

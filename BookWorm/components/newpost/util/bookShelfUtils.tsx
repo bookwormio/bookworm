@@ -1,6 +1,8 @@
 import {
-    type BookShelfBookModel,
-    type UserBookShelvesModel,
+  type BookShelfBookModel,
+  type BookshelfVolumeInfo,
+  type FlatBookItemModel,
+  type UserBookShelvesModel,
 } from "../../../types";
 
 export const isBookInCurrentlyReading = (
@@ -40,4 +42,26 @@ export const isBookInFinished = (
       (book: BookShelfBookModel) => book.id === bookID,
     );
   }
+};
+
+export const convertFlatBookToBookShelfBook = (
+  book: FlatBookItemModel,
+): BookshelfVolumeInfo => {
+  return {
+    title: book?.title,
+    subtitle: book?.subtitle,
+    authors: book?.authors,
+    publisher: book?.publisher,
+    publishedDate: book?.publishedDate,
+    description: book?.description,
+    pageCount: book?.pageCount,
+    categories: book?.categories,
+    maturityRating: book?.maturityRating,
+    previewLink: book?.previewLink,
+    averageRating: book?.averageRating,
+    ratingsCount: book?.ratingsCount,
+    language: book?.language,
+    mainCategory: book?.mainCategory,
+    thumbnail: book?.image,
+  };
 };
