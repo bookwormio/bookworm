@@ -172,8 +172,9 @@ export default Post;
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "lightgrey",
+    borderBottomWidth: 10.0,
+    borderBottomColor: "#F2F2F2",
+    backgroundColor: "white",
   },
   title: {
     fontSize: 15,
