@@ -22,6 +22,11 @@ import {
 import BookDropdownButton from "../../../components/bookselect/BookDropdownButton";
 import BookWormButton from "../../../components/button/BookWormButton";
 import {
+  isBookInCurrentlyReading,
+  isBookInFinished,
+  isBookInWantToRead,
+} from "../../../components/post/util/bookShelfUtils";
+import {
   prefetchBooksForBookshelves,
   useAddBookToShelf,
   useGetBooksForBookshelves,
@@ -30,7 +35,7 @@ import {
 import { ServerBookShelfName } from "../../../enums/Enums";
 import { fetchBookByVolumeID } from "../../../services/books-services/BookQueries";
 import { createPost } from "../../../services/firebase-services/PostQueries";
-import { type BookShelfBookModel, type CreatePostModel } from "../../../types";
+import { type CreatePostModel } from "../../../types";
 import { useNewPostContext } from "./NewPostContext";
 
 const NewPost = () => {
@@ -59,36 +64,6 @@ const NewPost = () => {
   void prefetchBooksForBookshelves(user?.uid ?? "");
 
   const { data: bookshelves } = useGetBooksForBookshelves(user?.uid ?? "");
-
-  const isBookInCurrentlyReading = (bookID: string): boolean => {
-    if (bookshelves == null) {
-      return false;
-    } else {
-      return bookshelves.currently_reading.some(
-        (book: BookShelfBookModel) => book.id === bookID,
-      );
-    }
-  };
-
-  const isBookInWantToRead = (bookID: string): boolean => {
-    if (bookshelves == null) {
-      return false;
-    } else {
-      return bookshelves.want_to_read.some(
-        (book: BookShelfBookModel) => book.id === bookID,
-      );
-    }
-  };
-
-  const isBookInFinished = (bookID: string): boolean => {
-    if (bookshelves == null) {
-      return false;
-    } else {
-      return bookshelves.finished.some(
-        (book: BookShelfBookModel) => book.id === bookID,
-      );
-    }
-  };
 
   const [currentBookmark, setCurrentBookmark] = useState(0);
 
@@ -179,8 +154,11 @@ const NewPost = () => {
         bookmark: currentBookmark,
         oldBookmark,
       });
+      if (bookshelves == null) {
+        return;
+      }
       if (currentBookmark === selectedBook.pageCount) {
-        if (!isBookInFinished(selectedBook.id)) {
+        if (!isBookInFinished(selectedBook.id, bookshelves)) {
           addBookMutation.mutate({
             userID: user.uid,
             bookID: selectedBook.id,
@@ -208,7 +186,7 @@ const NewPost = () => {
             "book not in finished yet and this would add it",
           );
         }
-        if (isBookInCurrentlyReading(selectedBook.id)) {
+        if (isBookInCurrentlyReading(selectedBook.id, bookshelves)) {
           removeBookMutation.mutate({
             userID: user.uid,
             bookID: selectedBook.id,
@@ -219,7 +197,7 @@ const NewPost = () => {
             "book is in currently reading and this would remove it",
           );
         }
-        if (isBookInWantToRead(selectedBook.id)) {
+        if (isBookInWantToRead(selectedBook.id, bookshelves)) {
           removeBookMutation.mutate({
             userID: user.uid,
             bookID: selectedBook.id,
@@ -233,7 +211,7 @@ const NewPost = () => {
       }
       // if currentBookmark does not equal page count
       else {
-        if (!isBookInCurrentlyReading(selectedBook.id)) {
+        if (!isBookInCurrentlyReading(selectedBook.id, bookshelves)) {
           addBookMutation.mutate({
             userID: user.uid,
             bookID: selectedBook.id,
@@ -262,7 +240,7 @@ const NewPost = () => {
           );
         }
       }
-      if (isBookInWantToRead(selectedBook.id)) {
+      if (isBookInWantToRead(selectedBook.id, bookshelves)) {
         removeBookMutation.mutate({
           userID: user.uid,
           bookID: selectedBook.id,
@@ -270,7 +248,7 @@ const NewPost = () => {
         });
         console.log(
           selectedBook.id,
-          "book current in want to read and getting removed",
+          "book currently in want to read and getting removed",
         );
       }
     }
