@@ -3,7 +3,6 @@ import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   ScrollView,
   StyleSheet,
@@ -15,6 +14,7 @@ import {
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
 import BookWormButton from "../../components/button/BookWormButton";
+import WormLoader from "../../components/wormloader/WormLoader";
 import { updateUser } from "../../services/firebase-services/UserQueries";
 import { type UserDataModel } from "../../types";
 
@@ -99,7 +99,7 @@ const MoreInfo = () => {
   if (loading) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color="black" />
+        <WormLoader />
       </View>
     );
   }

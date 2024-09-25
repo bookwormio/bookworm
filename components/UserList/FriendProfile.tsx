@@ -1,13 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { ServerNotificationType, TabNames } from "../../enums/Enums";
@@ -31,6 +25,7 @@ import { useAuth } from "../auth/context";
 import ProfileBookShelves from "../profile/BookShelf/ProfileBookShelves";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import ProfileTabSelector from "../profile/ProfileTabSelector";
+import WormLoader from "../wormloader/WormLoader";
 
 enum LocalFollowStatus {
   FOLLOWING = "following",
@@ -250,7 +245,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   if (friendIsLoading || isLoadingUserData) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#000000" />
+        <WormLoader />
       </View>
     );
   }

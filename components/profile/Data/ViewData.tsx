@@ -1,12 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import {
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { fetchPagesReadData } from "../../../services/firebase-services/DataQueries";
 import {
@@ -14,6 +8,7 @@ import {
   type WeekDataPointModel,
 } from "../../../types";
 import ViewDataChart from "../../chart/ViewDataChart";
+import WormLoader from "../../wormloader/WormLoader";
 
 // TODO: Combine these functions into a single generic
 function aggregatePagesDataByWeek(
@@ -71,7 +66,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
   if (isLoadingPagesData) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" />
+        <WormLoader style={{ width: 50, height: 50 }} />
       </View>
     );
   }

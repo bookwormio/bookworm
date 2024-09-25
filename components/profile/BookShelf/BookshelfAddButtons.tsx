@@ -1,16 +1,11 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import React from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   bookShelfDisplayMap,
   type ServerBookShelfName,
 } from "../../../enums/Enums";
+import WormLoader from "../../wormloader/WormLoader";
 
 interface BookshelfAddButtonsProps {
   selectedShelves: ServerBookShelfName[];
@@ -44,7 +39,7 @@ const BookshelfAddButtons = ({
           <Text style={[styles.buttonText]}>{item.label}</Text>
           <View style={styles.spacer} />
           {isDisabled ? (
-            <ActivityIndicator size="small" color="#000000" />
+            <WormLoader style={{ width: 50, height: 50 }} />
           ) : (
             <AntDesign
               name={

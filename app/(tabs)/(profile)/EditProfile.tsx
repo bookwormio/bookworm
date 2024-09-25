@@ -3,7 +3,6 @@ import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -17,6 +16,7 @@ import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import BookWormButton from "../../../components/button/BookWormButton";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
+import WormLoader from "../../../components/wormloader/WormLoader";
 import {
   newFetchUserInfo,
   updateUser,
@@ -108,7 +108,7 @@ const EditProfile = () => {
   if (isLoadingUserData) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#000000" />
+        <WormLoader />
       </View>
     );
   }

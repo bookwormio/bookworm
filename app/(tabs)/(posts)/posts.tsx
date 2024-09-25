@@ -17,9 +17,7 @@ import React, {
   useState,
 } from "react";
 import {
-  ActivityIndicator,
   FlatList,
-  RefreshControl,
   StyleSheet,
   Text,
   TextInput,
@@ -31,6 +29,7 @@ import BookWormButton from "../../../components/button/BookWormButton";
 import Comment from "../../../components/comment/comment";
 import Post from "../../../components/post/post";
 import { usePostsContext } from "../../../components/post/PostsContext";
+import WormLoader from "../../../components/wormloader/WormLoader";
 import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
 
@@ -127,7 +126,7 @@ const Posts = () => {
       <View style={styles.container}>
         {isLoadingFeedPosts && !refreshing && (
           <View style={styles.feedLoading}>
-            <ActivityIndicator size="large" color="black" />
+            <WormLoader />
           </View>
         )}
         <FlatList
@@ -137,13 +136,7 @@ const Posts = () => {
           renderItem={({ item: post }) => (
             <TouchableOpacity
               onPress={() => {
-                router.push({
-                  pathname: `/${post.id}`,
-                  params: {
-                    post,
-                    created: post.created,
-                  },
-                });
+                router.push({ pathname: `/${post.id}` });
               }}
             >
               <Post
@@ -157,13 +150,17 @@ const Posts = () => {
           )}
           removeClippedSubviews={true}
           keyExtractor={(item) => item.id}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          ListHeaderComponent={
+            refreshing ? (
+              <View style={styles.loadingMore}>
+                <WormLoader style={{ width: 50, height: 50 }} />
+              </View>
+            ) : null
           }
           ListFooterComponent={
             isFetchingNextPage ? (
               <View style={styles.loadingMore}>
-                <ActivityIndicator size="large" color="black" />
+                <WormLoader style={{ width: 50, height: 50 }} />
               </View>
             ) : null
           }
@@ -172,6 +169,12 @@ const Posts = () => {
               fetchNextPage().catch((error) => {
                 console.error("Error fetching next page", error);
               });
+            }
+          }}
+          onScroll={({ nativeEvent }) => {
+            // Trigger refresh manually when pulling down
+            if (nativeEvent.contentOffset.y < -50 && !refreshing) {
+              onRefresh();
             }
           }}
           onEndReachedThreshold={0.1} // How close to the end to trigger
@@ -237,7 +240,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
-    top: "50%",
+    top: "40%",
   },
   loadingMore: {
     marginTop: "10%",

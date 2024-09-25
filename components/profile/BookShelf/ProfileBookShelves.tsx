@@ -1,6 +1,7 @@
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { type ServerBookShelfName } from "../../../enums/Enums";
+import WormLoader from "../../wormloader/WormLoader";
 import { useGetBooksForBookshelves } from "../hooks/useBookshelfQueries";
 import BookShelf from "./BookShelf";
 
@@ -22,7 +23,7 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" />
+        <WormLoader style={{ width: 50, height: 50 }} />
       </View>
     );
   }

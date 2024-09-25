@@ -1,15 +1,9 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import {
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useAuth } from "../../components/auth/context";
 import BookWormButton from "../../components/button/BookWormButton";
+import WormLoader from "../../components/wormloader/WormLoader";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -28,7 +22,7 @@ const Login = () => {
 
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="black" />
+        <WormLoader />
       </View>
     );
   }

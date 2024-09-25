@@ -4,7 +4,6 @@ import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   ScrollView,
   StyleSheet,
@@ -22,6 +21,7 @@ import {
 import BookDropdownButton from "../../../components/bookselect/BookDropdownButton";
 import BookWormButton from "../../../components/button/BookWormButton";
 import { prefetchBooksForBookshelves } from "../../../components/profile/hooks/useBookshelfQueries";
+import WormLoader from "../../../components/wormloader/WormLoader";
 import { createPost } from "../../../services/firebase-services/PostQueries";
 import { type CreatePostModel } from "../../../types";
 import { useNewPostContext } from "./NewPostContext";
@@ -150,7 +150,7 @@ const NewPost = () => {
       <View style={styles.container}>
         {loading && (
           <View style={styles.loading}>
-            <ActivityIndicator size="large" color="black" />
+            <WormLoader />
           </View>
         )}
       </View>

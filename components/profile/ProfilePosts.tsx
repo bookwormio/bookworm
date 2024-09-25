@@ -1,16 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useAuth } from "../../components/auth/context";
 import { fetchPostsByUserID } from "../../services/firebase-services/PostQueries";
 import Post from "../post/post";
 import { usePostsContext } from "../post/PostsContext";
+import WormLoader from "../wormloader/WormLoader";
 
 const ProfilePosts = () => {
   const { user } = useAuth();
@@ -30,7 +26,7 @@ const ProfilePosts = () => {
   if (loading) {
     return (
       <View style={styles.feedLoading}>
-        <ActivityIndicator size="large" color="black" />
+        <WormLoader style={{ width: 50, height: 50 }} />
       </View>
     );
   } else {
