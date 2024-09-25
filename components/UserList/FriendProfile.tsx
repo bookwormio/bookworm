@@ -339,6 +339,7 @@ const styles = StyleSheet.create({
     flexDirection: "row", // Arrange children horizontally
     alignItems: "center", // Align children vertically in the center
     marginLeft: 20, // Adjust as needed
+    paddingBottom: 10,
   },
   bioPad: {
     paddingLeft: 20,
