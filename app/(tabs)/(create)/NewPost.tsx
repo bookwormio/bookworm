@@ -33,6 +33,7 @@ import {
   useGetBooksForBookshelves,
   useRemoveBookFromShelf,
 } from "../../../components/profile/hooks/useBookshelfQueries";
+import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { ServerBookShelfName } from "../../../enums/Enums";
 import { createPost } from "../../../services/firebase-services/PostQueries";
 import { type CreatePostModel } from "../../../types";
@@ -310,6 +311,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   slider: {
     marginBottom: 20,

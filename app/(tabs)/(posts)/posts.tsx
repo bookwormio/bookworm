@@ -31,6 +31,7 @@ import BookWormButton from "../../../components/button/BookWormButton";
 import Comment from "../../../components/comment/comment";
 import Post from "../../../components/post/post";
 import { usePostsContext } from "../../../components/post/PostsContext";
+import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
 
@@ -225,6 +226,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     paddingLeft: 10,
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   scrollContainer: {
     flex: 1,

@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useAuth } from "../../components/auth/context";
 import BookWormButton from "../../components/button/BookWormButton";
+import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -73,7 +74,7 @@ const Login = () => {
           <Text style={styles.question}>{"Don't have an account?"}</Text>
           <BookWormButton
             title="Create Account"
-            style={{ backgroundColor: "#f2f2f2", flex: 1 }}
+            style={{ backgroundColor: APP_BACKGROUND_COLOR, flex: 1 }}
             textStyle={styles.createButtonText}
             onPress={() => {
               router.push("/CreateAccount");
@@ -101,6 +102,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "center",
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   createButtonText: {
     color: "#FB6D0B",

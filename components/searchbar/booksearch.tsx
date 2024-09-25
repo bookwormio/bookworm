@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useQuery } from "@tanstack/react-query";
+import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { fetchBooksByTitleSearch } from "../../services/books-services/BookQueries";
 import { type BookVolumeInfo, type BookVolumeItem } from "../../types";
 import { useAuth } from "../auth/context";
@@ -137,6 +138,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 10,
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   bookContainer: {
     marginBottom: 2,

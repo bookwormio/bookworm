@@ -10,6 +10,7 @@ import {
 import { type PostModel } from "../../types";
 
 import { router } from "expo-router";
+import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { generateUserRoute } from "../../utilities/routeUtils";
 import { useAuth } from "../auth/context";
 import { useNavigateToBook } from "../profile/hooks/useRouteHooks";
@@ -171,9 +172,10 @@ export default Post;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "lightgrey",
+    padding: 20,
+    borderBottomWidth: 10.0,
+    borderBottomColor: "#F2F2F2",
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   title: {
     fontSize: 15,

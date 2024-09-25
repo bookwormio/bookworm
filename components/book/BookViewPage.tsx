@@ -25,6 +25,7 @@ import {
 } from "react-native";
 import RenderHtml from "react-native-render-html";
 import Toast from "react-native-toast-message";
+import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { type ServerBookShelfName } from "../../enums/Enums";
 import { fetchBookByVolumeID } from "../../services/books-services/BookQueries";
 import { type BookVolumeInfo } from "../../types";
@@ -270,6 +271,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   scrollContainer: {
     padding: 20,

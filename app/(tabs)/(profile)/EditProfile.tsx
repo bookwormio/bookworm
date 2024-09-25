@@ -17,6 +17,7 @@ import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import BookWormButton from "../../../components/button/BookWormButton";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
+import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import {
   newFetchUserInfo,
   updateUser,
@@ -264,6 +265,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     paddingBottom: 150,
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   loading: {
     flex: 1,

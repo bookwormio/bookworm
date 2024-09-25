@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   bookText: {
     width: 120,
     marginRight: 20,
-    marginTop: 20 / 2,
+    marginTop: 5,
     justifyContent: "center",
   },
   titleText: {

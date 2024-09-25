@@ -3,6 +3,7 @@ import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { type FlatBookItemModel } from "../../types";
 import { generateNewPostBookSearchRoute } from "../../utilities/routeUtils";
 
@@ -57,6 +58,7 @@ export default BookDropdownButton;
 const styles = StyleSheet.create({
   dropdownContainer: {
     paddingBottom: 20,
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   dropdown: {
     width: "100%",

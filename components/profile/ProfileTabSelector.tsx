@@ -6,6 +6,7 @@ import {
   TouchableHighlight,
   View,
 } from "react-native";
+import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { TabsTitleMap } from "../../enums/Enums";
 
 interface ProfileTabSelectorProps {
@@ -42,7 +43,7 @@ const ProfileTabSelector = ({
             ]}
             onPress={() => {
               setProfileTab(tab);
-              animateUnderline(0);
+              animateUnderline(index);
             }}
             disabled={profileTab === tab}
             activeOpacity={0.6}
@@ -60,7 +61,7 @@ const ProfileTabSelector = ({
               width: `${tabWidth}%`,
               left: underlinePosition.interpolate({
                 inputRange: tabs.map((_, i) => i),
-                outputRange: tabs.map((_, i) => `${i * tabWidth}`),
+                outputRange: tabs.map((_, i) => `${i * tabWidth}%`),
               }),
             },
           ]}
@@ -84,6 +85,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     width: "33.33%",
+    borderTopColor: "#F2F2F2",
+    borderTopWidth: 1.0,
   },
   buttonText: {
     fontSize: 15,
@@ -94,7 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFDAB9",
   },
   inactiveButton: {
-    backgroundColor: "#F2F2F2",
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   underline: {
     position: "absolute",

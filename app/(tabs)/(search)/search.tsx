@@ -8,7 +8,10 @@ import {
 } from "react-native";
 import BookSearch from "../../../components/searchbar/booksearch";
 import UserSearch from "../../../components/searchbar/usersearch";
-import { SEARCH_ROUTE_PREFIX } from "../../../constants/constants";
+import {
+  APP_BACKGROUND_COLOR,
+  SEARCH_ROUTE_PREFIX,
+} from "../../../constants/constants";
 
 const Search = () => {
   const [searchType, setSearchType] = useState("book"); // Default to book search
@@ -27,7 +30,7 @@ const Search = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: APP_BACKGROUND_COLOR }}>
       {/* Toggle buttons */}
       <View style={styles.container}>
         <TouchableOpacity
