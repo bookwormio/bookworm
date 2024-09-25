@@ -149,10 +149,21 @@ interface PostPaginationModel {
 interface FlatBookItemModel {
   id: string;
   title: string;
-  // TODO change this to use new expo images
   image: string;
   author: string;
   pageCount?: number;
+  subtitle?: string;
+  authors?: string[];
+  publisher?: string;
+  publishedDate?: string;
+  description?: string;
+  categories?: string[];
+  maturityRating?: string;
+  previewLink?: string;
+  averageRating?: number;
+  ratingsCount?: number;
+  language?: string;
+  mainCategory?: string;
 }
 
 interface BookShelfBookModel {
