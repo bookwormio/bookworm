@@ -70,50 +70,48 @@ const Profile = () => {
 
   return (
     <ScrollView stickyHeaderIndices={[4]} style={styles.scrollContainer}>
-      <View style={{ paddingBottom: 10 }}>
-        <View style={styles.imageTextContainer}>
-          <View style={styles.defaultImageContainer}>
-            <ProfilePicture userID={user?.uid ?? ""} size={60} />
-          </View>
-          <View>
-            <Text style={styles.nameText}>
-              {userData.first} {userData.last}
-            </Text>
-            <Text style={styles.locText}>
-              {userData.city === "" ? "" : userData.city}
-              {userData.city !== "" && userData.state !== "" ? ", " : ""}
-              {userData.state === "" ? "" : userData.state}
-            </Text>
-          </View>
+      <View style={styles.imageTextContainer}>
+        <View style={styles.defaultImageContainer}>
+          <ProfilePicture userID={user?.uid ?? ""} size={60} />
         </View>
         <View>
-          <Text style={styles.bioPad}>{userData.bio}</Text>
+          <Text style={styles.nameText}>
+            {userData.first} {userData.last}
+          </Text>
+          <Text style={styles.locText}>
+            {userData.city === "" ? "" : userData.city}
+            {userData.city !== "" && userData.state !== "" ? ", " : ""}
+            {userData.state === "" ? "" : userData.state}
+          </Text>
         </View>
-        <View style={styles.imageTextContainer}>
-          <View style={styles.locText}>
-            <Text>Followers</Text>
-            <Text>{followersCount ?? "-"}</Text>
-          </View>
-          <View style={styles.locText}>
-            <Text>Following</Text>
-            <Text>{followingCount ?? "-"}</Text>
-          </View>
+      </View>
+      <View>
+        <Text style={styles.bioPad}>{userData.bio}</Text>
+      </View>
+      <View style={styles.imageTextContainer}>
+        <View style={styles.locText}>
+          <Text>Followers</Text>
+          <Text>{followersCount ?? "-"}</Text>
         </View>
-        <View style={styles.outerButtonsContainer}>
-          <BookWormButton
-            title="Edit Profile"
-            onPress={() => {
-              if (user != null) {
-                router.push({
-                  pathname: "EditProfile",
-                });
-              } else {
-                console.error("User DNE");
-              }
-            }}
-          />
-          <BookWormButton title="Log Out" onPress={signOut} />
+        <View style={styles.locText}>
+          <Text>Following</Text>
+          <Text>{followingCount ?? "-"}</Text>
         </View>
+      </View>
+      <View style={styles.outerButtonsContainer}>
+        <BookWormButton
+          title="Edit Profile"
+          onPress={() => {
+            if (user != null) {
+              router.push({
+                pathname: "EditProfile",
+              });
+            } else {
+              console.error("User DNE");
+            }
+          }}
+        />
+        <BookWormButton title="Log Out" onPress={signOut} />
       </View>
       <ProfileTabSelector
         profileTab={profileTab}
@@ -145,6 +143,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     paddingHorizontal: 2,
+    backgroundColor: APP_BACKGROUND_COLOR,
+    paddingBottom: 10,
   },
   main: {
     flex: 1,
@@ -172,7 +172,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: APP_BACKGROUND_COLOR,
   },
   imageTextContainer: {
     flexDirection: "row", // Arrange children horizontally
