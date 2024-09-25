@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ServerBookShelfName } from "../../../enums/Enums";
+import { fetchBookByVolumeID } from "../../../services/books-services/BookQueries";
 import {
   addBookToUserBookshelf,
   getBooksFromUserBookShelves,
@@ -269,5 +270,17 @@ export const useGetShelvesForBook = (userID: string, bookID: string) => {
     queryFn: async () => await getShelvesContainingBook(userID, bookID), // Query function
     enabled: !(userID === "") && !(bookID === ""), // Only run query if userID and bookID are not null or undefined
     staleTime: 60000, // refetch data, here set to 1 minute
+  });
+};
+
+export const useFetchBookByVolumeID = (bookID: string) => {
+  return useQuery({
+    queryKey:
+      bookID !== null && bookID !== "" ? ["bookdata", bookID] : ["empty"],
+    queryFn: async () =>
+      bookID !== null && bookID !== ""
+        ? await fetchBookByVolumeID(bookID)
+        : null,
+    staleTime: 60000,
   });
 };

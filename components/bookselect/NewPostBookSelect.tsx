@@ -19,6 +19,18 @@ const NewPostBookSelect = () => {
       image: volumeInfo?.imageLinks?.smallThumbnail ?? "",
       author: volumeInfo?.authors?.[0] ?? "",
       pageCount: volumeInfo?.pageCount,
+      subtitle: volumeInfo?.subtitle,
+      authors: volumeInfo?.authors,
+      publisher: volumeInfo?.publisher,
+      publishedDate: volumeInfo?.publishedDate,
+      description: volumeInfo?.description,
+      categories: volumeInfo?.categories,
+      maturityRating: volumeInfo?.maturityRating,
+      previewLink: volumeInfo?.previewLink,
+      averageRating: volumeInfo?.averageRating,
+      ratingsCount: volumeInfo?.ratingsCount,
+      language: volumeInfo?.language,
+      mainCategory: volumeInfo?.mainCategory,
     };
     setSelectedBook(flatBook);
     router.back();
