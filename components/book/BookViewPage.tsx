@@ -21,9 +21,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  useWindowDimensions,
 } from "react-native";
-import RenderHtml from "react-native-render-html";
+import HTMLView from "react-native-htmlview";
 import Toast from "react-native-toast-message";
 import { type ServerBookShelfName } from "../../enums/Enums";
 import { fetchBookByVolumeID } from "../../services/books-services/BookQueries";
@@ -89,8 +88,6 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
       setSelectedShelves(inBookshelves);
     }
   }, [inBookshelves]);
-
-  const windowWidth = useWindowDimensions().width;
 
   const handleToggleShelf = (shelfName: ServerBookShelfName) => {
     if (selectedShelves.includes(shelfName)) {
@@ -234,11 +231,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
           </View>
           {bookData.description !== null && (
             <Text style={styles.description}>
-              Description:{" "}
-              <RenderHtml
-                contentWidth={windowWidth}
-                source={{ html: bookData.description ?? "" }}
-              />
+              Description: <HTMLView value={bookData.description ?? ""} />
             </Text>
           )}
         </ScrollView>
