@@ -133,7 +133,6 @@ const Posts = () => {
         )}
         <FlatList
           style={styles.scrollContainer}
-          contentContainerStyle={styles.scrollContent}
           data={posts}
           renderItem={({ item: post }) => (
             <TouchableOpacity
@@ -225,15 +224,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    paddingLeft: 10,
     backgroundColor: APP_BACKGROUND_COLOR,
   },
   scrollContainer: {
     flex: 1,
     width: "100%",
-  },
-  scrollContent: {
-    paddingRight: 16,
   },
   feedLoading: {
     alignItems: "center",
