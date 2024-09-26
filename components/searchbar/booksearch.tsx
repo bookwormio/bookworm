@@ -104,6 +104,13 @@ const BookSearch = ({
     );
   }, [fetchBookData, searchPhrase]);
 
+  useEffect(() => {
+    // Always show shelf books if search phrase is empty
+    if (searchPhrase === "" && flattenedShelfBooks.length > 0) {
+      setBooks(flattenedShelfBooks);
+    }
+  }, [searchPhrase, flattenedShelfBooks]);
+
   return (
     <View style={styles.container}>
       <SearchBar
