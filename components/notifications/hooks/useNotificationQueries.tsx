@@ -1,5 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { getAllFullNotifications } from "../../../services/firebase-services/NotificationQueries";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  createNotification,
+  getAllFullNotifications,
+} from "../../../services/firebase-services/NotificationQueries";
+import { type NotificationModel } from "../../../types";
 
 /**
  * Custom hook to fetch the notificatioons for a given user.
@@ -20,6 +24,28 @@ export const useGetAllFullNotifications = (userID: string) => {
       }
 
       return userNotifs;
+    },
+  });
+};
+
+// TODO add jsdoc
+export const useCreateNotification = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      friendUserID,
+      notification,
+    }: {
+      friendUserID: string;
+      notification: NotificationModel;
+    }) => {
+      return await createNotification(notification);
+    },
+    onSuccess: async (data, { friendUserID }) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["notifications", friendUserID],
+      });
     },
   });
 };

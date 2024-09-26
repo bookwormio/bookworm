@@ -68,7 +68,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
 
   // getting userdata
   const { data: userData, isLoading: isLoadingUserData } = useUserDataQuery(
-    user ?? undefined,
+    user?.uid,
   );
 
   const { data: isFollowingData } = useQuery({
@@ -316,7 +316,12 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         tabs={[TabNames.BOOKSHELVES, TabNames.POSTS, TabNames.DATA]}
       ></ProfileTabSelector>
       {profileTab === TabNames.BOOKSHELVES ? (
-        <ProfileBookShelves userID={friendUserID} />
+        <ProfileBookShelves
+          userID={friendUserID}
+          // TODO maybe a better way to pass data?
+          userFirstName={firstName}
+          userLastName={lastName}
+        />
       ) : profileTab === TabNames.POSTS ? (
         <Text>PUT THE POSTS HERE</Text>
       ) : profileTab === TabNames.DATA ? (

@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { type User } from "firebase/auth";
 import {
   fetchUserData,
   getUserProfileURL,
@@ -28,18 +27,19 @@ export const useProfilePicQuery = (userId: string | undefined) => {
   });
 };
 
+// TODO: ensure the jsdocs are right
 /**
  * Custom hook to fetch User Data for a given user.
  *
- * @param {User | undefined} user - The user object whose User Data is being fetched.
+ * @param {string | undefined} userID - The user object whose User Data is being fetched.
  * @returns {UseQueryResult<UserData | null>} The result of the query, containing the User Data or null.
  */
-export const useUserDataQuery = (user: User | undefined) => {
+export const useUserDataQuery = (userID?: string) => {
   return useQuery({
-    queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+    queryKey: userID != null ? ["userdata", userID] : ["userdata"],
     queryFn: async () => {
-      if (user != null) {
-        const userdata = await fetchUserData(user);
+      if (userID != null && userID !== "") {
+        const userdata = await fetchUserData(userID);
         return userdata;
       } else {
         // Return default value when user is null

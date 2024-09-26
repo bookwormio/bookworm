@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -8,10 +9,16 @@ import {
 } from "react-native";
 import {
   bookShelfDisplayMap,
-  type ServerBookShelfName,
+  ServerBookShelfName,
+  ServerNotificationType,
 } from "../../../enums/Enums";
-import { type BookShelfBookModel } from "../../../types";
+import {
+  type BookRequestNotification,
+  type BookShelfBookModel,
+} from "../../../types";
 import { useAuth } from "../../auth/context";
+import BookWormButton from "../../button/BookWormButton";
+import { useCreateNotification } from "../../notifications/hooks/useNotificationQueries";
 import { useRemoveBookFromShelf } from "../hooks/useBookshelfQueries";
 import { useBookRouteInfo } from "../hooks/useRouteHooks";
 import BookShelfBook from "./BookShelfBook";
@@ -19,13 +26,25 @@ import BookShelfBook from "./BookShelfBook";
 interface BookShelfProps {
   shelfName: ServerBookShelfName;
   books: BookShelfBookModel[];
+  userID: string;
+  userFirstName: string;
+  userLastName: string;
 }
 
-const BookShelf = ({ shelfName, books }: BookShelfProps) => {
+const BookShelf = ({
+  shelfName,
+  books,
+  userID,
+  userFirstName,
+  userLastName,
+}: BookShelfProps) => {
   const { user } = useAuth();
 
   const { mutate: removeBook, isPending: removeBookPending } =
     useRemoveBookFromShelf();
+
+  const notifyMutation = useCreateNotification();
+
   const { type: bookRouteType } = useBookRouteInfo();
 
   // Function to call the mutation
@@ -43,6 +62,71 @@ const BookShelf = ({ shelfName, books }: BookShelfProps) => {
       );
     } else {
       console.log("User or book ID is not available");
+    }
+  };
+
+  const handleBookRequestClicked = (bookID: string, bookTitle: string) => {
+    Alert.prompt(
+      "Request " + bookTitle + " from " + userID,
+      "Include a custom message (Optional)",
+      [
+        {
+          text: "Cancel",
+          onPress: () => {},
+          style: "cancel",
+        },
+        {
+          text: "Request",
+          onPress: (message) => {
+            handleSendBookRequestNotification({
+              bookID,
+              bookTitle,
+              message: message ?? "",
+            });
+          },
+        },
+      ],
+      "plain-text",
+    );
+  };
+
+  // TODO clean up these parameters
+  // TODO Probably put this in a separate file
+  const handleSendBookRequestNotification = ({
+    bookID,
+    bookTitle,
+    message,
+  }: {
+    bookID: string;
+    bookTitle: string;
+    message?: string;
+  }) => {
+    // TODO handle all the type checks here better
+    if (
+      user == null ||
+      userID == null ||
+      userFirstName == null ||
+      userLastName == null
+    ) {
+      console.error("User is null");
+    }
+    if (bookID == null || bookTitle == null) {
+      console.error("Book ID or book title is null");
+    }
+    if (user != null) {
+      const bookRequestNotification: BookRequestNotification = {
+        receiver: userID,
+        sender: user?.uid, // TODO make names less ambiguous
+        sender_name: userFirstName + " " + userLastName, // Use an empty string if user?.uid is undefined
+        bookID,
+        bookTitle,
+        custom_message: message ?? "",
+        type: ServerNotificationType.BOOK_REQUEST,
+      };
+      notifyMutation.mutate({
+        friendUserID: userID,
+        notification: bookRequestNotification,
+      });
     }
   };
 
@@ -81,6 +165,18 @@ const BookShelf = ({ shelfName, books }: BookShelfProps) => {
                 <Text style={{ color: "#FB6D0B" }}>Remove</Text>
               </TouchableOpacity>
             )}
+            {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
+              bookRouteType === "SEARCH" && (
+                <BookWormButton
+                  title="Request"
+                  onPress={() => {
+                    handleBookRequestClicked(
+                      item.id,
+                      item.volumeInfo?.title ?? "",
+                    );
+                  }}
+                ></BookWormButton>
+              )}
           </View>
         )}
         ListEmptyComponent={() => (

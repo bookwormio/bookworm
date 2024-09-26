@@ -25,7 +25,7 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
   const queryClient = useQueryClient();
 
   // getting userdata
-  const { data: userData } = useUserDataQuery(user ?? undefined);
+  const { data: userData } = useUserDataQuery(user?.uid);
 
   const notifyMutation = useMutation({
     mutationFn: createNotification,
