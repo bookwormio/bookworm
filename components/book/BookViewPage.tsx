@@ -3,7 +3,6 @@ import {
   BottomSheetBackdrop,
   type BottomSheetBackdropProps,
   BottomSheetModal,
-  BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
@@ -55,7 +54,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   // variables
-  const snapPoints = useMemo(() => ["25%", "50%", "100%"], []);
+  const snapPoints = useMemo(() => ["90%", "50%"], []);
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -198,7 +197,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
   }
 
   return (
-    <BottomSheetModalProvider>
+    <>
       <View style={styles.container}>
         <ScrollView
           style={styles.scrollContainer}
@@ -263,7 +262,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
         </BottomSheetModal>
       </View>
       <Toast />
-    </BottomSheetModalProvider>
+    </>
   );
 };
 

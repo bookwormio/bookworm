@@ -1,8 +1,4 @@
-import {
-  BottomSheetBackdrop,
-  BottomSheetModal,
-  BottomSheetModalProvider,
-} from "@gorhom/bottom-sheet";
+import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import {
@@ -123,7 +119,7 @@ const Posts = () => {
   }, []);
 
   return (
-    <BottomSheetModalProvider>
+    <>
       <View style={styles.container}>
         {isLoadingFeedPosts && !refreshing && (
           <View style={styles.feedLoading}>
@@ -214,7 +210,7 @@ const Posts = () => {
           />
         </View>
       </BottomSheetModal>
-    </BottomSheetModalProvider>
+    </>
   );
 };
 
@@ -259,6 +255,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 5,
     paddingHorizontal: 10,
+    paddingBottom: 30,
   },
   commentInput: {
     flex: 1,
