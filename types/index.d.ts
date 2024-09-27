@@ -4,7 +4,10 @@ import {
   type Timestamp,
 } from "firebase/firestore";
 
-import { type ServerNotificationType } from "../enums/Enums";
+import {
+  type ServerBookBorrowStatus,
+  type ServerNotificationType,
+} from "../enums/Enums";
 
 interface LineDataPointModel {
   x: number; // time in seconds
@@ -245,3 +248,10 @@ type Notification =
   | LikeNotification
   | CommentNotification
   | RecommendationNotification;
+
+interface BookBorrowModel {
+  bookID: string;
+  lendingUserID: string;
+  borrowingUserID: string;
+  borrowStatus: ServerBookBorrowStatus;
+}
