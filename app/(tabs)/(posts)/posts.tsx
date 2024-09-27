@@ -31,6 +31,7 @@ import BookWormButton from "../../../components/button/BookWormButton";
 import Comment from "../../../components/comment/comment";
 import Post from "../../../components/post/post";
 import { usePostsContext } from "../../../components/post/PostsContext";
+import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
 
@@ -132,7 +133,6 @@ const Posts = () => {
         )}
         <FlatList
           style={styles.scrollContainer}
-          contentContainerStyle={styles.scrollContent}
           data={posts}
           renderItem={({ item: post }) => (
             <TouchableOpacity
@@ -224,14 +224,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    paddingLeft: 10,
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   scrollContainer: {
     flex: 1,
     width: "100%",
-  },
-  scrollContent: {
-    paddingRight: 16,
   },
   feedLoading: {
     alignItems: "center",

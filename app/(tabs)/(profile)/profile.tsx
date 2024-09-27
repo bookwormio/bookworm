@@ -15,6 +15,7 @@ import ViewData from "../../../components/profile/Data/ViewData";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
 import ProfilePosts from "../../../components/profile/ProfilePosts";
 import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
+import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { TabNames } from "../../../enums/Enums";
 import {
   getNumberOfFollowersByUserID,
@@ -136,11 +137,14 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     height: "100%",
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   outerButtonsContainer: {
     flexDirection: "row",
     justifyContent: "center",
     paddingHorizontal: 2,
+    backgroundColor: APP_BACKGROUND_COLOR,
+    paddingBottom: 10,
   },
   main: {
     flex: 1,

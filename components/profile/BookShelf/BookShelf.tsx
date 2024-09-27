@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Button,
   FlatList,
   StyleSheet,
   Text,
@@ -72,13 +71,15 @@ const BookShelf = ({ shelfName, books }: BookShelfProps) => {
             </TouchableOpacity>
             {/* TODO: make this look better with minus sign button */}
             {bookRouteType === "PROFILE" && (
-              <Button
+              <TouchableOpacity
                 onPress={() => {
                   handleRemoveBook(item.id);
                 }}
-                title="Remove from shelf"
                 disabled={removeBookPending}
-              />
+                style={{ paddingTop: 2 }}
+              >
+                <Text style={{ color: "#FB6D0B" }}>Remove</Text>
+              </TouchableOpacity>
             )}
           </View>
         )}

@@ -61,3 +61,5 @@ export const IMG_STYLE: StyleProp<ImageStyle> = {
   borderRadius: POST_IMAGE_BORDER_RADIUS,
   marginRight: 10,
 };
+
+export const APP_BACKGROUND_COLOR = "white";

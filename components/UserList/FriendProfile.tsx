@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
+import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { ServerNotificationType, TabNames } from "../../enums/Enums";
 import {
   followUserByID,
@@ -258,7 +259,11 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   return (
     <ScrollView
       stickyHeaderIndices={[4]}
-      style={{ flexGrow: 1, height: "100%" }}
+      style={{
+        flexGrow: 1,
+        height: "100%",
+        backgroundColor: APP_BACKGROUND_COLOR,
+      }}
     >
       <View style={styles.buttonwrapper}></View>
       <View style={styles.imageTextContainer}>
@@ -334,6 +339,7 @@ const styles = StyleSheet.create({
     flexDirection: "row", // Arrange children horizontally
     alignItems: "center", // Align children vertically in the center
     marginLeft: 20, // Adjust as needed
+    paddingBottom: 10,
   },
   bioPad: {
     paddingLeft: 20,
@@ -364,6 +370,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   buttoncontainer: {
     alignItems: "flex-end",
