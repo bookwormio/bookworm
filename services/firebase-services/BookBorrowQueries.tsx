@@ -149,7 +149,13 @@ export async function getAllLendingBooksForUser(
   return await getAllBooksForUser(userID, ServerBookBorrowRole.LENDER);
 }
 
-// TODO: This lending or borrowing needs to be an enum
+/**
+ * Retrieves all books that the specified user is currently borrowing or lending.
+ *
+ * @param {string} userID - The ID of the user whose books are to be retrieved.
+ * @param {ServerBookBorrowRole} userType - The type of user (lender or borrower).
+ * @returns {Promise<BookBorrowModel[]>} A promise that resolves to an array of BookBorrowModel objects.
+ */
 async function getAllBooksForUser(
   userID: string,
   userType: ServerBookBorrowRole,
