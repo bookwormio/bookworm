@@ -15,6 +15,7 @@ import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
 import BookWormButton from "../../components/button/BookWormButton";
 import WormLoader from "../../components/wormloader/WormLoader";
+import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { updateUser } from "../../services/firebase-services/UserQueries";
 import { type UserDataModel } from "../../types";
 
@@ -227,6 +228,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     paddingBottom: 100,
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   container: {
     alignItems: "center",

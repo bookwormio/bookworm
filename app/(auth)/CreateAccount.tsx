@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, TextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
 import BookWormButton from "../../components/button/BookWormButton";
+import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 
 const CreateAccount = () => {
   const [email, setEmail] = useState("");
@@ -140,6 +141,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     paddingBottom: 40,
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   container: {
     alignItems: "center",

@@ -20,8 +20,21 @@ import {
 } from "../../../components/bookmark/hooks/useBookmarkQueries";
 import BookDropdownButton from "../../../components/bookselect/BookDropdownButton";
 import BookWormButton from "../../../components/button/BookWormButton";
-import { prefetchBooksForBookshelves } from "../../../components/profile/hooks/useBookshelfQueries";
+import {
+  convertFlatBookToBookShelfBook,
+  isBookInCurrentlyReading,
+  isBookInFinished,
+  isBookInWantToRead,
+} from "../../../components/newpost/util/bookShelfUtils";
+import {
+  prefetchBooksForBookshelves,
+  useAddBookToShelf,
+  useGetBooksForBookshelves,
+  useRemoveBookFromShelf,
+} from "../../../components/profile/hooks/useBookshelfQueries";
 import WormLoader from "../../../components/wormloader/WormLoader";
+import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
+import { ServerBookShelfName } from "../../../enums/Enums";
 import { createPost } from "../../../services/firebase-services/PostQueries";
 import { type CreatePostModel } from "../../../types";
 import { useNewPostContext } from "./NewPostContext";
@@ -40,6 +53,9 @@ const NewPost = () => {
   const { mutate: setBookmark } = useSetBookmarkForBook();
   const postMutation = useMutation({ mutationFn: createPost });
 
+  const addBookMutation = useAddBookToShelf();
+  const removeBookMutation = useRemoveBookFromShelf();
+
   const {
     data: oldBookmark,
     isLoading: bookmarkLoading,
@@ -47,6 +63,8 @@ const NewPost = () => {
   } = useGetBookmarkForBook(user?.uid, selectedBook?.id);
 
   void prefetchBooksForBookshelves(user?.uid ?? "");
+
+  const { data: bookshelves } = useGetBooksForBookshelves(user?.uid ?? "");
 
   const [currentBookmark, setCurrentBookmark] = useState(0);
 
@@ -120,6 +138,7 @@ const NewPost = () => {
   };
 
   const handleShareClicked = () => {
+    if (user?.uid == null || selectedBook == null) return;
     if (!fieldsMissing()) {
       createNewPost();
       setBookmark({
@@ -128,6 +147,44 @@ const NewPost = () => {
         bookmark: currentBookmark,
         oldBookmark,
       });
+      if (bookshelves == null) {
+        return;
+      }
+      if (currentBookmark === selectedBook.pageCount) {
+        if (!isBookInFinished(selectedBook.id, bookshelves)) {
+          addBookMutation.mutate({
+            userID: user.uid,
+            bookID: selectedBook.id,
+            volumeInfo: convertFlatBookToBookShelfBook(selectedBook),
+            shelfName: ServerBookShelfName.FINISHED,
+          });
+        }
+        if (isBookInCurrentlyReading(selectedBook.id, bookshelves)) {
+          removeBookMutation.mutate({
+            userID: user.uid,
+            bookID: selectedBook.id,
+            shelfName: ServerBookShelfName.CURRENTLY_READING,
+          });
+        }
+      }
+      // if currentBookmark does not equal page count
+      else {
+        if (!isBookInCurrentlyReading(selectedBook.id, bookshelves)) {
+          addBookMutation.mutate({
+            userID: user.uid,
+            bookID: selectedBook.id,
+            volumeInfo: convertFlatBookToBookShelfBook(selectedBook),
+            shelfName: ServerBookShelfName.CURRENTLY_READING,
+          });
+        }
+      }
+      if (isBookInWantToRead(selectedBook.id, bookshelves)) {
+        removeBookMutation.mutate({
+          userID: user.uid,
+          bookID: selectedBook.id,
+          shelfName: ServerBookShelfName.WANT_TO_READ,
+        });
+      }
     }
   };
 
@@ -254,6 +311,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   slider: {
     marginBottom: 20,

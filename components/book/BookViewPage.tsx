@@ -20,10 +20,10 @@ import {
   Text,
   TouchableOpacity,
   View,
-  useWindowDimensions,
 } from "react-native";
-import RenderHtml from "react-native-render-html";
+import HTMLView from "react-native-htmlview";
 import Toast from "react-native-toast-message";
+import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { type ServerBookShelfName } from "../../enums/Enums";
 import { fetchBookByVolumeID } from "../../services/books-services/BookQueries";
 import { type BookVolumeInfo } from "../../types";
@@ -89,8 +89,6 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
       setSelectedShelves(inBookshelves);
     }
   }, [inBookshelves]);
-
-  const windowWidth = useWindowDimensions().width;
 
   const handleToggleShelf = (shelfName: ServerBookShelfName) => {
     if (selectedShelves.includes(shelfName)) {
@@ -234,11 +232,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
           </View>
           {bookData.description !== null && (
             <Text style={styles.description}>
-              Description:{" "}
-              <RenderHtml
-                contentWidth={windowWidth}
-                source={{ html: bookData.description ?? "" }}
-              />
+              Description: <HTMLView value={bookData.description ?? ""} />
             </Text>
           )}
         </ScrollView>
@@ -270,8 +264,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
   scrollContainer: {
     padding: 20,
