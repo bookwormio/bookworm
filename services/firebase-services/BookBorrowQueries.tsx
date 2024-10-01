@@ -27,7 +27,8 @@ import {
  * @param {string} currentUserID - The ID of the user borrowing the book.
  * @param {string} friendUserID - The ID of the user lending the book.
  * @param {string} bookID - The ID of the book being borrowed.
- * @returns {Promise<boolean>} A promise that resolves to true if the book was successfully borrowed, false otherwise.
+ * @returns {Promise<boolean>} A promise that resolves to true if the book was successfully borrowed.
+ * @throws {Error} If there's an error during the borrowing process.
  */
 export async function borrowBookFromUser(
   currentUserID: string,
@@ -43,8 +44,7 @@ export async function borrowBookFromUser(
       ServerBookBorrowStatus.BORROWING,
     );
   } catch (error) {
-    console.error("Error borrowing book:", error);
-    return false;
+    throw new Error(`Error borrowing book: ${(error as Error).message}`);
   }
 }
 
@@ -54,7 +54,8 @@ export async function borrowBookFromUser(
  * @param {string} currentUserID - The ID of the user returning the book.
  * @param {string} friendUserID - The ID of the user who lent the book.
  * @param {string} bookID - The ID of the book being returned.
- * @returns {Promise<boolean>} A promise that resolves to true if the book was successfully returned, false otherwise.
+ * @returns {Promise<boolean>} A promise that resolves to true if the book was successfully returned.
+ * @throws {Error} If there's an error during the returning process.
  */
 export async function returnBookToUser(
   currentUserID: string,
@@ -71,8 +72,7 @@ export async function returnBookToUser(
       ServerBookBorrowStatus.RETURNED,
     );
   } catch (error) {
-    console.error("Error returning book:", error);
-    return false;
+    throw new Error(`Error returning book: ${(error as Error).message}`);
   }
 }
 
@@ -121,7 +121,7 @@ async function updateBorrowStatus(
     }
     return true;
   } catch (error) {
-    throw new Error("Error updating book status", error as Error);
+    throw new Error(`Error updating book status: ${(error as Error).message}`);
   }
 }
 
@@ -130,6 +130,7 @@ async function updateBorrowStatus(
  *
  * @param {string} userID - The ID of the user whose borrowing books are to be retrieved.
  * @returns {Promise<BookBorrowModel[]>} A promise that resolves to an array of BookBorrowModel objects.
+ * @throws {Error} If there's an error retrieving the books.
  */
 export async function getAllBorrowingBooksForUser(
   userID: string,
@@ -142,6 +143,7 @@ export async function getAllBorrowingBooksForUser(
  *
  * @param {string} userID - The ID of the user whose lending books are to be retrieved.
  * @returns {Promise<BookBorrowModel[]>} A promise that resolves to an array of BookBorrowModel objects.
+ * @throws {Error} If there's an error retrieving the books.
  */
 export async function getAllLendingBooksForUser(
   userID: string,
@@ -155,6 +157,7 @@ export async function getAllLendingBooksForUser(
  * @param {string} userID - The ID of the user whose books are to be retrieved.
  * @param {ServerBookBorrowRole} userType - The type of user (lender or borrower).
  * @returns {Promise<BookBorrowModel[]>} A promise that resolves to an array of BookBorrowModel objects.
+ * @throws {Error} If there's an error retrieving the books.
  */
 async function getAllBooksForUser(
   userID: string,
@@ -166,8 +169,9 @@ async function getAllBooksForUser(
     const bookSnapshot = await getDocs(q);
     return bookSnapshot.docs.map(convertBorrowDocToModel);
   } catch (error) {
-    console.error(`Error getting ${userType} books:`, error);
-    return [];
+    throw new Error(
+      `Error getting ${userType} books: ${(error as Error).message}`,
+    );
   }
 }
 
@@ -177,7 +181,8 @@ async function getAllBooksForUser(
  * @param {string} currentUserID - The ID of the current user.
  * @param {string} friendUserID - The ID of the other user involved in the lending.
  * @param {string} bookID - The ID of the book whose lending status is being checked.
- * @returns {Promise<BookBorrowModel | null>} A promise that resolves to a BookBorrowModel if the book is found, or null if not found or in case of an error.
+ * @returns {Promise<BookBorrowModel>} A promise that resolves to a BookBorrowModel.
+ * @throws {Error} If there's an error retrieving the book lending status.
  */
 export async function getBookLendingStatus(
   currentUserID: string,
@@ -205,7 +210,8 @@ export async function getBookLendingStatus(
       };
     }
   } catch (error) {
-    console.error("Error getting book lending status:", error);
-    return null;
+    throw new Error(
+      `Error getting book lending status: ${(error as Error).message}`,
+    );
   }
 }
