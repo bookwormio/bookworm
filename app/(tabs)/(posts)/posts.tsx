@@ -149,6 +149,7 @@ const Posts = () => {
   const refreshContainerStyles = useAnimatedStyle(() => {
     return {
       height: pullDownPosition.value,
+      backgroundColor: "#FFFFFF",
     };
   });
 
@@ -342,5 +343,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#FFFFFF",
   },
 });
