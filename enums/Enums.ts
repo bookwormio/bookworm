@@ -62,3 +62,14 @@ export const TabsTitleMap: StringMap = {
   [TabNames.POSTS]: "Posts",
   [TabNames.DATA]: "Data",
 };
+
+export enum ServerBookBorrowStatus {
+  BORROWING = "borrowing",
+  RETURNED = "returned",
+  NONE = "none",
+}
+
+export enum ServerBookBorrowRole {
+  LENDER = "lending_user",
+  BORROWER = "borrowing_user",
+}
