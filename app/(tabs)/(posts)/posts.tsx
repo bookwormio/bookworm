@@ -18,6 +18,7 @@ import React, {
 } from "react";
 import {
   FlatList,
+  Keyboard,
   PanResponder,
   StyleSheet,
   Text,
@@ -231,6 +232,8 @@ const Posts = () => {
   const handlePresentModalPress = useCallback(() => {
     commentsModalRef.current?.present();
   }, []);
+
+  Keyboard.dismiss();
 
   return (
     <BottomSheetModalProvider>
