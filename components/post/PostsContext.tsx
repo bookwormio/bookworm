@@ -66,7 +66,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   // list of postIDs with ongoing likes
   const [pendingLikes, setPendingLikes] = useState<Set<string>>(new Set());
   // getting userdata
-  const { data: userData } = useUserDataQuery(user ?? undefined);
+  const { data: userData } = useUserDataQuery(user?.uid);
   const queryClient = useQueryClient();
 
   /**

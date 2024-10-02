@@ -30,6 +30,7 @@ import {
 } from "../../types";
 
 import { caseFoldNormalize } from "../util/queryUtils";
+import { getLendingStatusesForBooks } from "./BookBorrowQueries";
 
 /**
  * Updates user data in the database.
@@ -583,6 +584,24 @@ export async function getBooksFromUserBookShelves(
           },
         });
       });
+
+      // get lending status for each book
+      if (shelf === ServerBookShelfName.LENDING_LIBRARY) {
+        // get lending status for books in lending library
+        const lendingStatuses = await getLendingStatusesForBooks(
+          userID,
+          userBookShelves[shelf].map((book) => book.id),
+        );
+        // add book borrow model to book
+        for (const book of userBookShelves[shelf]) {
+          const lendingStatus = lendingStatuses.find(
+            (status) => status.bookID === book.id,
+          );
+          if (lendingStatus != null) {
+            book.borrowInfo = lendingStatus;
+          }
+        }
+      }
     }
 
     return userBookShelves;

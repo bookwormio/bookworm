@@ -65,7 +65,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
           <ProfilePicture userID={notif.sender} size={50} />
         </TouchableOpacity>
         <NotificationItemContent
-          notif={notif}
+          notification={notif}
           time={time}
         ></NotificationItemContent>
       </View>

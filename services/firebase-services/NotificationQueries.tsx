@@ -1,14 +1,19 @@
 import {
   addDoc,
   collection,
+  doc,
   getDocs,
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
   type Timestamp,
   where,
 } from "firebase/firestore";
-import { ServerNotificationType } from "../../enums/Enums";
+import {
+  type BookRequestNotificationStatus,
+  ServerNotificationType,
+} from "../../enums/Enums";
 import { DB } from "../../firebase.config";
 import {
   type FullNotificationModel,
@@ -71,6 +76,7 @@ export async function createNotification(
         bookID: notif.bookID,
         bookTitle: notif.bookTitle,
         custom_message: notif.custom_message ?? "",
+        bookRequestStatus: notif.bookRequestStatus,
       }),
       ...(notif.type === ServerNotificationType.BOOK_REQUEST_RESPONSE && {
         bookID: notif.bookID,
@@ -88,6 +94,36 @@ export async function createNotification(
   } catch (error) {
     console.error("Error creating notification:", error);
     return false;
+  }
+}
+
+/**
+ * Updates the status of a book request notification.
+ *
+ * @param {string} notifID - The ID of the notification to update.
+ * @param {BookRequestNotificationStatus} newStatus - The new status to set for the notification.
+ * @returns {Promise<boolean>} A promise that resolves to true if the notification was successfully updated.
+ * @throws {Error} If there's an error updating the notification status.
+ */
+export async function updateNotificationStatus(
+  notifID: string,
+  newStatus: BookRequestNotificationStatus,
+): Promise<boolean> {
+  try {
+    const notifDocRef = doc(DB, "notifications", notifID);
+    await setDoc(
+      notifDocRef,
+      {
+        bookRequestStatus: newStatus,
+        updated_at: serverTimestamp(),
+      },
+      { merge: true },
+    );
+    return true;
+  } catch (error) {
+    throw new Error(
+      `Error updating notification status: ${(error as Error).message}`,
+    );
   }
 }
 
@@ -111,6 +147,7 @@ export async function getAllFullNotifications(
 
     for (const notifDoc of querySnap.docs) {
       const notif = {
+        notifID: notifDoc.id,
         receiver: notifDoc.data().receiver,
         comment: notifDoc.data().comment,
         sender: notifDoc.data().sender,

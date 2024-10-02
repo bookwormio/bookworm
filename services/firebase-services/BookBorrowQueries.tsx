@@ -22,29 +22,29 @@ import {
 } from "../util/bookBorrowUtils";
 
 /**
- * Borrows a book from another user.
+ * Lends a book to another user.
  *
- * @param {string} currentUserID - The ID of the user borrowing the book.
- * @param {string} friendUserID - The ID of the user lending the book.
- * @param {string} bookID - The ID of the book being borrowed.
- * @returns {Promise<boolean>} A promise that resolves to true if the book was successfully borrowed.
- * @throws {Error} If there's an error during the borrowing process.
+ * @param {string} lenderUserID - The ID of the user lending the book.
+ * @param {string} borrowerUserID - The ID of the user borrowing the book.
+ * @param {string} bookID - The ID of the book being lent.
+ * @returns {Promise<boolean>} A promise that resolves to true if the book was successfully lent.
+ * @throws {Error} If there's an error during the lending process.
  */
-export async function borrowBookFromUser(
-  currentUserID: string,
-  friendUserID: string,
+export async function lendBookToUser(
+  lenderUserID: string,
+  borrowerUserID: string,
   bookID: string,
 ): Promise<boolean> {
   try {
-    validateBorrowParams(currentUserID, friendUserID, bookID);
+    validateBorrowParams(lenderUserID, borrowerUserID, bookID);
     return await updateBorrowStatus(
-      currentUserID,
-      friendUserID,
+      borrowerUserID,
+      lenderUserID,
       bookID,
       ServerBookBorrowStatus.BORROWING,
     );
   } catch (error) {
-    throw new Error(`Error borrowing book: ${(error as Error).message}`);
+    throw new Error(`Error lending book: ${(error as Error).message}`);
   }
 }
 
@@ -212,6 +212,28 @@ export async function getBookLendingStatus(
   } catch (error) {
     throw new Error(
       `Error getting book lending status: ${(error as Error).message}`,
+    );
+  }
+}
+
+// TODO: add jsdoc
+export async function getLendingStatusesForBooks(
+  userID: string,
+  bookIDs: string[],
+): Promise<BookBorrowModel[]> {
+  try {
+    const bookRef = collection(DB, BORROW_BOOK_COLLECTION_REF);
+    // TODO batch this
+    const q = query(
+      bookRef,
+      where("borrowing_user", "==", userID),
+      where("book_id", "in", bookIDs),
+    );
+    const bookSnapshot = await getDocs(q);
+    return bookSnapshot.docs.map(convertBorrowDocToModel);
+  } catch (error) {
+    throw new Error(
+      `Error getting lending statuses for books: ${(error as Error).message}`,
     );
   }
 }

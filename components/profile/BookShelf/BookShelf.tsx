@@ -1,26 +1,17 @@
 import React from "react";
 import {
-  Alert,
   FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  bookShelfDisplayMap,
-  ServerBookShelfName,
-  ServerNotificationType,
-} from "../../../enums/Enums";
-import {
-  type BookRequestNotification,
-  type BookShelfBookModel,
-} from "../../../types";
+import { bookShelfDisplayMap, ServerBookShelfName } from "../../../enums/Enums";
+import { type BookShelfBookModel } from "../../../types";
 import { useAuth } from "../../auth/context";
-import BookWormButton from "../../button/BookWormButton";
-import { useCreateNotification } from "../../notifications/hooks/useNotificationQueries";
 import { useRemoveBookFromShelf } from "../hooks/useBookshelfQueries";
 import { useBookRouteInfo } from "../hooks/useRouteHooks";
+import BookBorrowButton from "./BookBorrowButton";
 import BookShelfBook from "./BookShelfBook";
 
 interface BookShelfProps {
@@ -43,8 +34,6 @@ const BookShelf = ({
   const { mutate: removeBook, isPending: removeBookPending } =
     useRemoveBookFromShelf();
 
-  const notifyMutation = useCreateNotification();
-
   const { type: bookRouteType } = useBookRouteInfo();
 
   // Function to call the mutation
@@ -62,71 +51,6 @@ const BookShelf = ({
       );
     } else {
       console.log("User or book ID is not available");
-    }
-  };
-
-  const handleBookRequestClicked = (bookID: string, bookTitle: string) => {
-    Alert.prompt(
-      "Request " + bookTitle + " from " + userID,
-      "Include a custom message (Optional)",
-      [
-        {
-          text: "Cancel",
-          onPress: () => {},
-          style: "cancel",
-        },
-        {
-          text: "Request",
-          onPress: (message) => {
-            handleSendBookRequestNotification({
-              bookID,
-              bookTitle,
-              message: message ?? "",
-            });
-          },
-        },
-      ],
-      "plain-text",
-    );
-  };
-
-  // TODO clean up these parameters
-  // TODO Probably put this in a separate file
-  const handleSendBookRequestNotification = ({
-    bookID,
-    bookTitle,
-    message,
-  }: {
-    bookID: string;
-    bookTitle: string;
-    message?: string;
-  }) => {
-    // TODO handle all the type checks here better
-    if (
-      user == null ||
-      userID == null ||
-      userFirstName == null ||
-      userLastName == null
-    ) {
-      console.error("User is null");
-    }
-    if (bookID == null || bookTitle == null) {
-      console.error("Book ID or book title is null");
-    }
-    if (user != null) {
-      const bookRequestNotification: BookRequestNotification = {
-        receiver: userID,
-        sender: user?.uid, // TODO make names less ambiguous
-        sender_name: userFirstName + " " + userLastName, // Use an empty string if user?.uid is undefined
-        bookID,
-        bookTitle,
-        custom_message: message ?? "",
-        type: ServerNotificationType.BOOK_REQUEST,
-      };
-      notifyMutation.mutate({
-        friendUserID: userID,
-        notification: bookRequestNotification,
-      });
     }
   };
 
@@ -154,7 +78,7 @@ const BookShelf = ({
               )}
             </TouchableOpacity>
             {/* TODO: make this look better with minus sign button */}
-            {bookRouteType === "PROFILE" && (
+            {bookRouteType === "PROFILE" && userID === user?.uid && (
               <TouchableOpacity
                 onPress={() => {
                   handleRemoveBook(item.id);
@@ -166,16 +90,14 @@ const BookShelf = ({
               </TouchableOpacity>
             )}
             {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
-              bookRouteType === "SEARCH" && (
-                <BookWormButton
-                  title="Request"
-                  onPress={() => {
-                    handleBookRequestClicked(
-                      item.id,
-                      item.volumeInfo?.title ?? "",
-                    );
-                  }}
-                ></BookWormButton>
+              // TODO ensure that this is correct
+              userID !== user?.uid && (
+                <BookBorrowButton
+                  bookID={item.id}
+                  bookTitle={item.volumeInfo?.title ?? ""}
+                  bookOwnerID={userID}
+                  bookBorrowInfo={item.borrowInfo}
+                />
               )}
           </View>
         )}

@@ -6,22 +6,20 @@ import {
 } from "../../enums/Enums";
 import BookWormButton from "../button/BookWormButton";
 
-interface BookRequestActionsProps {
+interface BookRequestNotificationActionsProps {
   onAccept: () => void;
   onDeny: () => void;
   requestStatus: BookRequestNotificationStatus;
 }
 
-// TODO: maybe rename to BookRequestResponseActions or BookRequestResponseButtons
-
-// TODO this should display status of requested and be disabled once the request goes through
-const BookRequestActions = ({
+const BookRequestNotificationActions = ({
   onAccept,
   onDeny,
   requestStatus,
-}: BookRequestActionsProps) => {
+}: BookRequestNotificationActionsProps) => {
+  console.log("requestStatus in BookRequestNotificationActions", requestStatus);
   return (
-    <View style={styles.bookRequestActions}>
+    <View style={styles.BookRequestNotificationActions}>
       {requestStatus === BookRequestNotificationStatus.PENDING && (
         <>
           <BookWormButton
@@ -49,10 +47,10 @@ const BookRequestActions = ({
   );
 };
 
-export default BookRequestActions;
+export default BookRequestNotificationActions;
 
 const styles = StyleSheet.create({
-  bookRequestActions: {
+  BookRequestNotificationActions: {
     flexDirection: "row",
     justifyContent: "space-around",
   },

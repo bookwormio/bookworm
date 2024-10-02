@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { type BookRequestNotificationStatus } from "../../../enums/Enums";
 import {
   createNotification,
   getAllFullNotifications,
+  updateNotificationStatus,
 } from "../../../services/firebase-services/NotificationQueries";
 import { type NotificationModel } from "../../../types";
 
@@ -45,6 +47,28 @@ export const useCreateNotification = () => {
     onSuccess: async (data, { friendUserID }) => {
       await queryClient.invalidateQueries({
         queryKey: ["notifications", friendUserID],
+      });
+    },
+  });
+};
+
+// TODO pass in user id for query key
+export const useUpdateNotificationStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      notifID,
+      newStatus,
+    }: {
+      notifID: string;
+      newStatus: BookRequestNotificationStatus;
+    }) => {
+      return await updateNotificationStatus(notifID, newStatus);
+    },
+    onSuccess: async (data, { notifID }) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["notifications", notifID],
       });
     },
   });

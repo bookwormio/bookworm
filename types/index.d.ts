@@ -174,6 +174,7 @@ interface BookShelfBookModel {
   id: string;
   created: Timestamp;
   volumeInfo: BookshelfVolumeInfo;
+  borrowInfo?: BookBorrowModel;
 }
 
 interface BookshelfVolumeInfo {
@@ -209,6 +210,7 @@ interface BasicNotificationModel {
 }
 
 interface FullNotificationModel {
+  notifID: string;
   receiver: string;
   comment: string;
   sender: string;
@@ -250,6 +252,7 @@ interface BookRequestNotification extends BasicNotificationModel {
   bookID: string;
   bookTitle: string;
   custom_message: string;
+  bookRequestStatus: BookRequestNotificationStatus;
 }
 
 interface BookRequestResponseNotification extends BasicNotificationModel {
@@ -257,7 +260,7 @@ interface BookRequestResponseNotification extends BasicNotificationModel {
   bookID: string;
   bookTitle: string;
   custom_message: string;
-  bookRequestStatus?: BookRequestResponseOptions;
+  bookRequestStatus?: BookRequestNotificationStatus;
 }
 
 type NotificationModel =

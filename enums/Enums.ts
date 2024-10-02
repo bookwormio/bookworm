@@ -58,19 +58,14 @@ export const NotificationMessageMap: StringMap = {
 };
 
 // TODO: do i need this?
-// export const SERVER_LENDING_STATUS = {
-//   LENDING: "lending",
-//   AVAILABLE: "available",
-// };
+export const SERVER_LENDING_STATUS = {
+  LENDING: "lending",
+  AVAILABLE: "available",
+};
 
 // TODO consolidate all this
 export enum BookRequestNotificationStatus {
   PENDING = "pending",
-  ACCEPTED = "accepted",
-  DENIED = "denied",
-}
-// TODO: and this
-export enum BookRequestResponseOptions {
   ACCEPTED = "accepted",
   DENIED = "denied",
 }
