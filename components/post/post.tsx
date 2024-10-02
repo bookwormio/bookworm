@@ -1,7 +1,7 @@
 import { type Timestamp } from "firebase/firestore";
 import React from "react";
 import {
-  ScrollView,
+  FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -71,109 +71,97 @@ const Post = ({
   const isCurrentUsersPost = user?.uid === post.user.id;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <View style={styles.profilePicContainer}>
-          <TouchableOpacity
-            disabled={isCurrentUsersPost}
-            onPress={() => {
-              handleNavigateToUser();
-            }}
-          >
-            <ProfilePicture userID={post.user.id} size={40} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.textContainer}>
-          {pagesObject != null &&
-          pagesRead != null &&
-          pagesObject.totalPages > 0 ? (
-            <Text style={styles.title}>
-              <Text
-                style={styles.userName}
-                onPress={() => {
-                  handleNavigateToUser();
-                }}
+    <FlatList
+      data={[post]}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => (
+        <View style={styles.container}>
+          <View style={styles.headerContainer}>
+            <View style={styles.profilePicContainer}>
+              <TouchableOpacity
                 disabled={isCurrentUsersPost}
+                onPress={handleNavigateToUser}
               >
-                {post.user.first} {post.user.last}
-              </Text>
-              {isBackwards ? " moved back " : " read "}
-              <Text>{Math.abs(pagesRead)}</Text>
-              {" pages"}
-              {isBackwards ? " in " : " of "}
-              {post.booktitle}
-            </Text>
-          ) : (
-            <Text style={styles.title}>
-              <Text
-                style={styles.userName}
-                onPress={() => {
-                  handleNavigateToUser();
-                }}
-                disabled={isCurrentUsersPost}
-              >
-                {post.user.first} {post.user.last}
-              </Text>
-              {" was reading"} {post.booktitle}
-            </Text>
-          )}
-          <Text style={styles.time}>{formattedDate}</Text>
-        </View>
-      </View>
-      {pagesObject != null &&
-        pagesRead != null &&
-        pagesObject.totalPages > 0 && (
-          <PagesProgressBar
-            oldBookmark={pagesObject.oldBookmark}
-            newBookmark={pagesObject.newBookmark}
-            totalPages={pagesObject.totalPages}
-            pagesRead={pagesRead}
-            isBackwards={isBackwards}
-          />
-        )}
-      <Text style={styles.body}>{post.text}</Text>
-      {post.images.length > 0 && (
-        <View style={{ marginTop: 10, height: 270 }}>
-          <ScrollView
-            horizontal={true}
-            showsHorizontalScrollIndicator={true}
-            contentContainerStyle={{ paddingBottom: 1 }}
-          >
-            {post.images.map((image, index) => {
-              if (index === 0) {
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => {
-                      navigateToBook();
-                    }}
-                    style={styles.imageContainer}
-                    >
-                      <View style={styles.firstImageStyle}>
-                        {image}
-                      </View>
-                  </TouchableOpacity>
-                );
-              }
-              return (
-              <View key={index} style={styles.imageContainer}>
-              <View style={styles.defaultImageStyle}>
-                {image}
-              </View>
+                <ProfilePicture userID={item.user.id} size={40} />
+              </TouchableOpacity>
             </View>
-              );
-            })}
-          </ScrollView>
+            <View style={styles.textContainer}>
+              {pagesObject != null &&
+              pagesRead != null &&
+              pagesObject.totalPages > 0 ? (
+                <Text style={styles.title}>
+                  <Text
+                    style={styles.userName}
+                    onPress={handleNavigateToUser}
+                    disabled={isCurrentUsersPost}
+                  >
+                    {item.user.first} {item.user.last}
+                  </Text>
+                  {isBackwards ? " moved back " : " read "}
+                  <Text>{Math.abs(pagesRead)}</Text>
+                  {" pages"}
+                  {isBackwards ? " in " : " of "}
+                  {item.booktitle}
+                </Text>
+              ) : (
+                <Text style={styles.title}>
+                  <Text
+                    style={styles.userName}
+                    onPress={handleNavigateToUser}
+                    disabled={isCurrentUsersPost}
+                  >
+                    {item.user.first} {item.user.last}
+                  </Text>
+                  {" was reading"} {item.booktitle}
+                </Text>
+              )}
+              <Text style={styles.time}>{formattedDate}</Text>
+            </View>
+          </View>
+          {pagesObject != null &&
+            pagesRead != null &&
+            pagesObject.totalPages > 0 && (
+              <PagesProgressBar
+                oldBookmark={pagesObject.oldBookmark}
+                newBookmark={pagesObject.newBookmark}
+                totalPages={pagesObject.totalPages}
+                pagesRead={pagesRead}
+                isBackwards={isBackwards}
+              />
+            )}
+          <Text style={styles.body}>{item.text}</Text>
+          {item.images.length > 0 && (
+            <View style={{ marginTop: 10, height: 270 }}>
+              <FlatList
+                nestedScrollEnabled={true}
+                scrollEnabled={true}
+                data={post.images}
+                contentContainerStyle={styles.flatListContainer}
+                showsHorizontalScrollIndicator={true}
+                horizontal
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => {
+                  if (index === 0) {
+                    return (
+                      <TouchableOpacity onPress={navigateToBook}>
+                        {item}
+                      </TouchableOpacity>
+                    );
+                  }
+                  return <View key={index}>{item}</View>;
+                }}
+              />
+            </View>
+          )}
+          <LikeComment
+            post={item}
+            key={`${item.id}-${item.comments.length}-${item.likes.length}`}
+            individualPage={individualPage}
+            presentComments={presentComments}
+          />
         </View>
       )}
-
-      <LikeComment
-        post={post}
-        key={`${post.id}-${post.comments.length}-${post.likes.length}`}
-        individualPage={individualPage}
-        presentComments={presentComments}
-      />
-    </View>
+    />
   );
 };
 
@@ -185,6 +173,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 10.0,
     borderBottomColor: "#F2F2F2",
     backgroundColor: APP_BACKGROUND_COLOR,
+    width: "100%",
+  },
+  flatListContainer: {
+    paddingBottom: 1,
+    flexDirection: "row",
+    alignItems: "center",
   },
   title: {
     fontSize: 15,
@@ -209,13 +203,13 @@ const styles = StyleSheet.create({
     width: 180, // custom width
     height: 250, // custom height
     borderRadius: 2,
-    overflow: 'hidden', // Ensure the image is clipped to the border radius
+    overflow: "hidden", // Ensure the image is clipped to the border radius
   },
   defaultImageStyle: {
     width: 250,
     height: 250,
     borderRadius: 0,
-    overflow: 'hidden', // Ensure the image is clipped to the border radius
+    overflow: "hidden", // Ensure the image is clipped to the border radius
   },
   imageContainer: {
     marginRight: 10,

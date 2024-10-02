@@ -1,9 +1,10 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { Keyboard, TouchableOpacity, View } from "react-native";
 
 const BackButton = () => {
+  Keyboard.dismiss();
   return (
     <View>
       {router.canGoBack() && (
