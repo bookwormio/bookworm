@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
 import {
-  ActivityIndicator,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -11,6 +10,7 @@ import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import { useGetAllFullNotifications } from "../../../components/notifications/hooks/useNotificationQueries";
 import NotificationItem from "../../../components/notifications/NotificationItem";
+import WormLoader from "../../../components/wormloader/WormLoader";
 
 const NotificationsScreen = () => {
   const { user } = useAuth();
@@ -43,7 +43,7 @@ const NotificationsScreen = () => {
   if (notifIsLoading) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" />
+        <WormLoader />
       </View>
     );
   }

@@ -15,7 +15,6 @@ import React, {
   useState,
 } from "react";
 import {
-  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -35,6 +34,7 @@ import {
   useGetShelvesForBook,
   useRemoveBookFromShelf,
 } from "../profile/hooks/useBookshelfQueries";
+import WormLoader from "../wormloader/WormLoader";
 
 interface BookViewProps {
   bookID: string;
@@ -182,7 +182,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
   if (bookData == null || isLoadingBook) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="small" color="#000000" />
+        <WormLoader />
       </View>
     );
   }

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useQuery } from "@tanstack/react-query";
 import { fetchUsersBySearch } from "../../services/firebase-services/UserQueries";
 import { type UserSearchDisplayModel } from "../../types";
 import UserList from "../UserList/UserList";
+import WormLoader from "../wormloader/WormLoader";
 import SearchBar from "./searchbar";
 
 const USER_SEARCH_PLACEHOLDER = "Search for users";
@@ -63,7 +64,7 @@ const UserSearch = ({
         ))}
         {isLoading && (
           <View style={styles.loading}>
-            <ActivityIndicator size="large" color="#000000" />
+            <WormLoader style={{ width: 50, height: 50 }} />
           </View>
         )}
       </ScrollView>

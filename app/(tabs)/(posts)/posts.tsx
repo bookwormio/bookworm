@@ -17,23 +17,38 @@ import React, {
   useState,
 } from "react";
 import {
-  ActivityIndicator,
   FlatList,
-  RefreshControl,
+  PanResponder,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated, {
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { useAuth } from "../../../components/auth/context";
 import BookWormButton from "../../../components/button/BookWormButton";
 import Comment from "../../../components/comment/comment";
 import Post from "../../../components/post/post";
 import { usePostsContext } from "../../../components/post/PostsContext";
+import WormLoader from "../../../components/wormloader/WormLoader";
 import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
+
+// limits the height when refreshing
+const MAX_PULLDOWN_DISTANCE = 150;
+// duration when decreasing the height from the users pull down distance to the refresh container height and closure
+const PULLDOWN_ANIMATION_DURATION = 180;
+// height of the pull down container when refreshing
+const PULLDOWN_REFRESHING_MAX_HEIGHT = 75;
+// height of the pull down container when closed
+const PULLDOWN_REFRESHING_MIN_HEIGHT = 0;
 
 const Posts = () => {
   const { user } = useAuth();
@@ -74,7 +89,75 @@ const Posts = () => {
   const snapPoints = useMemo(() => ["25%", "50%"], []);
   const queryClient = useQueryClient();
   const currentDate = new Date();
-  const onRefresh = () => {
+  // current scroll position throughout the feed
+  const scrollPosition = useSharedValue(0);
+  // position of the pull down container above the feed
+  const pullDownPosition = useSharedValue(0);
+  // whether the user has pulled down far enough to refresh
+  const isReadyToRefresh = useSharedValue(false);
+  // handler when the user releases the refresh gesture
+  const onPanRelease = () => {
+    // decreases the height of the pull down container over 180ms to either fit the animation or close the container
+    pullDownPosition.value = withTiming(
+      isReadyToRefresh.value
+        ? PULLDOWN_REFRESHING_MAX_HEIGHT
+        : PULLDOWN_REFRESHING_MIN_HEIGHT,
+      {
+        duration: PULLDOWN_ANIMATION_DURATION,
+      },
+    );
+    // triggers the refresh and closes the container afterwards
+    if (isReadyToRefresh.value) {
+      isReadyToRefresh.value = false;
+      const onRefreshComplete = () => {
+        pullDownPosition.value = withTiming(0, {
+          duration: PULLDOWN_ANIMATION_DURATION,
+        });
+      };
+      onRefresh(onRefreshComplete);
+    }
+  };
+  // pan responder monitors user gestures on the feed
+  const panResponderRef = React.useRef(
+    PanResponder.create({
+      // decides if the pan responder should react to the gesture (user scrolls above the feed)
+      onMoveShouldSetPanResponder: (event, gestureState) =>
+        scrollPosition.value <= 0 && gestureState.dy >= 0,
+      // if the criteria for the gesture is met, trigger a refresh if applicable
+      onPanResponderMove: (event, gestureState) => {
+        // sets the height of the pull down container during the gesture
+        pullDownPosition.value = Math.max(
+          Math.min(MAX_PULLDOWN_DISTANCE, gestureState.dy),
+          PULLDOWN_REFRESHING_MIN_HEIGHT,
+        );
+        // if the user has pulled down enough and the page isn't already refreshing, refresh the feed
+        if (
+          pullDownPosition.value >= MAX_PULLDOWN_DISTANCE / 2 &&
+          !isReadyToRefresh.value
+        ) {
+          isReadyToRefresh.value = true;
+        }
+        // if the user hasn't pulled down enough but the page is already refreshing, stop refreshing
+        if (
+          pullDownPosition.value < MAX_PULLDOWN_DISTANCE / 2 &&
+          isReadyToRefresh.value
+        ) {
+          isReadyToRefresh.value = false;
+        }
+      },
+      // triggers refresh after the gesture is released
+      onPanResponderRelease: onPanRelease,
+      onPanResponderTerminate: onPanRelease,
+    }),
+  );
+  // monitors the users current scroll position
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollPosition.value = event.contentOffset.y;
+    },
+  });
+  // refreshes posts feed and triggers refresh container closure
+  const onRefresh = (closeRefreshAnimation: () => void) => {
     setRefreshing(true);
     // Reset the query data to only the first page
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,12 +168,21 @@ const Posts = () => {
     refetch()
       .then(() => {
         setRefreshing(false);
+        closeRefreshAnimation();
       })
       .catch((error) => {
         console.error("Error refetching feed posts", error);
         setRefreshing(false);
+        closeRefreshAnimation();
       });
   };
+  // style for the pull down container
+  const refreshContainerStyles = useAnimatedStyle(() => {
+    return {
+      height: pullDownPosition.value,
+      backgroundColor: "#FFFFFF",
+    };
+  });
 
   useEffect(() => {
     if (feedPostsData != null) {
@@ -125,57 +217,69 @@ const Posts = () => {
 
   return (
     <BottomSheetModalProvider>
-      <View style={styles.container}>
-        {isLoadingFeedPosts && !refreshing && (
-          <View style={styles.feedLoading}>
-            <ActivityIndicator size="large" color="black" />
-          </View>
-        )}
-        <FlatList
-          style={styles.scrollContainer}
-          data={posts}
-          renderItem={({ item: post }) => (
-            <TouchableOpacity
-              onPress={() => {
-                router.push({
-                  pathname: `/${post.id}`,
-                  params: {
-                    post,
-                    created: post.created,
-                  },
-                });
-              }}
-            >
-              <Post
-                post={post}
-                created={post.created}
-                currentDate={currentDate}
-                individualPage={false}
-                presentComments={onCommentsPress}
-              />
-            </TouchableOpacity>
+      <View
+        style={{
+          flex: 1,
+        }}
+        pointerEvents={refreshing ? "none" : "auto"}
+      >
+        <Animated.View style={[refreshContainerStyles]}>
+          {refreshing && (
+            <View style={styles.topRefresh}>
+              <WormLoader style={{ width: 50, height: 50 }} />
+            </View>
           )}
-          removeClippedSubviews={true}
-          keyExtractor={(item) => item.id}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          ListFooterComponent={
-            isFetchingNextPage ? (
-              <View style={styles.loadingMore}>
-                <ActivityIndicator size="large" color="black" />
-              </View>
-            ) : null
-          }
-          onEndReached={() => {
-            if (hasNextPage) {
-              fetchNextPage().catch((error) => {
-                console.error("Error fetching next page", error);
-              });
+        </Animated.View>
+        <Animated.View
+          style={[styles.container]}
+          {...panResponderRef.current.panHandlers}
+        >
+          {isLoadingFeedPosts && !refreshing && (
+            <View style={styles.feedLoading}>
+              <WormLoader />
+            </View>
+          )}
+          <Animated.FlatList
+            style={styles.scrollContainer}
+            data={posts}
+            renderItem={({ item: post }) => (
+              <TouchableOpacity
+                onPress={() => {
+                  router.push({ pathname: `/${post.id}` });
+                }}
+              >
+                <Post
+                  post={post}
+                  created={post.created}
+                  currentDate={currentDate}
+                  individualPage={false}
+                  presentComments={onCommentsPress}
+                />
+              </TouchableOpacity>
+            )}
+            removeClippedSubviews={true}
+            keyExtractor={(item) => item.id}
+            ListFooterComponent={
+              isFetchingNextPage ? (
+                <View style={styles.loadingMore}>
+                  <WormLoader style={{ width: 50, height: 50 }} />
+                </View>
+              ) : null
             }
-          }}
-          onEndReachedThreshold={0.1} // How close to the end to trigger
-        />
+            onEndReached={() => {
+              if (hasNextPage) {
+                fetchNextPage().catch((error) => {
+                  console.error("Error fetching next page", error);
+                });
+              }
+            }}
+            onEndReachedThreshold={0.1} // How close to the end to trigger
+            overScrollMode="never"
+            showsVerticalScrollIndicator={false}
+            onScroll={scrollHandler}
+            scrollEventThrottle={16}
+          />
+        </Animated.View>
       </View>
       <BottomSheetModal
         ref={commentsModalRef}
@@ -234,7 +338,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
-    top: "50%",
+    top: "40%",
   },
   loadingMore: {
     marginTop: "10%",
@@ -265,5 +369,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  topRefresh: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
   },
 });

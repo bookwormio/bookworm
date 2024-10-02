@@ -1,15 +1,10 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Tabs } from "expo-router/tabs";
 import React from "react";
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import { useAuth } from "../../components/auth/context";
 import { PostsProvider } from "../../components/post/PostsContext";
+import WormLoader from "../../components/wormloader/WormLoader";
 
 const AppLayout = () => {
   const { isLoading } = useAuth();
@@ -25,7 +20,7 @@ const AppLayout = () => {
 
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="black" />
+        <WormLoader />
       </View>
     );
   }
