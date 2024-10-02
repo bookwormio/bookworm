@@ -29,6 +29,7 @@ interface PostProps {
   presentComments: (postID: string) => void;
 }
 
+// TODO: remove (fake comment to force push)
 const Post = ({
   post,
   created,
