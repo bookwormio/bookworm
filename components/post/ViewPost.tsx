@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 import Post from "../../components/post/post";
 import { usePostsContext } from "../../components/post/PostsContext";
@@ -33,27 +33,29 @@ const ViewPost = ({ postID, fromProfile }: ViewPostProps) => {
   });
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={{ alignItems: "center" }}>
-        <Toast />
-        {isLoading && (
-          <View style={styles.feedLoading}>
-            <WormLoader />
-          </View>
-        )}
-        {post != null && !isLoading && (
-          <View style={styles.postContainer}>
-            <Post
-              post={post}
-              created={post.created}
-              currentDate={new Date()}
-              individualPage={true}
-              presentComments={() => {}}
-            />
-          </View>
-        )}
+    <View style={styles.container}>
+      <View style={styles.container}>
+        <View style={{ alignItems: "center" }}>
+          <Toast />
+          {isLoading && (
+            <View style={styles.feedLoading}>
+              <WormLoader />
+            </View>
+          )}
+          {post != null && !isLoading && (
+            <View style={styles.postContainer}>
+              <Post
+                post={post}
+                created={post.created}
+                currentDate={new Date()}
+                individualPage={true}
+                presentComments={() => {}}
+              />
+            </View>
+          )}
+        </View>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -62,7 +64,7 @@ export default ViewPost;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexGrow: 1,
+    alignItems: "center",
   },
   feedLoading: {
     alignItems: "center",
