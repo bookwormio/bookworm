@@ -5,6 +5,7 @@ import { Keyboard, TouchableOpacity, View } from "react-native";
 
 const BackButton = () => {
   Keyboard.dismiss();
+
   return (
     <View>
       {router.canGoBack() && (
