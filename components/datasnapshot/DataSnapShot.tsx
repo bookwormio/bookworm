@@ -3,8 +3,9 @@ import { Text, View } from "react-native";
 import { useGetBooksForBookshelves } from "../profile/hooks/useBookshelfQueries";
 import { useGetPagesData } from "./hooks/useDataQueries";
 import {
-    calculateBooksWithinMonth,
-    calculatePagesWithinWeek,
+  calculateBooksWithinMonth,
+  calculatePagesWithinWeek,
+  findTopGenre,
 } from "./util/datasnapshotUtils";
 
 interface DataSnapProps {
@@ -26,10 +27,19 @@ const DataSnapShot = ({ userID }: DataSnapProps) => {
     booksFinished = calculateBooksWithinMonth(bookshelves.finished);
   }
 
+  let topGenre = "";
+  if (!(bookshelves == null)) {
+    topGenre = findTopGenre(
+      bookshelves.finished,
+      bookshelves.currently_reading,
+    );
+  }
+
   return (
     <View>
       <Text>Pages Read: {pagesRead}</Text>
       <Text>Books Finished This Month: {booksFinished}</Text>
+      <Text>Top Genre: {topGenre}</Text>
     </View>
   );
 };
