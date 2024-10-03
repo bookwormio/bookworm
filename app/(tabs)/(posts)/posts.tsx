@@ -34,6 +34,7 @@ import Animated, {
 import { useAuth } from "../../../components/auth/context";
 import BookWormButton from "../../../components/button/BookWormButton";
 import Comment from "../../../components/comment/comment";
+import DataSnapShot from "../../../components/datasnapshot/DataSnapShot";
 import Post from "../../../components/post/post";
 import { usePostsContext } from "../../../components/post/PostsContext";
 import WormLoader from "../../../components/wormloader/WormLoader";
@@ -217,6 +218,7 @@ const Posts = () => {
 
   return (
     <BottomSheetModalProvider>
+      <DataSnapShot userID={user?.uid ?? ""} />
       <View
         style={{
           flex: 1,

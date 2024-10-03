@@ -54,7 +54,6 @@ const NotificationItem = ({ notif }: NotifProp) => {
     >
       <View style={styles.imageTextContainer}>
         <TouchableOpacity
-         
           onPress={() => {
             const userRoute = generateUserRoute(
               user?.uid,
