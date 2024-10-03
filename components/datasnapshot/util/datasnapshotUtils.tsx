@@ -1,6 +1,6 @@
 import {
-    type BookShelfBookModel,
-    type LineDataPointModel,
+  type BookShelfBookModel,
+  type LineDataPointModel,
 } from "../../../types";
 
 /**
@@ -34,10 +34,7 @@ export function calculatePagesWithinWeek(pagesData: LineDataPointModel[]) {
   return numPages;
 }
 
-export function calculateBooksWithinMonth(
-  finishBookShelf: BookShelfBookModel[],
-) {
-  let numBooks = 0;
+export function getFirstLastMonthDates() {
   const today = new Date();
 
   const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -46,18 +43,97 @@ export function calculateBooksWithinMonth(
   const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
   lastDay.setHours(23, 59, 59, 999);
 
-  console.log(firstDay.toDateString(), lastDay.toDateString());
+  return [firstDay.getTime(), lastDay.getTime()];
+}
 
-  const firstDayMili = firstDay.getTime();
-  const lastDayMili = lastDay.getTime();
+export function getFirstLastYearDates() {
+  const today = new Date();
 
-  finishBookShelf.forEach((item) => {
-    const dateMili = new Date(item.created.seconds * 1000).getTime();
+  const firstDay = new Date(today.getFullYear(), 0, 1);
 
-    if (dateMili >= firstDayMili && dateMili <= lastDayMili) {
+  const lastDay = new Date(today.getFullYear(), 11, 31);
+  lastDay.setHours(23, 59, 59, 999);
+
+  return [firstDay.getTime(), lastDay.getTime()];
+}
+
+export function calculateBooksWithinMonth(
+  finishBookShelf: BookShelfBookModel[],
+) {
+  let numBooks = 0;
+
+  const firstLastMili = getFirstLastMonthDates();
+
+  finishBookShelf.forEach((book) => {
+    const dateMili = new Date(book.created.seconds * 1000).getTime();
+
+    if (dateMili >= firstLastMili[0] && dateMili <= firstLastMili[1]) {
       numBooks += 1;
     }
   });
 
   return numBooks;
+}
+
+export function findTopGenre(
+  finishBookShelf: BookShelfBookModel[],
+  currentBookShelf: BookShelfBookModel[],
+) {
+  const relevantBookShelves = finishBookShelf.concat(currentBookShelf);
+  const firstLastMili = getFirstLastYearDates();
+  const genreDict = new Map();
+
+  relevantBookShelves.forEach((book) => {
+    const dateMili = new Date(book.created.seconds * 1000).getTime();
+    if (dateMili >= firstLastMili[0] && dateMili <= firstLastMili[1]) {
+      book.volumeInfo.categories?.forEach((cat) => {
+        if (genreDict.has(cat)) {
+          genreDict.set(cat, genreDict.get(cat) + 1);
+        } else {
+          genreDict.set(cat, 1);
+        }
+      });
+    }
+  });
+
+  let maxVal = null;
+  let maxKey = [];
+  for (const [key, value] of genreDict) {
+    if (maxVal == null) {
+      maxVal = value;
+      maxKey.push(key);
+    } else if (maxVal === value) {
+      maxKey.push(key);
+    } else if (maxVal < value) {
+      maxKey = [key];
+    }
+  }
+
+  if (maxKey.length === 1) {
+    return maxKey[0];
+  } else if (maxKey.length === 0) {
+    return "";
+  } else {
+    const mainGenreDict = new Map();
+    maxKey.forEach((key) => {
+      const mainGenre = key.split(" / ")[0];
+      if (mainGenreDict.has(mainGenre)) {
+        mainGenreDict.set(mainGenre, mainGenreDict.get(mainGenre) + 1);
+      } else {
+        mainGenreDict.set(mainGenre, 1);
+      }
+    });
+    let maxMainVal = null;
+    let maxMainKey = null;
+    for (const [key, value] of mainGenreDict) {
+      if (maxVal == null) {
+        maxMainVal = value;
+        maxMainKey = key;
+      } else if (value > maxMainVal) {
+        maxMainVal = value;
+        maxMainKey = key;
+      }
+    }
+    return maxMainKey;
+  }
 }
