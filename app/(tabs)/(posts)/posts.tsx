@@ -162,6 +162,14 @@ const Posts = () => {
     setRefreshing(true);
     // Reset the query data to only the first page
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    queryClient
+      .invalidateQueries({ queryKey: ["bookshelves", user?.uid] })
+      .then(() => {
+        console.log("have to put this then to make it work");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     queryClient.setQueryData(queryKey, (data: any) => ({
       pages: data.pages.slice(0, 1),
       pageParams: data.pageParams.slice(0, 1),
@@ -218,7 +226,6 @@ const Posts = () => {
 
   return (
     <BottomSheetModalProvider>
-      <DataSnapShot userID={user?.uid ?? ""} />
       <View
         style={{
           flex: 1,
@@ -241,6 +248,7 @@ const Posts = () => {
               <WormLoader />
             </View>
           )}
+          {!(user == null) && <DataSnapShot userID={user?.uid ?? ""} />}
           <Animated.FlatList
             style={styles.scrollContainer}
             data={posts}
@@ -330,6 +338,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: APP_BACKGROUND_COLOR,
   },
   scrollContainer: {

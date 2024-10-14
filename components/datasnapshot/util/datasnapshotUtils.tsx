@@ -4,11 +4,8 @@ import {
 } from "../../../types";
 
 /**
- *
- *
- * @param {Date} createdDate - The date when the notification was created.
- * @returns {string} numPages
- *
+ * @param {LineDataPointModel[]} pagesData - The date when the notification was created.
+ * @returns {number} numPages
  */
 export function calculatePagesWithinWeek(pagesData: LineDataPointModel[]) {
   let numPages = 0;
