@@ -77,10 +77,7 @@ const styles = StyleSheet.create({
   },
   statsWrap: {
     flexDirection: "column",
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingTop: 10,
-    paddingBottom: 10,
+    padding: 8,
     alignContent: "center",
     justifyContent: "center",
   },
