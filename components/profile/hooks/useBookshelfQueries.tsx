@@ -14,31 +14,41 @@ import {
 
 /**
  * Custom hook to fetch books for the user's bookshelves.
- * @param {string} userID - The user's ID.
- * @returns {UseQueryResult} - The result of the query.
+ *
+ * @param {string} userID - The ID of the user whose bookshelves are being fetched.
+ * @param {string} currentUserID - The ID of the current user (used for book request statuses).
+ * @returns {UseQueryResult<UserBookShelvesModel>} The result of the query.
  *
  * @example
- * const { data: bookShelves, isLoading, isError, error } = useGetBooksForBookshelves(userID);
+ * const { data: bookShelves, isLoading, isError, error } = useGetBooksForBookshelves(userID, currentUserID);
  * // bookShelves is of type UserBookShelvesModel
  */
-export const useGetBooksForBookshelves = (userID: string) => {
+export const useGetBooksForBookshelves = (
+  userID: string,
+  currentUserID: string,
+) => {
   return useQuery({
-    queryKey: ["bookshelves", userID],
-    queryFn: async () => await fetchBookshelves(userID),
+    queryKey: ["bookshelves", userID, currentUserID],
+    queryFn: async () => await fetchBookshelves(userID, currentUserID),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
 /**
  * Prefetch the books for the user's bookshelves.
- * @param userID
+ *
+ * @param {string} userID - The ID of the user whose bookshelves are being prefetched.
+ * @param {string} currentUserID - The ID of the current user (used for book request statuses).
  * @returns {Promise<void>}
  */
-export const prefetchBooksForBookshelves = async (userID: string) => {
+export const prefetchBooksForBookshelves = async (
+  userID: string,
+  currentUserID: string,
+): Promise<void> => {
   const queryClient = useQueryClient();
   await queryClient.prefetchQuery({
-    queryKey: ["bookshelves", userID],
-    queryFn: async () => await fetchBookshelves(userID),
+    queryKey: ["bookshelves", userID, currentUserID],
+    queryFn: async () => await fetchBookshelves(userID, currentUserID),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
@@ -46,14 +56,25 @@ export const prefetchBooksForBookshelves = async (userID: string) => {
 /**
  * Helper Query Function to fetch the books for the user's bookshelves.
  *
- * @param userID
- * @returns {Promise<UserBookShelvesModel>}
+ * @param {string} userID - The ID of the user whose bookshelves are being fetched.
+ * @param {string} currentUserID - The ID of the current user (used for book request statuses).
+ * @returns {Promise<UserBookShelvesModel>} A promise that resolves to the user's bookshelves data.
+ * @throws {Error} If the user is not logged in or if there's an error fetching the books.
  */
-async function fetchBookshelves(userID: string): Promise<UserBookShelvesModel> {
-  if (userID == null || userID === "") throw new Error("User not logged in");
+async function fetchBookshelves(
+  userID: string,
+  currentUserID: string,
+): Promise<UserBookShelvesModel> {
+  if (userID == null || userID === "") throw new Error("User null");
+  if (currentUserID == null || currentUserID === "")
+    throw new Error("Current user null");
 
   const shelfTypes = Object.values(ServerBookShelfName);
-  const userBooks = await getBooksFromUserBookShelves(userID, shelfTypes);
+  const userBooks = await getBooksFromUserBookShelves(
+    userID,
+    shelfTypes,
+    currentUserID,
+  );
   if (userBooks == null) throw new Error("Error fetching user books");
 
   return userBooks;
@@ -106,7 +127,7 @@ export const useAddBookToShelf = () => {
         if (volumeInfo != null) {
           // Update the bookshelves with the new book and volume info
           queryClient.setQueryData<UserBookShelvesModel>(
-            userID != null ? ["bookshelves", userID] : ["bookshelves"],
+            userID != null ? ["bookshelves", userID, userID] : ["bookshelves"],
             (prevData) => {
               if (prevData == null) return prevData;
 
@@ -191,7 +212,9 @@ export const useRemoveBookFromShelf = () => {
     // This happens before the mutation is sent to the server
     onMutate: async ({ userID, bookID, shelfName }) => {
       // Cancel any outgoing refetches for bookshelves (so they don't overwrite the optimistic update)
-      await queryClient.cancelQueries({ queryKey: ["bookshelves", userID] });
+      await queryClient.cancelQueries({
+        queryKey: ["bookshelves", userID, userID],
+      });
 
       // Snapshot the previous bookshelves
       const previousShelves = queryClient.getQueryData<UserBookShelvesModel>([
@@ -202,7 +225,7 @@ export const useRemoveBookFromShelf = () => {
       // Optimistically remove the book from the shelf
       if (previousShelves?.[shelfName] != null) {
         queryClient.setQueryData<UserBookShelvesModel>(
-          ["bookshelves", userID],
+          ["bookshelves", userID, userID],
           {
             ...previousShelves,
             [shelfName]: previousShelves[shelfName].filter(
@@ -239,7 +262,7 @@ export const useRemoveBookFromShelf = () => {
       // Revert the bookshelves
       if (context?.previousShelves != null) {
         queryClient.setQueryData(
-          ["bookshelves", variables.userID],
+          ["bookshelves", variables.userID, variables.userID],
           context.previousShelves,
         );
       }

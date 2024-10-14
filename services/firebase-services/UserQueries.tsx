@@ -592,6 +592,9 @@ export async function getBooksFromUserBookShelves(
       // get lending status for each book
       if (shelf === ServerBookShelfName.LENDING_LIBRARY) {
         const bookIDs = userBookShelves[shelf].map((book) => book.id);
+        if (bookIDs.length === 0) {
+          continue;
+        }
         const [lendingStatuses, bookRequestStatuses] = await Promise.all([
           // Gets lending statuses for all books in the lending library
           getLendingStatusesForBooks(userID, bookIDs),

@@ -90,13 +90,13 @@ const BookShelf = ({
               </TouchableOpacity>
             )}
             {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
-              // TODO ensure that this is correct
               userID !== user?.uid && (
                 <BookBorrowButton
                   bookID={item.id}
                   bookTitle={item.volumeInfo?.title ?? ""}
                   bookOwnerID={userID}
-                  bookBorrowInfo={item.borrowInfo}
+                  borrowInfo={item.borrowInfo}
+                  requestStatus={item.bookRequestStatus}
                 />
               )}
           </View>

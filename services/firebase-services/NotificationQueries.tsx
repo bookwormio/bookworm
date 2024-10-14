@@ -9,9 +9,10 @@ import {
   setDoc,
   type Timestamp,
   where,
+  writeBatch,
 } from "firebase/firestore";
 import {
-  type BookRequestNotificationStatus,
+  BookRequestNotificationStatus,
   ServerNotificationType,
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
@@ -129,8 +130,10 @@ export async function updateNotificationStatus(
 
 /**
  * Returns all the notifications of all types for a user.
- * @param {string} userID - the userID of the user that helps us to retrieve their notifications.
- * @returns {Promise<FullNotification[]>} - returns a list of notifications.
+ * @param {string} userID - The unique identifier of the user for whom notifications are retrieved.
+ * @returns {Promise<FullNotificationModel[]>} - A promise that resolves to a list of full notification objects for the specified user.
+ *
+ * @throws {Error} If there is an issue retrieving notifications from Firestore.
  */
 export async function getAllFullNotifications(
   userID: string,
@@ -166,8 +169,9 @@ export async function getAllFullNotifications(
     console.log("Notifications: ", notifdata);
     return notifdata;
   } catch (error) {
-    console.error("Error getting all notifications: ", error);
-    return [];
+    throw new Error(
+      `Error getting all notifications: ${(error as Error).message}`,
+    );
   }
 }
 
@@ -222,3 +226,48 @@ export async function getBookRequestStatusForBooks(
     );
   }
 }
+
+/**
+ * Denies all pending book requests for a specific book, except for the accepted borrower.
+ *
+ * @param {string} lenderUserID - The ID of the user lending the book.
+ * @param {string} acceptedBorrowerUserID - The ID of the user whose request was accepted.
+ * @param {string} bookID - The ID of the book being requested.
+ * @returns {Promise<void>}
+ * @throws {Error} If there's an error updating the notifications.
+ */
+export const denyOtherRequests = async (
+  lenderUserID: string,
+  acceptedBorrowerUserID: string,
+  bookID: string,
+): Promise<void> => {
+  try {
+    const notificationsRef = collection(DB, "notifications");
+    const q = query(
+      notificationsRef,
+      where("receiver", "==", lenderUserID),
+      where("type", "==", ServerNotificationType.BOOK_REQUEST),
+      where("bookID", "==", bookID),
+      where("bookRequestStatus", "==", BookRequestNotificationStatus.PENDING),
+    );
+
+    const querySnapshot = await getDocs(q);
+    const batch = writeBatch(DB);
+
+    querySnapshot.forEach((docSnapshot) => {
+      const notifData = docSnapshot.data() as FullNotificationModel;
+      if (notifData.sender !== acceptedBorrowerUserID) {
+        const notifRef = doc(DB, "notifications", docSnapshot.id);
+        batch.update(notifRef, {
+          bookRequestStatus: BookRequestNotificationStatus.DENIED,
+        });
+      }
+    });
+
+    await batch.commit();
+  } catch (error) {
+    throw new Error(
+      `Error denying other requests: ${(error as Error).message}`,
+    );
+  }
+};

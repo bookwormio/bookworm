@@ -3,10 +3,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { lendBookToUser } from "../../../services/firebase-services/BookBorrowQueries";
 
-// export const useGetBookLendingStatus = (userID: string) => {
-
-// useLendBookToUser
-
 export const useLendBookToUser = () => {
   const queryClient = useQueryClient();
 

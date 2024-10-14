@@ -57,20 +57,13 @@ export const NotificationMessageMap: StringMap = {
   [ServerNotificationType.BOOK_REQUEST]: "requested to borrow",
 };
 
-// TODO: do i need this?
-export const SERVER_LENDING_STATUS = {
-  LENDING: "lending",
-  AVAILABLE: "available",
-};
-
-// TODO consolidate all this
 export enum BookRequestNotificationStatus {
   PENDING = "pending",
   ACCEPTED = "accepted",
   DENIED = "denied",
 }
 
-// TODO: and this
+// TODO: consolidate this
 export enum BookRequestActionDisplay {
   ACCEPT = "Accept",
   DENY = "Deny",

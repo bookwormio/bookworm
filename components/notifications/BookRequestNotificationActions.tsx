@@ -17,7 +17,6 @@ const BookRequestNotificationActions = ({
   onDeny,
   requestStatus,
 }: BookRequestNotificationActionsProps) => {
-  console.log("requestStatus in BookRequestNotificationActions", requestStatus);
   return (
     <View style={styles.BookRequestNotificationActions}>
       {requestStatus === BookRequestNotificationStatus.PENDING && (

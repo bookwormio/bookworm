@@ -17,9 +17,11 @@ import { useLendBookToUser } from "../profile/hooks/useBookBorrowQueries";
 import BookRequestNotificationActions from "./BookRequestNotificationActions";
 import {
   useCreateNotification,
+  useDenyOtherRequests,
   useUpdateNotificationStatus,
 } from "./hooks/useNotificationQueries";
 
+// This needs to be updated when other notificaitons that effect this one change
 interface NotificationItemContentProps {
   notification: FullNotificationModel;
   time: string;
@@ -32,6 +34,7 @@ const NotificationItemContent = ({
   const notifyMutation = useCreateNotification();
   const updateNotificationStatus = useUpdateNotificationStatus();
   const lendBookToUser = useLendBookToUser();
+  const denyOtherRequests = useDenyOtherRequests();
   const { user } = useAuth();
   const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
     user?.uid,
@@ -76,7 +79,11 @@ const NotificationItemContent = ({
   };
 
   const handleRejectOtherRequests = async () => {
-    // TODO: fill this in with rejecting all other requests for the same book
+    denyOtherRequests.mutate({
+      lenderUserID: notification.receiver,
+      acceptedBorrowerUserID: notification.sender,
+      bookID: notification.bookID,
+    });
   };
 
   const handleUpdateBookRequestStatus = async (
@@ -87,6 +94,7 @@ const NotificationItemContent = ({
     updateNotificationStatus.mutate({
       notifID: notification.notifID,
       newStatus: status,
+      userID: notification.receiver,
     });
   };
 
@@ -97,7 +105,7 @@ const NotificationItemContent = ({
       message: "",
       requestStatus: BookRequestNotificationStatus.ACCEPTED,
     });
-    // await handleRejectOtherRequests();
+    await handleRejectOtherRequests();
     await handleUpdateBookRequestStatus(BookRequestNotificationStatus.ACCEPTED);
 
     setBookRequestStatus(BookRequestNotificationStatus.ACCEPTED);
