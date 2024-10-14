@@ -170,3 +170,55 @@ export async function getAllFullNotifications(
     return [];
   }
 }
+
+/**
+ * Retrieves the book request status for specified books between two users.
+ *
+ * This function queries the notifications collection to find book request
+ * notifications sent by the current user to a friend for specific books.
+ * It returns an object mapping book IDs to their request statuses.
+ *
+ * @param {string} currentUserID - The ID of the user who sent the book requests.
+ * @param {string} friendUserID - The ID of the user who received the book requests.
+ * @param {string[]} bookIDs - An array of book IDs to check for request statuses.
+ *
+ * @returns {Promise<Record<string, BookRequestNotificationStatus>>} A promise that resolves
+ * to an object where keys are book IDs and values are their request statuses.
+ * Only books with existing requests will have entries in the returned object.
+ *
+ * @throws {Error} If there's an error querying the notifications collection.
+ * The error message includes details about the specific error encountered.
+ */
+export async function getBookRequestStatusForBooks(
+  currentUserID: string,
+  friendUserID: string,
+  bookIDs: string[],
+): Promise<Record<string, BookRequestNotificationStatus>> {
+  const bookRequestStatuses: Record<string, BookRequestNotificationStatus> = {};
+
+  try {
+    const notificationsRef = collection(DB, "notifications");
+    const q = query(
+      notificationsRef,
+      where("receiver", "==", friendUserID),
+      where("sender", "==", currentUserID),
+      where("type", "==", ServerNotificationType.BOOK_REQUEST),
+      where("bookID", "in", bookIDs),
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data?.bookID != null && data?.bookRequestStatus != null) {
+        bookRequestStatuses[data.bookID] =
+          data.bookRequestStatus as BookRequestNotificationStatus;
+      }
+    });
+    return bookRequestStatuses;
+  } catch (error) {
+    throw new Error(
+      `Error getting book request statuses: ${(error as Error).message}`,
+    );
+  }
+}

@@ -3,6 +3,7 @@ import { Alert } from "react-native";
 import { useUserDataQuery } from "../../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import {
   BookRequestNotificationStatus,
+  ServerBookBorrowStatus,
   ServerNotificationType,
 } from "../../../enums/Enums";
 import {
@@ -19,46 +20,77 @@ interface BookBorrowButtonProps {
   bookTitle: string;
   bookOwnerID: string;
   borrowInfo?: BookBorrowModel;
+  requestStatus?: BookRequestNotificationStatus;
 }
 
-// title can be
-// "Request"
-// "Return"
-// "Lent out to someone else"
+interface ButtonState {
+  title: string;
+  disabled: boolean;
+  action: () => void;
+}
 
 const BookBorrowButton = ({
   bookID,
   bookTitle,
   bookOwnerID,
   borrowInfo,
+  requestStatus,
 }: BookBorrowButtonProps) => {
   const { user } = useAuth();
   const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
     user?.uid,
   );
-
-  if (borrowInfo != null) {
-    console.log("Book is borrowed by someone");
-    // TODO FILL IN THIS CASE
-    // available, borrowed by me, borrowed by someone else
-    // title:
-    // available: Request
-    // borrowed by me: Return
-    // borrowed by someone else: Unavailable
-  } else {
-    // get notification status
-    // if available: try get notification status
-    // get notification status
-    // pending, accepted, denied
-    // title:
-    // pending: Requested
-    // accepted: Return
-    // denied: Denied
-  }
-
   const notifyMutation = useCreateNotification();
 
-  // TODO clean up these parameters
+  const getButtonState = (): ButtonState => {
+    if (isUserDataLoading) {
+      return { title: "Loading...", disabled: true, action: () => {} };
+    }
+
+    if (borrowInfo?.borrowStatus === ServerBookBorrowStatus.BORROWING) {
+      if (borrowInfo.borrowingUserID === user?.uid) {
+        return {
+          title: "Return",
+          disabled: false,
+          action: () => {
+            handleBookReturnClicked(bookID, bookTitle);
+          },
+        };
+      } else {
+        return { title: "Unavailable", disabled: true, action: () => {} };
+      }
+    }
+
+    switch (requestStatus) {
+      case BookRequestNotificationStatus.PENDING:
+        return { title: "Requested", disabled: true, action: () => {} };
+      case BookRequestNotificationStatus.ACCEPTED:
+        return {
+          title: "Return",
+          disabled: false,
+          action: () => {
+            handleBookReturnClicked(bookID, bookTitle);
+          },
+        };
+      case BookRequestNotificationStatus.DENIED:
+        return {
+          title: "Request Again",
+          disabled: false,
+          action: () => {
+            handleBookRequestClicked(bookID, bookTitle);
+          },
+        };
+      default:
+        return {
+          title: "Request",
+          disabled: false,
+          action: () => {
+            handleBookRequestClicked(bookID, bookTitle);
+          },
+        };
+    }
+  };
+
   // TODO Probably put this in a separate file
   const handleSendBookRequestNotification = ({
     bookID,
@@ -69,8 +101,6 @@ const BookBorrowButton = ({
     bookTitle: string;
     message?: string;
   }) => {
-    // TODO handle all the type checks here better
-
     if (user == null || bookOwnerID == null || userData == null) {
       console.error("User is null");
       return;
@@ -86,7 +116,7 @@ const BookBorrowButton = ({
 
     const bookRequestNotification: BookRequestNotification = {
       receiver: bookOwnerID,
-      sender: user?.uid, // TODO make names less ambiguous
+      sender: user.uid,
       sender_name: senderName,
       bookID,
       bookTitle,
@@ -101,9 +131,8 @@ const BookBorrowButton = ({
   };
 
   const handleBookRequestClicked = (bookID: string, bookTitle: string) => {
-    // TODO update this FROM the book owner
     Alert.prompt(
-      "Request " + bookTitle + " from " + bookOwnerID,
+      `Request ${bookTitle}`,
       "Include a custom message (Optional)",
       [
         {
@@ -127,22 +156,20 @@ const BookBorrowButton = ({
     );
   };
 
-  // TODO: implement handleBookRequestClicked
   // TODO: implement handleBookReturnClicked
+  const handleBookReturnClicked = (bookID: string, bookTitle: string) => {
+    // Implement the logic for returning a book
+    console.log(`Returning book: ${bookTitle} (ID: ${bookID})`);
+    // You might want to show a confirmation dialog and then call an API to update the book status
+  };
 
-  // 3 cases:
-  // this book is available for request,
-  // it is borrowed by me,
-  // or it is borrowed by someone else
+  const buttonState = getButtonState();
 
-  const title = bookRequestStatus === "AVAILABLE" ? "Request" : "Return";
   return (
     <BookWormButton
-      title={title}
-      onPress={() => {
-        handleBookRequestClicked(bookID, bookTitle ?? "");
-      }}
-      disabled={isUserDataLoading || bookRequestStatus !== "AVAILABLE"}
+      title={buttonState.title}
+      onPress={buttonState.action}
+      disabled={buttonState.disabled}
     ></BookWormButton>
   );
 };

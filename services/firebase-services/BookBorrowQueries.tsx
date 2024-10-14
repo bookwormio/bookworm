@@ -216,7 +216,18 @@ export async function getBookLendingStatus(
   }
 }
 
-// TODO: add jsdoc
+/**
+ * Retrieves the lending statuses for a set of books lent by a specific user.
+ *
+ * This function queries the Firestore database for books that are currently
+ * being borrowed, which were lent by the specified user and match the given book IDs.
+ *
+ * @param {string} userID - The ID of the user who is lending the books.
+ * @param {string[]} bookIDs - An array of book IDs to check for lending statuses.
+ * @returns {Promise<BookBorrowModel[]>} A promise that resolves to an array of BookBorrowModel objects,
+ *                                       representing the lending statuses of the specified books.
+ * @throws {Error} If there's an error querying the Firestore database.
+ */
 export async function getLendingStatusesForBooks(
   userID: string,
   bookIDs: string[],
@@ -226,7 +237,8 @@ export async function getLendingStatusesForBooks(
     // TODO batch this
     const q = query(
       bookRef,
-      where("borrowing_user", "==", userID),
+      where("lending_user", "==", userID),
+      where("borrow_status", "==", ServerBookBorrowStatus.BORROWING),
       where("book_id", "in", bookIDs),
     );
     const bookSnapshot = await getDocs(q);
