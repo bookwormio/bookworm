@@ -165,10 +165,18 @@ const Posts = () => {
     queryClient
       .invalidateQueries({ queryKey: ["bookshelves", user?.uid] })
       .then(() => {
-        console.log("have to put this then to make it work");
+        console.log("Queries invalidated successfully");
       })
       .catch((error) => {
-        console.log(error);
+        console.error("Error invalidating queries:", error);
+      });
+    queryClient
+      .invalidateQueries({ queryKey: ["pagesData", user?.uid] })
+      .then(() => {
+        console.log("Queries invalidated successfully");
+      })
+      .catch((error) => {
+        console.error("Error invalidating queries:", error);
       });
     queryClient.setQueryData(queryKey, (data: any) => ({
       pages: data.pages.slice(0, 1),
