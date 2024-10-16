@@ -39,7 +39,7 @@ const DataSnapShot = ({ userID }: DataSnapProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.statsWrap}>
-        <Text style={styles.statTitle}>Pages This Week</Text>
+        <Text style={styles.statTitle}>PAGES THIS WEEK</Text>
         <Text style={styles.stat}>{pagesRead}</Text>
       </View>
       <View
@@ -48,7 +48,7 @@ const DataSnapShot = ({ userID }: DataSnapProps) => {
           { borderLeftWidth: 1, borderLeftColor: "#FB6D0B" },
         ]}
       >
-        <Text style={styles.statTitle}>Finished This Month</Text>
+        <Text style={styles.statTitle}>BOOKS THIS MONTH</Text>
         <Text style={styles.stat}>{booksFinished}</Text>
       </View>
       <View
@@ -57,7 +57,7 @@ const DataSnapShot = ({ userID }: DataSnapProps) => {
           { borderLeftWidth: 1, borderLeftColor: "#FB6D0B" },
         ]}
       >
-        <Text style={styles.statTitle}>Top Genre</Text>
+        <Text style={styles.statTitle}>TOP BOOK GENRE</Text>
         <Text style={styles.stat}>{topGenre}</Text>
       </View>
     </View>
@@ -71,18 +71,21 @@ const styles = StyleSheet.create({
     backgroundColor: APP_BACKGROUND_COLOR,
     flexDirection: "row",
     borderBottomColor: "#F2F2F2",
+    // borderBottomColor: "black",
     borderBottomWidth: 1,
     paddingTop: 10,
     paddingBottom: 10,
   },
   statsWrap: {
     flexDirection: "column",
-    padding: 8,
     alignContent: "center",
     justifyContent: "center",
+    // width: 145,
+    // height: 80,
+    padding: 10,
   },
   statTitle: {
-    fontSize: 14,
+    fontSize: 13,
     alignSelf: "center",
     paddingBottom: 5,
   },
