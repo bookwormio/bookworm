@@ -34,27 +34,23 @@ const ViewPost = ({ postID, fromProfile }: ViewPostProps) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.container}>
-        <View style={{ alignItems: "center" }}>
-          <Toast />
-          {isLoading && (
-            <View style={styles.feedLoading}>
-              <WormLoader />
-            </View>
-          )}
-          {post != null && !isLoading && (
-            <View style={styles.postContainer}>
-              <Post
-                post={post}
-                created={post.created}
-                currentDate={new Date()}
-                individualPage={true}
-                presentComments={() => {}}
-              />
-            </View>
-          )}
+      <Toast />
+      {isLoading && (
+        <View style={styles.feedLoading}>
+          <WormLoader />
         </View>
-      </View>
+      )}
+      {post != null && !isLoading && (
+        <View style={styles.postContainer}>
+          <Post
+            post={post}
+            created={post.created}
+            currentDate={new Date()}
+            individualPage={true}
+            presentComments={() => {}}
+          />
+        </View>
+      )}
     </View>
   );
 };
