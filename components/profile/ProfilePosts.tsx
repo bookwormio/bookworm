@@ -2,20 +2,22 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { useAuth } from "../../components/auth/context";
 import { fetchPostsByUserID } from "../../services/firebase-services/PostQueries";
 import Post from "../post/post";
 import { usePostsContext } from "../post/PostsContext";
 import WormLoader from "../wormloader/WormLoader";
 
-const ProfilePosts = () => {
-  const { user } = useAuth();
+interface ProfilePostsProps {
+  userID: string;
+}
+
+const ProfilePosts = ({ userID }: ProfilePostsProps) => {
   const { profilePosts, setProfilePosts } = usePostsContext();
   const [loading, setLoading] = useState(true);
   useQuery({
     queryKey: ["usersPosts"],
     queryFn: async () => {
-      const profileFeed = await fetchPostsByUserID(user?.uid);
+      const profileFeed = await fetchPostsByUserID(userID);
       setProfilePosts(profileFeed);
       setLoading(false);
       return profileFeed;
