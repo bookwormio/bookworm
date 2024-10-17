@@ -116,7 +116,7 @@ const Profile = () => {
       {profileTab === TabNames.BOOKSHELVES && user !== null ? (
         <ProfileBookShelves userID={user?.uid} />
       ) : profileTab === TabNames.POSTS ? (
-        <ProfilePosts />
+        <ProfilePosts userID={user?.uid ?? ""} />
       ) : profileTab === TabNames.DATA ? (
         <ViewData userID={user?.uid ?? ""}></ViewData>
       ) : (

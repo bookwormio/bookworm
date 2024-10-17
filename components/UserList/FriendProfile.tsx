@@ -25,6 +25,7 @@ import {
 import { useAuth } from "../auth/context";
 import ProfileBookShelves from "../profile/BookShelf/ProfileBookShelves";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
+import ProfilePosts from "../profile/ProfilePosts";
 import ProfileTabSelector from "../profile/ProfileTabSelector";
 import WormLoader from "../wormloader/WormLoader";
 
@@ -318,7 +319,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       {profileTab === TabNames.BOOKSHELVES ? (
         <ProfileBookShelves userID={friendUserID} />
       ) : profileTab === TabNames.POSTS ? (
-        <Text>PUT THE POSTS HERE</Text>
+        <ProfilePosts userID={friendUserID} />
       ) : profileTab === TabNames.DATA ? (
         <Text>PUT DATA HERE</Text>
       ) : (
