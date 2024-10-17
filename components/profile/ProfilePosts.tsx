@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { fetchPostsByUserID } from "../../services/firebase-services/PostQueries";
+import { useAuth } from "../auth/context";
 import Post from "../post/post";
 import { usePostsContext } from "../post/PostsContext";
 import WormLoader from "../wormloader/WormLoader";
@@ -12,6 +13,7 @@ interface ProfilePostsProps {
 }
 
 const ProfilePosts = ({ userID }: ProfilePostsProps) => {
+  const { user } = useAuth();
   const { profilePosts, setProfilePosts } = usePostsContext();
   const [loading, setLoading] = useState(true);
   useQuery({

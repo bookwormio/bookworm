@@ -32,6 +32,14 @@ const SearchLayout = () => {
           headerLeft: () => <BackButton />,
         }}
       />
+      <Stack.Screen
+        name="posts/[postID]"
+        options={{
+          headerShown: true,
+          headerTitle: "Post",
+          headerLeft: () => <BackButton />,
+        }}
+      />
     </Stack>
   );
 };
