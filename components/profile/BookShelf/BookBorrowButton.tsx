@@ -4,6 +4,7 @@ import { Alert, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { useUserDataQuery } from "../../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import {
+  BookBorrowButtonDisplay,
   BookRequestNotificationStatus,
   ServerBookBorrowStatus,
   ServerNotificationType,
@@ -27,18 +28,8 @@ interface BookBorrowButtonProps {
   requestStatus?: BookRequestNotificationStatus;
 }
 
-// TODO: move this to enums
-enum BorrowButtonDisplay {
-  LOADING = "Loading...",
-  UNAVAILABLE = "Unavailable",
-  REQUESTED = "Requested",
-  RETURN = "Return",
-  REQUEST_AGAIN = "Request Again",
-  REQUEST = "Request",
-}
-
 interface ButtonState {
-  title: BorrowButtonDisplay;
+  title: BookBorrowButtonDisplay;
   disabled: boolean;
   action: () => void;
 }
@@ -63,7 +54,7 @@ const BookBorrowButton = ({
     if (isLoading || isUserDataLoading) {
       // Case: Loading
       return {
-        title: BorrowButtonDisplay.LOADING,
+        title: BookBorrowButtonDisplay.LOADING,
         disabled: true,
         action: () => {},
       };
@@ -72,7 +63,7 @@ const BookBorrowButton = ({
     if (borrowInfo == null || requestStatus == null) {
       // This should not happen but just in case
       return {
-        title: BorrowButtonDisplay.UNAVAILABLE,
+        title: BookBorrowButtonDisplay.UNAVAILABLE,
         disabled: true,
         action: () => {},
       };
@@ -82,7 +73,7 @@ const BookBorrowButton = ({
       if (borrowInfo.borrowingUserID === user?.uid) {
         // Case: Current user is borrowing the book
         return {
-          title: BorrowButtonDisplay.RETURN,
+          title: BookBorrowButtonDisplay.RETURN,
           disabled: false,
           action: () => {
             handleBookReturnClicked(bookID);
@@ -91,7 +82,7 @@ const BookBorrowButton = ({
       } else {
         return {
           // Case: Book is already borrowed by someone else
-          title: BorrowButtonDisplay.UNAVAILABLE,
+          title: BookBorrowButtonDisplay.UNAVAILABLE,
           disabled: true,
           action: () => {},
         };
@@ -102,7 +93,7 @@ const BookBorrowButton = ({
       case BookRequestNotificationStatus.PENDING:
         // Case: Current user has already requested the book
         return {
-          title: BorrowButtonDisplay.REQUESTED,
+          title: BookBorrowButtonDisplay.REQUESTED,
           disabled: true,
           action: () => {},
         };
@@ -110,7 +101,7 @@ const BookBorrowButton = ({
         // Case: Current user is borrowing the book
         // (it should not reach here, but just in case)
         return {
-          title: BorrowButtonDisplay.RETURN,
+          title: BookBorrowButtonDisplay.RETURN,
           disabled: false,
           action: () => {
             handleBookReturnClicked(bookID);
@@ -119,7 +110,7 @@ const BookBorrowButton = ({
       case BookRequestNotificationStatus.DENIED:
         // Case: Current user's request was denied
         return {
-          title: BorrowButtonDisplay.REQUEST_AGAIN,
+          title: BookBorrowButtonDisplay.REQUEST_AGAIN,
           disabled: false,
           action: () => {
             handleBookRequestClicked(bookID, bookTitle);
@@ -128,7 +119,7 @@ const BookBorrowButton = ({
       default:
         return {
           // Default case: Current user has not requested the book
-          title: BorrowButtonDisplay.REQUEST,
+          title: BookBorrowButtonDisplay.REQUEST,
           disabled: false,
           action: () => {
             handleBookRequestClicked(bookID, bookTitle);
@@ -137,17 +128,22 @@ const BookBorrowButton = ({
     }
   };
 
-  // TODO pass in all the dependencies
   const handleSendBookRequestNotification = ({
     bookID,
     bookTitle,
     message,
+    userData,
+    bookOwnerID,
+    userID,
   }: {
     bookID: string;
     bookTitle: string;
     message?: string;
+    userData: UserDataModel | null | undefined;
+    bookOwnerID: string;
+    userID: string | null | undefined;
   }) => {
-    if (user == null || bookOwnerID == null || userData == null) {
+    if (userID == null || bookOwnerID == null || userData == null) {
       Toast.show({
         type: "error",
         text1: "Error sending request",
@@ -164,13 +160,12 @@ const BookBorrowButton = ({
       return;
     }
 
-    const userDataTyped = userData as UserDataModel;
     const senderName =
-      `${userDataTyped?.first ?? ""} ${userDataTyped?.last ?? ""}`.trim();
+      `${userData?.first ?? ""} ${userData?.last ?? ""}`.trim();
 
     const bookRequestNotification: BookRequestNotification = {
       receiver: bookOwnerID,
-      sender: user.uid,
+      sender: userID,
       sender_name: senderName,
       bookID,
       bookTitle,
@@ -208,6 +203,9 @@ const BookBorrowButton = ({
               bookID,
               bookTitle,
               message: message ?? "",
+              userData,
+              bookOwnerID,
+              userID: user?.uid,
             });
           },
         },

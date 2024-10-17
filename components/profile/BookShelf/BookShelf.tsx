@@ -20,17 +20,9 @@ interface BookShelfProps {
   shelfName: ServerBookShelfName;
   books: BookShelfBookModel[];
   userID: string;
-  userFirstName: string;
-  userLastName: string;
 }
 
-const BookShelf = ({
-  shelfName,
-  books,
-  userID,
-  userFirstName,
-  userLastName,
-}: BookShelfProps) => {
+const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
   const { user } = useAuth();
 
   const { mutate: removeBook, isPending: removeBookPending } =
@@ -39,6 +31,9 @@ const BookShelf = ({
   const { type: bookRouteType } = useBookRouteInfo();
 
   const bookIds = books.map((book) => book.id);
+
+  // Cannot conditionally call hooks, so we need to call it regardless of the shelf
+  // Pass in empty data if the shelf is not lending library
   const {
     data: lendingStatuses,
     isLoading: isLoadingLendingStatus,
@@ -99,6 +94,7 @@ const BookShelf = ({
               )}
             </TouchableOpacity>
             {/* TODO: make this look better with minus sign button */}
+            {/* TODO use route utils here */}
             {bookRouteType === "PROFILE" && userID === user?.uid && (
               <TouchableOpacity
                 onPress={() => {

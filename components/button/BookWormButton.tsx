@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     backgroundColor: "rgba(251, 109, 11, 0.5)", // 50% opacity of original color
   },
-  // TODO: Maybe make this look better
   buttonNegative: {
     backgroundColor: "rgb(217, 219, 218)",
   },

@@ -22,9 +22,13 @@ import {
 } from "../../types";
 
 /**
- * Adds a notification to the notifications collection for that user.
- * @param {BasicNotificationModel} notif - The basic info of the notification.
- * @returns {Promise<boolean>} A promise that resolves to true if the notification was successfully created, false otherwise.
+ * Adds a notification to the notifications collection for the specified user.
+ * The notification type determines the structure and fields included in the document.
+ *
+ * @param {NotificationModel} notif - The notification object containing details such as receiver, sender, and type.
+ * Depending on the notification type, additional fields like postID, bookID, bookTitle, and custom_message may be included.
+ *
+ * @returns {Promise<boolean>} A promise that resolves to true if the notification was successfully created, or false if the creation fails (e.g., duplicate like notifications).
  */
 export async function createNotification(
   notif: NotificationModel,
@@ -52,14 +56,15 @@ export async function createNotification(
       }
     }
 
-    // TODO fix this type
-    const fullNotif: FullNotificationModel = {
+    // Omit notifID from the full notification object because it's auto-generated
+    const fullNotif: Omit<FullNotificationModel, "notifID"> = {
       receiver: notif.receiver,
       sender: notif.sender,
       sender_name: notif.sender_name,
       created: serverTimestamp() as Timestamp,
       // haven't implement read_at yet
       read_at: null,
+      type: notif.type,
       /// ... used to conditionally add fields to an object
       ...(notif.type === ServerNotificationType.LIKE && {
         postID: notif.postID,
@@ -85,12 +90,10 @@ export async function createNotification(
         custom_message: notif.custom_message ?? "",
         bookRequestStatus: notif.bookRequestStatus,
       }),
-      type: notif.type,
     };
 
     await addDoc(notificationsRef, fullNotif);
 
-    console.log("ADDED DOC");
     return true;
   } catch (error) {
     console.error("Error creating notification:", error);
@@ -149,7 +152,7 @@ export async function getAllFullNotifications(
     const querySnap = await getDocs(q);
 
     for (const notifDoc of querySnap.docs) {
-      const notif = {
+      const notif: FullNotificationModel = {
         notifID: notifDoc.id,
         receiver: notifDoc.data().receiver,
         comment: notifDoc.data().comment,

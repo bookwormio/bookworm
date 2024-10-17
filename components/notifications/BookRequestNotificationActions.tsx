@@ -12,36 +12,70 @@ interface BookRequestNotificationActionsProps {
   requestStatus: BookRequestNotificationStatus;
 }
 
+interface ButtonConfig {
+  title: BookRequestActionDisplay;
+  onPress: () => void;
+  disabled?: boolean;
+  isNegativeOption?: boolean;
+}
+
 const BookRequestNotificationActions = ({
   onAccept,
   onDeny,
   requestStatus,
 }: BookRequestNotificationActionsProps) => {
+  const getActionButtons = (): ButtonConfig[] => {
+    switch (requestStatus) {
+      case BookRequestNotificationStatus.PENDING:
+        // Case: Request is pending: show accept and deny buttons
+        return [
+          {
+            title: BookRequestActionDisplay.ACCEPT,
+            onPress: onAccept,
+          },
+          {
+            title: BookRequestActionDisplay.DENY,
+            onPress: onDeny,
+            isNegativeOption: true,
+          },
+        ];
+      case BookRequestNotificationStatus.ACCEPTED:
+        // Case: Request is accepted: show accepted button disabled
+        return [
+          {
+            title: BookRequestActionDisplay.ACCEPTED,
+            onPress: () => {},
+            disabled: true,
+          },
+        ];
+      case BookRequestNotificationStatus.DENIED:
+        // Case: Request is denied: show denied button disabled
+        return [
+          {
+            title: BookRequestActionDisplay.DENIED,
+            onPress: () => {},
+            disabled: true,
+            isNegativeOption: true,
+          },
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const actionButtons = getActionButtons();
+
   return (
-    <View style={styles.BookRequestNotificationActions}>
-      {requestStatus === BookRequestNotificationStatus.PENDING && (
-        <>
-          <BookWormButton
-            title={BookRequestActionDisplay.ACCEPT}
-            onPress={onAccept}
-          />
-          <BookWormButton
-            title={BookRequestActionDisplay.DENY}
-            onPress={onDeny}
-            isNegativeOption={true}
-          />
-        </>
-      )}
-      {requestStatus === BookRequestNotificationStatus.ACCEPTED && (
-        <BookWormButton title={BookRequestActionDisplay.ACCEPTED} disabled />
-      )}
-      {requestStatus === BookRequestNotificationStatus.DENIED && (
+    <View style={styles.container}>
+      {actionButtons.map((button, index) => (
         <BookWormButton
-          title={BookRequestActionDisplay.DENIED}
-          disabled
-          isNegativeOption
+          key={index}
+          title={button.title}
+          onPress={button.onPress}
+          disabled={button.disabled}
+          isNegativeOption={button.isNegativeOption}
         />
-      )}
+      ))}
     </View>
   );
 };
@@ -49,17 +83,8 @@ const BookRequestNotificationActions = ({
 export default BookRequestNotificationActions;
 
 const styles = StyleSheet.create({
-  BookRequestNotificationActions: {
+  container: {
     flexDirection: "row",
     justifyContent: "space-around",
-  },
-  actionButton: {
-    backgroundColor: "#4CAF50",
-    padding: 10,
-    borderRadius: 5,
-  },
-  actionButtonText: {
-    color: "white",
-    fontWeight: "bold",
   },
 });

@@ -62,7 +62,6 @@ const BookSearch = ({
 
   const { data: preloadedShelfBooks } = useGetBooksForBookshelves(
     user?.uid ?? "",
-    user?.uid ?? "",
   );
 
   useEffect(() => {

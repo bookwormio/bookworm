@@ -8,7 +8,6 @@ import { createNotification } from "../../services/firebase-services/Notificatio
 import {
   type BookVolumeInfo,
   type RecommendationNotification,
-  type UserDataModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
 import BookSearch from "../searchbar/booksearch";
@@ -47,7 +46,7 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
   }) => {
     // send book title and bookID
     if (user !== undefined && user !== null) {
-      const uData = userData as UserDataModel;
+      const uData = userData!;
       const FRnotify: RecommendationNotification = {
         receiver: friendUserID,
         sender: user?.uid,

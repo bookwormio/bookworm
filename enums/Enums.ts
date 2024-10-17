@@ -92,3 +92,12 @@ export enum ServerBookBorrowRole {
   LENDER = "lending_user",
   BORROWER = "borrowing_user",
 }
+
+export enum BookBorrowButtonDisplay {
+  LOADING = "Loading...",
+  UNAVAILABLE = "Unavailable",
+  REQUESTED = "Requested",
+  RETURN = "Return",
+  REQUEST_AGAIN = "Request Again",
+  REQUEST = "Request",
+}

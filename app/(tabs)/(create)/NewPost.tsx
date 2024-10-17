@@ -62,12 +62,9 @@ const NewPost = () => {
     isSuccess: isBookmarkLoadedSuccess,
   } = useGetBookmarkForBook(user?.uid, selectedBook?.id);
 
-  void prefetchBooksForBookshelves(user?.uid ?? "", user?.uid ?? "");
+  void prefetchBooksForBookshelves(user?.uid ?? "");
 
-  const { data: bookshelves } = useGetBooksForBookshelves(
-    user?.uid ?? "",
-    user?.uid ?? "",
-  );
+  const { data: bookshelves } = useGetBooksForBookshelves(user?.uid ?? "");
 
   const [currentBookmark, setCurrentBookmark] = useState(0);
 

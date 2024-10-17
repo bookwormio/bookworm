@@ -24,6 +24,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
       router.push(userRoute);
     }
   };
+
   return (
     <TouchableOpacity
       style={styles.notif_container}

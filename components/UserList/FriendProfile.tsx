@@ -188,7 +188,11 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
 
   const handleFollow = async () => {
     const currentUserID = user?.uid;
-    if (currentUserID === undefined || friendUserID === undefined) {
+    if (
+      currentUserID === undefined ||
+      friendUserID === undefined ||
+      userData == null
+    ) {
       console.error(
         "Either current user ID is undefined or friend user ID is undefined",
       );
@@ -205,11 +209,10 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       };
       followMutation.mutate(connection);
       if (user !== undefined && user !== null) {
-        const uData = userData as UserDataModel;
         const FRnotify: FriendRequestNotification = {
           receiver: friendUserID,
           sender: user?.uid,
-          sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+          sender_name: userData.first + " " + userData.last, // Use an empty string if user?.uid is undefined
           type: ServerNotificationType.FRIEND_REQUEST,
         };
         notifyMutation.mutate(FRnotify);
@@ -316,12 +319,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         tabs={[TabNames.BOOKSHELVES, TabNames.POSTS, TabNames.DATA]}
       ></ProfileTabSelector>
       {profileTab === TabNames.BOOKSHELVES ? (
-        <ProfileBookShelves
-          userID={friendUserID}
-          // TODO maybe a better way to pass data?
-          userFirstName={firstName}
-          userLastName={lastName}
-        />
+        <ProfileBookShelves userID={friendUserID} />
       ) : profileTab === TabNames.POSTS ? (
         <Text>PUT THE POSTS HERE</Text>
       ) : profileTab === TabNames.DATA ? (

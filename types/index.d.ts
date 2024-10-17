@@ -211,16 +211,16 @@ interface BasicNotificationModel {
 interface FullNotificationModel {
   notifID: string;
   receiver: string;
-  comment: string;
+  comment?: string;
   sender: string;
   sender_name: string;
   created: Timestamp;
-  read_at: Timestamp;
-  postID: string | null;
-  bookID: string;
-  bookTitle: string;
-  custom_message: string;
-  bookRequestStatus: BookRequestNotificationStatus;
+  read_at: Timestamp | null;
+  postID?: string;
+  bookID?: string;
+  bookTitle?: string;
+  custom_message?: string;
+  bookRequestStatus?: BookRequestNotificationStatus;
   type: ServerNotificationType;
 }
 
