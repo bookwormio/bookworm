@@ -7,6 +7,17 @@ import {
   returnBookToUser,
 } from "../../../services/firebase-services/BookBorrowQueries";
 
+/**
+ * Custom hook to fetch lending statuses for multiple books.
+ *
+ * @param {string} ownerID - The ID of the book owner.
+ * @param {string} currentUserID - The ID of the current user.
+ * @param {string[]} bookIDs - An array of book IDs to fetch statuses for.
+ * @returns {UseQueryResult<Record<string, BookStatusModel>>} The result of the query containing lending statuses.
+ *
+ * @example
+ * const { data: lendingStatuses, isLoading, error } = useGetLendingLibraryBookStatuses(ownerID, currentUserID, bookIDs);
+ */
 export const useGetLendingLibraryBookStatuses = (
   ownerID: string,
   currentUserID: string,
@@ -21,6 +32,15 @@ export const useGetLendingLibraryBookStatuses = (
   });
 };
 
+/**
+ * Custom hook to lend a book to a user.
+ *
+ * @returns {UseMutationResult} The result of the mutation.
+ *
+ * @example
+ * const { mutate: lendBook, isLoading, error } = useLendBookToUser();
+ * lendBook({ lenderUserID, borrowerUserID, bookID });
+ */
 export const useLendBookToUser = () => {
   const queryClient = useQueryClient();
 
@@ -47,6 +67,15 @@ export const useLendBookToUser = () => {
   });
 };
 
+/**
+ * Custom hook to return a borrowed book.
+ *
+ * @returns {UseMutationResult} The result of the mutation.
+ *
+ * @example
+ * const { mutate: returnBook, isLoading, error } = useReturnBook();
+ * returnBook({ lenderUserID, borrowerUserID, bookID });
+ */
 export const useReturnBook = () => {
   const queryClient = useQueryClient();
 
