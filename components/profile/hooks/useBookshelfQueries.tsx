@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ServerBookShelfName } from "../../../enums/Enums";
-import { fetchBookByVolumeID } from "../../../services/books-services/BookQueries";
 import {
   addBookToUserBookshelf,
   getBooksFromUserBookShelves,
@@ -14,8 +13,9 @@ import {
 
 /**
  * Custom hook to fetch books for the user's bookshelves.
- * @param {string} userID - The user's ID.
- * @returns {UseQueryResult} - The result of the query.
+ *
+ * @param {string} userID - The ID of the user whose bookshelves are being fetched.
+ * @returns {UseQueryResult<UserBookShelvesModel>} The result of the query.
  *
  * @example
  * const { data: bookShelves, isLoading, isError, error } = useGetBooksForBookshelves(userID);
@@ -31,10 +31,13 @@ export const useGetBooksForBookshelves = (userID: string) => {
 
 /**
  * Prefetch the books for the user's bookshelves.
- * @param userID
- * @returns {Promise<void>}
+ *
+ * @param {string} userID - The ID of the user whose bookshelves are being prefetched.
+ * @returns {Promise<void>} A promise that resolves when the prefetching is complete.
  */
-export const prefetchBooksForBookshelves = async (userID: string) => {
+export const prefetchBooksForBookshelves = async (
+  userID: string,
+): Promise<void> => {
   const queryClient = useQueryClient();
   await queryClient.prefetchQuery({
     queryKey: ["bookshelves", userID],
@@ -46,11 +49,12 @@ export const prefetchBooksForBookshelves = async (userID: string) => {
 /**
  * Helper Query Function to fetch the books for the user's bookshelves.
  *
- * @param userID
- * @returns {Promise<UserBookShelvesModel>}
+ * @param {string} userID - The ID of the user whose bookshelves are being fetched.
+ * @returns {Promise<UserBookShelvesModel>} A promise that resolves to the user's bookshelves data.
+ * @throws {Error} If the user ID is invalid or there's an error fetching the books.
  */
 async function fetchBookshelves(userID: string): Promise<UserBookShelvesModel> {
-  if (userID == null || userID === "") throw new Error("User not logged in");
+  if (userID == null || userID === "") throw new Error("User null");
 
   const shelfTypes = Object.values(ServerBookShelfName);
   const userBooks = await getBooksFromUserBookShelves(userID, shelfTypes);
@@ -270,17 +274,5 @@ export const useGetShelvesForBook = (userID: string, bookID: string) => {
     queryFn: async () => await getShelvesContainingBook(userID, bookID), // Query function
     enabled: !(userID === "") && !(bookID === ""), // Only run query if userID and bookID are not null or undefined
     staleTime: 60000, // refetch data, here set to 1 minute
-  });
-};
-
-export const useFetchBookByVolumeID = (bookID: string) => {
-  return useQuery({
-    queryKey:
-      bookID !== null && bookID !== "" ? ["bookdata", bookID] : ["empty"],
-    queryFn: async () =>
-      bookID !== null && bookID !== ""
-        ? await fetchBookByVolumeID(bookID)
-        : null,
-    staleTime: 60000,
   });
 };

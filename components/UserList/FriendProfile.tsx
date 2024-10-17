@@ -69,7 +69,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
 
   // getting userdata
   const { data: userData, isLoading: isLoadingUserData } = useUserDataQuery(
-    user ?? undefined,
+    user?.uid,
   );
 
   const { data: isFollowingData } = useQuery({
@@ -189,7 +189,11 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
 
   const handleFollow = async () => {
     const currentUserID = user?.uid;
-    if (currentUserID === undefined || friendUserID === undefined) {
+    if (
+      currentUserID === undefined ||
+      friendUserID === undefined ||
+      userData == null
+    ) {
       console.error(
         "Either current user ID is undefined or friend user ID is undefined",
       );
@@ -206,17 +210,16 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       };
       followMutation.mutate(connection);
       if (user !== undefined && user !== null) {
-        const uData = userData as UserDataModel;
         const FRnotify: FriendRequestNotification = {
           receiver: friendUserID,
           sender: user?.uid,
-          sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+          sender_name: userData.first + " " + userData.last,
           type: ServerNotificationType.FRIEND_REQUEST,
         };
         notifyMutation.mutate(FRnotify);
       }
     } catch (error) {
-      setFollowStatus("not following");
+      setFollowStatus(LocalFollowStatus.NOT_FOLLOWING);
       console.error("Error occurred while following user:", error);
     }
   };

@@ -18,7 +18,6 @@ import {
   type CommentNotification,
   type LikeNotification,
   type PostModel,
-  type UserDataModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
 
@@ -66,7 +65,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   // list of postIDs with ongoing likes
   const [pendingLikes, setPendingLikes] = useState<Set<string>>(new Set());
   // getting userdata
-  const { data: userData } = useUserDataQuery(user ?? undefined);
+  const { data: userData } = useUserDataQuery(user?.uid);
   const queryClient = useQueryClient();
 
   /**
@@ -75,14 +74,16 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
    * @param postID - the postID of the post to like/unlike
    */
   const handleLike = (postID: string) => {
+    if (userData == null) {
+      throw new Error("User data is null");
+    }
     likePostMutation.mutate({ postID });
     const postToUpdate = posts.find((post) => post.id === postID);
-    const uData = userData as UserDataModel;
     if (postToUpdate !== undefined && user?.uid !== undefined) {
       const BNotify: LikeNotification = {
         receiver: postToUpdate.user.id,
         sender: user?.uid,
-        sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+        sender_name: userData.first + " " + userData.last, // Use an empty string if user?.uid is undefined
         postID,
         type: ServerNotificationType.LIKE,
       };
@@ -189,14 +190,16 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
    * @param comment - the text of the new comment.
    */
   const handleComment = (postID: string, comment: string) => {
+    if (userData == null) {
+      throw new Error("User data is null");
+    }
     addCommentMutation.mutate({ postID, comment });
     const postToUpdate = posts.find((post) => post.id === postID);
-    const uData = userData as UserDataModel;
     if (postToUpdate !== undefined && user?.uid !== undefined) {
       const BNotify: CommentNotification = {
         receiver: postToUpdate.user.id,
         sender: user?.uid,
-        sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+        sender_name: userData.first + " " + userData.last,
         type: ServerNotificationType.COMMENT,
         postID,
         comment,

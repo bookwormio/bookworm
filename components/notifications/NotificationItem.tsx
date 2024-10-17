@@ -1,15 +1,13 @@
 import { router } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import {
-  NotificationMessageMap,
-  NotificationTypeMap,
-  ServerNotificationType,
-} from "../../enums/Enums";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { ServerNotificationType } from "../../enums/Enums";
 import { type FullNotificationModel } from "../../types";
 import { generateUserRoute } from "../../utilities/routeUtils";
 import { useAuth } from "../auth/context";
+import { useNavigateToBook } from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
+import NotificationItemContent from "./NotificationItemContent";
 import { calculateTimeSinceNotification } from "./util/notificationUtils";
 
 interface NotifProp {
@@ -19,8 +17,9 @@ interface NotifProp {
 const NotificationItem = ({ notif }: NotifProp) => {
   const { user } = useAuth();
   const time = calculateTimeSinceNotification(notif.created.toDate());
-  const notifDisplay =
-    NotificationTypeMap[notif.type as ServerNotificationType];
+
+  const navigateToBook = useNavigateToBook(notif.bookID);
+
   return (
     <TouchableOpacity
       style={styles.notif_container}
@@ -32,23 +31,16 @@ const NotificationItem = ({ notif }: NotifProp) => {
           router.push({
             pathname: `/${notif.postID}`,
           });
-        } else if (notif.type === ServerNotificationType.FRIEND_REQUEST) {
-          const userRoute = generateUserRoute(
-            user?.uid,
-            notif.sender,
-            undefined,
-          );
-          if (userRoute != null) {
-            router.push(userRoute);
-          }
-        } else if (notif.type === ServerNotificationType.RECOMMENDATION) {
+        } else if (
+          notif.type === ServerNotificationType.FRIEND_REQUEST ||
+          notif.type === ServerNotificationType.BOOK_REQUEST ||
+          notif.type === ServerNotificationType.BOOK_REQUEST_RESPONSE
+        ) {
           router.push({
             pathname: `/postsbook/${notif.bookID}`,
           });
         } else if (notif.type === ServerNotificationType.RECOMMENDATION) {
-          router.push({
-            pathname: `/postsbook/${notif.bookID}`,
-          });
+          navigateToBook();
         }
       }}
     >
@@ -67,26 +59,10 @@ const NotificationItem = ({ notif }: NotifProp) => {
         >
           <ProfilePicture userID={notif.sender} size={50} />
         </TouchableOpacity>
-        <View style={styles.notifTextContainer}>
-          <Text style={styles.notifTitle}>{notifDisplay}</Text>
-          <Text style={styles.notifMessage}>
-            <Text style={{ fontWeight: "bold" }}>{notif.sender_name}</Text>
-            <Text>
-              {" "}
-              {NotificationMessageMap[notif.type]}
-              {notif.type === ServerNotificationType.COMMENT
-                ? " " + notif.comment
-                : ""}
-              {notif.type === ServerNotificationType.RECOMMENDATION
-                ? " " + notif.bookTitle
-                : ""}
-              {notif.custom_message != null && notif.custom_message !== ""
-                ? " - " + notif.custom_message
-                : ""}{" "}
-            </Text>
-            <Text style={{ color: "grey" }}>{time}</Text>
-          </Text>
-        </View>
+        <NotificationItemContent
+          notification={notif}
+          time={time}
+        ></NotificationItemContent>
       </View>
     </TouchableOpacity>
   );
@@ -127,21 +103,5 @@ const styles = StyleSheet.create({
     height: "100%", // Adjust the size of the image as needed
     width: "100%", // Adjust the size of the image as needed
     borderRadius: 30, // Make the image circular
-  },
-  notifTextContainer: {
-    flexDirection: "column",
-    flex: 1,
-  },
-  notifTitle: {
-    fontWeight: "bold",
-    fontSize: 18,
-    paddingLeft: 20,
-    paddingBottom: 5,
-  },
-  notifMessage: {
-    paddingLeft: 20,
-    flexWrap: "wrap",
-    flex: 1,
-    fontSize: 15,
   },
 });

@@ -6,27 +6,43 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  bookShelfDisplayMap,
-  type ServerBookShelfName,
-} from "../../../enums/Enums";
+import Toast from "react-native-toast-message";
+import { bookShelfDisplayMap, ServerBookShelfName } from "../../../enums/Enums";
 import { type BookShelfBookModel } from "../../../types";
 import { useAuth } from "../../auth/context";
+import { useGetLendingLibraryBookStatuses } from "../hooks/useBookBorrowQueries";
 import { useRemoveBookFromShelf } from "../hooks/useBookshelfQueries";
 import { useBookRouteInfo } from "../hooks/useRouteHooks";
+import BookBorrowButton from "./BookBorrowButton";
 import BookShelfBook from "./BookShelfBook";
 
 interface BookShelfProps {
   shelfName: ServerBookShelfName;
   books: BookShelfBookModel[];
+  userID: string;
 }
 
-const BookShelf = ({ shelfName, books }: BookShelfProps) => {
+const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
   const { user } = useAuth();
 
   const { mutate: removeBook, isPending: removeBookPending } =
     useRemoveBookFromShelf();
+
   const { type: bookRouteType } = useBookRouteInfo();
+
+  const bookIds = books.map((book) => book.id);
+
+  // Cannot conditionally call hooks, so we need to call it regardless of the shelf
+  // Pass in empty data if the shelf is not lending library
+  const {
+    data: lendingStatuses,
+    isLoading: isLoadingLendingStatus,
+    isError: isLendingStatusError,
+  } = useGetLendingLibraryBookStatuses(
+    shelfName === ServerBookShelfName.LENDING_LIBRARY ? userID : "",
+    shelfName === ServerBookShelfName.LENDING_LIBRARY ? user?.uid ?? "" : "",
+    shelfName === ServerBookShelfName.LENDING_LIBRARY ? bookIds : [],
+  );
 
   // Function to call the mutation
   const handleRemoveBook = (bookID: string) => {
@@ -45,6 +61,14 @@ const BookShelf = ({ shelfName, books }: BookShelfProps) => {
       console.log("User or book ID is not available");
     }
   };
+
+  if (isLendingStatusError) {
+    Toast.show({
+      type: "error",
+      text1: "Error loading lending statuses",
+      text2: "Please try again later",
+    });
+  }
 
   const shelfNameDisplay = bookShelfDisplayMap[shelfName];
 
@@ -70,7 +94,7 @@ const BookShelf = ({ shelfName, books }: BookShelfProps) => {
               )}
             </TouchableOpacity>
             {/* TODO: make this look better with minus sign button */}
-            {bookRouteType === "PROFILE" && (
+            {bookRouteType === "PROFILE" && userID === user?.uid && (
               <TouchableOpacity
                 onPress={() => {
                   handleRemoveBook(item.id);
@@ -81,12 +105,24 @@ const BookShelf = ({ shelfName, books }: BookShelfProps) => {
                 <Text style={{ color: "#FB6D0B" }}>Remove</Text>
               </TouchableOpacity>
             )}
+            {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
+              userID !== user?.uid && (
+                <BookBorrowButton
+                  bookID={item.id}
+                  bookTitle={item.volumeInfo?.title ?? ""}
+                  bookOwnerID={userID}
+                  borrowInfo={lendingStatuses?.[item.id]?.borrowInfo}
+                  requestStatus={lendingStatuses?.[item.id]?.requestStatus}
+                  isLoading={isLoadingLendingStatus}
+                />
+              )}
           </View>
         )}
         ListEmptyComponent={() => (
           <Text style={styles.emptyShelfText}>No books available</Text>
         )}
       />
+      <Toast />
     </View>
   );
 };
