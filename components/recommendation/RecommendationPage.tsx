@@ -44,13 +44,15 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
     volumeInfo: BookVolumeInfo;
     message?: string;
   }) => {
+    if (user == null || userData == null) {
+      throw new Error("User or userData is null");
+    }
     // send book title and bookID
     if (user !== undefined && user !== null) {
-      const uData = userData!;
       const FRnotify: RecommendationNotification = {
         receiver: friendUserID,
         sender: user?.uid,
-        sender_name: uData.first + " " + uData.last, // Use an empty string if user?.uid is undefined
+        sender_name: userData.first + " " + userData.last, // Use an empty string if user?.uid is undefined
         bookID,
         bookTitle: volumeInfo.title ?? "",
         custom_message: message ?? "",

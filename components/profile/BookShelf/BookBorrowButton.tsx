@@ -60,12 +60,14 @@ const BookBorrowButton = ({
       };
     }
 
-    if (borrowInfo == null || requestStatus == null) {
-      // This should not happen but just in case
+    if (borrowInfo == null && requestStatus == null) {
+      // Case: Book is available for borrowing
       return {
-        title: BookBorrowButtonDisplay.UNAVAILABLE,
-        disabled: true,
-        action: () => {},
+        title: BookBorrowButtonDisplay.REQUEST,
+        disabled: false,
+        action: () => {
+          handleBookRequestClicked(bookID, bookTitle);
+        },
       };
     }
 
@@ -237,7 +239,11 @@ const BookBorrowButton = ({
       <BookWormButton
         title={buttonState.title}
         onPress={buttonState.action}
-        disabled={buttonState.disabled}
+        disabled={
+          buttonState.disabled ||
+          returnMutation.isPending ||
+          notifyMutation.isPending
+        }
       ></BookWormButton>
       <Toast />
     </View>

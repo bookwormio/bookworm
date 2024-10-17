@@ -9,7 +9,8 @@ import BookWormButton from "../button/BookWormButton";
 interface BookRequestNotificationActionsProps {
   onAccept: () => void;
   onDeny: () => void;
-  requestStatus: BookRequestNotificationStatus;
+  requestStatus?: BookRequestNotificationStatus;
+  mutationPending: boolean;
 }
 
 interface ButtonConfig {
@@ -23,8 +24,12 @@ const BookRequestNotificationActions = ({
   onAccept,
   onDeny,
   requestStatus,
+  mutationPending,
 }: BookRequestNotificationActionsProps) => {
   const getActionButtons = (): ButtonConfig[] => {
+    if (requestStatus == null) {
+      return [];
+    }
     switch (requestStatus) {
       case BookRequestNotificationStatus.PENDING:
         // Case: Request is pending: show accept and deny buttons
@@ -32,10 +37,12 @@ const BookRequestNotificationActions = ({
           {
             title: BookRequestActionDisplay.ACCEPT,
             onPress: onAccept,
+            disabled: mutationPending,
           },
           {
             title: BookRequestActionDisplay.DENY,
             onPress: onDeny,
+            disabled: mutationPending,
             isNegativeOption: true,
           },
         ];

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
+import Toast from "react-native-toast-message";
 import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import {
   BookRequestNotificationStatus,
-  NotificationMessageMap,
-  NotificationTypeMap,
   ServerNotificationType,
 } from "../../enums/Enums";
 import {
+  type BookRequestNotification,
   type BookRequestResponseNotification,
   type FullNotificationModel,
   type UserDataModel,
@@ -20,78 +20,12 @@ import {
   useDenyOtherRequests,
   useUpdateNotificationStatus,
 } from "./hooks/useNotificationQueries";
+import { formatNotification } from "./util/notificationUtils";
 
-// This needs to be updated when other notificaitons that effect this one change
 interface NotificationItemContentProps {
   notification: FullNotificationModel;
   time: string;
 }
-
-// TODO: Make this work
-// export const NotificationConfig: Record<
-//   ServerNotificationType,
-//   {
-//     title: string | ((notifStatus?: BookRequestNotificationStatus) => string);
-//     message: string | ((notifStatus?: BookRequestNotificationStatus) => string);
-//   }
-// > = {
-//   [ServerNotificationType.FRIEND_REQUEST]: {
-//     title: "New Follower",
-//     message: "followed you",
-//   },
-//   [ServerNotificationType.LIKE]: {
-//     title: "New Like",
-//     message: "liked your post",
-//   },
-//   [ServerNotificationType.COMMENT]: {
-//     title: "New Comment",
-//     message: "commented on your post:",
-//   },
-//   [ServerNotificationType.RECOMMENDATION]: {
-//     title: "New Recommendation",
-//     message: "thinks you should read",
-//   },
-//   [ServerNotificationType.BOOK_REQUEST]: {
-//     title: "New Book Request",
-//     message: "requested to borrow",
-//   },
-//   [ServerNotificationType.BOOK_REQUEST_RESPONSE]: {
-//     title: (notifStatus) =>
-//       notifStatus === BookRequestNotificationStatus.ACCEPTED
-//         ? "Book Request Accepted"
-//         : "Book Request Denied",
-//     message: (notifStatus) =>
-//       notifStatus === BookRequestNotificationStatus.ACCEPTED
-//         ? "accepted your request to borrow"
-//         : "denied your request to borrow",
-//   },
-// };
-
-// // Generalized notification formatter
-// const formatNotification = (
-//   notifType: ServerNotificationType,
-//   notifStatus?: BookRequestNotificationStatus,
-// ) => {
-//   const config = NotificationConfig[notifType];
-
-//   const title =
-//     typeof config.title === "function"
-//       ? config.title(notifStatus)
-//       : config.title;
-
-//   const message =
-//     typeof config.message === "function"
-//       ? config.message(notifStatus)
-//       : config.message;
-
-//   return { title, message };
-// };
-
-// // Usage
-// const { title, message } = formatNotification(
-//   ServerNotificationType.BOOK_REQUEST_RESPONSE,
-//   BookRequestNotificationStatus.ACCEPTED,
-// );
 
 const NotificationItemContent = ({
   notification,
@@ -101,6 +35,7 @@ const NotificationItemContent = ({
   const updateNotificationStatus = useUpdateNotificationStatus();
   const lendBookToUser = useLendBookToUser();
   const denyOtherRequests = useDenyOtherRequests();
+
   const { user } = useAuth();
   const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
     user?.uid,
@@ -110,14 +45,17 @@ const NotificationItemContent = ({
     bookID,
     message,
     requestStatus,
+    userData,
+    notification,
   }: {
     bookID: string;
     message?: string;
     requestStatus: BookRequestNotificationStatus;
+    userData: UserDataModel;
+    notification: BookRequestNotification;
   }) => {
-    const userDataTyped = userData as UserDataModel;
     const senderName =
-      `${userDataTyped?.first ?? ""} ${userDataTyped?.last ?? ""}`.trim();
+      `${userData?.first ?? ""} ${userData?.last ?? ""}`.trim();
 
     const bookResponseNotification: BookRequestResponseNotification = {
       receiver: notification.sender,
@@ -165,8 +103,6 @@ const NotificationItemContent = ({
     newStatus: BookRequestNotificationStatus,
     userID: string,
   ) => {
-    // TODO: handle failure
-    // Update the request notification status from the original notification
     updateNotificationStatus.mutate({
       notifID,
       newStatus,
@@ -174,51 +110,92 @@ const NotificationItemContent = ({
     });
   };
 
-  const handleAcceptClicked = async () => {
-    await Promise.all([
-      handleLendBookToUser(
-        notification.receiver,
-        notification.sender,
-        notification.bookID,
-      ),
-      handleSendBookResponseNotification({
-        bookID: notification.bookID,
-        message: "",
-        requestStatus: BookRequestNotificationStatus.ACCEPTED,
-      }),
-      handleRejectOtherRequests(
-        notification.receiver,
-        notification.sender,
-        notification.bookID,
-      ),
-      handleUpdateBookRequestStatus(
-        notification.notifID,
-        BookRequestNotificationStatus.ACCEPTED,
-        notification.receiver,
-      ),
-    ]);
-
-    // TODO: remove this (should be handled by query cache)
-    setBookRequestStatus(BookRequestNotificationStatus.ACCEPTED);
+  const handleAcceptBookRequestClicked = () => {
+    const acceptRequest = async () => {
+      const notificationTyped = notification as BookRequestNotification & {
+        notifID: string;
+      };
+      if (userData == null) {
+        Toast.show({
+          type: "error",
+          text1: "Error accepting request",
+          text2: "User data is missing",
+        });
+        return;
+      }
+      try {
+        await Promise.all([
+          handleLendBookToUser(
+            notificationTyped.receiver,
+            notificationTyped.sender,
+            notificationTyped.bookID,
+          ),
+          handleSendBookResponseNotification({
+            bookID: notificationTyped.bookID,
+            message: "",
+            requestStatus: BookRequestNotificationStatus.ACCEPTED,
+            userData,
+            notification: notificationTyped,
+          }),
+          handleRejectOtherRequests(
+            notificationTyped.receiver,
+            notificationTyped.sender,
+            notificationTyped.bookID,
+          ),
+          handleUpdateBookRequestStatus(
+            notificationTyped.notifID,
+            BookRequestNotificationStatus.ACCEPTED,
+            notificationTyped.receiver,
+          ),
+        ]);
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: "Error accepting request",
+          text2: "Please try again later",
+        });
+      }
+    };
+    void acceptRequest();
   };
 
   const handleDenySent = async (message?: string) => {
-    await Promise.all([
-      handleSendBookResponseNotification({
-        bookID: notification.bookID,
-        message: message ?? "",
-        requestStatus: BookRequestNotificationStatus.DENIED,
-      }),
-      handleUpdateBookRequestStatus(
-        notification.notifID,
-        BookRequestNotificationStatus.DENIED,
-        notification.receiver,
-      ),
-    ]);
-    setBookRequestStatus(BookRequestNotificationStatus.DENIED);
+    const notificationTyped = notification as BookRequestNotification & {
+      notifID: string;
+    };
+    if (userData == null) {
+      Toast.show({
+        type: "error",
+        text1: "Error accepting request",
+        text2: "User data is missing",
+      });
+      return;
+    }
+    try {
+      await Promise.all([
+        handleSendBookResponseNotification({
+          bookID: notificationTyped.bookID,
+          message: message ?? "",
+          requestStatus: BookRequestNotificationStatus.DENIED,
+          userData,
+          notification: notificationTyped,
+        }),
+        handleUpdateBookRequestStatus(
+          notification.notifID,
+          BookRequestNotificationStatus.DENIED,
+          notification.receiver,
+        ),
+      ]);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error denying request",
+        text2: "Please try again later",
+      });
+    }
   };
 
-  const handleDenyClicked = () => {
+  const handleDenyBookRequestClicked = () => {
     Alert.prompt(
       "Deny Book Request",
       "Include a custom message (Optional)",
@@ -239,57 +216,20 @@ const NotificationItemContent = ({
     );
   };
 
-  // TODO: move to utils file
-  const formatNotificationTitle = (
-    notifType: ServerNotificationType,
-    notifStatus: BookRequestNotificationStatus,
-  ) => {
-    if (notifType === ServerNotificationType.BOOK_REQUEST_RESPONSE) {
-      return notifStatus === BookRequestNotificationStatus.ACCEPTED
-        ? "Book Request Accepted"
-        : "Book Request Denied";
-    } else {
-      return NotificationTypeMap[notifType];
-    }
-  };
-
-  // TODO: move to utils file
-  const formatNotificationDisplay = (
-    notifType: ServerNotificationType,
-    notifStatus: BookRequestNotificationStatus,
-  ) => {
-    if (notifType === ServerNotificationType.BOOK_REQUEST_RESPONSE) {
-      return notifStatus === BookRequestNotificationStatus.ACCEPTED
-        ? "accepted your request to borrow"
-        : "denied your request to borrow";
-    } else {
-      return NotificationMessageMap[notifType];
-    }
-  };
-
-  const [bookRequestStatus, setBookRequestStatus] = useState(
-    notification.bookRequestStatus,
-  );
-
   const isBookRequest =
     notification.type === ServerNotificationType.BOOK_REQUEST;
 
+  const { title: notificationTitle, message: notificationMessage } =
+    formatNotification(notification.type, notification?.bookRequestStatus);
+
   return (
     <View style={styles.notifTextContainer}>
-      <Text style={styles.notifTitle}>
-        {formatNotificationTitle(
-          notification.type,
-          notification.bookRequestStatus,
-        )}
-      </Text>
+      <Text style={styles.notifTitle}>{notificationTitle}</Text>
       <Text style={styles.notifMessage}>
         <Text style={{ fontWeight: "bold" }}>{notification.sender_name}</Text>
         <Text>
           {" "}
-          {formatNotificationDisplay(
-            notification.type,
-            notification.bookRequestStatus,
-          )}
+          {notificationMessage}
           {notification.type === ServerNotificationType.COMMENT
             ? " " + notification.comment
             : ""}
@@ -312,9 +252,15 @@ const NotificationItemContent = ({
       {isBookRequest && !isUserDataLoading && (
         <View style={styles.bookRequestButtonContainer}>
           <BookRequestNotificationActions
-            onAccept={handleAcceptClicked}
-            onDeny={handleDenyClicked}
-            requestStatus={bookRequestStatus}
+            onAccept={handleAcceptBookRequestClicked}
+            onDeny={handleDenyBookRequestClicked}
+            requestStatus={notification.bookRequestStatus}
+            mutationPending={
+              notifyMutation.isPending ||
+              updateNotificationStatus.isPending ||
+              lendBookToUser.isPending ||
+              denyOtherRequests.isPending
+            }
           ></BookRequestNotificationActions>
         </View>
       )}

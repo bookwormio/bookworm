@@ -212,13 +212,13 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         const FRnotify: FriendRequestNotification = {
           receiver: friendUserID,
           sender: user?.uid,
-          sender_name: userData.first + " " + userData.last, // Use an empty string if user?.uid is undefined
+          sender_name: userData.first + " " + userData.last,
           type: ServerNotificationType.FRIEND_REQUEST,
         };
         notifyMutation.mutate(FRnotify);
       }
     } catch (error) {
-      setFollowStatus("not following");
+      setFollowStatus(LocalFollowStatus.NOT_FOLLOWING);
       console.error("Error occurred while following user:", error);
     }
   };

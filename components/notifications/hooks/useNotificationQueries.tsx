@@ -84,10 +84,6 @@ export const useUpdateNotificationStatus = () => {
         queryKey: ["notifications", userID],
       });
     },
-    // TODO:
-    // on mutate
-    // optimisitcally update lending status in cache "lendingStatuses"
-    // if there is an error undo the optimistic update
   });
 };
 
@@ -112,6 +108,7 @@ export const useDenyOtherRequests = () => {
       await denyOtherRequests(lenderUserID, acceptedBorrowerUserID, bookID);
       // TODO: this also needs to send notifications to the other users
     },
+
     onSuccess: async (data, { lenderUserID }) => {
       await queryClient.invalidateQueries({
         queryKey: ["notifications"],

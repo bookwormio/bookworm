@@ -5,6 +5,7 @@ import { ServerNotificationType } from "../../enums/Enums";
 import { type FullNotificationModel } from "../../types";
 import { generateUserRoute } from "../../utilities/routeUtils";
 import { useAuth } from "../auth/context";
+import { useNavigateToBook } from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import NotificationItemContent from "./NotificationItemContent";
 import { calculateTimeSinceNotification } from "./util/notificationUtils";
@@ -17,13 +18,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
   const { user } = useAuth();
   const time = calculateTimeSinceNotification(notif.created.toDate());
 
-  // TODO make this into a route utils
-  const tryPushUserRoute = (currentUserID?: string, friendID?: string) => {
-    const userRoute = generateUserRoute(currentUserID, friendID, undefined);
-    if (userRoute != null) {
-      router.push(userRoute);
-    }
-  };
+  const navigateToBook = useNavigateToBook(notif.bookID);
 
   return (
     <TouchableOpacity
@@ -36,17 +31,16 @@ const NotificationItem = ({ notif }: NotifProp) => {
           router.push({
             pathname: `/${notif.postID}`,
           });
-        } else if (notif.type === ServerNotificationType.FRIEND_REQUEST) {
-          tryPushUserRoute(user?.uid, notif.sender);
-        } else if (notif.type === ServerNotificationType.RECOMMENDATION) {
-          router.push({
-            pathname: `/postsbook/${notif.bookID}`,
-          });
         } else if (
+          notif.type === ServerNotificationType.FRIEND_REQUEST ||
           notif.type === ServerNotificationType.BOOK_REQUEST ||
           notif.type === ServerNotificationType.BOOK_REQUEST_RESPONSE
         ) {
-          tryPushUserRoute(user?.uid, notif.sender);
+          router.push({
+            pathname: `/postsbook/${notif.bookID}`,
+          });
+        } else if (notif.type === ServerNotificationType.RECOMMENDATION) {
+          navigateToBook();
         }
       }}
     >

@@ -44,7 +44,7 @@ export const useBookRouteInfo = (): RouteInfo => {
  * @param bookID - The ID of the book
  * @returns The function to navigate to the book
  */
-export const useNavigateToBook = (bookID: string) => {
+export const useNavigateToBook = (bookID?: string) => {
   const router = useRouter();
   const { prefix } = useBookRouteInfo();
 

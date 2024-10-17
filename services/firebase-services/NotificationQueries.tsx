@@ -169,7 +169,6 @@ export async function getAllFullNotifications(
       };
       notifdata.push(notif);
     }
-    console.log("Notifications: ", notifdata);
     return notifdata;
   } catch (error) {
     throw new Error(

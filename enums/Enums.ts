@@ -40,7 +40,7 @@ export enum ServerNotificationType {
 }
 
 // TODO Remove this and use NotificationConfig
-export const NotificationTypeMap: StringMap = {
+export const NotificationTitleMap: StringMap = {
   [ServerNotificationType.FRIEND_REQUEST]: "New Follower",
   [ServerNotificationType.LIKE]: "New Like",
   [ServerNotificationType.COMMENT]: "New Comment",
@@ -62,7 +62,6 @@ export enum BookRequestNotificationStatus {
   DENIED = "denied",
 }
 
-// TODO: consolidate this
 export enum BookRequestActionDisplay {
   ACCEPT = "Accept",
   DENY = "Deny",
