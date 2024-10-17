@@ -73,7 +73,7 @@ const Profile = () => {
           <Text style={styles.nameText}>
             {userData.first} {userData.last}
           </Text>
-          <Text style={styles.locText}>
+          <Text style={{ paddingLeft: 20 }}>
             {userData.city === "" ? "" : userData.city}
             {userData.city !== "" && userData.state !== "" ? ", " : ""}
             {userData.state === "" ? "" : userData.state}
@@ -85,12 +85,16 @@ const Profile = () => {
       </View>
       <View style={styles.imageTextContainer}>
         <View style={styles.locText}>
-          <Text>Followers</Text>
-          <Text>{followersCount ?? "-"}</Text>
+          <Text style={{ fontSize: 16 }}>Followers</Text>
+          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+            {followersCount ?? "-"}
+          </Text>
         </View>
         <View style={styles.locText}>
-          <Text>Following</Text>
-          <Text>{followingCount ?? "-"}</Text>
+          <Text style={{ fontSize: 16 }}>Following</Text>
+          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+            {followingCount ?? "-"}
+          </Text>
         </View>
       </View>
       <View style={styles.outerButtonsContainer}>
@@ -175,8 +179,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   bioPad: {
-    paddingLeft: 40,
-    paddingRight: 40,
+    paddingLeft: 30,
+    paddingRight: 30,
+    fontSize: 16,
   },
   nameText: {
     paddingLeft: 20,
@@ -184,7 +189,7 @@ const styles = StyleSheet.create({
     marginTop: -10,
   },
   locText: {
-    paddingLeft: 20,
+    paddingLeft: 12,
     paddingBottom: 20,
   },
   defaultImageContainer: {
