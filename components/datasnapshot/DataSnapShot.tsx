@@ -11,12 +11,15 @@ import {
 
 interface DataSnapProps {
   userID: string;
+  isLoadingOther: boolean;
 }
 
-const DataSnapShot = ({ userID }: DataSnapProps) => {
-  const { data: pagesData } = useGetPagesData(userID);
+const DataSnapShot = ({ userID, isLoadingOther }: DataSnapProps) => {
+  const { data: pagesData, isLoading: pagesIsLoading } =
+    useGetPagesData(userID);
 
-  const { data: bookshelves } = useGetBooksForBookshelves(userID);
+  const { data: bookshelves, isLoading: bookshelvesLoading } =
+    useGetBooksForBookshelves(userID);
 
   let pagesRead = 0;
   if (!(pagesData == null)) {
@@ -37,29 +40,33 @@ const DataSnapShot = ({ userID }: DataSnapProps) => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.statsWrap}>
-        <Text style={styles.statTitle}>PAGES THIS WEEK</Text>
-        <Text style={styles.stat}>{pagesRead}</Text>
-      </View>
-      <View
-        style={[
-          styles.statsWrap,
-          { borderLeftWidth: 1, borderLeftColor: "#FB6D0B" },
-        ]}
-      >
-        <Text style={styles.statTitle}>BOOKS THIS MONTH</Text>
-        <Text style={styles.stat}>{booksFinished}</Text>
-      </View>
-      <View
-        style={[
-          styles.statsWrap,
-          { borderLeftWidth: 1, borderLeftColor: "#FB6D0B" },
-        ]}
-      >
-        <Text style={styles.statTitle}>TOP BOOK GENRE</Text>
-        <Text style={styles.stat}>{topGenre}</Text>
-      </View>
+    <View>
+      {!(pagesIsLoading || bookshelvesLoading || isLoadingOther) && (
+        <View style={styles.container}>
+          <View style={styles.statsWrap}>
+            <Text style={styles.statTitle}>PAGES THIS WEEK</Text>
+            <Text style={styles.stat}>{pagesRead}</Text>
+          </View>
+          <View
+            style={[
+              styles.statsWrap,
+              { borderLeftWidth: 1, borderLeftColor: "#FB6D0B" },
+            ]}
+          >
+            <Text style={styles.statTitle}>BOOKS THIS MONTH</Text>
+            <Text style={styles.stat}>{booksFinished}</Text>
+          </View>
+          <View
+            style={[
+              styles.statsWrap,
+              { borderLeftWidth: 1, borderLeftColor: "#FB6D0B" },
+            ]}
+          >
+            <Text style={styles.statTitle}>TOP BOOK GENRE</Text>
+            <Text style={styles.stat}>{topGenre}</Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 };

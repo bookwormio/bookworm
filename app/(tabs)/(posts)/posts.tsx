@@ -256,7 +256,12 @@ const Posts = () => {
               <WormLoader />
             </View>
           )}
-          {!(user == null) && <DataSnapShot userID={user?.uid ?? ""} />}
+          {!(user == null) && (
+            <DataSnapShot
+              userID={user?.uid ?? ""}
+              isLoadingOther={isLoadingFeedPosts}
+            />
+          )}
           <Animated.FlatList
             style={styles.scrollContainer}
             data={posts}
