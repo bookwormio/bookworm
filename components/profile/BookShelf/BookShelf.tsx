@@ -6,9 +6,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { bookShelfDisplayMap, ServerBookShelfName } from "../../../enums/Enums";
 import { type BookShelfBookModel } from "../../../types";
 import { useAuth } from "../../auth/context";
+import { useGetLendingLibraryBookStatuses } from "../hooks/useBookBorrowQueries";
 import { useRemoveBookFromShelf } from "../hooks/useBookshelfQueries";
 import { useBookRouteInfo } from "../hooks/useRouteHooks";
 import BookBorrowButton from "./BookBorrowButton";
@@ -36,6 +38,17 @@ const BookShelf = ({
 
   const { type: bookRouteType } = useBookRouteInfo();
 
+  const bookIds = books.map((book) => book.id);
+  const {
+    data: lendingStatuses,
+    isLoading: isLoadingLendingStatus,
+    isError: isLendingStatusError,
+  } = useGetLendingLibraryBookStatuses(
+    shelfName === ServerBookShelfName.LENDING_LIBRARY ? userID : "",
+    shelfName === ServerBookShelfName.LENDING_LIBRARY ? user?.uid ?? "" : "",
+    shelfName === ServerBookShelfName.LENDING_LIBRARY ? bookIds : [],
+  );
+
   // Function to call the mutation
   const handleRemoveBook = (bookID: string) => {
     if (user != null && bookID != null) {
@@ -53,6 +66,14 @@ const BookShelf = ({
       console.log("User or book ID is not available");
     }
   };
+
+  if (isLendingStatusError) {
+    Toast.show({
+      type: "error",
+      text1: "Error loading lending statuses",
+      text2: "Please try again later",
+    });
+  }
 
   const shelfNameDisplay = bookShelfDisplayMap[shelfName];
 
@@ -95,8 +116,9 @@ const BookShelf = ({
                   bookID={item.id}
                   bookTitle={item.volumeInfo?.title ?? ""}
                   bookOwnerID={userID}
-                  borrowInfo={item.borrowInfo}
-                  requestStatus={item.bookRequestStatus}
+                  borrowInfo={lendingStatuses?.[item.id]?.borrowInfo}
+                  requestStatus={lendingStatuses?.[item.id]?.requestStatus}
+                  isLoading={isLoadingLendingStatus}
                 />
               )}
           </View>
@@ -105,6 +127,7 @@ const BookShelf = ({
           <Text style={styles.emptyShelfText}>No books available</Text>
         )}
       />
+      <Toast />
     </View>
   );
 };

@@ -20,15 +20,14 @@ const ProfileBookShelves = ({
   // Initialize the bookShelves state with all shelves empty
   const { user } = useAuth();
 
-  // TODO FIX NULL USERID
   const {
     data: bookShelves,
-    isLoading,
+    isLoading: isLoadingBooks,
     isError,
     error,
   } = useGetBooksForBookshelves(userID ?? "", user?.uid ?? "");
 
-  if (isLoading) {
+  if (isLoadingBooks) {
     return (
       <View style={styles.container}>
         <WormLoader style={{ width: 50, height: 50 }} />

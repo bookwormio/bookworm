@@ -30,8 +30,6 @@ import {
 } from "../../types";
 
 import { caseFoldNormalize } from "../util/queryUtils";
-import { getLendingStatusesForBooks } from "./BookBorrowQueries";
-import { getBookRequestStatusForBooks } from "./NotificationQueries";
 
 /**
  * Updates user data in the database.
@@ -541,17 +539,14 @@ export async function removeBookFromUserBookshelf(
 
 /**
  * Fetches books from specified bookshelves for a user and organizes them by shelf.
- * For books in the lending library, it also fetches lending statuses and book request statuses.
  *
  * @param {string} userID - The user's ID.
  * @param {string[]} shelves - List of shelf names to retrieve books from.
- * @param {string} currentUserID - The ID of the current user (used for book request statuses).
  * @returns {Promise<UserBookShelvesModel | null>} - A promise that resolves to a map of shelves with their corresponding books or null if an error occurs.
  */
 export async function getBooksFromUserBookShelves(
   userID: string,
   shelves: string[],
-  currentUserID: string,
 ): Promise<UserBookShelvesModel | null> {
   try {
     const userBookShelves: UserBookShelvesModel = {};
@@ -588,35 +583,6 @@ export async function getBooksFromUserBookShelves(
           },
         });
       });
-
-      // get lending status for each book
-      if (shelf === ServerBookShelfName.LENDING_LIBRARY) {
-        const bookIDs = userBookShelves[shelf].map((book) => book.id);
-        if (bookIDs.length === 0) {
-          continue;
-        }
-        const [lendingStatuses, bookRequestStatuses] = await Promise.all([
-          // Gets lending statuses for all books in the lending library
-          getLendingStatusesForBooks(userID, bookIDs),
-
-          // Gets book request statuses for all books in the lending library
-          getBookRequestStatusForBooks(currentUserID, userID, bookIDs),
-        ]);
-        for (const book of userBookShelves[shelf]) {
-          // Find and assign the lending status for this specific book
-          const lendingStatus = lendingStatuses.find(
-            (status) => status.bookID === book.id,
-          );
-          if (lendingStatus != null) {
-            book.borrowInfo = lendingStatus;
-          }
-          // Assign the book request status for this specific book
-          const requestStatus = bookRequestStatuses[book.id];
-          if (requestStatus != null) {
-            book.bookRequestStatus = requestStatus;
-          }
-        }
-      }
     }
 
     return userBookShelves;

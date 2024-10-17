@@ -174,8 +174,6 @@ interface BookShelfBookModel {
   id: string;
   created: Timestamp;
   volumeInfo: BookshelfVolumeInfo;
-  borrowInfo?: BookBorrowModel;
-  bookRequestStatus?: BookRequestNotificationStatus;
 }
 
 interface BookshelfVolumeInfo {

@@ -39,8 +39,7 @@ export enum ServerNotificationType {
   BOOK_REQUEST_RESPONSE = "BOOK_REQUEST_RESPONSE",
 }
 
-// TODO make this into a function instead of a map
-// because book request response has different messages based on status
+// TODO Remove this and use NotificationConfig
 export const NotificationTypeMap: StringMap = {
   [ServerNotificationType.FRIEND_REQUEST]: "New Follower",
   [ServerNotificationType.LIKE]: "New Like",

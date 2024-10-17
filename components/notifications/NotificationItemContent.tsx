@@ -27,6 +27,72 @@ interface NotificationItemContentProps {
   time: string;
 }
 
+// TODO: Make this work
+// export const NotificationConfig: Record<
+//   ServerNotificationType,
+//   {
+//     title: string | ((notifStatus?: BookRequestNotificationStatus) => string);
+//     message: string | ((notifStatus?: BookRequestNotificationStatus) => string);
+//   }
+// > = {
+//   [ServerNotificationType.FRIEND_REQUEST]: {
+//     title: "New Follower",
+//     message: "followed you",
+//   },
+//   [ServerNotificationType.LIKE]: {
+//     title: "New Like",
+//     message: "liked your post",
+//   },
+//   [ServerNotificationType.COMMENT]: {
+//     title: "New Comment",
+//     message: "commented on your post:",
+//   },
+//   [ServerNotificationType.RECOMMENDATION]: {
+//     title: "New Recommendation",
+//     message: "thinks you should read",
+//   },
+//   [ServerNotificationType.BOOK_REQUEST]: {
+//     title: "New Book Request",
+//     message: "requested to borrow",
+//   },
+//   [ServerNotificationType.BOOK_REQUEST_RESPONSE]: {
+//     title: (notifStatus) =>
+//       notifStatus === BookRequestNotificationStatus.ACCEPTED
+//         ? "Book Request Accepted"
+//         : "Book Request Denied",
+//     message: (notifStatus) =>
+//       notifStatus === BookRequestNotificationStatus.ACCEPTED
+//         ? "accepted your request to borrow"
+//         : "denied your request to borrow",
+//   },
+// };
+
+// // Generalized notification formatter
+// const formatNotification = (
+//   notifType: ServerNotificationType,
+//   notifStatus?: BookRequestNotificationStatus,
+// ) => {
+//   const config = NotificationConfig[notifType];
+
+//   const title =
+//     typeof config.title === "function"
+//       ? config.title(notifStatus)
+//       : config.title;
+
+//   const message =
+//     typeof config.message === "function"
+//       ? config.message(notifStatus)
+//       : config.message;
+
+//   return { title, message };
+// };
+
+// // Usage
+// const { title, message } = formatNotification(
+//   ServerNotificationType.BOOK_REQUEST_RESPONSE,
+//   BookRequestNotificationStatus.ACCEPTED,
+// );
+
 const NotificationItemContent = ({
   notification,
   time,
@@ -63,51 +129,76 @@ const NotificationItemContent = ({
       custom_message: message ?? "",
       bookRequestStatus: requestStatus,
     };
+    // TODO: disable the button while this mutation is happening
     notifyMutation.mutate({
       friendUserID: notification.sender,
       notification: bookResponseNotification,
     });
   };
 
-  const handleLendBookToUser = async () => {
-    // lend the book to the user
+  const handleLendBookToUser = async (
+    lenderUserID: string,
+    borrowerUserID: string,
+    bookID: string,
+  ) => {
     lendBookToUser.mutate({
-      lenderUserID: notification.receiver,
-      borrowerUserID: notification.sender,
-      bookID: notification.bookID,
+      lenderUserID,
+      borrowerUserID,
+      bookID,
     });
   };
 
-  const handleRejectOtherRequests = async () => {
+  const handleRejectOtherRequests = async (
+    lenderUserID: string,
+    acceptedBorrowerUserID: string,
+    bookID: string,
+  ) => {
     denyOtherRequests.mutate({
-      lenderUserID: notification.receiver,
-      acceptedBorrowerUserID: notification.sender,
-      bookID: notification.bookID,
+      lenderUserID,
+      acceptedBorrowerUserID,
+      bookID,
     });
   };
 
   const handleUpdateBookRequestStatus = async (
-    status: BookRequestNotificationStatus,
+    notifID: string,
+    newStatus: BookRequestNotificationStatus,
+    userID: string,
   ) => {
     // TODO: handle failure
     // Update the request notification status from the original notification
     updateNotificationStatus.mutate({
-      notifID: notification.notifID,
-      newStatus: status,
-      userID: notification.receiver,
+      notifID,
+      newStatus,
+      userID,
     });
   };
 
   const handleAcceptClicked = async () => {
-    await handleLendBookToUser();
-    await handleSendBookResponseNotification({
-      bookID: notification.bookID,
-      message: "",
-      requestStatus: BookRequestNotificationStatus.ACCEPTED,
-    });
-    await handleRejectOtherRequests();
-    await handleUpdateBookRequestStatus(BookRequestNotificationStatus.ACCEPTED);
+    await Promise.all([
+      handleLendBookToUser(
+        notification.receiver,
+        notification.sender,
+        notification.bookID,
+      ),
+      handleSendBookResponseNotification({
+        bookID: notification.bookID,
+        message: "",
+        requestStatus: BookRequestNotificationStatus.ACCEPTED,
+      }),
+      handleRejectOtherRequests(
+        notification.receiver,
+        notification.sender,
+        notification.bookID,
+      ),
+      handleUpdateBookRequestStatus(
+        notification.notifID,
+        BookRequestNotificationStatus.ACCEPTED,
+        notification.receiver,
+      ),
+    ]);
 
+    // TODO: remove this (should be handled by query cache)
     setBookRequestStatus(BookRequestNotificationStatus.ACCEPTED);
   };
 
@@ -118,7 +209,11 @@ const NotificationItemContent = ({
         message: message ?? "",
         requestStatus: BookRequestNotificationStatus.DENIED,
       }),
-      handleUpdateBookRequestStatus(BookRequestNotificationStatus.DENIED),
+      handleUpdateBookRequestStatus(
+        notification.notifID,
+        BookRequestNotificationStatus.DENIED,
+        notification.receiver,
+      ),
     ]);
     setBookRequestStatus(BookRequestNotificationStatus.DENIED);
   };

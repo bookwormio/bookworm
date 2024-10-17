@@ -70,11 +70,7 @@ async function fetchBookshelves(
     throw new Error("Current user null");
 
   const shelfTypes = Object.values(ServerBookShelfName);
-  const userBooks = await getBooksFromUserBookShelves(
-    userID,
-    shelfTypes,
-    currentUserID,
-  );
+  const userBooks = await getBooksFromUserBookShelves(userID, shelfTypes);
   if (userBooks == null) throw new Error("Error fetching user books");
 
   return userBooks;
