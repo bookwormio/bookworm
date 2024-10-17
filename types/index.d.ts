@@ -255,3 +255,9 @@ interface BookBorrowModel {
   borrowingUserID: string;
   borrowStatus: ServerBookBorrowStatus;
 }
+
+interface FlatAPIBookModel {
+  volume_id: string;
+  categories: string[] | undefined;
+  description: string | undefined;
+}
