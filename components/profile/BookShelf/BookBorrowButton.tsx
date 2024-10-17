@@ -199,8 +199,6 @@ const BookBorrowButton = ({
         {
           text: "Request",
           onPress: (message) => {
-            // TODO: set button to requested after sent !!!!
-            // this is where i do the mutation to update the notification
             handleSendBookRequestNotification({
               bookID,
               bookTitle,
@@ -239,11 +237,7 @@ const BookBorrowButton = ({
       <BookWormButton
         title={buttonState.title}
         onPress={buttonState.action}
-        disabled={
-          buttonState.disabled ||
-          returnMutation.isPending ||
-          notifyMutation.isPending
-        }
+        disabled={buttonState.disabled}
       ></BookWormButton>
       <Toast />
     </View>

@@ -10,12 +10,11 @@ import {
 } from "firebase/firestore";
 import { BORROW_BOOK_COLLECTION_REF } from "../../constants/constants";
 import {
-  type BookRequestNotificationStatus,
   ServerBookBorrowRole,
   ServerBookBorrowStatus,
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
-import { type BookBorrowModel } from "../../types";
+import { type BookBorrowModel, type BookStatusModel } from "../../types";
 import {
   convertBorrowDocToModel,
   makeBorrowDocID,
@@ -250,11 +249,6 @@ export async function getLendingStatusesForBooks(
       `Error getting lending statuses for books: ${(error as Error).message}`,
     );
   }
-}
-
-interface BookStatusModel {
-  borrowInfo?: BookBorrowModel;
-  requestStatus?: BookRequestNotificationStatus;
 }
 
 /**

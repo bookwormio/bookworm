@@ -39,7 +39,6 @@ export enum ServerNotificationType {
   BOOK_REQUEST_RESPONSE = "BOOK_REQUEST_RESPONSE",
 }
 
-// TODO Remove this and use NotificationConfig
 export const NotificationTitleMap: StringMap = {
   [ServerNotificationType.FRIEND_REQUEST]: "New Follower",
   [ServerNotificationType.LIKE]: "New Like",

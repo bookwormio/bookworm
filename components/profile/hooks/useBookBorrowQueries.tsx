@@ -44,11 +44,6 @@ export const useLendBookToUser = () => {
         queryKey: ["notifications"],
       });
     },
-    // TODO:
-    // on mutate: (optimistically)
-    // go into the query cache and update the lending status to be lent out to that user.
-    // lendingStatuses
-    // if there is an error undo the optimistic update
   });
 };
 
@@ -72,10 +67,5 @@ export const useReturnBook = () => {
         queryKey: ["lendingStatuses"],
       });
     },
-    // TODO:
-    // on mutate: (optimistically)
-    // go into the query cache and update the lending status to be returned to the owner.
-    // lendingStatuses
-    // if there is an error undo the optimistic update
   });
 };

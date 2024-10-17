@@ -10,7 +10,6 @@ interface BookRequestNotificationActionsProps {
   onAccept: () => void;
   onDeny: () => void;
   requestStatus?: BookRequestNotificationStatus;
-  mutationPending: boolean;
 }
 
 interface ButtonConfig {
@@ -24,7 +23,6 @@ const BookRequestNotificationActions = ({
   onAccept,
   onDeny,
   requestStatus,
-  mutationPending,
 }: BookRequestNotificationActionsProps) => {
   const getActionButtons = (): ButtonConfig[] => {
     if (requestStatus == null) {
@@ -37,12 +35,10 @@ const BookRequestNotificationActions = ({
           {
             title: BookRequestActionDisplay.ACCEPT,
             onPress: onAccept,
-            disabled: mutationPending,
           },
           {
             title: BookRequestActionDisplay.DENY,
             onPress: onDeny,
-            disabled: mutationPending,
             isNegativeOption: true,
           },
         ];

@@ -277,3 +277,7 @@ interface BookBorrowModel {
   borrowingUserID: string;
   borrowStatus: ServerBookBorrowStatus;
 }
+interface BookStatusModel {
+  borrowInfo?: BookBorrowModel;
+  requestStatus?: BookRequestNotificationStatus;
+}

@@ -94,7 +94,6 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
               )}
             </TouchableOpacity>
             {/* TODO: make this look better with minus sign button */}
-            {/* TODO use route utils here */}
             {bookRouteType === "PROFILE" && userID === user?.uid && (
               <TouchableOpacity
                 onPress={() => {

@@ -67,7 +67,6 @@ const NotificationItemContent = ({
       custom_message: message ?? "",
       bookRequestStatus: requestStatus,
     };
-    // TODO: disable the button while this mutation is happening
     notifyMutation.mutate({
       friendUserID: notification.sender,
       notification: bookResponseNotification,
@@ -255,12 +254,6 @@ const NotificationItemContent = ({
             onAccept={handleAcceptBookRequestClicked}
             onDeny={handleDenyBookRequestClicked}
             requestStatus={notification.bookRequestStatus}
-            mutationPending={
-              notifyMutation.isPending ||
-              updateNotificationStatus.isPending ||
-              lendBookToUser.isPending ||
-              denyOtherRequests.isPending
-            }
           ></BookRequestNotificationActions>
         </View>
       )}
