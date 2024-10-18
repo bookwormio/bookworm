@@ -24,7 +24,7 @@ export const useGetLendingLibraryBookStatuses = (
   bookIDs: string[],
 ) => {
   return useQuery({
-    queryKey: ["lendingStatuses", ownerID, currentUserID, bookIDs],
+    queryKey: ["lendingStatuses", ownerID, currentUserID],
     queryFn: async () =>
       await getLendingLibraryBookStatuses(ownerID, currentUserID, bookIDs),
     enabled: bookIDs.length > 0,

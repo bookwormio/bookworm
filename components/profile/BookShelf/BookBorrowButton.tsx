@@ -50,9 +50,15 @@ const BookBorrowButton = ({
   const returnMutation = useReturnBook();
   const queryClient = useQueryClient();
 
+  const isCurrentUserBorrowing = borrowInfo?.borrowingUserID === user?.uid;
+  const isBookBorrowed =
+    borrowInfo?.borrowStatus === ServerBookBorrowStatus.BORROWING;
+  const isBookReturned =
+    borrowInfo?.borrowStatus === ServerBookBorrowStatus.RETURNED;
+
   const getButtonState = (): ButtonState => {
     if (isLoading || isUserDataLoading) {
-      // Case: Loading
+      // Case: Loading state while fetching data
       return {
         title: BookBorrowButtonDisplay.LOADING,
         disabled: true,
@@ -61,7 +67,7 @@ const BookBorrowButton = ({
     }
 
     if (borrowInfo == null && requestStatus == null) {
-      // Case: Book is available for borrowing
+      // Case: Book is available for borrowing (no existing borrow info or request)
       return {
         title: BookBorrowButtonDisplay.REQUEST,
         disabled: false,
@@ -71,19 +77,19 @@ const BookBorrowButton = ({
       };
     }
 
-    if (borrowInfo?.borrowStatus === ServerBookBorrowStatus.BORROWING) {
-      if (borrowInfo.borrowingUserID === user?.uid) {
-        // Case: Current user is borrowing the book
+    if (isBookBorrowed) {
+      if (isCurrentUserBorrowing)
         return {
+          // Case: Current user is borrowing the book
           title: BookBorrowButtonDisplay.RETURN,
           disabled: false,
           action: () => {
             handleBookReturnClicked(bookID);
           },
         };
-      } else {
+      else {
+        // Case: Book is borrowed by someone else
         return {
-          // Case: Book is already borrowed by someone else
           title: BookBorrowButtonDisplay.UNAVAILABLE,
           disabled: true,
           action: () => {},
@@ -93,24 +99,34 @@ const BookBorrowButton = ({
 
     switch (requestStatus) {
       case BookRequestNotificationStatus.PENDING:
-        // Case: Current user has already requested the book
+        // Case: User has a pending request for this book
         return {
           title: BookBorrowButtonDisplay.REQUESTED,
           disabled: true,
           action: () => {},
         };
       case BookRequestNotificationStatus.ACCEPTED:
-        // Case: Current user is borrowing the book
-        // (it should not reach here, but just in case)
-        return {
-          title: BookBorrowButtonDisplay.RETURN,
-          disabled: false,
-          action: () => {
-            handleBookReturnClicked(bookID);
-          },
-        };
+        if (isBookReturned && isCurrentUserBorrowing)
+          // Case: Book has been returned, user can request again
+          return {
+            title: BookBorrowButtonDisplay.REQUEST_AGAIN,
+            disabled: false,
+            action: () => {
+              handleBookRequestClicked(bookID, bookTitle);
+            },
+          };
+        else {
+          // Case: User is currently borrowing the accepted book
+          return {
+            title: BookBorrowButtonDisplay.RETURN,
+            disabled: false,
+            action: () => {
+              handleBookReturnClicked(bookID);
+            },
+          };
+        }
       case BookRequestNotificationStatus.DENIED:
-        // Case: Current user's request was denied
+        // Case: User's request was denied, but they can request again
         return {
           title: BookBorrowButtonDisplay.REQUEST_AGAIN,
           disabled: false,
@@ -119,8 +135,8 @@ const BookBorrowButton = ({
           },
         };
       default:
+        // Default case: No specific request status, allow user to request
         return {
-          // Default case: Current user has not requested the book
           title: BookBorrowButtonDisplay.REQUEST,
           disabled: false,
           action: () => {
@@ -237,7 +253,11 @@ const BookBorrowButton = ({
       <BookWormButton
         title={buttonState.title}
         onPress={buttonState.action}
-        disabled={buttonState.disabled}
+        disabled={
+          buttonState.disabled ||
+          returnMutation.isPending ||
+          notifyMutation.isPending
+        }
       ></BookWormButton>
       <Toast />
     </View>

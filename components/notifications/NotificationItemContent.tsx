@@ -254,6 +254,12 @@ const NotificationItemContent = ({
             onAccept={handleAcceptBookRequestClicked}
             onDeny={handleDenyBookRequestClicked}
             requestStatus={notification.bookRequestStatus}
+            mutationPending={
+              notifyMutation.isPending ||
+              updateNotificationStatus.isPending ||
+              lendBookToUser.isPending ||
+              denyOtherRequests.isPending
+            }
           ></BookRequestNotificationActions>
         </View>
       )}

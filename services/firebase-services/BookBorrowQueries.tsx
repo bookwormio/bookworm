@@ -1,8 +1,10 @@
 import {
+  and,
   collection,
   doc,
   getDoc,
   getDocs,
+  or,
   query,
   serverTimestamp,
   setDoc,
@@ -238,9 +240,15 @@ export async function getLendingStatusesForBooks(
     // TODO batch this
     const q = query(
       bookRef,
-      where("lending_user", "==", userID),
-      where("borrow_status", "==", ServerBookBorrowStatus.BORROWING),
-      where("book_id", "in", bookIDs),
+      and(
+        where("lending_user", "==", userID),
+        // Don't get books that are in NONE status
+        or(
+          where("borrow_status", "==", ServerBookBorrowStatus.BORROWING),
+          where("borrow_status", "==", ServerBookBorrowStatus.RETURNED),
+        ),
+        where("book_id", "in", bookIDs),
+      ),
     );
     const bookSnapshot = await getDocs(q);
     return bookSnapshot.docs.map(convertBorrowDocToModel);
