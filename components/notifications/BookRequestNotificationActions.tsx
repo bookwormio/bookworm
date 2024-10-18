@@ -81,6 +81,7 @@ const BookRequestNotificationActions = ({
           onPress={button.onPress}
           disabled={button.disabled}
           isNegativeOption={button.isNegativeOption}
+          textStyle={{ fontSize: 14 }}
         />
       ))}
     </View>

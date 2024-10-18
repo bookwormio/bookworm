@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   buttonTextNegative: {
-    color: "black",
+    color: "#333333", // Off-black color
   },
   buttonDisabled: {
     backgroundColor: "rgba(251, 109, 11, 0.5)", // 50% opacity of original color

@@ -107,14 +107,16 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
             )}
             {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
               userID !== user?.uid && (
-                <BookBorrowButton
-                  bookID={item.id}
-                  bookTitle={item.volumeInfo?.title ?? ""}
-                  bookOwnerID={userID}
-                  borrowInfo={lendingStatuses?.[item.id]?.borrowInfo}
-                  requestStatus={lendingStatuses?.[item.id]?.requestStatus}
-                  isLoading={isLoadingLendingStatus}
-                />
+                <View style={styles.buttonContainer}>
+                  <BookBorrowButton
+                    bookID={item.id}
+                    bookTitle={item.volumeInfo?.title ?? ""}
+                    bookOwnerID={userID}
+                    borrowInfo={lendingStatuses?.[item.id]?.borrowInfo}
+                    requestStatus={lendingStatuses?.[item.id]?.requestStatus}
+                    isLoading={isLoadingLendingStatus}
+                  />
+                </View>
               )}
           </View>
         )}
@@ -135,6 +137,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
+    flexGrow: 0,
   },
   listContainer: {
     padding: 20,
@@ -164,5 +167,12 @@ const styles = StyleSheet.create({
     // Styling for the empty shelf text
     color: "#666",
     fontStyle: "italic",
+  },
+  buttonContainer: {
+    width: 120,
+    marginRight: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 50,
   },
 });

@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import { Alert, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { useUserDataQuery } from "../../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import {
@@ -32,6 +32,7 @@ interface ButtonState {
   title: BookBorrowButtonDisplay;
   disabled: boolean;
   action: () => void;
+  isNegativeOption?: boolean;
 }
 
 const BookBorrowButton = ({
@@ -86,6 +87,7 @@ const BookBorrowButton = ({
           action: () => {
             handleBookReturnClicked(bookID);
           },
+          isNegativeOption: true,
         };
       else {
         // Case: Book is borrowed by someone else
@@ -123,6 +125,7 @@ const BookBorrowButton = ({
             action: () => {
               handleBookReturnClicked(bookID);
             },
+            isNegativeOption: true,
           };
         }
       case BookRequestNotificationStatus.DENIED:
@@ -249,7 +252,7 @@ const BookBorrowButton = ({
   const buttonState = getButtonState();
 
   return (
-    <View>
+    <View style={styles.container}>
       <BookWormButton
         title={buttonState.title}
         onPress={buttonState.action}
@@ -258,10 +261,27 @@ const BookBorrowButton = ({
           returnMutation.isPending ||
           notifyMutation.isPending
         }
+        isNegativeOption={buttonState.isNegativeOption}
+        style={styles.button}
+        textStyle={{
+          fontSize: 12,
+        }}
       ></BookWormButton>
       <Toast />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  button: {
+    minWidth: 120, // Adjust this value to match the width of your "Remove" button
+    minHeight: 35,
+  },
+});
 
 export default BookBorrowButton;

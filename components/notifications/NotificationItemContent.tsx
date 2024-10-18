@@ -288,5 +288,8 @@ const styles = StyleSheet.create({
   bookRequestButtonContainer: {
     paddingLeft: 10,
     paddingTop: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 60,
   },
 });
