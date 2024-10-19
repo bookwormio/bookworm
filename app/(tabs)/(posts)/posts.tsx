@@ -164,17 +164,13 @@ const Posts = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     queryClient
       .invalidateQueries({ queryKey: ["bookshelves", user?.uid] })
-      .then(() => {
-        console.log("Queries invalidated successfully");
-      })
+      .then(() => {})
       .catch((error) => {
         console.error("Error invalidating queries:", error);
       });
     queryClient
       .invalidateQueries({ queryKey: ["pagesData", user?.uid] })
-      .then(() => {
-        console.log("Queries invalidated successfully");
-      })
+      .then(() => {})
       .catch((error) => {
         console.error("Error invalidating queries:", error);
       });
@@ -256,12 +252,6 @@ const Posts = () => {
               <WormLoader />
             </View>
           )}
-          {!(user == null) && (
-            <DataSnapShot
-              userID={user?.uid ?? ""}
-              isLoadingOther={isLoadingFeedPosts}
-            />
-          )}
           <Animated.FlatList
             style={styles.scrollContainer}
             data={posts}
@@ -282,6 +272,14 @@ const Posts = () => {
             )}
             removeClippedSubviews={true}
             keyExtractor={(item) => item.id}
+            ListHeaderComponent={
+              !(user == null) ? (
+                <DataSnapShot
+                  userID={user?.uid ?? ""}
+                  isLoadingOther={isLoadingFeedPosts}
+                />
+              ) : null
+            }
             ListFooterComponent={
               isFetchingNextPage ? (
                 <View style={styles.loadingMore}>

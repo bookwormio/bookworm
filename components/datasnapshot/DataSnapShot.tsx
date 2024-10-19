@@ -40,7 +40,7 @@ const DataSnapShot = ({ userID, isLoadingOther }: DataSnapProps) => {
   }
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       {!(pagesIsLoading || bookshelvesLoading || isLoadingOther) && (
         <View style={styles.container}>
           <View style={styles.statsWrap}>
@@ -87,19 +87,22 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignContent: "center",
     justifyContent: "center",
-    // width: 145,
-    // height: 80,
-    padding: 10,
+    width: "33%",
+    padding: 5,
   },
   statTitle: {
-    fontSize: 13,
     alignSelf: "center",
     paddingBottom: 5,
+    flexWrap: "wrap",
+    textAlign: "center",
+    fontSize: 13,
   },
   stat: {
-    fontSize: 18,
     fontWeight: "bold",
     alignSelf: "center",
+    flexWrap: "wrap",
+    textAlign: "center",
+    fontSize: 16,
   },
 });
 
