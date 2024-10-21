@@ -121,7 +121,7 @@ const Profile = () => {
       ) : profileTab === TabNames.POSTS ? (
         <ProfilePosts userID={user?.uid ?? ""} />
       ) : profileTab === TabNames.DATA ? (
-        <ViewData userID={user?.uid ?? ""}></ViewData>
+        <ViewData userID={user?.uid ?? ""} />
       ) : (
         <Text>Tab DNE</Text>
       )}

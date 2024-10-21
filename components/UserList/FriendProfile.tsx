@@ -23,6 +23,7 @@ import {
   useGetNumberOfFollowingByUserID,
 } from "../followdetails/useFollowDetailQueries";
 import ProfileBookShelves from "../profile/BookShelf/ProfileBookShelves";
+import ViewData from "../profile/Data/ViewData";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import ProfilePosts from "../profile/ProfilePosts";
 import ProfileTabSelector from "../profile/ProfileTabSelector";
@@ -344,7 +345,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       ) : profileTab === TabNames.POSTS ? (
         <ProfilePosts userID={friendUserID} />
       ) : profileTab === TabNames.DATA ? (
-        <Text>PUT DATA HERE</Text>
+        <ViewData userID={friendUserID} />
       ) : (
         <Text>Tab DNE</Text>
       )}
