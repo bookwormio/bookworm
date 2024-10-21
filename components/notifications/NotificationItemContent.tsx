@@ -68,7 +68,6 @@ const NotificationItemContent = ({
       bookRequestStatus: requestStatus,
     };
     notifyMutation.mutate({
-      friendUserID: notification.sender,
       notification: bookResponseNotification,
     });
   };

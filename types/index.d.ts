@@ -281,3 +281,15 @@ interface BookStatusModel {
   borrowInfo?: BookBorrowModel;
   requestStatus?: BookRequestNotificationStatus;
 }
+
+interface UpdateBorrowNotificationParams {
+  notifID: string;
+  newStatus: BookRequestNotificationStatus;
+  userID: string;
+}
+
+interface DenyOtherBorrowRequestsParams {
+  lenderUserID: string;
+  acceptedBorrowerUserID: string;
+  bookID: string;
+}

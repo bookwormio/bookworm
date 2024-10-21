@@ -195,7 +195,6 @@ const BookBorrowButton = ({
       bookRequestStatus: BookRequestNotificationStatus.PENDING,
     };
     notifyMutation.mutate({
-      friendUserID: bookOwnerID,
       notification: bookRequestNotification,
     });
 

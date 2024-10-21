@@ -1,12 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type BookRequestNotificationStatus } from "../../../enums/Enums";
 import {
   createNotification,
   denyOtherBorrowRequests,
   getAllFullNotifications,
   updateBorrowNotificationStatus,
 } from "../../../services/firebase-services/NotificationQueries";
-import { type NotificationModel } from "../../../types";
+import {
+  type DenyOtherBorrowRequestsParams,
+  type NotificationModel,
+  type UpdateBorrowNotificationParams,
+} from "../../../types";
 
 /**
  * Custom hook to fetch the notifications for a given user.
@@ -42,17 +45,15 @@ export const useCreateNotification = () => {
 
   return useMutation({
     mutationFn: async ({
-      friendUserID,
       notification,
     }: {
-      friendUserID: string;
       notification: NotificationModel;
     }) => {
       return await createNotification(notification);
     },
-    onSuccess: async (data, { friendUserID }) => {
+    onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["notifications", friendUserID],
+        queryKey: ["notifications"],
       });
     },
   });
@@ -71,11 +72,7 @@ export const useUpdateBorrowNotificationStatus = () => {
       notifID,
       newStatus,
       userID,
-    }: {
-      notifID: string;
-      newStatus: BookRequestNotificationStatus;
-      userID: string;
-    }) => {
+    }: UpdateBorrowNotificationParams) => {
       return await updateBorrowNotificationStatus(notifID, newStatus);
     },
     onSuccess: async (data, { userID }) => {
@@ -99,11 +96,7 @@ export const useDenyOtherBorrowRequests = () => {
       lenderUserID,
       acceptedBorrowerUserID,
       bookID,
-    }: {
-      lenderUserID: string;
-      acceptedBorrowerUserID: string;
-      bookID: string;
-    }) => {
+    }: DenyOtherBorrowRequestsParams) => {
       await denyOtherBorrowRequests(
         lenderUserID,
         acceptedBorrowerUserID,
