@@ -59,15 +59,12 @@ export const formatNotification = (
   let message: string;
 
   if (notifType === ServerNotificationType.BOOK_REQUEST_RESPONSE) {
-    title =
-      notifStatus === BookRequestNotificationStatus.ACCEPTED
-        ? "Book Request Accepted"
-        : "Book Request Denied";
+    const isAccepted = notifStatus === BookRequestNotificationStatus.ACCEPTED;
 
-    message =
-      notifStatus === BookRequestNotificationStatus.ACCEPTED
-        ? "accepted your request to borrow"
-        : "denied your request to borrow";
+    title = isAccepted ? "Book Request Accepted" : "Book Request Denied";
+    message = isAccepted
+      ? "accepted your request to borrow"
+      : "denied your request to borrow";
   } else {
     title = NotificationTitleMap[notifType];
     message = NotificationMessageMap[notifType];

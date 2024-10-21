@@ -109,7 +109,7 @@ export async function createNotification(
  * @returns {Promise<boolean>} A promise that resolves to true if the notification was successfully updated.
  * @throws {Error} If there's an error updating the notification status.
  */
-export async function updateNotificationStatus(
+export async function updateBorrowNotificationStatus(
   notifID: string,
   newStatus: BookRequestNotificationStatus,
 ): Promise<boolean> {
@@ -238,7 +238,7 @@ export async function getBookRequestStatusForBooks(
  * @returns {Promise<void>}
  * @throws {Error} If there's an error updating the notifications.
  */
-export const denyOtherRequests = async (
+export const denyOtherBorrowRequests = async (
   lenderUserID: string,
   acceptedBorrowerUserID: string,
   bookID: string,

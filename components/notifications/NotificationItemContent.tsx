@@ -17,8 +17,8 @@ import { useLendBookToUser } from "../profile/hooks/useBookBorrowQueries";
 import BookRequestNotificationActions from "./BookRequestNotificationActions";
 import {
   useCreateNotification,
-  useDenyOtherRequests,
-  useUpdateNotificationStatus,
+  useDenyOtherBorrowRequests,
+  useUpdateBorrowNotificationStatus,
 } from "./hooks/useNotificationQueries";
 import { formatNotification } from "./util/notificationUtils";
 
@@ -32,9 +32,9 @@ const NotificationItemContent = ({
   time,
 }: NotificationItemContentProps) => {
   const notifyMutation = useCreateNotification();
-  const updateNotificationStatus = useUpdateNotificationStatus();
+  const updateBorrowNotificationStatus = useUpdateBorrowNotificationStatus();
   const lendBookToUser = useLendBookToUser();
-  const denyOtherRequests = useDenyOtherRequests();
+  const denyOtherBorrowRequests = useDenyOtherBorrowRequests();
 
   const { user } = useAuth();
   const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
@@ -90,7 +90,7 @@ const NotificationItemContent = ({
     acceptedBorrowerUserID: string,
     bookID: string,
   ) => {
-    denyOtherRequests.mutate({
+    denyOtherBorrowRequests.mutate({
       lenderUserID,
       acceptedBorrowerUserID,
       bookID,
@@ -102,7 +102,7 @@ const NotificationItemContent = ({
     newStatus: BookRequestNotificationStatus,
     userID: string,
   ) => {
-    updateNotificationStatus.mutate({
+    updateBorrowNotificationStatus.mutate({
       notifID,
       newStatus,
       userID,
@@ -256,9 +256,9 @@ const NotificationItemContent = ({
             requestStatus={notification.bookRequestStatus}
             mutationPending={
               notifyMutation.isPending ||
-              updateNotificationStatus.isPending ||
+              updateBorrowNotificationStatus.isPending ||
               lendBookToUser.isPending ||
-              denyOtherRequests.isPending
+              denyOtherBorrowRequests.isPending
             }
           ></BookRequestNotificationActions>
         </View>

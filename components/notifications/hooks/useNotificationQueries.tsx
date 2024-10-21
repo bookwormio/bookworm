@@ -2,9 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type BookRequestNotificationStatus } from "../../../enums/Enums";
 import {
   createNotification,
-  denyOtherRequests,
+  denyOtherBorrowRequests,
   getAllFullNotifications,
-  updateNotificationStatus,
+  updateBorrowNotificationStatus,
 } from "../../../services/firebase-services/NotificationQueries";
 import { type NotificationModel } from "../../../types";
 
@@ -22,8 +22,7 @@ export const useGetAllFullNotifications = (userID: string) => {
         if (userID == null || userID === "") {
           throw new Error("User ID is required");
         }
-        const userNotifs = await getAllFullNotifications(userID);
-        return userNotifs;
+        return await getAllFullNotifications(userID);
       } catch (error) {
         throw new Error(
           `Error fetching user notifications: ${(error as Error).message}`,
@@ -64,7 +63,7 @@ export const useCreateNotification = () => {
  *
  * @returns {UseMutationResult} The mutation result object.
  */
-export const useUpdateNotificationStatus = () => {
+export const useUpdateBorrowNotificationStatus = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -77,7 +76,7 @@ export const useUpdateNotificationStatus = () => {
       newStatus: BookRequestNotificationStatus;
       userID: string;
     }) => {
-      return await updateNotificationStatus(notifID, newStatus);
+      return await updateBorrowNotificationStatus(notifID, newStatus);
     },
     onSuccess: async (data, { userID }) => {
       await queryClient.invalidateQueries({
@@ -92,7 +91,7 @@ export const useUpdateNotificationStatus = () => {
  *
  * @returns {UseMutationResult} The mutation result object.
  */
-export const useDenyOtherRequests = () => {
+export const useDenyOtherBorrowRequests = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -105,8 +104,12 @@ export const useDenyOtherRequests = () => {
       acceptedBorrowerUserID: string;
       bookID: string;
     }) => {
-      await denyOtherRequests(lenderUserID, acceptedBorrowerUserID, bookID);
-      // TODO: this also needs to send notifications to the other users
+      await denyOtherBorrowRequests(
+        lenderUserID,
+        acceptedBorrowerUserID,
+        bookID,
+      );
+      // TODO: this also needs to send denial notifications to the other users
     },
 
     onSuccess: async (data, { lenderUserID }) => {

@@ -31,15 +31,20 @@ const NotificationItem = ({ notif }: NotifProp) => {
           router.push({
             pathname: `/${notif.postID}`,
           });
+        } else if (notif.type === ServerNotificationType.FRIEND_REQUEST) {
+          const userRoute = generateUserRoute(
+            user?.uid,
+            notif.sender,
+            undefined,
+          );
+          if (userRoute != null) {
+            router.push(userRoute);
+          }
         } else if (
-          notif.type === ServerNotificationType.FRIEND_REQUEST ||
+          notif.type === ServerNotificationType.RECOMMENDATION ||
           notif.type === ServerNotificationType.BOOK_REQUEST ||
           notif.type === ServerNotificationType.BOOK_REQUEST_RESPONSE
         ) {
-          router.push({
-            pathname: `/postsbook/${notif.bookID}`,
-          });
-        } else if (notif.type === ServerNotificationType.RECOMMENDATION) {
           navigateToBook();
         }
       }}
