@@ -55,12 +55,16 @@ export enum TabNames {
   BOOKSHELVES = "shelf",
   POSTS = "post",
   DATA = "data",
+  FOLLOWERS = "followers",
+  FOLLOWING = "following",
 }
 
 export const TabsTitleMap: StringMap = {
   [TabNames.BOOKSHELVES]: "Shelves",
   [TabNames.POSTS]: "Posts",
   [TabNames.DATA]: "Data",
+  [TabNames.FOLLOWERS]: "Followers",
+  [TabNames.FOLLOWING]: "Following",
 };
 
 export enum ServerBookBorrowStatus {

@@ -32,6 +32,14 @@ const ProfileLayout = () => {
           headerLeft: () => <BackButton />,
         }}
       />
+      <Stack.Screen
+        name="follow/[userID]"
+        options={{
+          headerShown: true,
+          headerTitle: "Follow/Following",
+          headerLeft: () => <BackButton />,
+        }}
+      />
     </Stack>
   );
 };

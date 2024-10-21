@@ -417,6 +417,55 @@ export async function getNumberOfFollowersByUserID(
 }
 
 /**
+ * Method to retrieve the followers' detailed data for a user.
+ * @param userID - The uid of the current user.
+ * @returns {Promise<UserSearchDisplayModel[]>} - An array of followers' detailed data.
+ */
+export async function getFollowersByUserID(
+  userID: string,
+): Promise<UserSearchDisplayModel[]> {
+  // Query to find all users who are following the specified userID
+  const followersQuery = query(
+    collection(DB, "relationships"),
+    where("following", "==", userID),
+    where("follow_status", "==", "following"),
+  );
+
+  // Execute the query and get the snapshot
+  const followersSnapshot = await getDocs(followersQuery);
+
+  // Extract follower IDs from the relationships
+  const followerIDs = followersSnapshot.docs.map((doc) =>
+    String(doc.data().follower),
+  );
+
+  // Fetch detailed information for each follower
+  const followersData = await Promise.all(
+    followerIDs.map(async (followerID) => {
+      const followerDocRef = doc(DB, "user_collection", followerID); // Adjust "user_collection" as necessary
+      const followerDoc = await getDoc(followerDocRef);
+
+      // Check if the document exists and map it to UserSearchDisplayModel
+      if (followerDoc.exists()) {
+        const data = followerDoc.data();
+        return {
+          id: followerDoc.id, // Use the document ID as the id
+          firstName: data.first ?? "", // Provide a default value if not available
+          lastName: data.last ?? "", // Provide a default value if not available
+          profilePicURL: data.profilepic ?? "", // Provide a default value if not available
+        } satisfies UserSearchDisplayModel;
+      }
+      return null; // Return null if the document doesn't exist
+    }),
+  );
+
+  // Filter out nulls in case some followers do not exist in user_collection
+  return followersData.filter(
+    (data) => data !== null,
+  ) as UserSearchDisplayModel[];
+}
+
+/**
  * Method to retrieve the number of users the provided user is following.
  * @param userID - The uid of the current user.
  * @returns {Promise<number>} - The number of folowees a user has.

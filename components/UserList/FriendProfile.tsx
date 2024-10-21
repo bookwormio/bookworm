@@ -276,14 +276,27 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         <Text style={styles.bioPad}>{bio}</Text>
       </View>
       <View style={styles.imageTextContainer}>
-        <View>
+        <TouchableOpacity
+          onPress={() => {
+            router.push({
+              pathname: `/follow/${friendUserID}?followersfirst=true`,
+            });
+          }}
+        >
           <Text>Followers</Text>
           <Text>{followersData ?? "-"}</Text>
-        </View>
-        <View style={styles.locText}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.locText}
+          onPress={() => {
+            router.push({
+              pathname: `/follow/${friendUserID}?followersfirst=false`,
+            });
+          }}
+        >
           <Text>Following</Text>
           <Text>{followingData ?? "-"}</Text>
-        </View>
+        </TouchableOpacity>
         <View style={styles.buttoncontainer}>
           <TouchableOpacity
             style={styles.button}
@@ -314,7 +327,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         profileTab={profileTab}
         setProfileTab={setProfileTab}
         tabs={[TabNames.BOOKSHELVES, TabNames.POSTS, TabNames.DATA]}
-      ></ProfileTabSelector>
+      />
       {profileTab === TabNames.BOOKSHELVES ? (
         <ProfileBookShelves userID={friendUserID} />
       ) : profileTab === TabNames.POSTS ? (

@@ -41,6 +41,7 @@ export const PROFILE_ROUTE_PREFIX = "(profile)";
 export const PROFILE_BOOK_PREFIX = "profilebook";
 export const POSTS_BOOK_PREFIX = "postsbook";
 export const SEARCH_BOOK_PREFIX = "searchbook";
+export const PROFILE_FOLLOW_PREFIX = "follow";
 
 export const NEW_POST_BOOK_FOLDER = "createbook";
 export const NEW_POST_BOOK_SEARCH = "createbooksearch";

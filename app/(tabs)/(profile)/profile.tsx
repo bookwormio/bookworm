@@ -1,7 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import BookWormButton from "../../../components/button/BookWormButton";
 import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBookShelves";
@@ -84,14 +90,28 @@ const Profile = () => {
         <Text style={styles.bioPad}>{userData.bio}</Text>
       </View>
       <View style={styles.imageTextContainer}>
-        <View style={styles.locText}>
+        <TouchableOpacity
+          style={styles.locText}
+          onPress={() => {
+            router.push({
+              pathname: `/follow/${user?.uid}?followersfirst=true`,
+            });
+          }}
+        >
           <Text>Followers</Text>
           <Text>{followersCount ?? "-"}</Text>
-        </View>
-        <View style={styles.locText}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.locText}
+          onPress={() => {
+            router.push({
+              pathname: `/follow/${user?.uid}?followersfirst=false`,
+            });
+          }}
+        >
           <Text>Following</Text>
           <Text>{followingCount ?? "-"}</Text>
-        </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.outerButtonsContainer}>
         <BookWormButton
@@ -112,7 +132,7 @@ const Profile = () => {
         profileTab={profileTab}
         setProfileTab={setProfileTab}
         tabs={[TabNames.BOOKSHELVES, TabNames.POSTS, TabNames.DATA]}
-      ></ProfileTabSelector>
+      />
       {profileTab === TabNames.BOOKSHELVES && user !== null ? (
         <ProfileBookShelves userID={user?.uid} />
       ) : profileTab === TabNames.POSTS ? (

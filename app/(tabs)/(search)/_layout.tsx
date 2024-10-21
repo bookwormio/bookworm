@@ -32,6 +32,14 @@ const SearchLayout = () => {
           headerLeft: () => <BackButton />,
         }}
       />
+      <Stack.Screen
+        name="follow/[friendUserID]"
+        options={{
+          headerShown: true,
+          headerTitle: "Follow/Following",
+          headerLeft: () => <BackButton />,
+        }}
+      />
     </Stack>
   );
 };
