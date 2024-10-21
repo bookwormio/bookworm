@@ -70,30 +70,30 @@ const Profile = () => {
         </View>
       </View>
       <View>
-        <Text style={styles.bioPad}>{userData.bio}</Text>
+        <Text style={styles.bioWrap}>{userData.bio}</Text>
       </View>
       <View style={styles.imageTextContainer}>
         <TouchableOpacity
-          style={styles.locText}
+          style={styles.textWrap}
           onPress={() => {
             router.push({
               pathname: `profilefollow/${user?.uid}?followersfirst=true`,
             });
           }}
         >
-          <Text>Followers</Text>
-          <Text>{followersCount ?? "-"}</Text>
+          <Text style={styles.followTitle}>Followers</Text>
+          <Text style={styles.followAmount}>{followersCount ?? "-"}</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.locText}
+          style={styles.textWrap}
           onPress={() => {
             router.push({
               pathname: `profilefollow/${user?.uid}?followersfirst=false`,
             });
           }}
         >
-          <Text>Following</Text>
-          <Text>{followingCount ?? "-"}</Text>
+          <Text style={styles.followTitle}>Following</Text>
+          <Text style={styles.followAmount}>{followingCount ?? "-"}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.outerButtonsContainer}>
@@ -177,9 +177,11 @@ const styles = StyleSheet.create({
     marginLeft: 20, // Adjust as needed
     marginTop: 20,
   },
-  bioPad: {
-    paddingLeft: 40,
-    paddingRight: 40,
+  bioWrap: {
+    paddingLeft: 30,
+    paddingRight: 30,
+    fontSize: 16,
+    paddingBottom: 5,
   },
   nameText: {
     paddingLeft: 20,
@@ -188,6 +190,9 @@ const styles = StyleSheet.create({
   },
   locText: {
     paddingLeft: 20,
+  },
+  textWrap: {
+    paddingLeft: 11,
     paddingBottom: 20,
   },
   defaultImageContainer: {
@@ -198,4 +203,6 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginLeft: 5,
   },
+  followTitle: { fontSize: 16 },
+  followAmount: { fontSize: 18, fontWeight: "bold" },
 });

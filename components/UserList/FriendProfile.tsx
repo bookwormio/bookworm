@@ -42,6 +42,8 @@ interface FriendProfileProps {
 const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
   const [bio, setBio] = useState("");
   const { user } = useAuth();
   const [profileTab, setProfileTab] = useState("shelf");
@@ -160,6 +162,12 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       if (setFriendData.bio !== undefined) {
         setBio(setFriendData.bio);
       }
+      if (setFriendData.city !== undefined) {
+        setCity(setFriendData.city);
+      }
+      if (setFriendData.state !== undefined) {
+        setState(setFriendData.state);
+      }
     }
   }, [friendData]);
 
@@ -235,7 +243,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     }
   };
 
-  if (friendIsLoading || isLoadingUserData) {
+  if (friendIsLoading || isLoadingUserData || friendData == null) {
     return (
       <View style={styles.loading}>
         <WormLoader />
@@ -261,11 +269,15 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           <Text style={styles.nameText}>
             {firstName} {lastName}
           </Text>
-          <Text style={styles.locText}>Salt Lake City, UT</Text>
+          <Text style={styles.locText}>
+            {city === "" ? "" : city}
+            {city !== "" && state !== "" ? ", " : ""}
+            {state === "" ? "" : state}
+          </Text>
         </View>
       </View>
       <View>
-        <Text style={styles.bioPad}>{bio}</Text>
+        <Text style={styles.bioWrap}>{bio}</Text>
       </View>
       <View style={styles.imageTextContainer}>
         <TouchableOpacity
@@ -309,6 +321,14 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           <Text>Following</Text>
           <Text>{numFollowingData ?? "-"}</Text>
         </TouchableOpacity>
+        <View style={styles.textWrap}>
+          <Text style={styles.followTitle}>Followers</Text>
+          <Text style={styles.followAmount}>{numFollowersData ?? "-"}</Text>
+        </View>
+        <View style={styles.textWrap}>
+          <Text style={styles.followTitle}>Following</Text>
+          <Text style={styles.followAmount}>{numFollowingData ?? "-"}</Text>
+        </View>
         <View style={styles.buttoncontainer}>
           <TouchableOpacity
             style={styles.button}
@@ -361,17 +381,10 @@ const styles = StyleSheet.create({
     marginLeft: 20, // Adjust as needed
     paddingBottom: 10,
   },
-  bioPad: {
-    paddingLeft: 20,
-    paddingBottom: 10,
-  },
   nameText: {
     paddingLeft: 20,
     fontSize: 30,
     marginTop: -25,
-  },
-  locText: {
-    paddingLeft: 20,
   },
   input: {
     borderColor: "gray",
@@ -427,5 +440,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignSelf: "flex-start",
     marginLeft: 5,
+  },
+  followTitle: { fontSize: 16 },
+  followAmount: { fontSize: 18, fontWeight: "bold" },
+  locText: {
+    paddingLeft: 20,
+  },
+  textWrap: {
+    paddingLeft: 11,
+    paddingBottom: 20,
+  },
+  bioWrap: {
+    paddingLeft: 30,
+    paddingRight: 30,
+    fontSize: 16,
+    paddingBottom: 5,
   },
 });
