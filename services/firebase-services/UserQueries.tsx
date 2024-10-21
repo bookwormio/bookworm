@@ -424,43 +424,92 @@ export async function getNumberOfFollowersByUserID(
 export async function getFollowersByUserID(
   userID: string,
 ): Promise<UserSearchDisplayModel[]> {
-  // Query to find all users who are following the specified userID
   const followersQuery = query(
     collection(DB, "relationships"),
     where("following", "==", userID),
     where("follow_status", "==", "following"),
   );
 
-  // Execute the query and get the snapshot
   const followersSnapshot = await getDocs(followersQuery);
 
-  // Extract follower IDs from the relationships
-  const followerIDs = followersSnapshot.docs.map((doc) =>
-    String(doc.data().follower),
+  const followerIDs = Array.from(
+    new Set(followersSnapshot.docs.map((doc) => String(doc.data().follower))),
   );
 
-  // Fetch detailed information for each follower
   const followersData = await Promise.all(
     followerIDs.map(async (followerID) => {
-      const followerDocRef = doc(DB, "user_collection", followerID); // Adjust "user_collection" as necessary
+      const followerDocRef = doc(DB, "user_collection", followerID);
       const followerDoc = await getDoc(followerDocRef);
 
-      // Check if the document exists and map it to UserSearchDisplayModel
       if (followerDoc.exists()) {
         const data = followerDoc.data();
+
+        const profilePicURL = await getUserProfileURL(followerDoc.id);
+        let profilePic = "";
+        if (profilePicURL != null) {
+          profilePic = profilePicURL;
+        }
         return {
-          id: followerDoc.id, // Use the document ID as the id
-          firstName: data.first ?? "", // Provide a default value if not available
-          lastName: data.last ?? "", // Provide a default value if not available
-          profilePicURL: data.profilepic ?? "", // Provide a default value if not available
+          id: followerDoc.id,
+          firstName: data.first ?? "",
+          lastName: data.last ?? "",
+          profilePicURL: profilePic ?? "",
         } satisfies UserSearchDisplayModel;
       }
-      return null; // Return null if the document doesn't exist
+      return null;
     }),
   );
 
-  // Filter out nulls in case some followers do not exist in user_collection
   return followersData.filter(
+    (data) => data !== null,
+  ) as UserSearchDisplayModel[];
+}
+
+/**
+ * Method to retrieve the following' detailed data for a user.
+ * @param userID - The uid of the current user.
+ * @returns {Promise<UserSearchDisplayModel[]>} - An array of followers' detailed data.
+ */
+export async function getFollowingByID(
+  userID: string,
+): Promise<UserSearchDisplayModel[]> {
+  const followingQuery = query(
+    collection(DB, "relationships"),
+    where("follower", "==", userID),
+    where("follow_status", "==", "following"),
+  );
+
+  const followingSnapshot = await getDocs(followingQuery);
+
+  const followingIDs = Array.from(
+    new Set(followingSnapshot.docs.map((doc) => String(doc.data().following))),
+  );
+
+  const followingData = await Promise.all(
+    followingIDs.map(async (followingID) => {
+      const followingDocRef = doc(DB, "user_collection", followingID);
+      const followingDoc = await getDoc(followingDocRef);
+
+      if (followingDoc.exists()) {
+        const data = followingDoc.data();
+
+        const profilePicURL = await getUserProfileURL(followingDoc.id);
+        let profilePic = "";
+        if (profilePicURL != null) {
+          profilePic = profilePicURL;
+        }
+        return {
+          id: followingDoc.id,
+          firstName: data.first ?? "",
+          lastName: data.last ?? "",
+          profilePicURL: profilePic ?? "",
+        } satisfies UserSearchDisplayModel;
+      }
+      return null;
+    }),
+  );
+
+  return followingData.filter(
     (data) => data !== null,
   ) as UserSearchDisplayModel[];
 }
