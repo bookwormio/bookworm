@@ -1,8 +1,10 @@
 import {
+  and,
   collection,
   doc,
   getDoc,
   getDocs,
+  or,
   query,
   serverTimestamp,
   setDoc,
@@ -14,60 +16,61 @@ import {
   ServerBookBorrowStatus,
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
-import { type BookBorrowModel } from "../../types";
+import { type BookBorrowModel, type BookStatusModel } from "../../types";
 import {
   convertBorrowDocToModel,
   makeBorrowDocID,
   validateBorrowParams,
 } from "../util/bookBorrowUtils";
+import { getBookRequestStatusForBooks } from "./NotificationQueries";
 
 /**
- * Borrows a book from another user.
+ * Lends a book to another user.
  *
- * @param {string} currentUserID - The ID of the user borrowing the book.
- * @param {string} friendUserID - The ID of the user lending the book.
- * @param {string} bookID - The ID of the book being borrowed.
- * @returns {Promise<boolean>} A promise that resolves to true if the book was successfully borrowed.
- * @throws {Error} If there's an error during the borrowing process.
+ * @param {string} lenderUserID - The ID of the user lending the book.
+ * @param {string} borrowerUserID - The ID of the user borrowing the book.
+ * @param {string} bookID - The ID of the book being lent.
+ * @returns {Promise<boolean>} A promise that resolves to true if the book was successfully lent.
+ * @throws {Error} If there's an error during the lending process.
  */
-export async function borrowBookFromUser(
-  currentUserID: string,
-  friendUserID: string,
+export async function lendBookToUser(
+  lenderUserID: string,
+  borrowerUserID: string,
   bookID: string,
 ): Promise<boolean> {
   try {
-    validateBorrowParams(currentUserID, friendUserID, bookID);
+    validateBorrowParams(lenderUserID, borrowerUserID, bookID);
     return await updateBorrowStatus(
-      currentUserID,
-      friendUserID,
+      borrowerUserID,
+      lenderUserID,
       bookID,
       ServerBookBorrowStatus.BORROWING,
     );
   } catch (error) {
-    throw new Error(`Error borrowing book: ${(error as Error).message}`);
+    throw new Error(`Error lending book: ${(error as Error).message}`);
   }
 }
 
 /**
  * Returns a book to its owner.
  *
- * @param {string} currentUserID - The ID of the user returning the book.
- * @param {string} friendUserID - The ID of the user who lent the book.
+ * @param {string} borrowerUserID - The ID of the user returning the book.
+ * @param {string} lenderUserID - The ID of the user who lent the book.
  * @param {string} bookID - The ID of the book being returned.
  * @returns {Promise<boolean>} A promise that resolves to true if the book was successfully returned.
  * @throws {Error} If there's an error during the returning process.
  */
 export async function returnBookToUser(
-  currentUserID: string,
-  friendUserID: string,
+  borrowerUserID: string,
+  lenderUserID: string,
   bookID: string,
 ): Promise<boolean> {
   try {
-    validateBorrowParams(currentUserID, friendUserID, bookID);
+    validateBorrowParams(borrowerUserID, lenderUserID, bookID);
 
     return await updateBorrowStatus(
-      currentUserID,
-      friendUserID,
+      borrowerUserID,
+      lenderUserID,
       bookID,
       ServerBookBorrowStatus.RETURNED,
     );
@@ -77,25 +80,25 @@ export async function returnBookToUser(
 }
 
 /**
- * Updates the borrow status of a book.
+ * Helper function to update the borrow status of a book.
  *
- * @param {string} currentUserID - The ID of the user borrowing or returning the book.
- * @param {string} friendUserID - The ID of the other user involved in the transaction.
+ * @param {string} borrowerUserID - The ID of the user borrowing or returning the book.
+ * @param {string} lenderUserID - The ID of the other user involved in the transaction.
  * @param {string} bookID - The ID of the book being borrowed or returned.
  * @param {ServerBookBorrowStatus} newBorrowStatus - The new borrow status to be set.
  * @returns {Promise<boolean>} A promise that resolves to true if the status was successfully updated.
  * @throws {Error} If there's an error updating the book status.
  */
 async function updateBorrowStatus(
-  currentUserID: string,
-  friendUserID: string,
+  borrowerUserID: string,
+  lenderUserID: string,
   bookID: string,
   newBorrowStatus: ServerBookBorrowStatus,
 ): Promise<boolean> {
   const borrowBookDocRef = doc(
     DB,
     BORROW_BOOK_COLLECTION_REF,
-    makeBorrowDocID(currentUserID, friendUserID, bookID),
+    makeBorrowDocID(borrowerUserID, lenderUserID, bookID),
   );
 
   try {
@@ -105,8 +108,8 @@ async function updateBorrowStatus(
       await setDoc(borrowBookDocRef, {
         created_at: serverTimestamp(),
         borrow_status: newBorrowStatus,
-        borrowing_user: currentUserID,
-        lending_user: friendUserID,
+        borrowing_user: borrowerUserID,
+        lending_user: lenderUserID,
         book_id: bookID,
       });
     } else {
@@ -178,24 +181,24 @@ async function getAllBooksForUser(
 /**
  * Retrieves the lending status of a specific book between two users.
  *
- * @param {string} currentUserID - The ID of the current user.
- * @param {string} friendUserID - The ID of the other user involved in the lending.
+ * @param {string} borrowerUserID - The ID of the current user.
+ * @param {string} lenderUserID - The ID of the other user involved in the lending.
  * @param {string} bookID - The ID of the book whose lending status is being checked.
  * @returns {Promise<BookBorrowModel>} A promise that resolves to a BookBorrowModel.
  * @throws {Error} If there's an error retrieving the book lending status.
  */
 export async function getBookLendingStatus(
-  currentUserID: string,
-  friendUserID: string,
+  borrowerUserID: string,
+  lenderUserID: string,
   bookID: string,
 ): Promise<BookBorrowModel | null> {
   try {
-    validateBorrowParams(currentUserID, friendUserID, bookID);
+    validateBorrowParams(borrowerUserID, lenderUserID, bookID);
 
     const borrowBookDocRef = doc(
       DB,
       BORROW_BOOK_COLLECTION_REF,
-      makeBorrowDocID(currentUserID, friendUserID, bookID),
+      makeBorrowDocID(borrowerUserID, lenderUserID, bookID),
     );
 
     const borrowBookDocSnap = await getDoc(borrowBookDocRef);
@@ -204,14 +207,101 @@ export async function getBookLendingStatus(
     } else {
       return {
         bookID,
-        lendingUserID: friendUserID,
-        borrowingUserID: currentUserID,
+        lendingUserID: lenderUserID,
+        borrowingUserID: borrowerUserID,
         borrowStatus: ServerBookBorrowStatus.NONE,
       };
     }
   } catch (error) {
     throw new Error(
       `Error getting book lending status: ${(error as Error).message}`,
+    );
+  }
+}
+
+/**
+ * Retrieves the lending statuses for a set of books lent by a specific user.
+ *
+ * This function queries the Firestore database for books that are currently
+ * being borrowed, which were lent by the specified user and match the given book IDs.
+ *
+ * @param {string} userID - The ID of the user who is lending the books.
+ * @param {string[]} bookIDs - An array of book IDs to check for lending statuses.
+ * @returns {Promise<BookBorrowModel[]>} A promise that resolves to an array of BookBorrowModel objects,
+ *                                       representing the lending statuses of the specified books.
+ * @throws {Error} If there's an error querying the Firestore database.
+ */
+export async function getLendingStatusesForBooks(
+  userID: string,
+  bookIDs: string[],
+): Promise<BookBorrowModel[]> {
+  try {
+    const bookRef = collection(DB, BORROW_BOOK_COLLECTION_REF);
+    // TODO batch this
+    const q = query(
+      bookRef,
+      and(
+        where("lending_user", "==", userID),
+        // Don't get books that are in NONE status
+        or(
+          where("borrow_status", "==", ServerBookBorrowStatus.BORROWING),
+          where("borrow_status", "==", ServerBookBorrowStatus.RETURNED),
+        ),
+        where("book_id", "in", bookIDs),
+      ),
+    );
+    const bookSnapshot = await getDocs(q);
+    return bookSnapshot.docs.map(convertBorrowDocToModel);
+  } catch (error) {
+    throw new Error(
+      `Error getting lending statuses for books: ${(error as Error).message}`,
+    );
+  }
+}
+
+/**
+ * Fetches lending statuses and book request statuses for given book IDs in the lending library.
+ *
+ * @param {string} ownerID - The ID of the book owner.
+ * @param {string} currentUserID - The ID of the current user (used for book request statuses).
+ * @param {string[]} bookIDs - Array of book IDs to fetch statuses for.
+ * @returns {Promise<Record<string, BookStatusModel>>} - A promise that resolves to an object containing combined status info for each book ID.
+ */
+export async function getLendingLibraryBookStatuses(
+  ownerID: string,
+  currentUserID: string,
+  bookIDs: string[],
+): Promise<Record<string, BookStatusModel>> {
+  if (ownerID == null || ownerID === "") {
+    throw new Error("Owner ID is invalid");
+  }
+  if (currentUserID == null || currentUserID === "") {
+    throw new Error("Current user ID is invalid");
+  }
+
+  try {
+    if (bookIDs.length === 0) {
+      return {};
+    }
+
+    const [lendingStatuses, bookRequestStatuses] = await Promise.all([
+      getLendingStatusesForBooks(ownerID, bookIDs),
+      getBookRequestStatusForBooks(currentUserID, ownerID, bookIDs),
+    ]);
+
+    const bookStatuses: Record<string, BookStatusModel> = {};
+
+    bookIDs.forEach((bookID) => {
+      bookStatuses[bookID] = {
+        borrowInfo: lendingStatuses.find((status) => status.bookID === bookID),
+        requestStatus: bookRequestStatuses[bookID],
+      };
+    });
+
+    return bookStatuses;
+  } catch (error) {
+    throw new Error(
+      `Error getting lending library book statuses: ${(error as Error).message}`,
     );
   }
 }

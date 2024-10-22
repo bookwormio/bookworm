@@ -27,12 +27,14 @@ const BookShelfBook = ({ book, bookID }: BookShelfBookProps) => {
           />
         </View>
         {/* TODO center the text */}
-        <Text numberOfLines={1} style={styles.titleText}>
-          {book.title}
-        </Text>
-        <Text numberOfLines={1} style={styles.bookText}>
-          {book.authors?.join(", ")}
-        </Text>
+        <View style={styles.textContainer}>
+          <Text numberOfLines={1} style={styles.titleText}>
+            {book.title}
+          </Text>
+          <Text numberOfLines={1} style={styles.bookText}>
+            {book.authors?.join(", ")}
+          </Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -64,6 +66,11 @@ const styles = StyleSheet.create({
     marginRight: 20,
     marginTop: 20 / 2,
     justifyContent: "center",
+  },
+  textContainer: {
+    height: 40,
+    justifyContent: "space-between",
+    marginBottom: 10,
   },
 });
 
