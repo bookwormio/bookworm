@@ -27,16 +27,13 @@ const DataSnapShot = ({ userID, isLoadingOther }: DataSnapProps) => {
   }
 
   let booksFinished = 0;
-  if (!(bookshelves == null)) {
-    booksFinished = calculateBooksWithinMonth(bookshelves.finished);
-  }
-
   let topGenre = "";
-  if (!(bookshelves == null)) {
+  if (bookshelves != null) {
     topGenre = findTopGenre(
       bookshelves.finished,
       bookshelves.currently_reading,
     );
+    booksFinished = calculateBooksWithinMonth(bookshelves.finished);
   }
 
   return (
