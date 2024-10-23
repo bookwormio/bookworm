@@ -24,14 +24,14 @@ const FollowDetails = ({ userID, followersfirst, routePrefix }: UserProp) => {
   const { data: followers, isLoading: isLoadingFollowers } = useQuery({
     queryKey: userID != null ? ["followers", userID] : ["followers"],
     queryFn: async () => {
-      return getFollowersByUserID(userID ?? "");
+      return await getFollowersByUserID(userID ?? "");
     },
   });
 
   const { data: following, isLoading: isLoadingFollowing } = useQuery({
     queryKey: userID != null ? ["following", userID] : ["following"],
     queryFn: async () => {
-      return getFollowingByID(userID ?? "");
+      return await getFollowingByID(userID ?? "");
     },
   });
 
@@ -43,52 +43,50 @@ const FollowDetails = ({ userID, followersfirst, routePrefix }: UserProp) => {
     );
   }
 
-  // PROFILE_ROUTE_PREFIX/PROFILE_FOLLOW_PREFIX
-  if (followers !== undefined && following !== undefined)
-    return (
-      <View style={styles.container}>
-        <ProfileTabSelector
-          profileTab={profileTab}
-          setProfileTab={setProfileTab}
-          tabs={[TabNames.FOLLOWERS, TabNames.FOLLOWING]}
-        />
-        {profileTab === TabNames.FOLLOWERS ? (
-          <ScrollView
-            style={styles.scrollContainer}
-            contentContainerStyle={styles.scrollContent}
-          >
-            {followers.map((user) => (
-              <View style={styles.userContainer} key={user.id}>
-                <UserList routePrefix={routePrefix} users={[user]} />
-              </View>
-            ))}
-            {isLoadingFollowers && (
-              <View style={styles.loading}>
-                <WormLoader style={{ width: 50, height: 50 }} />
-              </View>
-            )}
-          </ScrollView>
-        ) : profileTab === TabNames.FOLLOWING ? (
-          <ScrollView
-            style={styles.scrollContainer}
-            contentContainerStyle={styles.scrollContent}
-          >
-            {following.map((user) => (
-              <View style={styles.userContainer} key={user.id}>
-                <UserList routePrefix={routePrefix} users={[user]} />
-              </View>
-            ))}
-            {isLoadingFollowing && (
-              <View style={styles.loading}>
-                <WormLoader style={{ width: 50, height: 50 }} />
-              </View>
-            )}
-          </ScrollView>
-        ) : (
-          <Text>Tab DNE</Text>
-        )}
-      </View>
-    );
+  return (
+    <View style={styles.container}>
+      <ProfileTabSelector
+        profileTab={profileTab}
+        setProfileTab={setProfileTab}
+        tabs={[TabNames.FOLLOWERS, TabNames.FOLLOWING]}
+      />
+      {profileTab === TabNames.FOLLOWERS ? (
+        <ScrollView
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {followers?.map((user) => (
+            <View style={styles.userContainer} key={user.id}>
+              <UserList routePrefix={routePrefix} users={[user]} />
+            </View>
+          ))}
+          {isLoadingFollowers && (
+            <View style={styles.loading}>
+              <WormLoader style={{ width: 50, height: 50 }} />
+            </View>
+          )}
+        </ScrollView>
+      ) : profileTab === TabNames.FOLLOWING ? (
+        <ScrollView
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {following?.map((user) => (
+            <View style={styles.userContainer} key={user.id}>
+              <UserList routePrefix={routePrefix} users={[user]} />
+            </View>
+          ))}
+          {isLoadingFollowing && (
+            <View style={styles.loading}>
+              <WormLoader style={{ width: 50, height: 50 }} />
+            </View>
+          )}
+        </ScrollView>
+      ) : (
+        <Text>Tab DNE</Text>
+      )}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({

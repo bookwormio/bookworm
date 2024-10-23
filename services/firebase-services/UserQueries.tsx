@@ -466,9 +466,9 @@ export async function getFollowersByUserID(
 }
 
 /**
- * Method to retrieve the following' detailed data for a user.
+ * Method to retrieve the following detailed data for a user.
  * @param userID - The uid of the current user.
- * @returns {Promise<UserSearchDisplayModel[]>} - An array of followers' detailed data.
+ * @returns {Promise<UserSearchDisplayModel[]>} - An array of following detailed data.
  */
 export async function getFollowingByID(
   userID: string,

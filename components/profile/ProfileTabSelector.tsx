@@ -20,6 +20,7 @@ const ProfileTabSelector = ({
   setProfileTab,
   tabs,
 }: ProfileTabSelectorProps) => {
+  // finds the initial index so we start on the correct tab
   const initialTabIndex = tabs.findIndex((tab) => tab === profileTab);
   const [underlinePosition] = useState(new Animated.Value(initialTabIndex));
   const tabWidth = 100 / tabs.length;
