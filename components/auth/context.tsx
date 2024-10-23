@@ -115,7 +115,6 @@ const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
             });
         },
         signOut: () => {
-          console.log("LOGGING OUT");
           setLoading(true);
           FIREBASE_AUTH.signOut()
             .then(() => {
