@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import FollowDetails from "../../../../components/followdetails/FollowDetails";
+import { PROFILE_ROUTE_PREFIX } from "../../../../constants/constants";
 
 const FollowWrapper = () => {
   const { userID } = useLocalSearchParams<{ userID: string }>();
@@ -11,6 +12,7 @@ const FollowWrapper = () => {
     <FollowDetails
       userID={userID ?? ""}
       followersfirst={followersfirst ?? ""}
+      routePrefix={`${PROFILE_ROUTE_PREFIX}`}
     ></FollowDetails>
   );
 };

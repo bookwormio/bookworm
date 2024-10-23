@@ -86,7 +86,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   });
 
   const { data: followersData } = useQuery({
-    queryKey: ["followersdata"],
+    queryKey: ["followersdata", friendUserID],
     queryFn: async () => {
       if (user != null) {
         const followersCount = await getNumberOfFollowersByUserID(friendUserID);
@@ -98,7 +98,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   });
 
   const { data: followingData } = useQuery({
-    queryKey: ["followingdata"],
+    queryKey: ["followingdata", friendUserID],
     queryFn: async () => {
       if (user != null) {
         const followingCount = await getNumberOfFollowingByUserID(friendUserID);

@@ -1,10 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import {
-  APP_BACKGROUND_COLOR,
-  PROFILE_ROUTE_PREFIX,
-} from "../../constants/constants";
+import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { TabNames } from "../../enums/Enums";
 import {
   getFollowersByUserID,
@@ -17,31 +14,27 @@ import WormLoader from "../wormloader/WormLoader";
 interface UserProp {
   userID: string;
   followersfirst: string;
+  routePrefix: string;
 }
 
-const FollowDetails = ({ userID, followersfirst }: UserProp) => {
+const FollowDetails = ({ userID, followersfirst, routePrefix }: UserProp) => {
   const [profileTab, setProfileTab] = useState(
     followersfirst === "true" ? "followers" : "following",
   );
   const { data: followers, isLoading: isLoadingFollowers } = useQuery({
     queryKey: userID != null ? ["followers", userID] : ["followers"],
     queryFn: async () => {
-      if (userID != null) {
-        return await getFollowersByUserID(userID);
-      }
+      return getFollowersByUserID(userID ?? "");
     },
   });
 
   const { data: following, isLoading: isLoadingFollowing } = useQuery({
     queryKey: userID != null ? ["following", userID] : ["following"],
     queryFn: async () => {
-      if (userID != null) {
-        return await getFollowingByID(userID);
-      }
+      return getFollowingByID(userID ?? "");
     },
   });
 
-  const routePrefix = `${PROFILE_ROUTE_PREFIX}`;
   if (isLoadingFollowers || followers === null || isLoadingFollowing) {
     return (
       <View style={styles.loading}>

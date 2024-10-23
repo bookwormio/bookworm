@@ -36,7 +36,7 @@ const SearchLayout = () => {
         name="follow/[friendUserID]"
         options={{
           headerShown: true,
-          headerTitle: "Follow/Following",
+          headerTitle: "Follow Details",
           headerLeft: () => <BackButton />,
         }}
       />
