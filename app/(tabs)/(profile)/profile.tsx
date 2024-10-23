@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   bioWrap: {
     paddingLeft: 30,
     paddingRight: 30,
-    fontSize: 16,
+    fontSize: 15,
     paddingBottom: 5,
   },
   nameText: {
@@ -203,6 +203,6 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginLeft: 5,
   },
-  followTitle: { fontSize: 16 },
+  followTitle: { fontSize: 15 },
   followAmount: { fontSize: 18, fontWeight: "bold" },
 });
