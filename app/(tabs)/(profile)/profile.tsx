@@ -38,7 +38,7 @@ const Profile = () => {
   });
 
   const { data: followersCount } = useQuery({
-    queryKey: user != null ? ["followersdata", user.uid] : ["followersdata"],
+    queryKey: user != null ? ["numfollowers", user.uid] : ["numfollowers"],
     queryFn: async () => {
       if (user != null) {
         const followers = await getNumberOfFollowersByUserID(user.uid);
@@ -50,7 +50,7 @@ const Profile = () => {
   });
 
   const { data: followingCount } = useQuery({
-    queryKey: user != null ? ["followingdata", user.uid] : ["followingdata"],
+    queryKey: user != null ? ["numfollowing", user.uid] : ["numfollowing"],
     queryFn: async () => {
       if (user != null) {
         const following = await getNumberOfFollowingByUserID(user.uid);

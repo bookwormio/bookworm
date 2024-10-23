@@ -85,8 +85,8 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     },
   });
 
-  const { data: followersData } = useQuery({
-    queryKey: ["followersdata", friendUserID],
+  const { data: numFollowersData } = useQuery({
+    queryKey: ["numfollowers", friendUserID],
     queryFn: async () => {
       if (user != null) {
         const followersCount = await getNumberOfFollowersByUserID(friendUserID);
@@ -97,8 +97,8 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     },
   });
 
-  const { data: followingData } = useQuery({
-    queryKey: ["followingdata", friendUserID],
+  const { data: numFollowingData } = useQuery({
+    queryKey: ["numfollowing", friendUserID],
     queryFn: async () => {
       if (user != null) {
         const followingCount = await getNumberOfFollowingByUserID(friendUserID);
@@ -118,7 +118,18 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
             ? ["followingstatus", friendUserID, user?.uid]
             : ["followingstatus"],
       });
-      await queryClient.invalidateQueries({ queryKey: ["followersdata"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["numfollowers", friendUserID],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["numfollowing", user?.uid],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["followers", friendUserID],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["following", user?.uid],
+      });
       setFollowStatusFetched(true);
     },
   });
@@ -132,7 +143,18 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
             ? ["followingstatus", friendUserID, user?.uid]
             : ["followingstatus"],
       });
-      await queryClient.invalidateQueries({ queryKey: ["followersdata"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["numfollowers", friendUserID],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["numfollowing", user?.uid],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["followers", friendUserID],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["following", user?.uid],
+      });
       setFollowStatusFetched(true);
     },
   });
@@ -284,7 +306,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           }}
         >
           <Text>Followers</Text>
-          <Text>{followersData ?? "-"}</Text>
+          <Text>{numFollowersData ?? "-"}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.locText}
@@ -295,7 +317,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           }}
         >
           <Text>Following</Text>
-          <Text>{followingData ?? "-"}</Text>
+          <Text>{numFollowingData ?? "-"}</Text>
         </TouchableOpacity>
         <View style={styles.buttoncontainer}>
           <TouchableOpacity
