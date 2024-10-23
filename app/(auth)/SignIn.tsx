@@ -46,7 +46,6 @@ const Login = () => {
         <TextInput
           onSubmitEditing={() => {
             signIn(email, password);
-            router.replace("/post");
           }}
           style={styles.input}
           value={password}
@@ -61,7 +60,6 @@ const Login = () => {
           title="Login"
           onPress={() => {
             signIn(email, password);
-            router.replace("/post");
           }}
         />
         <View style={styles.accountContainer}>

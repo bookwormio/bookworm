@@ -16,7 +16,7 @@ const AuthLayout = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <Stack>
-        <Stack.Screen name="sign-in" options={{ headerShown: false }} />
+        <Stack.Screen name="SignIn" options={{ headerShown: false }} />
         <Stack.Screen
           name="CreateAccount"
           options={{

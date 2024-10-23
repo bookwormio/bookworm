@@ -17,7 +17,7 @@ const ProfileLayout = () => {
         }}
       />
       <Stack.Screen
-        name="posts/[postID]"
+        name="profilepost/[postID]"
         options={{
           headerShown: true,
           headerTitle: "Post",

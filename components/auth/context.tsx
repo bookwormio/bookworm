@@ -47,13 +47,13 @@ function useAuthenticatedRoute(user: User | null, newUser: boolean) {
     },
   });
   if (typeof userExists === "boolean" && userExists === false) {
-    router.replace("/sign-in");
+    router.replace("/SignIn");
   }
 
   React.useEffect(() => {
     const inAuthGroup = segments[0] === "(auth)";
     if (user == null && !inAuthGroup) {
-      router.replace("/sign-in");
+      router.replace("/SignIn");
     }
     if (user != null && !newUser && inAuthGroup) {
       router.replace("/posts");
