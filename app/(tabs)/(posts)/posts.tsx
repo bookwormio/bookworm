@@ -164,13 +164,11 @@ const Posts = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     queryClient
       .invalidateQueries({ queryKey: ["bookshelves", user?.uid] })
-      .then(() => {})
       .catch((error) => {
         console.error("Error invalidating queries:", error);
       });
     queryClient
       .invalidateQueries({ queryKey: ["pagesData", user?.uid] })
-      .then(() => {})
       .catch((error) => {
         console.error("Error invalidating queries:", error);
       });

@@ -6,15 +6,15 @@ import { useGetPagesData } from "./hooks/useDataQueries";
 import {
   calculateBooksWithinMonth,
   calculatePagesWithinWeek,
-  findTopGenre,
+  findYearTopGenre,
 } from "./util/datasnapshotUtils";
 
-interface DataSnapProps {
+interface DataSnapShotProps {
   userID: string;
   isLoadingOther: boolean;
 }
 
-const DataSnapShot = ({ userID, isLoadingOther }: DataSnapProps) => {
+const DataSnapShot = ({ userID, isLoadingOther }: DataSnapShotProps) => {
   const { data: pagesData, isLoading: pagesIsLoading } =
     useGetPagesData(userID);
 
@@ -22,14 +22,14 @@ const DataSnapShot = ({ userID, isLoadingOther }: DataSnapProps) => {
     useGetBooksForBookshelves(userID);
 
   let pagesRead = 0;
-  if (!(pagesData == null)) {
+  if (pagesData != null) {
     pagesRead = calculatePagesWithinWeek(pagesData);
   }
 
   let booksFinished = 0;
   let topGenre = "";
   if (bookshelves != null) {
-    topGenre = findTopGenre(
+    topGenre = findYearTopGenre(
       bookshelves.finished,
       bookshelves.currently_reading,
     );
@@ -44,21 +44,11 @@ const DataSnapShot = ({ userID, isLoadingOther }: DataSnapProps) => {
             <Text style={styles.statTitle}>PAGES THIS WEEK</Text>
             <Text style={styles.stat}>{pagesRead}</Text>
           </View>
-          <View
-            style={[
-              styles.statsWrap,
-              { borderLeftWidth: 1, borderLeftColor: "#FB6D0B" },
-            ]}
-          >
+          <View style={[styles.statsWrap, styles.leftBorder]}>
             <Text style={styles.statTitle}>BOOKS THIS MONTH</Text>
             <Text style={styles.stat}>{booksFinished}</Text>
           </View>
-          <View
-            style={[
-              styles.statsWrap,
-              { borderLeftWidth: 1, borderLeftColor: "#FB6D0B" },
-            ]}
-          >
+          <View style={[styles.statsWrap, styles.leftBorder]}>
             <Text style={styles.statTitle}>TOP BOOK GENRE</Text>
             <Text style={styles.stat}>{topGenre}</Text>
           </View>
@@ -75,7 +65,6 @@ const styles = StyleSheet.create({
     backgroundColor: APP_BACKGROUND_COLOR,
     flexDirection: "row",
     borderBottomColor: "#F2F2F2",
-    // borderBottomColor: "black",
     borderBottomWidth: 1,
     paddingTop: 10,
     paddingBottom: 10,
@@ -100,6 +89,10 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     textAlign: "center",
     fontSize: 16,
+  },
+  leftBorder: {
+    borderLeftWidth: 1,
+    borderLeftColor: "#FB6D0B",
   },
 });
 

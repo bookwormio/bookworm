@@ -6,8 +6,7 @@ export const useGetPagesData = (userID: string) => {
     queryKey: ["pagesData", userID],
     queryFn: async () => {
       if (userID !== "") {
-        const pagesReadData = await fetchPagesReadData(userID);
-        return pagesReadData;
+        return await fetchPagesReadData(userID);
       }
     },
   });
