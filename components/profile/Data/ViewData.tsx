@@ -8,6 +8,7 @@ import {
   type WeekDataPointModel,
 } from "../../../types";
 import ViewDataChart from "../../chart/ViewDataChart";
+import DataSnapShot from "../../datasnapshot/DataSnapShot";
 import WormLoader from "../../wormloader/WormLoader";
 
 // TODO: Combine these functions into a single generic
@@ -84,6 +85,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
 
   return (
     <ScrollView style={{ flex: 1 }}>
+      <DataSnapShot userID={userID} isLoadingOther={isLoadingPagesData} />
       <View>
         <Text style={styles.dataType}>Pages Read:</Text>
         {aggregatedPagesData.length > 0 ? (
