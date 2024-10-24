@@ -23,6 +23,8 @@ import {
   useGetNumberOfFollowingByUserID,
 } from "../followdetails/useFollowDetailQueries";
 import ProfileBookShelves from "../profile/BookShelf/ProfileBookShelves";
+import ViewData from "../profile/Data/ViewData";
+import FriendProfilePosts from "../profile/FriendProfilePosts";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import ProfileTabSelector from "../profile/ProfileTabSelector";
 import WormLoader from "../wormloader/WormLoader";
@@ -38,9 +40,6 @@ interface FriendProfileProps {
 }
 
 const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [bio, setBio] = useState("");
   const { user } = useAuth();
   const [profileTab, setProfileTab] = useState("shelf");
   const [followStatus, setFollowStatus] = useState<string>(
@@ -146,21 +145,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     }
   }, [isFollowingData]);
 
-  useEffect(() => {
-    if (friendData !== undefined) {
-      const setFriendData = friendData;
-      if (setFriendData.first !== undefined) {
-        setFirstName(setFriendData.first);
-      }
-      if (setFriendData.last !== undefined) {
-        setLastName(setFriendData.last);
-      }
-      if (setFriendData.bio !== undefined) {
-        setBio(setFriendData.bio);
-      }
-    }
-  }, [friendData]);
-
   const handleFollowButtonPressed = () => {
     if (followStatus === LocalFollowStatus.LOADING) {
       // Do nothing if follow status is still loading
@@ -233,7 +217,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     }
   };
 
-  if (friendIsLoading || isLoadingUserData) {
+  if (friendIsLoading || isLoadingUserData || friendData == null) {
     return (
       <View style={styles.loading}>
         <WormLoader />
@@ -257,13 +241,17 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         </View>
         <View>
           <Text style={styles.nameText}>
-            {firstName} {lastName}
+            {friendData.first} {friendData.last}
           </Text>
-          <Text style={styles.locText}>Salt Lake City, UT</Text>
+          <Text style={styles.locText}>
+            {friendData.city === "" ? "" : friendData.city}
+            {friendData.city !== "" && friendData.state !== "" ? ", " : ""}
+            {friendData.state === "" ? "" : friendData.state}
+          </Text>
         </View>
       </View>
       <View>
-        <Text style={styles.bioPad}>{bio}</Text>
+        <Text style={styles.bioWrap}>{friendData.bio}</Text>
       </View>
       <View style={styles.imageTextContainer}>
         <TouchableOpacity
@@ -307,6 +295,14 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           <Text>Following</Text>
           <Text>{numFollowingData ?? "-"}</Text>
         </TouchableOpacity>
+        <View style={styles.textWrap}>
+          <Text style={styles.followTitle}>Followers</Text>
+          <Text style={styles.followAmount}>{numFollowersData ?? "-"}</Text>
+        </View>
+        <View style={styles.textWrap}>
+          <Text style={styles.followTitle}>Following</Text>
+          <Text style={styles.followAmount}>{numFollowingData ?? "-"}</Text>
+        </View>
         <View style={styles.buttoncontainer}>
           <TouchableOpacity
             style={styles.button}
@@ -341,9 +337,9 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       {profileTab === TabNames.BOOKSHELVES ? (
         <ProfileBookShelves userID={friendUserID} />
       ) : profileTab === TabNames.POSTS ? (
-        <Text>PUT THE POSTS HERE</Text>
+        <FriendProfilePosts userID={friendUserID} />
       ) : profileTab === TabNames.DATA ? (
-        <Text>PUT DATA HERE</Text>
+        <ViewData userID={friendUserID} />
       ) : (
         <Text>Tab DNE</Text>
       )}
@@ -359,17 +355,10 @@ const styles = StyleSheet.create({
     marginLeft: 20, // Adjust as needed
     paddingBottom: 10,
   },
-  bioPad: {
-    paddingLeft: 20,
-    paddingBottom: 10,
-  },
   nameText: {
     paddingLeft: 20,
     fontSize: 30,
     marginTop: -25,
-  },
-  locText: {
-    paddingLeft: 20,
   },
   input: {
     borderColor: "gray",
@@ -425,5 +414,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignSelf: "flex-start",
     marginLeft: 5,
+  },
+  followTitle: { fontSize: 15 },
+  followAmount: { fontSize: 18, fontWeight: "bold" },
+  locText: {
+    paddingLeft: 20,
+  },
+  textWrap: {
+    paddingLeft: 11,
+    paddingBottom: 20,
+  },
+  bioWrap: {
+    paddingLeft: 30,
+    paddingRight: 30,
+    fontSize: 15,
+    paddingBottom: 5,
   },
 });

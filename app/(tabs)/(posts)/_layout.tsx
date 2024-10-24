@@ -65,6 +65,22 @@ const PostsLayout = () => {
           headerLeft: () => <BackButton />,
         }}
       />
+      <Stack.Screen
+        name="postsfollow/[friendUserID]"
+        options={{
+          headerShown: true,
+          headerTitle: "Follow Details",
+          headerLeft: () => <BackButton />,
+        }}
+      />
+      <Stack.Screen
+        name="viewposts/[postID]"
+        options={{
+          headerShown: true,
+          headerTitle: "Post",
+          headerLeft: () => <BackButton />,
+        }}
+      />
     </Stack>
   );
 };

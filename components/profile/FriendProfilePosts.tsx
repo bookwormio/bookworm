@@ -4,29 +4,22 @@ import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { fetchPostsByUserID } from "../../services/firebase-services/PostQueries";
 import Post from "../post/post";
-import { usePostsContext } from "../post/PostsContext";
 import WormLoader from "../wormloader/WormLoader";
 
-interface ProfilePostsProps {
+interface FriendProfilePostsProps {
   userID: string;
 }
 
-const ProfilePosts = ({ userID }: ProfilePostsProps) => {
-  const { setProfilePosts } = usePostsContext();
-
-  const { data: userProfilePosts, isLoading: isUserProfilePostsLoading } =
-    useQuery({
-      queryKey: userID != null ? ["userPosts", userID] : ["userPosts"],
-      queryFn: async () => {
-        const posts = await fetchPostsByUserID(userID);
-        setProfilePosts(posts);
-        return posts;
-      },
-    });
-
+const FriendProfilePosts = ({ userID }: FriendProfilePostsProps) => {
+  const { data: profilePosts, isLoading: isProfilePostsLoading } = useQuery({
+    queryKey: userID != null ? ["friendPosts", userID] : ["friendPosts"],
+    queryFn: async () => {
+      return await fetchPostsByUserID(userID);
+    },
+  });
   const currentDate = new Date();
 
-  if (isUserProfilePostsLoading) {
+  if (isProfilePostsLoading) {
     return (
       <View style={styles.feedLoading}>
         <WormLoader style={{ width: 50, height: 50 }} />
@@ -35,7 +28,7 @@ const ProfilePosts = ({ userID }: ProfilePostsProps) => {
   } else {
     return (
       <View style={styles.container}>
-        {userProfilePosts?.map((post) => (
+        {profilePosts?.map((post) => (
           <TouchableOpacity
             key={post.id}
             onPress={() => {
@@ -63,7 +56,7 @@ const ProfilePosts = ({ userID }: ProfilePostsProps) => {
   }
 };
 
-export default ProfilePosts;
+export default FriendProfilePosts;
 
 const styles = StyleSheet.create({
   container: {},
