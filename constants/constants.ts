@@ -34,14 +34,14 @@ export const MINUTES = Array.from({ length: 11 }, (_, index) => ({
   value: ((index + 1) * 5).toString(),
 }));
 
-export const POSTS_ROUTE_PREFIX = "(posts)";
-export const SEARCH_ROUTE_PREFIX = "(search)";
-export const PROFILE_ROUTE_PREFIX = "(profile)";
+export const POSTS_ROUTE_PREFIX: string = "(posts)";
+export const SEARCH_ROUTE_PREFIX: string = "(search)";
+export const PROFILE_ROUTE_PREFIX: string = "(profile)";
 
-export const PROFILE_BOOK_PREFIX = "profilebook";
-export const POSTS_BOOK_PREFIX = "postsbook";
-export const SEARCH_BOOK_PREFIX = "searchbook";
-export const PROFILE_FOLLOW_PREFIX = "follow";
+export const PROFILE_BOOK_PREFIX: string = "profilebook";
+export const POSTS_BOOK_PREFIX: string = "postsbook";
+export const SEARCH_BOOK_PREFIX: string = "searchbook";
+export const PROFILE_FOLLOW_PREFIX: string = "follow";
 
 export const NEW_POST_BOOK_FOLDER = "createbook";
 export const NEW_POST_BOOK_SEARCH = "createbooksearch";
