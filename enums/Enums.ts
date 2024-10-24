@@ -77,3 +77,8 @@ export enum ServerBookBorrowRole {
   LENDER = "lending_user",
   BORROWER = "borrowing_user",
 }
+
+export enum ServerFollowDetailType {
+  FOLLOWING = "following",
+  FOLLOWER = "follower",
+}

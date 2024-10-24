@@ -56,12 +56,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     queryKey: ["frienddata", friendUserID],
     enabled: friendUserID != null,
     queryFn: async () => {
-      if (friendUserID != null) {
-        return await fetchFriendData(friendUserID);
-      } else {
-        // Return default value when user is null
-        return {};
-      }
+      return await fetchFriendData(friendUserID);
     },
     staleTime: 60000, // Set stale time to 1 minute
   });
@@ -75,11 +70,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     queryKey: ["followingstatus", friendUserID, user?.uid],
     enabled: friendUserID != null && user?.uid != null,
     queryFn: async () => {
-      if (friendUserID != null && user?.uid != null) {
-        return await getIsFollowing(user?.uid, friendUserID);
-      } else {
-        return null;
-      }
+      return await getIsFollowing(user?.uid ?? "", friendUserID);
     },
   });
 
@@ -87,12 +78,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     queryKey: ["numfollowers", friendUserID],
     enabled: friendUserID != null,
     queryFn: async () => {
-      if (user != null) {
-        const followersCount = await getNumberOfFollowersByUserID(friendUserID);
-        return followersCount ?? 0;
-      } else {
-        return 0;
-      }
+      return (await getNumberOfFollowersByUserID(friendUserID)) ?? 0;
     },
   });
 
@@ -100,12 +86,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     queryKey: ["numfollowing", friendUserID],
     enabled: friendUserID != null,
     queryFn: async () => {
-      if (user != null) {
-        const followingCount = await getNumberOfFollowingByUserID(friendUserID);
-        return followingCount ?? 0;
-      } else {
-        return 0;
-      }
+      return (await getNumberOfFollowingByUserID(friendUserID)) ?? 0;
     },
   });
 
@@ -150,7 +131,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
             : ["followingstatus"],
       });
       await handleInvalidateFollowDetails();
-
       setFollowStatusFetched(true);
     },
   });
@@ -179,7 +159,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
 
   useEffect(() => {
     if (friendData !== undefined) {
-      const setFriendData = friendData as UserDataModel;
+      const setFriendData = friendData;
       if (setFriendData.first !== undefined) {
         setFirstName(setFriendData.first);
       }

@@ -29,35 +29,26 @@ const Profile = () => {
   const [profileTab, setProfileTab] = useState("shelf"); // Default to bookshelf
 
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
-    queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+    queryKey: ["userdata", user?.uid],
+    enabled: user != null,
     queryFn: async () => {
-      if (user != null) {
-        return await newFetchUserInfo(user.uid);
-      }
+      return await newFetchUserInfo(user?.uid ?? "");
     },
   });
 
   const { data: followersCount } = useQuery({
-    queryKey: user != null ? ["numfollowers", user.uid] : ["numfollowers"],
+    queryKey: ["numfollowers", user?.uid],
+    enabled: user != null,
     queryFn: async () => {
-      if (user != null) {
-        const followers = await getNumberOfFollowersByUserID(user.uid);
-        return followers ?? 0;
-      } else {
-        return 0;
-      }
+      return (await getNumberOfFollowersByUserID(user?.uid ?? "")) ?? 0;
     },
   });
 
   const { data: followingCount } = useQuery({
-    queryKey: user != null ? ["numfollowing", user.uid] : ["numfollowing"],
+    queryKey: ["numfollowing", user?.uid],
+    enabled: user != null,
     queryFn: async () => {
-      if (user != null) {
-        const following = await getNumberOfFollowingByUserID(user.uid);
-        return following ?? 0;
-      } else {
-        return 0;
-      }
+      return (await getNumberOfFollowingByUserID(user?.uid ?? "")) ?? 0;
     },
   });
 

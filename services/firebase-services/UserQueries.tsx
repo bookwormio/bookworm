@@ -18,7 +18,7 @@ import {
   where,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { ServerBookShelfName } from "../../enums/Enums";
+import { ServerBookShelfName, ServerFollowDetailType } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
   type BookShelfBookModel,
@@ -424,45 +424,7 @@ export async function getNumberOfFollowersByUserID(
 export async function getFollowersByUserID(
   userID: string,
 ): Promise<UserSearchDisplayModel[]> {
-  const followersQuery = query(
-    collection(DB, "relationships"),
-    where("following", "==", userID),
-    where("follow_status", "==", "following"),
-  );
-
-  const followersSnapshot = await getDocs(followersQuery);
-
-  const followerIDs = Array.from(
-    new Set(followersSnapshot.docs.map((doc) => String(doc.data().follower))),
-  );
-
-  const followersData = await Promise.all(
-    followerIDs.map(async (followerID) => {
-      const followerDocRef = doc(DB, "user_collection", followerID);
-      const followerDoc = await getDoc(followerDocRef);
-
-      if (followerDoc.exists()) {
-        const data = followerDoc.data();
-
-        const profilePicURL = await getUserProfileURL(followerDoc.id);
-        let profilePic = "";
-        if (profilePicURL != null) {
-          profilePic = profilePicURL;
-        }
-        return {
-          id: followerDoc.id,
-          firstName: data.first ?? "",
-          lastName: data.last ?? "",
-          profilePicURL: profilePic ?? "",
-        } satisfies UserSearchDisplayModel;
-      }
-      return null;
-    }),
-  );
-
-  return followersData.filter(
-    (data) => data !== null,
-  ) as UserSearchDisplayModel[];
+  return await getFollowDetailByID(userID, ServerFollowDetailType.FOLLOWING);
 }
 
 /**
@@ -473,33 +435,56 @@ export async function getFollowersByUserID(
 export async function getFollowingByID(
   userID: string,
 ): Promise<UserSearchDisplayModel[]> {
-  const followingQuery = query(
+  return await getFollowDetailByID(userID, ServerFollowDetailType.FOLLOWER);
+}
+
+/**
+ * Method to retrieve the followers' detailed data for a user.
+ * @param userID - The uid of the current user.
+ * @returns {Promise<UserSearchDisplayModel[]>} - An array of followers' detailed data.
+ */
+export async function getFollowDetailByID(
+  userID: string,
+  type: ServerFollowDetailType,
+): Promise<UserSearchDisplayModel[]> {
+  const followDetailQuery = query(
     collection(DB, "relationships"),
-    where("follower", "==", userID),
+    where(type, "==", userID),
     where("follow_status", "==", "following"),
   );
 
-  const followingSnapshot = await getDocs(followingQuery);
+  const followDetailSnapshot = await getDocs(followDetailQuery);
 
-  const followingIDs = Array.from(
-    new Set(followingSnapshot.docs.map((doc) => String(doc.data().following))),
-  );
+  let followDetailIDs;
+  if (type === ServerFollowDetailType.FOLLOWING) {
+    followDetailIDs = Array.from(
+      new Set(
+        followDetailSnapshot.docs.map((doc) => String(doc.data().follower)),
+      ),
+    );
+  } else {
+    followDetailIDs = Array.from(
+      new Set(
+        followDetailSnapshot.docs.map((doc) => String(doc.data().following)),
+      ),
+    );
+  }
 
-  const followingData = await Promise.all(
-    followingIDs.map(async (followingID) => {
-      const followingDocRef = doc(DB, "user_collection", followingID);
-      const followingDoc = await getDoc(followingDocRef);
+  const followDetailData = await Promise.all(
+    followDetailIDs.map(async (followerID) => {
+      const followDetailDocRef = doc(DB, "user_collection", followerID);
+      const followDetailDoc = await getDoc(followDetailDocRef);
 
-      if (followingDoc.exists()) {
-        const data = followingDoc.data();
+      if (followDetailDoc.exists()) {
+        const data = followDetailDoc.data();
 
-        const profilePicURL = await getUserProfileURL(followingDoc.id);
+        const profilePicURL = await getUserProfileURL(followDetailDoc.id);
         let profilePic = "";
         if (profilePicURL != null) {
           profilePic = profilePicURL;
         }
         return {
-          id: followingDoc.id,
+          id: followDetailDoc.id,
           firstName: data.first ?? "",
           lastName: data.last ?? "",
           profilePicURL: profilePic ?? "",
@@ -509,7 +494,7 @@ export async function getFollowingByID(
     }),
   );
 
-  return followingData.filter(
+  return followDetailData.filter(
     (data) => data !== null,
   ) as UserSearchDisplayModel[];
 }
