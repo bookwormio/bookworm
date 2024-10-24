@@ -33,7 +33,7 @@ const SearchLayout = () => {
         }}
       />
       <Stack.Screen
-        name="follow/[friendUserID]"
+        name="searchfollow/[friendUserID]"
         options={{
           headerShown: true,
           headerTitle: "Follow Details",

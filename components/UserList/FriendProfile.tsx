@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router } from "expo-router";
+import { router, useSegments } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
@@ -15,7 +15,6 @@ import { fetchFriendData } from "../../services/firebase-services/UserQueries";
 import {
   type ConnectionModel,
   type FriendRequestNotification,
-  type UserDataModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
 import {
@@ -51,6 +50,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     useState<boolean>(false);
 
   const queryClient = useQueryClient();
+  const segments = useSegments();
 
   const { data: friendData, isLoading: friendIsLoading } = useQuery({
     queryKey: ["frienddata", friendUserID],
@@ -268,9 +268,15 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       <View style={styles.imageTextContainer}>
         <TouchableOpacity
           onPress={() => {
-            router.push({
-              pathname: `/follow/${friendUserID}?followersfirst=true`,
-            });
+            if (segments[1] === "(posts)") {
+              router.push({
+                pathname: `postsfollow/${friendUserID}?followersfirst=true`,
+              });
+            } else if (segments[1] === "(search)") {
+              router.push({
+                pathname: `searchfollow/${friendUserID}?followersfirst=true`,
+              });
+            }
           }}
         >
           <Text>Followers</Text>
@@ -279,9 +285,15 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         <TouchableOpacity
           style={styles.locText}
           onPress={() => {
-            router.push({
-              pathname: `/follow/${friendUserID}?followersfirst=false`,
-            });
+            if (segments[1] === "(posts)") {
+              router.push({
+                pathname: `postsfollow/${friendUserID}?followersfirst=false`,
+              });
+            } else if (segments[1] === "(search)") {
+              router.push({
+                pathname: `searchfollow/${friendUserID}?followersfirst=false`,
+              });
+            }
           }}
         >
           <Text>Following</Text>

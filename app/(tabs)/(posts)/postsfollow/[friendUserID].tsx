@@ -11,7 +11,7 @@ const FollowWrapper = () => {
   return (
     <FollowDetails
       userID={friendUserID ?? ""}
-      followersfirst={followersfirst}
+      followersfirst={followersfirst ?? ""}
       routePrefix={`${SEARCH_ROUTE_PREFIX}`}
     ></FollowDetails>
   );
