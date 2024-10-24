@@ -144,23 +144,6 @@ const styles = StyleSheet.create({
     backgroundColor: APP_BACKGROUND_COLOR,
     paddingBottom: 10,
   },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
-  },
-  input: {
-    borderColor: "gray",
-    width: "100%",
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
-  },
   loading: {
     flex: 1,
     alignItems: "center",
@@ -172,9 +155,9 @@ const styles = StyleSheet.create({
     right: 0,
   },
   imageTextContainer: {
-    flexDirection: "row", // Arrange children horizontally
-    alignItems: "center", // Align children vertically in the center
-    marginLeft: 20, // Adjust as needed
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 20,
     marginTop: 20,
   },
   bioWrap: {
