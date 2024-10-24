@@ -22,14 +22,16 @@ const FollowDetails = ({ userID, followersfirst, routePrefix }: UserProp) => {
     followersfirst === "true" ? "followers" : "following",
   );
   const { data: followers, isLoading: isLoadingFollowers } = useQuery({
-    queryKey: userID != null ? ["followers", userID] : ["followers"],
+    queryKey: ["followers", userID],
+    enabled: userID != null,
     queryFn: async () => {
       return await getFollowersByUserID(userID ?? "");
     },
   });
 
   const { data: following, isLoading: isLoadingFollowing } = useQuery({
-    queryKey: userID != null ? ["following", userID] : ["following"],
+    queryKey: ["following", userID],
+    enabled: userID != null,
     queryFn: async () => {
       return await getFollowingByID(userID ?? "");
     },
