@@ -276,6 +276,10 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
               router.push({
                 pathname: `searchfollow/${friendUserID}?followersfirst=true`,
               });
+            } else if (segments[1] === "(profile)") {
+              router.push({
+                pathname: `profilefollow/${friendUserID}?followersfirst=true`,
+              });
             }
           }}
         >
@@ -292,6 +296,10 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
             } else if (segments[1] === "(search)") {
               router.push({
                 pathname: `searchfollow/${friendUserID}?followersfirst=false`,
+              });
+            } else if (segments[1] === "(profile)") {
+              router.push({
+                pathname: `profilefollow/${friendUserID}?followersfirst=false`,
               });
             }
           }}

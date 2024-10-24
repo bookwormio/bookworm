@@ -33,7 +33,7 @@ const ProfileLayout = () => {
         }}
       />
       <Stack.Screen
-        name="follow/[userID]"
+        name="profilefollow/[userID]"
         options={{
           headerShown: true,
           headerTitle: "Follow Details",

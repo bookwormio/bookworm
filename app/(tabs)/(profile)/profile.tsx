@@ -77,7 +77,7 @@ const Profile = () => {
           style={styles.locText}
           onPress={() => {
             router.push({
-              pathname: `/follow/${user?.uid}?followersfirst=true`,
+              pathname: `profilefollow/${user?.uid}?followersfirst=true`,
             });
           }}
         >
@@ -88,7 +88,7 @@ const Profile = () => {
           style={styles.locText}
           onPress={() => {
             router.push({
-              pathname: `/follow/${user?.uid}?followersfirst=false`,
+              pathname: `profilefollow/${user?.uid}?followersfirst=false`,
             });
           }}
         >
