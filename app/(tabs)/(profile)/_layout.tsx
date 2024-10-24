@@ -32,6 +32,22 @@ const ProfileLayout = () => {
           headerLeft: () => <BackButton />,
         }}
       />
+      <Stack.Screen
+        name="profilefollow/[userID]"
+        options={{
+          headerShown: true,
+          headerTitle: "Follow Details",
+          headerLeft: () => <BackButton />,
+        }}
+      />
+      <Stack.Screen
+        name="user/[friendUserID]"
+        options={{
+          headerShown: true,
+          headerTitle: "User",
+          headerLeft: () => <BackButton />,
+        }}
+      />
     </Stack>
   );
 };

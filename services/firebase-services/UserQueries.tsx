@@ -18,7 +18,7 @@ import {
   where,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { ServerBookShelfName } from "../../enums/Enums";
+import { ServerBookShelfName, ServerFollowDetailType } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
   type BookShelfBookModel,
@@ -417,6 +417,89 @@ export async function getNumberOfFollowersByUserID(
   );
   const followersSnapshot = await getCountFromServer(followersQuery);
   return followersSnapshot.data().count;
+}
+
+/**
+ * Method to retrieve the followers' detailed data for a user.
+ * @param userID - The uid of the current user.
+ * @returns {Promise<UserSearchDisplayModel[]>} - An array of followers' detailed data.
+ */
+export async function getFollowersByUserID(
+  userID: string,
+): Promise<UserSearchDisplayModel[]> {
+  return await getFollowDetailByID(userID, ServerFollowDetailType.FOLLOWING);
+}
+
+/**
+ * Method to retrieve the following detailed data for a user.
+ * @param userID - The uid of the current user.
+ * @returns {Promise<UserSearchDisplayModel[]>} - An array of following detailed data.
+ */
+export async function getFollowingByID(
+  userID: string,
+): Promise<UserSearchDisplayModel[]> {
+  return await getFollowDetailByID(userID, ServerFollowDetailType.FOLLOWER);
+}
+
+/**
+ * Method to retrieve the followers' detailed data for a user.
+ * @param userID - The uid of the current user.
+ * @returns {Promise<UserSearchDisplayModel[]>} - An array of followers' detailed data.
+ */
+export async function getFollowDetailByID(
+  userID: string,
+  type: ServerFollowDetailType,
+): Promise<UserSearchDisplayModel[]> {
+  const followDetailQuery = query(
+    collection(DB, "relationships"),
+    where(type, "==", userID),
+    where("follow_status", "==", "following"),
+  );
+
+  const followDetailSnapshot = await getDocs(followDetailQuery);
+
+  let followDetailIDs;
+  if (type === ServerFollowDetailType.FOLLOWING) {
+    followDetailIDs = Array.from(
+      new Set(
+        followDetailSnapshot.docs.map((doc) => String(doc.data().follower)),
+      ),
+    );
+  } else {
+    followDetailIDs = Array.from(
+      new Set(
+        followDetailSnapshot.docs.map((doc) => String(doc.data().following)),
+      ),
+    );
+  }
+
+  const followDetailData = await Promise.all(
+    followDetailIDs.map(async (followerID) => {
+      const followDetailDocRef = doc(DB, "user_collection", followerID);
+      const followDetailDoc = await getDoc(followDetailDocRef);
+
+      if (followDetailDoc.exists()) {
+        const data = followDetailDoc.data();
+
+        const profilePicURL = await getUserProfileURL(followDetailDoc.id);
+        let profilePic = "";
+        if (profilePicURL != null) {
+          profilePic = profilePicURL;
+        }
+        return {
+          id: followDetailDoc.id,
+          firstName: data.first ?? "",
+          lastName: data.last ?? "",
+          profilePicURL: profilePic ?? "",
+        } satisfies UserSearchDisplayModel;
+      }
+      return null;
+    }),
+  );
+
+  return followDetailData.filter(
+    (data) => data !== null,
+  ) as UserSearchDisplayModel[];
 }
 
 /**

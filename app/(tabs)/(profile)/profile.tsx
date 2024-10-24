@@ -1,9 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import BookWormButton from "../../../components/button/BookWormButton";
+import {
+  useGetNumberOfFollowersByUserID,
+  useGetNumberOfFollowingByUserID,
+} from "../../../components/followdetails/useFollowDetailQueries";
 import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBookShelves";
 import ViewData from "../../../components/profile/Data/ViewData";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
@@ -12,48 +22,27 @@ import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
 import WormLoader from "../../../components/wormloader/WormLoader";
 import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { TabNames } from "../../../enums/Enums";
-import {
-  getNumberOfFollowersByUserID,
-  getNumberOfFollowingByUserID,
-  newFetchUserInfo,
-} from "../../../services/firebase-services/UserQueries";
+import { newFetchUserInfo } from "../../../services/firebase-services/UserQueries";
 
 const Profile = () => {
   const { signOut, user } = useAuth();
   const [profileTab, setProfileTab] = useState("shelf"); // Default to bookshelf
 
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
-    queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+    queryKey: ["userdata", user?.uid],
+    enabled: user != null,
     queryFn: async () => {
-      if (user != null) {
-        return await newFetchUserInfo(user.uid);
-      }
+      return await newFetchUserInfo(user?.uid ?? "");
     },
   });
 
-  const { data: followersCount } = useQuery({
-    queryKey: user != null ? ["followersdata", user.uid] : ["followersdata"],
-    queryFn: async () => {
-      if (user != null) {
-        const followers = await getNumberOfFollowersByUserID(user.uid);
-        return followers ?? 0;
-      } else {
-        return 0;
-      }
-    },
-  });
+  const { data: followersCount } = useGetNumberOfFollowersByUserID(
+    user?.uid ?? "",
+  );
 
-  const { data: followingCount } = useQuery({
-    queryKey: user != null ? ["followingdata", user.uid] : ["followingdata"],
-    queryFn: async () => {
-      if (user != null) {
-        const following = await getNumberOfFollowingByUserID(user.uid);
-        return following ?? 0;
-      } else {
-        return 0;
-      }
-    },
-  });
+  const { data: followingCount } = useGetNumberOfFollowingByUserID(
+    user?.uid ?? "",
+  );
 
   if (isLoadingUserData || userData == null) {
     return (
@@ -84,14 +73,28 @@ const Profile = () => {
         <Text style={styles.bioPad}>{userData.bio}</Text>
       </View>
       <View style={styles.imageTextContainer}>
-        <View style={styles.locText}>
+        <TouchableOpacity
+          style={styles.locText}
+          onPress={() => {
+            router.push({
+              pathname: `profilefollow/${user?.uid}?followersfirst=true`,
+            });
+          }}
+        >
           <Text>Followers</Text>
           <Text>{followersCount ?? "-"}</Text>
-        </View>
-        <View style={styles.locText}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.locText}
+          onPress={() => {
+            router.push({
+              pathname: `profilefollow/${user?.uid}?followersfirst=false`,
+            });
+          }}
+        >
           <Text>Following</Text>
           <Text>{followingCount ?? "-"}</Text>
-        </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.outerButtonsContainer}>
         <BookWormButton
@@ -112,7 +115,7 @@ const Profile = () => {
         profileTab={profileTab}
         setProfileTab={setProfileTab}
         tabs={[TabNames.BOOKSHELVES, TabNames.POSTS, TabNames.DATA]}
-      ></ProfileTabSelector>
+      />
       {profileTab === TabNames.BOOKSHELVES && user !== null ? (
         <ProfileBookShelves userID={user?.uid} />
       ) : profileTab === TabNames.POSTS ? (

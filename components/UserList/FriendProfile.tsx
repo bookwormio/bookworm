@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router } from "expo-router";
+import { router, useSegments } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
@@ -8,21 +8,20 @@ import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { ServerNotificationType, TabNames } from "../../enums/Enums";
 import {
   followUserByID,
-  getIsFollowing,
   unfollowUserByID,
 } from "../../services/firebase-services/FriendQueries";
 import { createNotification } from "../../services/firebase-services/NotificationQueries";
-import {
-  fetchFriendData,
-  getNumberOfFollowersByUserID,
-  getNumberOfFollowingByUserID,
-} from "../../services/firebase-services/UserQueries";
+import { fetchFriendData } from "../../services/firebase-services/UserQueries";
 import {
   type ConnectionModel,
   type FriendRequestNotification,
-  type UserDataModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
+import {
+  useGetIsFollowing,
+  useGetNumberOfFollowersByUserID,
+  useGetNumberOfFollowingByUserID,
+} from "../followdetails/useFollowDetailQueries";
 import ProfileBookShelves from "../profile/BookShelf/ProfileBookShelves";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import ProfileTabSelector from "../profile/ProfileTabSelector";
@@ -51,17 +50,13 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     useState<boolean>(false);
 
   const queryClient = useQueryClient();
+  const segments = useSegments();
 
   const { data: friendData, isLoading: friendIsLoading } = useQuery({
-    queryKey:
-      friendUserID != null ? ["frienddata", friendUserID] : ["frienddata"],
+    queryKey: ["frienddata", friendUserID],
+    enabled: friendUserID != null,
     queryFn: async () => {
-      if (friendUserID != null) {
-        return await fetchFriendData(friendUserID);
-      } else {
-        // Return default value when user is null
-        return {};
-      }
+      return await fetchFriendData(friendUserID);
     },
     staleTime: 60000, // Set stale time to 1 minute
   });
@@ -71,43 +66,35 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     user?.uid,
   );
 
-  const { data: isFollowingData } = useQuery({
-    queryKey:
-      user?.uid != null && friendUserID !== null
-        ? ["followingstatus", friendUserID, user?.uid]
-        : ["followingstatus"],
-    queryFn: async () => {
-      if (friendUserID != null && user?.uid != null) {
-        return await getIsFollowing(user?.uid, friendUserID);
-      } else {
-        return null;
-      }
-    },
-  });
+  const { data: isFollowingData } = useGetIsFollowing(
+    user?.uid ?? "",
+    friendUserID,
+  );
 
-  const { data: followersData } = useQuery({
-    queryKey: ["followersdata"],
-    queryFn: async () => {
-      if (user != null) {
-        const followersCount = await getNumberOfFollowersByUserID(friendUserID);
-        return followersCount ?? 0;
-      } else {
-        return 0;
-      }
-    },
-  });
+  const { data: numFollowersData } = useGetNumberOfFollowersByUserID(
+    friendUserID ?? "",
+  );
 
-  const { data: followingData } = useQuery({
-    queryKey: ["followingdata"],
-    queryFn: async () => {
-      if (user != null) {
-        const followingCount = await getNumberOfFollowingByUserID(friendUserID);
-        return followingCount ?? 0;
-      } else {
-        return 0;
-      }
-    },
-  });
+  const { data: numFollowingData } = useGetNumberOfFollowingByUserID(
+    friendUserID ?? "",
+  );
+
+  const handleInvalidateFollowDetails = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: ["numfollowers", friendUserID],
+      }),
+      queryClient.invalidateQueries({
+        queryKey: ["numfollowing", user?.uid],
+      }),
+      queryClient.invalidateQueries({
+        queryKey: ["followers", friendUserID],
+      }),
+      queryClient.invalidateQueries({
+        queryKey: ["following", user?.uid],
+      }),
+    ]);
+  };
 
   const followMutation = useMutation({
     mutationFn: followUserByID,
@@ -118,7 +105,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
             ? ["followingstatus", friendUserID, user?.uid]
             : ["followingstatus"],
       });
-      await queryClient.invalidateQueries({ queryKey: ["followersdata"] });
+      await handleInvalidateFollowDetails();
       setFollowStatusFetched(true);
     },
   });
@@ -132,7 +119,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
             ? ["followingstatus", friendUserID, user?.uid]
             : ["followingstatus"],
       });
-      await queryClient.invalidateQueries({ queryKey: ["followersdata"] });
+      await handleInvalidateFollowDetails();
       setFollowStatusFetched(true);
     },
   });
@@ -161,7 +148,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
 
   useEffect(() => {
     if (friendData !== undefined) {
-      const setFriendData = friendData as UserDataModel;
+      const setFriendData = friendData;
       if (setFriendData.first !== undefined) {
         setFirstName(setFriendData.first);
       }
@@ -279,14 +266,47 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         <Text style={styles.bioPad}>{bio}</Text>
       </View>
       <View style={styles.imageTextContainer}>
-        <View>
+        <TouchableOpacity
+          onPress={() => {
+            if (segments[1] === "(posts)") {
+              router.push({
+                pathname: `postsfollow/${friendUserID}?followersfirst=true`,
+              });
+            } else if (segments[1] === "(search)") {
+              router.push({
+                pathname: `searchfollow/${friendUserID}?followersfirst=true`,
+              });
+            } else if (segments[1] === "(profile)") {
+              router.push({
+                pathname: `profilefollow/${friendUserID}?followersfirst=true`,
+              });
+            }
+          }}
+        >
           <Text>Followers</Text>
-          <Text>{followersData ?? "-"}</Text>
-        </View>
-        <View style={styles.locText}>
+          <Text>{numFollowersData ?? "-"}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.locText}
+          onPress={() => {
+            if (segments[1] === "(posts)") {
+              router.push({
+                pathname: `postsfollow/${friendUserID}?followersfirst=false`,
+              });
+            } else if (segments[1] === "(search)") {
+              router.push({
+                pathname: `searchfollow/${friendUserID}?followersfirst=false`,
+              });
+            } else if (segments[1] === "(profile)") {
+              router.push({
+                pathname: `profilefollow/${friendUserID}?followersfirst=false`,
+              });
+            }
+          }}
+        >
           <Text>Following</Text>
-          <Text>{followingData ?? "-"}</Text>
-        </View>
+          <Text>{numFollowingData ?? "-"}</Text>
+        </TouchableOpacity>
         <View style={styles.buttoncontainer}>
           <TouchableOpacity
             style={styles.button}
@@ -317,7 +337,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         profileTab={profileTab}
         setProfileTab={setProfileTab}
         tabs={[TabNames.BOOKSHELVES, TabNames.POSTS, TabNames.DATA]}
-      ></ProfileTabSelector>
+      />
       {profileTab === TabNames.BOOKSHELVES ? (
         <ProfileBookShelves userID={friendUserID} />
       ) : profileTab === TabNames.POSTS ? (
