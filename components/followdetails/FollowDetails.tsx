@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     width: "100%",
+    padding: 10,
   },
   scrollContent: {
     paddingRight: 16, // Adjusted padding to accommodate scroll bar
