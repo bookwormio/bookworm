@@ -1,15 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { TabNames } from "../../enums/Enums";
-import {
-  getFollowersByUserID,
-  getFollowingByID,
-} from "../../services/firebase-services/UserQueries";
 import ProfileTabSelector from "../profile/ProfileTabSelector";
 import UserList from "../UserList/UserList";
 import WormLoader from "../wormloader/WormLoader";
+import {
+  useGetFollowersByID,
+  useGetFollowingByID,
+} from "./useFollowDetailQueries";
 
 interface UserProp {
   userID: string;
@@ -21,21 +20,11 @@ const FollowDetails = ({ userID, followersfirst, routePrefix }: UserProp) => {
   const [profileTab, setProfileTab] = useState(
     followersfirst === "true" ? "followers" : "following",
   );
-  const { data: followers, isLoading: isLoadingFollowers } = useQuery({
-    queryKey: ["followers", userID],
-    enabled: userID != null,
-    queryFn: async () => {
-      return await getFollowersByUserID(userID ?? "");
-    },
-  });
+  const { data: followers, isLoading: isLoadingFollowers } =
+    useGetFollowersByID(userID);
 
-  const { data: following, isLoading: isLoadingFollowing } = useQuery({
-    queryKey: ["following", userID],
-    enabled: userID != null,
-    queryFn: async () => {
-      return await getFollowingByID(userID ?? "");
-    },
-  });
+  const { data: following, isLoading: isLoadingFollowing } =
+    useGetFollowingByID(userID);
 
   if (isLoadingFollowers || followers === null || isLoadingFollowing) {
     return (

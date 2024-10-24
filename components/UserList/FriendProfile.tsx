@@ -8,21 +8,21 @@ import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { ServerNotificationType, TabNames } from "../../enums/Enums";
 import {
   followUserByID,
-  getIsFollowing,
   unfollowUserByID,
 } from "../../services/firebase-services/FriendQueries";
 import { createNotification } from "../../services/firebase-services/NotificationQueries";
-import {
-  fetchFriendData,
-  getNumberOfFollowersByUserID,
-  getNumberOfFollowingByUserID,
-} from "../../services/firebase-services/UserQueries";
+import { fetchFriendData } from "../../services/firebase-services/UserQueries";
 import {
   type ConnectionModel,
   type FriendRequestNotification,
   type UserDataModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
+import {
+  useGetIsFollowing,
+  useGetNumberOfFollowersByUserID,
+  useGetNumberOfFollowingByUserID,
+} from "../followdetails/useFollowDetailQueries";
 import ProfileBookShelves from "../profile/BookShelf/ProfileBookShelves";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import ProfileTabSelector from "../profile/ProfileTabSelector";
@@ -66,29 +66,18 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     user ?? undefined,
   );
 
-  const { data: isFollowingData } = useQuery({
-    queryKey: ["followingstatus", friendUserID, user?.uid],
-    enabled: friendUserID != null && user?.uid != null,
-    queryFn: async () => {
-      return await getIsFollowing(user?.uid ?? "", friendUserID);
-    },
-  });
+  const { data: isFollowingData } = useGetIsFollowing(
+    user?.uid ?? "",
+    friendUserID,
+  );
 
-  const { data: numFollowersData } = useQuery({
-    queryKey: ["numfollowers", friendUserID],
-    enabled: friendUserID != null,
-    queryFn: async () => {
-      return (await getNumberOfFollowersByUserID(friendUserID)) ?? 0;
-    },
-  });
+  const { data: numFollowersData } = useGetNumberOfFollowersByUserID(
+    friendUserID ?? "",
+  );
 
-  const { data: numFollowingData } = useQuery({
-    queryKey: ["numfollowing", friendUserID],
-    enabled: friendUserID != null,
-    queryFn: async () => {
-      return (await getNumberOfFollowingByUserID(friendUserID)) ?? 0;
-    },
-  });
+  const { data: numFollowingData } = useGetNumberOfFollowingByUserID(
+    friendUserID ?? "",
+  );
 
   const handleInvalidateFollowDetails = async () => {
     await Promise.all([

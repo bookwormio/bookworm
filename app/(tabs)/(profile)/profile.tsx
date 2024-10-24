@@ -10,6 +10,10 @@ import {
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
 import BookWormButton from "../../../components/button/BookWormButton";
+import {
+  useGetNumberOfFollowersByUserID,
+  useGetNumberOfFollowingByUserID,
+} from "../../../components/followdetails/useFollowDetailQueries";
 import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBookShelves";
 import ViewData from "../../../components/profile/Data/ViewData";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
@@ -18,11 +22,7 @@ import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
 import WormLoader from "../../../components/wormloader/WormLoader";
 import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { TabNames } from "../../../enums/Enums";
-import {
-  getNumberOfFollowersByUserID,
-  getNumberOfFollowingByUserID,
-  newFetchUserInfo,
-} from "../../../services/firebase-services/UserQueries";
+import { newFetchUserInfo } from "../../../services/firebase-services/UserQueries";
 
 const Profile = () => {
   const { signOut, user } = useAuth();
@@ -36,21 +36,13 @@ const Profile = () => {
     },
   });
 
-  const { data: followersCount } = useQuery({
-    queryKey: ["numfollowers", user?.uid],
-    enabled: user != null,
-    queryFn: async () => {
-      return (await getNumberOfFollowersByUserID(user?.uid ?? "")) ?? 0;
-    },
-  });
+  const { data: followersCount } = useGetNumberOfFollowersByUserID(
+    user?.uid ?? "",
+  );
 
-  const { data: followingCount } = useQuery({
-    queryKey: ["numfollowing", user?.uid],
-    enabled: user != null,
-    queryFn: async () => {
-      return (await getNumberOfFollowingByUserID(user?.uid ?? "")) ?? 0;
-    },
-  });
+  const { data: followingCount } = useGetNumberOfFollowingByUserID(
+    user?.uid ?? "",
+  );
 
   if (isLoadingUserData || userData == null) {
     return (
