@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getIsFollowing } from "../../services/firebase-services/FriendQueries";
 import {
-    getFollowersByUserID,
-    getFollowingByID,
-    getNumberOfFollowersByUserID,
-    getNumberOfFollowingByUserID,
+  getFollowersByUserID,
+  getFollowingByID,
+  getNumberOfFollowersByUserID,
+  getNumberOfFollowingByUserID,
 } from "../../services/firebase-services/UserQueries";
 
 /**
@@ -15,7 +15,7 @@ import {
 export const useGetFollowersByID = (userID: string) => {
   return useQuery({
     queryKey: ["followers", userID],
-    enabled: userID != null && userID !== null,
+    enabled: userID != null && userID !== "",
     queryFn: async () => {
       return await getFollowersByUserID(userID ?? "");
     },
