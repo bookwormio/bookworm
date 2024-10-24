@@ -76,17 +76,6 @@ const Profile = () => {
               {userData.state === "" ? "" : userData.state}
             </Text>
           </View>
-          <View style={styles.ellipsisContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                router.push({
-                  pathname: "GenerateRecommendations",
-                });
-              }}
-            >
-              <Text style={styles.touchableEllipses}>{"..."}</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </View>
       <View>
@@ -133,7 +122,17 @@ const Profile = () => {
         tabs={[TabNames.BOOKSHELVES, TabNames.POSTS, TabNames.DATA]}
       />
       {profileTab === TabNames.BOOKSHELVES && user !== null ? (
-        <ProfileBookShelves userID={user?.uid} />
+        <View style={styles.shelves}>
+          <View style={{ paddingLeft: 20, paddingRight: 20 }}>
+            <BookWormButton
+              title="Generate Recommendations"
+              onPress={() => {
+                router.push("/GenerateRecommendations");
+              }}
+            />
+          </View>
+          <ProfileBookShelves userID={user?.uid} />
+        </View>
       ) : profileTab === TabNames.POSTS ? (
         <ProfilePosts userID={user?.uid ?? ""} />
       ) : profileTab === TabNames.DATA ? (
@@ -208,13 +207,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
   },
-  ellipsisContainer: {
-    marginLeft: 20,
-    alignContent: "flex-start",
-  },
-  touchableEllipses: {
-    fontSize: 30,
-    color: "grey",
-    textAlignVertical: "top",
+  shelves: {
+    marginTop: 20,
   },
 });
