@@ -195,6 +195,7 @@ const NewPost = () => {
   const pickImageAsync = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
+      aspect: [1, 1],
       quality: 1,
     });
     if (!result.canceled) {
