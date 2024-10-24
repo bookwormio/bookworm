@@ -234,7 +234,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         backgroundColor: APP_BACKGROUND_COLOR,
       }}
     >
-      <View style={styles.buttonwrapper}></View>
       <View style={styles.imageTextContainer}>
         <View style={styles.profilePicContainer}>
           <ProfilePicture userID={friendUserID} size={60} />
@@ -255,6 +254,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       </View>
       <View style={styles.imageTextContainer}>
         <TouchableOpacity
+          style={styles.textWrap}
           onPress={() => {
             if (segments[1] === "(posts)") {
               router.push({
@@ -271,11 +271,11 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
             }
           }}
         >
-          <Text>Followers</Text>
-          <Text>{numFollowersData ?? "-"}</Text>
+          <Text style={styles.followTitle}>Followers</Text>
+          <Text style={styles.followAmount}>{numFollowersData ?? "-"}</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.locText}
+          style={styles.textWrap}
           onPress={() => {
             if (segments[1] === "(posts)") {
               router.push({
@@ -292,17 +292,9 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
             }
           }}
         >
-          <Text>Following</Text>
-          <Text>{numFollowingData ?? "-"}</Text>
-        </TouchableOpacity>
-        <View style={styles.textWrap}>
-          <Text style={styles.followTitle}>Followers</Text>
-          <Text style={styles.followAmount}>{numFollowersData ?? "-"}</Text>
-        </View>
-        <View style={styles.textWrap}>
           <Text style={styles.followTitle}>Following</Text>
           <Text style={styles.followAmount}>{numFollowingData ?? "-"}</Text>
-        </View>
+        </TouchableOpacity>
         <View style={styles.buttoncontainer}>
           <TouchableOpacity
             style={styles.button}
@@ -350,24 +342,16 @@ export default FriendProfile;
 
 const styles = StyleSheet.create({
   imageTextContainer: {
-    flexDirection: "row", // Arrange children horizontally
-    alignItems: "center", // Align children vertically in the center
-    marginLeft: 20, // Adjust as needed
-    paddingBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 20,
+    marginTop: 20,
   },
   nameText: {
     paddingLeft: 20,
     fontSize: 30,
     marginTop: -25,
   },
-  input: {
-    borderColor: "gray",
-    width: "100%",
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-  },
-
   loading: {
     flex: 1,
     alignItems: "center",
@@ -396,17 +380,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FB6D0B",
-  },
-  backButtonContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    zIndex: 1,
-    padding: 10,
-  },
-  buttonwrapper: {
-    marginBottom: 8,
-    alignItems: "flex-start",
   },
   profilePicContainer: {
     alignItems: "center",
