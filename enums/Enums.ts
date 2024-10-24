@@ -35,13 +35,16 @@ export enum ServerNotificationType {
   LIKE = "LIKE",
   COMMENT = "COMMENT",
   RECOMMENDATION = "RECOMMENDATION",
+  BOOK_REQUEST = "BOOK_REQUEST",
+  BOOK_REQUEST_RESPONSE = "BOOK_REQUEST_RESPONSE",
 }
 
-export const NotificationTypeMap: StringMap = {
+export const NotificationTitleMap: StringMap = {
   [ServerNotificationType.FRIEND_REQUEST]: "New Follower",
   [ServerNotificationType.LIKE]: "New Like",
   [ServerNotificationType.COMMENT]: "New Comment",
   [ServerNotificationType.RECOMMENDATION]: "New Recommendation",
+  [ServerNotificationType.BOOK_REQUEST]: "New Book Request",
 };
 
 export const NotificationMessageMap: StringMap = {
@@ -49,7 +52,21 @@ export const NotificationMessageMap: StringMap = {
   [ServerNotificationType.LIKE]: "liked your post",
   [ServerNotificationType.COMMENT]: "commented on your post:",
   [ServerNotificationType.RECOMMENDATION]: "thinks you should read",
+  [ServerNotificationType.BOOK_REQUEST]: "requested to borrow",
 };
+
+export enum BookRequestNotificationStatus {
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  DENIED = "denied",
+}
+
+export enum BookRequestActionDisplay {
+  ACCEPT = "Accept",
+  DENY = "Deny",
+  ACCEPTED = "Accepted",
+  DENIED = "Denied",
+}
 
 export enum TabNames {
   BOOKSHELVES = "shelf",
@@ -81,4 +98,13 @@ export enum ServerBookBorrowRole {
 export enum ServerFollowDetailType {
   FOLLOWING = "following",
   FOLLOWER = "follower",
+}
+
+export enum BookBorrowButtonDisplay {
+  LOADING = "Loading...",
+  UNAVAILABLE = "Unavailable",
+  REQUESTED = "Requested",
+  RETURN = "Return",
+  REQUEST_AGAIN = "Request Again",
+  REQUEST = "Request",
 }

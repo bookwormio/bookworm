@@ -12,15 +12,14 @@ interface BookShelvesProp {
 const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
   // Initialize the bookShelves state with all shelves empty
 
-  // TODO FIX NULL USERID
   const {
     data: bookShelves,
-    isLoading,
+    isLoading: isLoadingBooks,
     isError,
     error,
   } = useGetBooksForBookshelves(userID ?? "");
 
-  if (isLoading) {
+  if (isLoadingBooks) {
     return (
       <View style={styles.container}>
         <WormLoader style={{ width: 50, height: 50 }} />
@@ -43,6 +42,7 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
           key={shelfName}
           shelfName={shelfName as ServerBookShelfName}
           books={books}
+          userID={userID}
         />
       ))}
     </View>

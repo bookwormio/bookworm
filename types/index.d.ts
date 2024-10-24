@@ -5,6 +5,7 @@ import {
 } from "firebase/firestore";
 
 import {
+  type BookRequestNotificationStatus,
   type ServerBookBorrowStatus,
   type ServerNotificationType,
 } from "../enums/Enums";
@@ -208,16 +209,18 @@ interface BasicNotificationModel {
 }
 
 interface FullNotificationModel {
+  notifID: string;
   receiver: string;
-  comment: string;
+  comment?: string;
   sender: string;
   sender_name: string;
   created: Timestamp;
-  read_at: Timestamp;
-  postID: string | null;
-  bookID: string;
-  bookTitle: string;
-  custom_message: string;
+  read_at: Timestamp | null;
+  postID?: string;
+  bookID?: string;
+  bookTitle?: string;
+  custom_message?: string;
+  bookRequestStatus?: BookRequestNotificationStatus;
   type: ServerNotificationType;
 }
 
@@ -243,15 +246,50 @@ interface RecommendationNotification extends BasicNotificationModel {
   custom_message: string;
 }
 
-type Notification =
+interface BookRequestNotification extends BasicNotificationModel {
+  type: ServerNotificationType.BOOK_REQUEST;
+  bookID: string;
+  bookTitle: string;
+  custom_message: string;
+  bookRequestStatus: BookRequestNotificationStatus;
+}
+
+interface BookRequestResponseNotification extends BasicNotificationModel {
+  type: ServerNotificationType.BOOK_REQUEST_RESPONSE;
+  bookID: string;
+  bookTitle: string;
+  custom_message: string;
+  bookRequestStatus?: BookRequestNotificationStatus;
+}
+
+type NotificationModel =
   | FriendRequestNotification
   | LikeNotification
   | CommentNotification
-  | RecommendationNotification;
+  | RecommendationNotification
+  | BookRequestNotification
+  | BookRequestAcceptedNotification
+  | BookRequestDeniedNotification;
 
 interface BookBorrowModel {
   bookID: string;
   lendingUserID: string;
   borrowingUserID: string;
   borrowStatus: ServerBookBorrowStatus;
+}
+interface BookStatusModel {
+  borrowInfo?: BookBorrowModel;
+  requestStatus?: BookRequestNotificationStatus;
+}
+
+interface UpdateBorrowNotificationParams {
+  notifID: string;
+  newStatus: BookRequestNotificationStatus;
+  userID: string;
+}
+
+interface DenyOtherBorrowRequestsParams {
+  lenderUserID: string;
+  acceptedBorrowerUserID: string;
+  bookID: string;
 }

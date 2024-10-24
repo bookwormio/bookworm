@@ -34,6 +34,7 @@ import Animated, {
 import { useAuth } from "../../../components/auth/context";
 import BookWormButton from "../../../components/button/BookWormButton";
 import Comment from "../../../components/comment/comment";
+import DataSnapShot from "../../../components/datasnapshot/DataSnapShot";
 import Post from "../../../components/post/post";
 import { usePostsContext } from "../../../components/post/PostsContext";
 import WormLoader from "../../../components/wormloader/WormLoader";
@@ -161,6 +162,16 @@ const Posts = () => {
     setRefreshing(true);
     // Reset the query data to only the first page
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    queryClient
+      .invalidateQueries({ queryKey: ["bookshelves", user?.uid] })
+      .catch((error) => {
+        console.error("Error invalidating queries:", error);
+      });
+    queryClient
+      .invalidateQueries({ queryKey: ["pagesData", user?.uid] })
+      .catch((error) => {
+        console.error("Error invalidating queries:", error);
+      });
     queryClient.setQueryData(queryKey, (data: any) => ({
       pages: data.pages.slice(0, 1),
       pageParams: data.pageParams.slice(0, 1),
@@ -259,6 +270,14 @@ const Posts = () => {
             )}
             removeClippedSubviews={true}
             keyExtractor={(item) => item.id}
+            ListHeaderComponent={
+              !(user == null) ? (
+                <DataSnapShot
+                  userID={user?.uid ?? ""}
+                  isLoadingOther={isLoadingFeedPosts}
+                />
+              ) : null
+            }
             ListFooterComponent={
               isFetchingNextPage ? (
                 <View style={styles.loadingMore}>
@@ -328,6 +347,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: APP_BACKGROUND_COLOR,
   },
   scrollContainer: {
