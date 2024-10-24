@@ -24,6 +24,10 @@ const BookListItem = ({
 }: BookListItemProps) => {
   const navigateToBook = useNavigateToBook(bookID);
 
+  const handleClick = () => {
+    navigateToBook();
+  };
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -31,7 +35,7 @@ const BookListItem = ({
         if (handleBookClickOverride != null) {
           handleBookClickOverride(bookID, volumeInfo);
         } else {
-          navigateToBook();
+          handleClick();
         }
       }}
     >

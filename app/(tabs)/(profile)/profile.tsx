@@ -64,15 +64,29 @@ const Profile = () => {
         <View style={styles.defaultImageContainer}>
           <ProfilePicture userID={user?.uid ?? ""} size={60} />
         </View>
-        <View>
-          <Text style={styles.nameText}>
-            {userData.first} {userData.last}
-          </Text>
-          <Text style={styles.locText}>
-            {userData.city === "" ? "" : userData.city}
-            {userData.city !== "" && userData.state !== "" ? ", " : ""}
-            {userData.state === "" ? "" : userData.state}
-          </Text>
+
+        <View style={styles.profileHeader}>
+          <View>
+            <Text style={styles.nameText}>
+              {userData.first} {userData.last}
+            </Text>
+            <Text style={styles.locText}>
+              {userData.city === "" ? "" : userData.city}
+              {userData.city !== "" && userData.state !== "" ? ", " : ""}
+              {userData.state === "" ? "" : userData.state}
+            </Text>
+          </View>
+          <View style={styles.ellipsisContainer}>
+            <TouchableOpacity
+              onPress={() => {
+                router.push({
+                  pathname: "GenerateRecommendations",
+                });
+              }}
+            >
+              <Text style={styles.touchableEllipses}>{"..."}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
       <View>
@@ -190,4 +204,17 @@ const styles = StyleSheet.create({
   },
   followTitle: { fontSize: 15 },
   followAmount: { fontSize: 18, fontWeight: "bold" },
+  profileHeader: {
+    flexDirection: "row",
+    width: "100%",
+  },
+  ellipsisContainer: {
+    marginLeft: 20,
+    alignContent: "flex-start",
+  },
+  touchableEllipses: {
+    fontSize: 30,
+    color: "grey",
+    textAlignVertical: "top",
+  },
 });
