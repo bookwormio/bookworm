@@ -21,6 +21,7 @@ const BookList = ({ volumes, handleBookClickOverride }: BookListProps) => {
           bookID={value.id}
           volumeInfo={value.volumeInfo}
           handleBookClickOverride={handleBookClickOverride}
+          bookShelf={value.bookShelf}
         ></BookListItem>
       ))}
     </View>

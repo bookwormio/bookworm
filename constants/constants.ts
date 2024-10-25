@@ -52,6 +52,7 @@ export const FIRST_PROGRESS_COLOR = "rgb(88, 166, 92)";
 export const SECOND_PROGRESS_COLOR = "rgb(169, 207, 96)";
 export const BACKWARDS_PROGRESS_COLOR = "rgb(255, 99, 71)";
 export const REMAINING_PROGRESS_COLOR = "rgb(229, 232, 249)";
+export const BOOK_WORM_ORANGE = "#FB6D0B";
 
 export const POST_IMAGE_HEIGHT = 250;
 export const POST_IMAGE_WIDTH = 250;

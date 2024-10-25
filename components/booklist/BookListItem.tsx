@@ -2,7 +2,9 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { type ServerBookShelfName } from "../../enums/Enums";
 import { type BookVolumeInfo } from "../../types";
+import BookshelfListChip from "./BookshelfListChip";
 
 interface BookListItemProps {
   bookID: string;
@@ -11,12 +13,14 @@ interface BookListItemProps {
     bookID: string,
     volumeInfo: BookVolumeInfo,
   ) => void;
+  bookShelf?: ServerBookShelfName;
 }
 
 const BookListItem = ({
   bookID,
   volumeInfo,
   handleBookClickOverride,
+  bookShelf,
 }: BookListItemProps) => {
   const handleClick = ({ bookID }: { bookID: string }) => {
     router.push({
@@ -55,6 +59,7 @@ const BookListItem = ({
         </Text>
         {/* TODO: Add more properties as needed */}
       </View>
+      {bookShelf != null && <BookshelfListChip bookShelf={bookShelf} />}
     </TouchableOpacity>
   );
 };
