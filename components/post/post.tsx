@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   firstImageStyle: {
-    width: 200, // custom width
+    width: 180, // custom width
     height: 250, // custom height
     borderRadius: 2,
     overflow: 'hidden', // Ensure the image is clipped to the border radius
