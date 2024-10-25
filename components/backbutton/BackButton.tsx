@@ -3,9 +3,11 @@ import { router } from "expo-router";
 import React from "react";
 import { Keyboard, TouchableOpacity, View } from "react-native";
 
-const BackButton = () => {
-  Keyboard.dismiss();
+interface BackButtonProps {
+  waitForKeyBoardDismiss?: boolean;
+}
 
+const BackButton = ({ waitForKeyBoardDismiss }: BackButtonProps) => {
   return (
     <View>
       {router.canGoBack() && (
@@ -13,7 +15,15 @@ const BackButton = () => {
           style={{ paddingLeft: 10, paddingBottom: 2 }}
           disabled={!router.canGoBack()}
           onPress={() => {
-            router.back();
+            Keyboard.dismiss();
+            if (waitForKeyBoardDismiss === true) {
+              console.log("waiting for keyboard dismiss");
+              setTimeout(() => {
+                router.back();
+              }, 10);
+            } else {
+              router.back();
+            }
           }}
         >
           <FontAwesome5 name="arrow-left" size={20} color="#FB6D0B" />

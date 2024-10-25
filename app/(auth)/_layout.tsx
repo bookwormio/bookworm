@@ -1,13 +1,7 @@
-import { FontAwesome5 } from "@expo/vector-icons";
-import { Stack, router } from "expo-router";
+import { Stack } from "expo-router";
 import React from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform } from "react-native";
+import BackButton from "../../components/backbutton/BackButton";
 
 const AuthLayout = () => {
   return (
@@ -21,30 +15,7 @@ const AuthLayout = () => {
           name="CreateAccount"
           options={{
             headerTitle: "Create Account",
-            headerLeft: () => (
-              <View>
-                {router.canGoBack() && (
-                  <TouchableOpacity
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                    disabled={!router.canGoBack()}
-                    onPress={() => {
-                      router.back();
-                    }}
-                  >
-                    <FontAwesome5
-                      name="arrow-left"
-                      size={20}
-                      style={{ marginRight: 10 }}
-                    />
-                    <Text>Sign In</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            ),
+            headerLeft: () => <BackButton />,
           }}
         />
         <Stack.Screen

@@ -36,15 +36,18 @@ const Profile = () => {
     },
   });
 
-  const { data: followersCount } = useGetNumberOfFollowersByUserID(
-    user?.uid ?? "",
-  );
+  const { data: followersCount, isLoading: isLoadingFollowersCount } =
+    useGetNumberOfFollowersByUserID(user?.uid ?? "");
 
-  const { data: followingCount } = useGetNumberOfFollowingByUserID(
-    user?.uid ?? "",
-  );
+  const { data: followingCount, isLoading: isLoadingFollowingCount } =
+    useGetNumberOfFollowingByUserID(user?.uid ?? "");
 
-  if (isLoadingUserData || userData == null) {
+  if (
+    isLoadingUserData ||
+    userData == null ||
+    isLoadingFollowersCount ||
+    isLoadingFollowingCount
+  ) {
     return (
       <View style={styles.loading}>
         <WormLoader />

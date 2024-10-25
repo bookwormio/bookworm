@@ -65,18 +65,14 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     user?.uid,
   );
 
-  const { data: isFollowingData } = useGetIsFollowing(
-    user?.uid ?? "",
-    friendUserID,
-  );
+  const { data: isFollowingData, isLoading: isLoadingIsFollowingData } =
+    useGetIsFollowing(user?.uid ?? "", friendUserID);
 
-  const { data: numFollowersData } = useGetNumberOfFollowersByUserID(
-    friendUserID ?? "",
-  );
+  const { data: numFollowersData, isLoading: isLoadingNumFollowersData } =
+    useGetNumberOfFollowersByUserID(friendUserID ?? "");
 
-  const { data: numFollowingData } = useGetNumberOfFollowingByUserID(
-    friendUserID ?? "",
-  );
+  const { data: numFollowingData, isLoading: isLoadingNumFollowingData } =
+    useGetNumberOfFollowingByUserID(friendUserID ?? "");
 
   const handleInvalidateFollowDetails = async () => {
     await Promise.all([
@@ -217,7 +213,14 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     }
   };
 
-  if (friendIsLoading || isLoadingUserData || friendData == null) {
+  if (
+    friendIsLoading ||
+    isLoadingUserData ||
+    friendData == null ||
+    isLoadingIsFollowingData ||
+    isLoadingNumFollowersData ||
+    isLoadingNumFollowingData
+  ) {
     return (
       <View style={styles.loading}>
         <WormLoader />

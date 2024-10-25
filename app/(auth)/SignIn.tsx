@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
+  Keyboard,
   ScrollView,
   StyleSheet,
   Text,
@@ -77,6 +78,7 @@ const Login = () => {
             }}
             textStyle={styles.createButtonText}
             onPress={() => {
+              Keyboard.dismiss();
               router.push("/CreateAccount");
             }}
           />

@@ -50,7 +50,7 @@ const SearchLayout = () => {
           options={{
             headerShown: true,
             headerTitle: "Post",
-            headerLeft: () => <BackButton />,
+            headerLeft: () => <BackButton waitForKeyBoardDismiss={true} />,
           }}
         />
       </Stack>
