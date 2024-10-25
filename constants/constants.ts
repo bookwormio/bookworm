@@ -71,6 +71,7 @@ export const CHIP_GRADIENT_COLORS = {
   [ServerBookShelfName.WANT_TO_READ]: [LIGHT_LAVENDER, DARK_LAVENDER],
   [ServerBookShelfName.FINISHED]: [LIGHT_ORANGE, MEDIUM_ORANGE],
   [ServerBookShelfName.LENDING_LIBRARY]: [LIGHT_SALMON, DARK_SALMON],
+  // TODO: update once we have borrowing library
   // [ServerBookShelfName.BORROWING]: [LIGHT_GOLD, DARK_GOLD],
 };
 
