@@ -1,9 +1,9 @@
 import React from "react";
 import {
   BACKWARDS_PROGRESS_COLOR,
-  FIRST_PROGRESS_COLOR,
+  BOOKWORM_DARK_GREEN,
+  BOOKWORM_LIGHT_GREEN,
   REMAINING_PROGRESS_COLOR,
-  SECOND_PROGRESS_COLOR,
 } from "../../../constants/constants";
 import ProgressBar from "./ProgressBar";
 
@@ -32,10 +32,10 @@ const PagesProgressBar = ({
       animateDuration={500}
       barHeight={15}
       data={[
-        { progress: firstProgress, color: FIRST_PROGRESS_COLOR },
+        { progress: firstProgress, color: BOOKWORM_DARK_GREEN },
         {
           progress: secondProgress,
-          color: isBackwards ? BACKWARDS_PROGRESS_COLOR : SECOND_PROGRESS_COLOR,
+          color: isBackwards ? BACKWARDS_PROGRESS_COLOR : BOOKWORM_LIGHT_GREEN,
         },
         { progress: remainingProgress, color: REMAINING_PROGRESS_COLOR },
       ]}
