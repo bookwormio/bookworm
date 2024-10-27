@@ -147,7 +147,7 @@ const Post = ({
                     onPress={() => {
                       navigateToBook();
                     }}
-                    style={styles.firstImageContainer}
+                    style={styles.imageContainer}
                     >
                       <View style={styles.firstImageStyle}>
                         {image}
@@ -156,7 +156,7 @@ const Post = ({
                 );
               }
               return (
-              <View key={index} style={styles.defaultImageContainer}>
+              <View key={index} style={styles.imageContainer}>
               <View style={styles.defaultImageStyle}>
                 {image}
               </View>
@@ -217,10 +217,7 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     overflow: 'hidden', // Ensure the image is clipped to the border radius
   },
-  defaultImageContainer: {
-    marginRight: 10,
-  },
-  firstImageContainer: {
+  imageContainer: {
     marginRight: 10,
   },
   headerContainer: {
