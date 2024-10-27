@@ -131,7 +131,7 @@ export async function fetchPostsByUserIDs(
                 );
               })
               .catch((error) => {
-                console.error("Error fetching image by User Ids ", error);
+                console.error("Error fetching image ", error);
               });
             downloadPromises.push(promise);
           }
@@ -207,7 +207,7 @@ export async function fetchPostsByUserID(
                   );
                 })
                 .catch((error) => {
-                  console.error("Error fetching image by User Id", error);
+                  console.error("Error fetching image ", error);
                 });
               downloadPromises.push(promise);
             }
