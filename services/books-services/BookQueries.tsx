@@ -4,6 +4,7 @@ import {
   type BookVolumeItem,
   type BooksResponse,
 } from "../../types";
+import { convertToHttps } from "../util/bookQueryUtils";
 
 /**
  * Fetch books from Google Books API by title search
@@ -36,7 +37,24 @@ export async function fetchBooksByTitleSearch(
       id: item.id,
       etag: item.etag,
       selfLink: item.selfLink,
-      volumeInfo: item.volumeInfo,
+      volumeInfo: {
+        ...item.volumeInfo,
+        imageLinks:
+          item.volumeInfo.imageLinks != null
+            ? {
+                smallThumbnail: convertToHttps(
+                  item.volumeInfo.imageLinks.smallThumbnail,
+                ),
+                thumbnail: convertToHttps(item.volumeInfo.imageLinks.thumbnail),
+                small: convertToHttps(item.volumeInfo.imageLinks.small),
+                medium: convertToHttps(item.volumeInfo.imageLinks.medium),
+                large: convertToHttps(item.volumeInfo.imageLinks.large),
+                extraLarge: convertToHttps(
+                  item.volumeInfo.imageLinks.extraLarge,
+                ),
+              }
+            : undefined,
+      },
     }));
   } catch (error) {
     console.error("Error fetching books by title search", error);
@@ -64,6 +82,19 @@ export async function fetchBookByVolumeID(
         projection: "full",
       },
     });
+
+    const volumeInfo = response.data.volumeInfo;
+    if (volumeInfo.imageLinks != null) {
+      volumeInfo.imageLinks = {
+        smallThumbnail: convertToHttps(volumeInfo.imageLinks.smallThumbnail),
+        thumbnail: convertToHttps(volumeInfo.imageLinks.thumbnail),
+        small: convertToHttps(volumeInfo.imageLinks.small),
+        medium: convertToHttps(volumeInfo.imageLinks.medium),
+        large: convertToHttps(volumeInfo.imageLinks.large),
+        extraLarge: convertToHttps(volumeInfo.imageLinks.extraLarge),
+      };
+    }
+
     return response.data.volumeInfo;
   } catch (error) {
     console.error("Error fetching book by volume id", error);
