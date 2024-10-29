@@ -88,3 +88,6 @@ export const IMG_STYLE: StyleProp<ImageStyle> = {
 export const APP_BACKGROUND_COLOR = "white";
 
 export const BORROW_BOOK_COLLECTION_REF = "borrowing_collection";
+
+export const BOOK_AUTO_DENIAL_NOTIFICATION_MESSAGE =
+  "This book is being lent to someone else.";
