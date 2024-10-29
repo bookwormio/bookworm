@@ -147,12 +147,21 @@ const Post = ({
                     onPress={() => {
                       navigateToBook();
                     }}
-                  >
-                    {image}
+                    style={styles.imageContainer}
+                    >
+                      <View style={styles.firstImageStyle}>
+                        {image}
+                      </View>
                   </TouchableOpacity>
                 );
               }
-              return <View key={index}>{image}</View>;
+              return (
+              <View key={index} style={styles.imageContainer}>
+              <View style={styles.defaultImageStyle}>
+                {image}
+              </View>
+            </View>
+              );
             })}
           </ScrollView>
         </View>
@@ -196,7 +205,21 @@ const styles = StyleSheet.create({
   profilePicContainer: {
     marginRight: 10,
   },
-
+  firstImageStyle: {
+    width: 180, // custom width
+    height: 250, // custom height
+    borderRadius: 2,
+    overflow: 'hidden', // Ensure the image is clipped to the border radius
+  },
+  defaultImageStyle: {
+    width: 250,
+    height: 250,
+    borderRadius: 0,
+    overflow: 'hidden', // Ensure the image is clipped to the border radius
+  },
+  imageContainer: {
+    marginRight: 10,
+  },
   headerContainer: {
     flexDirection: "row",
     alignItems: "flex-start",

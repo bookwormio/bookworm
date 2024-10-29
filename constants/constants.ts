@@ -85,6 +85,16 @@ export const IMG_STYLE: StyleProp<ImageStyle> = {
   marginRight: 10,
 };
 
+export const FIRST_IMAGE_HEIGHT = 250;
+export const FIRST_IMAGE_WIDTH = 180;
+export const FIRST_IMAGE_BORDER_RADIUS = 3;
+export const FIRST_IMG_STYLE: StyleProp<ImageStyle> = {
+  height: FIRST_IMAGE_HEIGHT,
+  width: FIRST_IMAGE_WIDTH,
+  borderRadius: FIRST_IMAGE_BORDER_RADIUS,
+  marginRight: 0,
+};
+
 export const APP_BACKGROUND_COLOR = "white";
 
 export const BORROW_BOOK_COLLECTION_REF = "borrowing_collection";
