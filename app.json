@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "BookWorm",
-    "slug": "BookWorm",
+    "name": "bookworm.io",
+    "slug": "bookworm",
     "scheme": "BookWorm",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -27,6 +27,21 @@
     "plugins": [
       "expo-router",
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "0be03592-18f6-4911-a3db-71212671a5c5"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.rilescode.bookwormio"
+    },
+    "owner": "bookwormio",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0be03592-18f6-4911-a3db-71212671a5c5"
+    }
   }
 }
