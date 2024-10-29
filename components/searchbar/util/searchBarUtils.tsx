@@ -41,10 +41,14 @@ export function mapAndSortPreloadedBooks(
     }
   }
 
-  return Array.from(uniqueBooks.values()).map((book) => ({
-    id: book.id,
-    volumeInfo: book.volumeInfo,
-  }));
+  return Array.from(uniqueBooks.values()).map((book) => {
+    const myBook: BookVolumeItem = {
+      id: book.id,
+      bookShelf: book.shelf,
+      volumeInfo: book.volumeInfo,
+    };
+    return myBook;
+  });
 }
 
 /**
