@@ -4,6 +4,7 @@ import {
   NotificationTitleMap,
   ServerNotificationType,
 } from "../../../enums/Enums";
+import { type BookRequestResponseNotification } from "../../../types";
 
 /**
  * Calculates the time elapsed since a notification was created and returns it in a human-readable format.
@@ -71,4 +72,29 @@ export const formatNotification = (
   }
 
   return { title, message };
+};
+
+/**
+ * Creates a new book request notification.
+ */
+export const createBookResponseNotification = (
+  receiver: string,
+  sender: string,
+  senderName: string,
+  bookID: string,
+  bookTitle: string,
+  bookRequestStatus: BookRequestNotificationStatus,
+  customMessage?: string,
+) => {
+  const bookResponseNotification: BookRequestResponseNotification = {
+    receiver,
+    sender,
+    sender_name: senderName,
+    type: ServerNotificationType.BOOK_REQUEST_RESPONSE,
+    bookID,
+    bookTitle,
+    custom_message: customMessage ?? "",
+    bookRequestStatus,
+  };
+  return bookResponseNotification;
 };

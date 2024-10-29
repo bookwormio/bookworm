@@ -291,5 +291,6 @@ interface UpdateBorrowNotificationParams {
 interface DenyOtherBorrowRequestsParams {
   lenderUserID: string;
   acceptedBorrowerUserID: string;
+  acceptedBorrowerUserName: string;
   bookID: string;
 }
