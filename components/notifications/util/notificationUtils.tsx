@@ -85,7 +85,7 @@ export const createBookResponseNotification = (
   bookTitle: string,
   bookRequestStatus: BookRequestNotificationStatus,
   customMessage?: string,
-) => {
+): BookRequestResponseNotification => {
   const bookResponseNotification: BookRequestResponseNotification = {
     receiver,
     sender,
