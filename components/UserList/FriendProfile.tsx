@@ -227,7 +227,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
 
   return (
     <ScrollView
-      stickyHeaderIndices={[4]}
+      stickyHeaderIndices={[3]}
       style={{
         flexGrow: 1,
         height: "100%",

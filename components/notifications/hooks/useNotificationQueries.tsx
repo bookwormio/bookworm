@@ -106,7 +106,7 @@ export const useDenyOtherBorrowRequests = () => {
       );
     },
 
-    onSuccess: async (data, { lenderUserID }) => {
+    onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["notifications"],
       });

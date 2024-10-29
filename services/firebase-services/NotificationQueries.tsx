@@ -278,8 +278,16 @@ export const denyOtherBorrowRequests = async (
           BookRequestNotificationStatus.DENIED,
           BOOK_AUTO_DENIAL_NOTIFICATION_MESSAGE,
         );
+
+        // add required fields to the denial notification
+        const fullNotification: Omit<FullNotificationModel, "notifID"> = {
+          ...denialNotification,
+          created: serverTimestamp() as Timestamp,
+          read_at: null,
+        };
+
         const newDocRef = doc(collection(DB, "notifications"));
-        batch.set(newDocRef, denialNotification);
+        batch.set(newDocRef, fullNotification);
       }
     });
 
