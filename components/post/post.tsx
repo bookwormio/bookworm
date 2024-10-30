@@ -78,7 +78,9 @@ const Post = ({
           <View style={styles.profilePicContainer}>
             <TouchableOpacity
               disabled={isCurrentUsersPost}
-              onPress={handleNavigateToUser}
+              onPress={() => {
+                handleNavigateToUser();
+              }}
             >
               <ProfilePicture userID={post.user.id} size={40} />
             </TouchableOpacity>
@@ -90,7 +92,9 @@ const Post = ({
               <Text style={styles.title}>
                 <Text
                   style={styles.userName}
-                  onPress={handleNavigateToUser}
+                  onPress={() => {
+                    handleNavigateToUser();
+                  }}
                   disabled={isCurrentUsersPost}
                 >
                   {post.user.first} {post.user.last}
@@ -105,7 +109,9 @@ const Post = ({
               <Text style={styles.title}>
                 <Text
                   style={styles.userName}
-                  onPress={handleNavigateToUser}
+                  onPress={() => {
+                    handleNavigateToUser();
+                  }}
                   disabled={isCurrentUsersPost}
                 >
                   {post.user.first} {post.user.last}
@@ -151,6 +157,7 @@ const Post = ({
             />
           </View>
         )}
+
         <LikeComment
           post={post}
           key={`${post.id}-${post.comments.length}-${post.likes.length}`}
