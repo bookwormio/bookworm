@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
+  Keyboard,
   ScrollView,
   StyleSheet,
   Text,
@@ -69,9 +70,15 @@ const Login = () => {
           <Text style={styles.question}>{"Don't have an account?"}</Text>
           <BookWormButton
             title="Create Account"
-            style={{ backgroundColor: APP_BACKGROUND_COLOR, flex: 1 }}
+            style={{
+              backgroundColor: APP_BACKGROUND_COLOR,
+              flex: 1,
+              marginVertical: 0,
+              marginHorizontal: 0,
+            }}
             textStyle={styles.createButtonText}
             onPress={() => {
+              Keyboard.dismiss();
               router.push("/CreateAccount");
             }}
           />
@@ -101,9 +108,8 @@ const styles = StyleSheet.create({
   },
   createButtonText: {
     color: "#FB6D0B",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "bold",
-    marginLeft: 10,
   },
   container: {
     alignItems: "center",

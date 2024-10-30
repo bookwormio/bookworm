@@ -216,7 +216,7 @@ const NewPost = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <BookDropdownButton selectedBook={selectedBook} />
 
       {selectedBook?.pageCount != null &&
@@ -303,7 +303,7 @@ const NewPost = () => {
         />
       </View>
       <Toast />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -313,6 +313,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     backgroundColor: APP_BACKGROUND_COLOR,
+    flexGrow: 1,
+    flexDirection: "column",
   },
   slider: {
     marginBottom: 20,
@@ -329,7 +331,7 @@ const styles = StyleSheet.create({
   },
   imageScroll: {
     flexGrow: 0,
-    marginBottom: 20,
+    marginBottom: 145,
   },
   imageContainer: {
     marginRight: 10,
@@ -370,6 +372,7 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     right: 20,
+    paddingBottom: 20,
   },
   buttonDisabled: {
     backgroundColor: "rgba(251, 109, 11, 0.5)", // 50% opacity of original color

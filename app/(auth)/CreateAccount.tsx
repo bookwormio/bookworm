@@ -1,6 +1,12 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, TextInput, View } from "react-native";
+import {
+  Keyboard,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
 import BookWormButton from "../../components/button/BookWormButton";
@@ -116,6 +122,7 @@ const CreateAccount = () => {
           onPress={() => {
             if (validFields()) {
               try {
+                Keyboard.dismiss();
                 createAccount(email, password);
                 router.push("/MoreInfo");
               } catch (error) {
