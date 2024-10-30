@@ -1,16 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
-import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { fetchPostsByUserID } from "../../services/firebase-services/PostQueries";
 import Post from "../post/post";
 import WormLoader from "../wormloader/WormLoader";
+import { useNavigateToPost } from "./hooks/useRouteHooks";
 
 interface FriendProfilePostsProps {
   userID: string;
 }
 
 const FriendProfilePosts = ({ userID }: FriendProfilePostsProps) => {
+  const navigateToPost = useNavigateToPost();
   const { data: profilePosts, isLoading: isProfilePostsLoading } = useQuery({
     queryKey: userID != null ? ["friendPosts", userID] : ["friendPosts"],
     queryFn: async () => {
@@ -32,9 +33,7 @@ const FriendProfilePosts = ({ userID }: FriendProfilePostsProps) => {
           <TouchableOpacity
             key={post.id}
             onPress={() => {
-              router.push({
-                pathname: `posts/${post.id}`,
-              });
+              navigateToPost(post.id);
             }}
           >
             <Post
@@ -44,9 +43,7 @@ const FriendProfilePosts = ({ userID }: FriendProfilePostsProps) => {
               currentDate={currentDate}
               individualPage={false}
               presentComments={() => {
-                router.push({
-                  pathname: `posts/${post.id}`,
-                });
+                navigateToPost(post.id);
               }}
             />
           </TouchableOpacity>

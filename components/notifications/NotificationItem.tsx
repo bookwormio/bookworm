@@ -1,11 +1,13 @@
-import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { ServerNotificationType } from "../../enums/Enums";
 import { type FullNotificationModel } from "../../types";
-import { generateUserRoute } from "../../utilities/routeUtils";
 import { useAuth } from "../auth/context";
-import { useNavigateToBook } from "../profile/hooks/useRouteHooks";
+import {
+  useNavigateToBook,
+  useNavigateToPost,
+  useNavigateToUser,
+} from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import NotificationItemContent from "./NotificationItemContent";
 import { calculateTimeSinceNotification } from "./util/notificationUtils";
@@ -20,6 +22,10 @@ const NotificationItem = ({ notif }: NotifProp) => {
 
   const navigateToBook = useNavigateToBook(notif.bookID);
 
+  const navigateToPost = useNavigateToPost();
+
+  const navigateToUser = useNavigateToUser(notif.sender);
+
   return (
     <TouchableOpacity
       style={styles.notif_container}
@@ -28,18 +34,9 @@ const NotificationItem = ({ notif }: NotifProp) => {
           notif.type === ServerNotificationType.LIKE ||
           notif.type === ServerNotificationType.COMMENT
         ) {
-          router.push({
-            pathname: `/${notif.postID}`,
-          });
+          navigateToPost(notif.postID);
         } else if (notif.type === ServerNotificationType.FRIEND_REQUEST) {
-          const userRoute = generateUserRoute(
-            user?.uid,
-            notif.sender,
-            undefined,
-          );
-          if (userRoute != null) {
-            router.push(userRoute);
-          }
+          navigateToUser();
         } else if (
           notif.type === ServerNotificationType.RECOMMENDATION ||
           notif.type === ServerNotificationType.BOOK_REQUEST ||
@@ -52,14 +49,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
       <View style={styles.imageTextContainer}>
         <TouchableOpacity
           onPress={() => {
-            const userRoute = generateUserRoute(
-              user?.uid,
-              notif.sender,
-              undefined,
-            );
-            if (userRoute != null) {
-              router.push(userRoute);
-            }
+            navigateToUser();
           }}
         >
           <ProfilePicture userID={notif.sender} size={50} />

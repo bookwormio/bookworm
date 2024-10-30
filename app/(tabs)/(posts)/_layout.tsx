@@ -35,14 +35,6 @@ const PostsLayout = () => {
           }}
         />
         <Stack.Screen
-          name="[postID]"
-          options={{
-            headerShown: true,
-            headerTitle: "Post",
-            headerLeft: () => <BackButton waitForKeyBoardDismiss={true} />,
-          }}
-        />
-        <Stack.Screen
           name="user/[friendUserID]"
           options={{
             headerShown: true,

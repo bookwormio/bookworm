@@ -1,9 +1,9 @@
 import { Image } from "expo-image";
-import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type ServerBookShelfName } from "../../enums/Enums";
 import { type BookVolumeInfo } from "../../types";
+import { useNavigateToBook } from "../profile/hooks/useRouteHooks";
 import BookshelfListChip from "./BookshelfListChip";
 
 interface BookListItemProps {
@@ -22,11 +22,7 @@ const BookListItem = ({
   handleBookClickOverride,
   bookShelf,
 }: BookListItemProps) => {
-  const handleClick = ({ bookID }: { bookID: string }) => {
-    router.push({
-      pathname: `/searchbook/${bookID}`,
-    });
-  };
+  const navigateToBook = useNavigateToBook(bookID);
 
   return (
     <TouchableOpacity
@@ -35,7 +31,7 @@ const BookListItem = ({
         if (handleBookClickOverride != null) {
           handleBookClickOverride(bookID, volumeInfo);
         } else {
-          handleClick({ bookID });
+          navigateToBook();
         }
       }}
     >
