@@ -40,7 +40,7 @@ const ProfilePosts = ({ userID }: ProfilePostsProps) => {
             key={post.id}
             onPress={() => {
               router.push({
-                pathname: `posts/${post.id}`,
+                pathname: `profilepost/${post.id}`,
               });
             }}
           >
@@ -52,7 +52,7 @@ const ProfilePosts = ({ userID }: ProfilePostsProps) => {
               individualPage={false}
               presentComments={() => {
                 router.push({
-                  pathname: `posts/${post.id}`,
+                  pathname: `profilepost/${post.id}`,
                 });
               }}
             />

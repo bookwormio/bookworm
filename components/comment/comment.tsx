@@ -1,9 +1,8 @@
-import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type CommentModel } from "../../types";
-import { generateUserRoute } from "../../utilities/routeUtils";
 import { useAuth } from "../auth/context";
+import { useNavigateToUser } from "../profile/hooks/useRouteHooks";
 
 interface PostProps {
   comment: CommentModel;
@@ -11,19 +10,13 @@ interface PostProps {
 
 const Comment = ({ comment }: PostProps) => {
   const { user } = useAuth();
+  const navigateToUser = useNavigateToUser(user?.uid, comment.userID);
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
         onPress={() => {
-          const userRoute = generateUserRoute(
-            user?.uid,
-            comment.userID,
-            undefined,
-          );
-          if (userRoute != null) {
-            router.push(userRoute);
-          }
+          navigateToUser();
         }}
         disabled={comment.userID === user?.uid}
       >

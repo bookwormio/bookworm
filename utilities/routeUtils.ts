@@ -38,7 +38,7 @@ export function generateUserRoute(
   }
 
   if (currentUserID !== navigateToUserID) {
-    const pathName = `/${prefix ?? ""}user/${navigateToUserID}`;
+    const pathName = `/${prefix ?? ""}/user/${navigateToUserID}`;
     return pathName;
   }
 
