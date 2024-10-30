@@ -1,9 +1,15 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useAuth } from "../../components/auth/context";
 import BookWormButton from "../../components/button/BookWormButton";
-import WormLoader from "../../components/wormloader/WormLoader";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 
 const Login = () => {
@@ -12,18 +18,15 @@ const Login = () => {
   const { signIn, isLoading } = useAuth();
 
   if (isLoading) {
-    const styles = StyleSheet.create({
-      container: {
-        flex: 1,
-        alignItems: "center",
-        padding: 40,
-        justifyContent: "center",
-      },
-    });
-
     return (
-      <View style={styles.container}>
-        <WormLoader />
+      <View>
+        <Image
+          source={require("../../assets/bookworm-splash-screen.png")}
+          style={{
+            height: "100%",
+            width: "100%",
+          }}
+        />
       </View>
     );
   }

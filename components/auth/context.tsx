@@ -76,7 +76,6 @@ const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
       setUser(authUser);
       setLoading(false);
     });
-    setLoading(false);
     return unsubscribe;
   }, []);
   useAuthenticatedRoute(currentUser, createUser);
