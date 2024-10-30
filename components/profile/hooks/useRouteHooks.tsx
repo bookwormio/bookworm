@@ -33,6 +33,10 @@ interface RouteInfo {
   prefix: string;
 }
 
+/**
+ * Hook to get the current book route info based on URL segments.
+ * @returns {RouteInfo} - Object containing the route type and prefix for books.
+ */
 export const useBookRouteInfo = (): RouteInfo => {
   const segments = useSegments();
 
@@ -46,6 +50,11 @@ export const useBookRouteInfo = (): RouteInfo => {
   return { type: null, prefix: "" };
 };
 
+/**
+ * Hook to navigate to a book detail page using the provided book ID.
+ * @param {string} [bookID] - The ID of the book to navigate to.
+ * @returns {Function} - Function to navigate to the book page.
+ */
 export const useNavigateToBook = (bookID?: string) => {
   const router = useRouter();
   const { prefix } = useBookRouteInfo();
@@ -73,6 +82,10 @@ interface UserRouteInfo {
   prefix: string;
 }
 
+/**
+ * Hook to get the current user route info based on URL segments.
+ * @returns {UserRouteInfo} - Object containing the route type and prefix for users.
+ */
 export const useUserRouteInfo = (): UserRouteInfo => {
   const segments = useSegments();
 
@@ -86,6 +99,12 @@ export const useUserRouteInfo = (): UserRouteInfo => {
   return { type: null, prefix: "" };
 };
 
+/**
+ * Hook to navigate to a user detail page using the provided user and friend IDs.
+ * @param {string} [userID] - The ID of the user to navigate to.
+ * @param {string} [friendID] - Optional friend ID for user navigation.
+ * @returns {Function} - Function to navigate to the user page.
+ */
 export const useNavigateToUser = (userID?: string, friendID?: string) => {
   const router = useRouter();
   const { prefix } = useUserRouteInfo();
@@ -112,6 +131,10 @@ interface PostRouteInfo {
   prefix: string;
 }
 
+/**
+ * Hook to get the current post route info based on URL segments.
+ * @returns {PostRouteInfo} - Object containing the route type and prefix for posts.
+ */
 export const usePostRouteInfo = (): PostRouteInfo => {
   const segments = useSegments();
 
@@ -125,6 +148,11 @@ export const usePostRouteInfo = (): PostRouteInfo => {
   return { type: null, prefix: "" };
 };
 
+/**
+ * Hook to navigate to a post detail page using the provided post ID.
+ * @param {string} [postID] - The ID of the post to navigate to.
+ * @returns {Function} - Function to navigate to the post page.
+ */
 export const useNavigateToPost = () => {
   const router = useRouter();
   const { prefix } = usePostRouteInfo();
@@ -152,6 +180,10 @@ interface FollowListRouteInfo {
   prefix: string;
 }
 
+/**
+ * Hook to get the current follow list route info based on URL segments.
+ * @returns {FollowListRouteInfo} - Object containing the route type and prefix for follow lists.
+ */
 export const useFollowListRouteInfo = (): FollowListRouteInfo => {
   const segments = useSegments();
 
@@ -165,6 +197,12 @@ export const useFollowListRouteInfo = (): FollowListRouteInfo => {
   return { type: null, prefix: "" };
 };
 
+/**
+ * Hook to navigate to a follow list page for a given user.
+ * @param {string} [userID] - The ID of the user whose follow list is being navigated to.
+ * @param {boolean} [followersfirst] - If true, navigates to followers list first.
+ * @returns {Function} - Function to navigate to the follow list page.
+ */
 export const useNavigateToFollowList = (userID?: string) => {
   const router = useRouter();
   const { prefix } = useFollowListRouteInfo();
