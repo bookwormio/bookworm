@@ -147,17 +147,27 @@ const Post = ({
               renderItem={({ item, index }) => {
                 if (index === 0) {
                   return (
-                    <TouchableOpacity onPress={navigateToBook}>
-                      {item}
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => {
+                        navigateToBook();
+                      }}
+                      style={styles.imageContainer}
+                    >
+                      <View style={styles.firstImageStyle}>{item}</View>
                     </TouchableOpacity>
                   );
                 }
-                return <View key={index}>{item}</View>;
+
+                return (
+                  <View key={index} style={styles.imageContainer}>
+                    <View style={styles.defaultImageStyle}>{item}</View>
+                  </View>
+                );
               }}
             />
           </View>
         )}
-
         <LikeComment
           post={post}
           key={`${post.id}-${post.comments.length}-${post.likes.length}`}
