@@ -1,7 +1,6 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  FlatList,
   StyleSheet,
   Text,
   TextInput,
@@ -79,10 +78,10 @@ export const LikeComment = ({
       </View>
       {showCommentSection && (
         <>
-          <FlatList
-            data={post.comments}
-            renderItem={({ item: comment }) => <Comment comment={comment} />}
-          />
+          {post.comments.map(
+            (comment, index) =>
+              comment != null && <Comment key={index} comment={comment} />,
+          )}
           <View style={styles.commentInputContainer}>
             <TextInput
               style={styles.commentInput}
