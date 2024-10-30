@@ -98,3 +98,14 @@ export const createBookResponseNotification = (
   };
   return bookResponseNotification;
 };
+
+/**
+ * Formats the sender name by concatenating the first and last name.
+ *
+ * @param first The first name of the sender
+ * @param last The last name of the sender
+ * @returns The formatted sender name
+ */
+export const formatSenderName = (first: string, last: string) => {
+  return `${first ?? ""} ${last ?? ""}`.trim();
+};

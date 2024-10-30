@@ -21,6 +21,7 @@ import {
 import {
   createBookResponseNotification,
   formatNotification,
+  formatSenderName,
 } from "./util/notificationUtils";
 
 interface NotificationItemContentProps {
@@ -41,10 +42,6 @@ const NotificationItemContent = ({
   const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
     user?.uid,
   );
-
-  const formatSenderName = (first: string, last: string) => {
-    return `${first ?? ""} ${last ?? ""}`.trim();
-  };
 
   const handleSendBookResponseNotification = async ({
     bookID,
