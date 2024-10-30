@@ -21,7 +21,7 @@ const Login = () => {
     return (
       <View>
         <Image
-          source={require("../../assets/splash.png")}
+          source={require("../../assets/bookworm-splash-screen.png")}
           style={{
             height: "100%",
             width: "100%",
