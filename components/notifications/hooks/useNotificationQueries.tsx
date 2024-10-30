@@ -95,17 +95,18 @@ export const useDenyOtherBorrowRequests = () => {
     mutationFn: async ({
       lenderUserID,
       acceptedBorrowerUserID,
+      acceptedBorrowerUserName,
       bookID,
     }: DenyOtherBorrowRequestsParams) => {
       await denyOtherBorrowRequests(
         lenderUserID,
         acceptedBorrowerUserID,
+        acceptedBorrowerUserName,
         bookID,
       );
-      // TODO: this also needs to send denial notifications to the other users
     },
 
-    onSuccess: async (data, { lenderUserID }) => {
+    onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["notifications"],
       });
