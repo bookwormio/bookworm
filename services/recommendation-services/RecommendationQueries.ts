@@ -32,7 +32,9 @@ export async function sendPing() {
  * @returns Promise resolving to an array of recommended volume IDs
  * @throws Error if the request fails or invalid input is provided
  */
-export async function getRecommendations(userIds: string[]): Promise<string[]> {
+export async function fetchRecommendationsFromAPI(
+  userIds: string[],
+): Promise<string[]> {
   if (userIds == null || userIds.length === 0) {
     throw new Error("User IDs must be provided as a non-empty array");
   }
@@ -80,7 +82,7 @@ export async function fetchUserBookRecommendations(
   userID: string,
 ): Promise<BookVolumeItem[]> {
   // Fetch recommendation IDs from API
-  const recommendationIDs = await getRecommendations([userID]);
+  const recommendationIDs = await fetchRecommendationsFromAPI([userID]);
 
   // Fetch book info for each recommendation
   const volumeResults = await Promise.all(
