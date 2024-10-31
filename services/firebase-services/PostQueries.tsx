@@ -16,7 +16,7 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import React from "react";
-import { BLURHASH, IMG_STYLE } from "../../constants/constants";
+import { BLURHASH, FIRST_IMG_STYLE, IMG_STYLE } from "../../constants/constants";
 import { DB, STORAGE } from "../../firebase.config";
 import {
   type CommentModel,
@@ -125,7 +125,7 @@ export async function fetchPostsByUserIDs(
                     source={{ uri: url }}
                     cachePolicy={"memory-disk"}
                     placeholder={BLURHASH}
-                    style={IMG_STYLE}
+                    style={index === 0 ? FIRST_IMG_STYLE : IMG_STYLE}
                     contentFit="fill"
                   />
                 );
@@ -202,7 +202,7 @@ export async function fetchPostsByUserID(
                       source={{ uri: url }}
                       cachePolicy={"memory-disk"}
                       placeholder={BLURHASH}
-                      style={IMG_STYLE}
+                      style={index === 0 ? FIRST_IMG_STYLE : IMG_STYLE}
                     />
                   );
                 })
@@ -279,12 +279,12 @@ export async function fetchPostByPostID(
                     source={{ uri: url }}
                     cachePolicy={"memory-disk"}
                     placeholder={BLURHASH}
-                    style={IMG_STYLE}
+                    style={index === 0 ? FIRST_IMG_STYLE : IMG_STYLE}
                   />
                 );
               })
               .catch((error) => {
-                console.error("Error fetching image ", error);
+                console.error("Error fetching image by postId ", error);
               });
             downloadPromises.push(promise);
           }

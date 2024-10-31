@@ -1,7 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, View } from "react-native";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
 import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { ServerNotificationType } from "../../enums/Enums";
 import { createNotification } from "../../services/firebase-services/NotificationQueries";
@@ -96,13 +101,19 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <BookSearch
-        searchPhrase={searchPhrase}
-        setSearchPhrase={setParentSearchPhrase}
-        handleBookClickOverride={handleBookClickOverride}
-      />
-    </View>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 110 : 0}
+    >
+      <ScrollView style={{ flex: 1 }}>
+        <BookSearch
+          searchPhrase={searchPhrase}
+          setSearchPhrase={setParentSearchPhrase}
+          handleBookClickOverride={handleBookClickOverride}
+        />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

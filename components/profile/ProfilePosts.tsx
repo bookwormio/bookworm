@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { fetchPostsByUserID } from "../../services/firebase-services/PostQueries";
 import Post from "../post/post";
 import { usePostsContext } from "../post/PostsContext";
 import WormLoader from "../wormloader/WormLoader";
+import { useNavigateToPost } from "./hooks/useRouteHooks";
 
 interface ProfilePostsProps {
   userID: string;
@@ -13,6 +13,8 @@ interface ProfilePostsProps {
 
 const ProfilePosts = ({ userID }: ProfilePostsProps) => {
   const { setProfilePosts } = usePostsContext();
+
+  const navigateToPost = useNavigateToPost();
 
   const { data: userProfilePosts, isLoading: isUserProfilePostsLoading } =
     useQuery({
@@ -39,9 +41,7 @@ const ProfilePosts = ({ userID }: ProfilePostsProps) => {
           <TouchableOpacity
             key={post.id}
             onPress={() => {
-              router.push({
-                pathname: `posts/${post.id}`,
-              });
+              navigateToPost(post.id);
             }}
           >
             <Post
@@ -51,9 +51,7 @@ const ProfilePosts = ({ userID }: ProfilePostsProps) => {
               currentDate={currentDate}
               individualPage={false}
               presentComments={() => {
-                router.push({
-                  pathname: `posts/${post.id}`,
-                });
+                navigateToPost(post.id);
               }}
             />
           </TouchableOpacity>

@@ -16,6 +16,7 @@ import {
 } from "../../../components/followdetails/useFollowDetailQueries";
 import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBookShelves";
 import ViewData from "../../../components/profile/Data/ViewData";
+import { useNavigateToFollowList } from "../../../components/profile/hooks/useRouteHooks";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
 import ProfilePosts from "../../../components/profile/ProfilePosts";
 import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
@@ -28,6 +29,8 @@ const Profile = () => {
   const { signOut, user } = useAuth();
   const [profileTab, setProfileTab] = useState("shelf"); // Default to bookshelf
 
+  const navigateToFollowList = useNavigateToFollowList(user?.uid);
+
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
     queryKey: ["userdata", user?.uid],
     enabled: user != null,
@@ -36,15 +39,18 @@ const Profile = () => {
     },
   });
 
-  const { data: followersCount } = useGetNumberOfFollowersByUserID(
-    user?.uid ?? "",
-  );
+  const { data: followersCount, isLoading: isLoadingFollowersCount } =
+    useGetNumberOfFollowersByUserID(user?.uid ?? "");
 
-  const { data: followingCount } = useGetNumberOfFollowingByUserID(
-    user?.uid ?? "",
-  );
+  const { data: followingCount, isLoading: isLoadingFollowingCount } =
+    useGetNumberOfFollowingByUserID(user?.uid ?? "");
 
-  if (isLoadingUserData || userData == null) {
+  if (
+    isLoadingUserData ||
+    userData == null ||
+    isLoadingFollowersCount ||
+    isLoadingFollowingCount
+  ) {
     return (
       <View style={styles.loading}>
         <WormLoader />
@@ -76,9 +82,7 @@ const Profile = () => {
         <TouchableOpacity
           style={styles.textWrap}
           onPress={() => {
-            router.push({
-              pathname: `profilefollow/${user?.uid}?followersfirst=true`,
-            });
+            navigateToFollowList(true);
           }}
         >
           <Text style={styles.followTitle}>Followers</Text>
@@ -87,9 +91,7 @@ const Profile = () => {
         <TouchableOpacity
           style={styles.textWrap}
           onPress={() => {
-            router.push({
-              pathname: `profilefollow/${user?.uid}?followersfirst=false`,
-            });
+            navigateToFollowList(false);
           }}
         >
           <Text style={styles.followTitle}>Following</Text>

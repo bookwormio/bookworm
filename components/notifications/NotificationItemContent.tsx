@@ -8,9 +8,7 @@ import {
 } from "../../enums/Enums";
 import {
   type BookRequestNotification,
-  type BookRequestResponseNotification,
   type FullNotificationModel,
-  type UserDataModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
 import { useLendBookToUser } from "../profile/hooks/useBookBorrowQueries";
@@ -20,7 +18,11 @@ import {
   useDenyOtherBorrowRequests,
   useUpdateBorrowNotificationStatus,
 } from "./hooks/useNotificationQueries";
-import { formatNotification } from "./util/notificationUtils";
+import {
+  createBookResponseNotification,
+  formatNotification,
+  formatSenderName,
+} from "./util/notificationUtils";
 
 interface NotificationItemContentProps {
   notification: FullNotificationModel;
@@ -45,28 +47,25 @@ const NotificationItemContent = ({
     bookID,
     message,
     requestStatus,
-    userData,
+    senderName,
     notification,
   }: {
     bookID: string;
     message?: string;
     requestStatus: BookRequestNotificationStatus;
-    userData: UserDataModel;
+    senderName: string;
     notification: BookRequestNotification;
   }) => {
-    const senderName =
-      `${userData?.first ?? ""} ${userData?.last ?? ""}`.trim();
+    const bookResponseNotification = createBookResponseNotification(
+      notification.sender,
+      notification.receiver,
+      senderName,
+      notification.bookID,
+      notification.bookTitle,
+      requestStatus,
+      message,
+    );
 
-    const bookResponseNotification: BookRequestResponseNotification = {
-      receiver: notification.sender,
-      sender: notification.receiver,
-      sender_name: senderName,
-      type: ServerNotificationType.BOOK_REQUEST_RESPONSE,
-      bookID,
-      bookTitle: notification.bookTitle,
-      custom_message: message ?? "",
-      bookRequestStatus: requestStatus,
-    };
     notifyMutation.mutate({
       notification: bookResponseNotification,
     });
@@ -87,11 +86,13 @@ const NotificationItemContent = ({
   const handleRejectOtherRequests = async (
     lenderUserID: string,
     acceptedBorrowerUserID: string,
+    acceptedBorrowerUserName: string,
     bookID: string,
   ) => {
     denyOtherBorrowRequests.mutate({
       lenderUserID,
       acceptedBorrowerUserID,
+      acceptedBorrowerUserName,
       bookID,
     });
   };
@@ -132,12 +133,13 @@ const NotificationItemContent = ({
             bookID: notificationTyped.bookID,
             message: "",
             requestStatus: BookRequestNotificationStatus.ACCEPTED,
-            userData,
+            senderName: formatSenderName(userData.first, userData.last),
             notification: notificationTyped,
           }),
           handleRejectOtherRequests(
             notificationTyped.receiver,
             notificationTyped.sender,
+            formatSenderName(userData.first, userData.last),
             notificationTyped.bookID,
           ),
           handleUpdateBookRequestStatus(
@@ -175,7 +177,7 @@ const NotificationItemContent = ({
           bookID: notificationTyped.bookID,
           message: message ?? "",
           requestStatus: BookRequestNotificationStatus.DENIED,
-          userData,
+          senderName: formatSenderName(userData.first, userData.last),
           notification: notificationTyped,
         }),
         handleUpdateBookRequestStatus(

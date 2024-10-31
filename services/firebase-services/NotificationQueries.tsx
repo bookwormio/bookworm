@@ -11,6 +11,8 @@ import {
   where,
   writeBatch,
 } from "firebase/firestore";
+import { createBookResponseNotification } from "../../components/notifications/util/notificationUtils";
+import { BOOK_AUTO_DENIAL_NOTIFICATION_MESSAGE } from "../../constants/constants";
 import {
   BookRequestNotificationStatus,
   ServerNotificationType,
@@ -241,6 +243,7 @@ export async function getBookRequestStatusForBooks(
 export const denyOtherBorrowRequests = async (
   lenderUserID: string,
   acceptedBorrowerUserID: string,
+  acceptedBorrowerUserName: string,
   bookID: string,
 ): Promise<void> => {
   try {
@@ -259,10 +262,32 @@ export const denyOtherBorrowRequests = async (
     querySnapshot.forEach((docSnapshot) => {
       const notifData = docSnapshot.data() as FullNotificationModel;
       if (notifData.sender !== acceptedBorrowerUserID) {
+        // update the status of the request to denied
         const notifRef = doc(DB, "notifications", docSnapshot.id);
         batch.update(notifRef, {
           bookRequestStatus: BookRequestNotificationStatus.DENIED,
         });
+
+        // create a denial notification
+        const denialNotification = createBookResponseNotification(
+          notifData.sender,
+          lenderUserID,
+          acceptedBorrowerUserName,
+          bookID,
+          notifData?.bookTitle ?? "",
+          BookRequestNotificationStatus.DENIED,
+          BOOK_AUTO_DENIAL_NOTIFICATION_MESSAGE,
+        );
+
+        // add required fields to the denial notification
+        const fullNotification: Omit<FullNotificationModel, "notifID"> = {
+          ...denialNotification,
+          created: serverTimestamp() as Timestamp,
+          read_at: null,
+        };
+
+        const newDocRef = doc(collection(DB, "notifications"));
+        batch.set(newDocRef, fullNotification);
       }
     });
 

@@ -5,6 +5,7 @@ import {
   deleteDoc,
   doc,
   type DocumentData,
+  documentId,
   getCountFromServer,
   getDoc,
   getDocs,
@@ -337,10 +338,18 @@ export async function fetchFriendData(
   }
 }
 
-// TODO: sort this with following users at the top
-// Function to fetch users based on the search phrase
+/**
+ * Searches for users based on their first and/or last names while excluding the current user.
+ * Supports partial, case-insensitive matching at the beginning of names.
+ *
+ * @param {string} searchValue - String to search for. Can be single name or space-separated first/last names.
+ * @param {string} currentUserID - ID of the current user to exclude from results.
+ * @returns {Promise<UserSearchDisplayModel[]>} A Promise that resolves to an array of matching users with their details.
+ * @throws {Error} If there is an error while searching the users collection.
+ */
 export async function fetchUsersBySearch(
   searchValue: string,
+  currentUserID: string,
 ): Promise<UserSearchDisplayModel[]> {
   if (searchValue === "") {
     return []; // Return empty array if there's no searchValue
@@ -353,24 +362,27 @@ export async function fetchUsersBySearch(
     // search for users by their case-folded first or last names.
     const q = query(
       collection(DB, "user_collection"),
-      // where("isPublic", "==", true),
-      or(
-        and(
-          // Match users whose first name starts with the full search value
-          where("first_casefold", ">=", normalizedSearchValue),
-          where("first_casefold", "<=", normalizedSearchValue + "\uf8ff"),
-        ),
-        and(
-          // OR match users whose last name starts with the full search value
-          where("last_casefold", ">=", normalizedSearchValue),
-          where("last_casefold", "<=", normalizedSearchValue + "\uf8ff"),
-        ),
-        and(
-          // OR Match users whose first and last names start with the respective parts of the search value
-          where("first_casefold", ">=", normalizedFirst),
-          where("first_casefold", "<=", normalizedFirst + "\uf8ff"),
-          where("last_casefold", ">=", normalizedLast),
-          where("last_casefold", "<=", normalizedLast + "\uf8ff"),
+      and(
+        // filter out the current user
+        where(documentId(), "!=", currentUserID),
+        or(
+          and(
+            // Match users whose first name starts with the full search value
+            where("first_casefold", ">=", normalizedSearchValue),
+            where("first_casefold", "<=", normalizedSearchValue + "\uf8ff"),
+          ),
+          and(
+            // OR match users whose last name starts with the full search value
+            where("last_casefold", ">=", normalizedSearchValue),
+            where("last_casefold", "<=", normalizedSearchValue + "\uf8ff"),
+          ),
+          and(
+            // OR Match users whose first and last names start with the respective parts of the search value
+            where("first_casefold", ">=", normalizedFirst),
+            where("first_casefold", "<=", normalizedFirst + "\uf8ff"),
+            where("last_casefold", ">=", normalizedLast),
+            where("last_casefold", "<=", normalizedLast + "\uf8ff"),
+          ),
         ),
       ),
     );
@@ -397,8 +409,7 @@ export async function fetchUsersBySearch(
 
     return usersData;
   } catch (error) {
-    console.error("Error searching for users: ", error);
-    return [];
+    throw new Error(`Error searching for users: ${(error as Error).message}`);
   }
 }
 

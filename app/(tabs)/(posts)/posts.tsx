@@ -4,7 +4,6 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { router } from "expo-router";
 import {
   type DocumentData,
   type QueryDocumentSnapshot,
@@ -18,6 +17,7 @@ import React, {
 } from "react";
 import {
   FlatList,
+  Keyboard,
   PanResponder,
   StyleSheet,
   Text,
@@ -37,6 +37,7 @@ import Comment from "../../../components/comment/comment";
 import DataSnapShot from "../../../components/datasnapshot/DataSnapShot";
 import Post from "../../../components/post/post";
 import { usePostsContext } from "../../../components/post/PostsContext";
+import { useNavigateToPost } from "../../../components/profile/hooks/useRouteHooks";
 import WormLoader from "../../../components/wormloader/WormLoader";
 import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQueries";
@@ -226,6 +227,10 @@ const Posts = () => {
     commentsModalRef.current?.present();
   }, []);
 
+  Keyboard.dismiss();
+
+  const navigateToPost = useNavigateToPost();
+
   return (
     <BottomSheetModalProvider>
       <View
@@ -256,7 +261,7 @@ const Posts = () => {
             renderItem={({ item: post }) => (
               <TouchableOpacity
                 onPress={() => {
-                  router.push({ pathname: `/${post.id}` });
+                  navigateToPost(post.id);
                 }}
               >
                 <Post

@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { fetchUsersBySearch } from "../../services/firebase-services/UserQueries";
 import { type UserSearchDisplayModel } from "../../types";
+import { useAuth } from "../auth/context";
 import UserList from "../UserList/UserList";
 import WormLoader from "../wormloader/WormLoader";
 import SearchBar from "./searchbar";
@@ -21,6 +22,7 @@ const UserSearch = ({
   setSearchPhrase,
   routePrefix,
 }: UserSearchProps) => {
+  const { user } = useAuth();
   const [users, setUsers] = useState<UserSearchDisplayModel[]>([]);
   const [searchClicked, setSearchClicked] = useState<boolean>(
     searchPhrase !== "",
@@ -30,11 +32,16 @@ const UserSearch = ({
     queryKey: ["searchusers", searchPhrase],
     queryFn: async () => {
       if (searchPhrase != null && searchPhrase !== "") {
-        return await fetchUsersBySearch(searchPhrase);
+        return await fetchUsersBySearch(searchPhrase, user?.uid ?? "");
       } else {
         return null;
       }
     },
+    enabled:
+      user?.uid != null &&
+      user.uid !== "" &&
+      searchPhrase != null &&
+      searchPhrase !== "",
     staleTime: 60000, // Set stale time to 1 minute
   });
 

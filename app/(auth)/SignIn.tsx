@@ -1,9 +1,16 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Image,
+  Keyboard,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useAuth } from "../../components/auth/context";
 import BookWormButton from "../../components/button/BookWormButton";
-import WormLoader from "../../components/wormloader/WormLoader";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 
 const Login = () => {
@@ -12,18 +19,15 @@ const Login = () => {
   const { signIn, isLoading } = useAuth();
 
   if (isLoading) {
-    const styles = StyleSheet.create({
-      container: {
-        flex: 1,
-        alignItems: "center",
-        padding: 40,
-        justifyContent: "center",
-      },
-    });
-
     return (
-      <View style={styles.container}>
-        <WormLoader />
+      <View>
+        <Image
+          source={require("../../assets/bookworm-splash-screen.png")}
+          style={{
+            height: "100%",
+            width: "100%",
+          }}
+        />
       </View>
     );
   }
@@ -66,9 +70,15 @@ const Login = () => {
           <Text style={styles.question}>{"Don't have an account?"}</Text>
           <BookWormButton
             title="Create Account"
-            style={{ backgroundColor: APP_BACKGROUND_COLOR, flex: 1 }}
+            style={{
+              backgroundColor: APP_BACKGROUND_COLOR,
+              flex: 1,
+              marginVertical: 0,
+              marginHorizontal: 0,
+            }}
             textStyle={styles.createButtonText}
             onPress={() => {
+              Keyboard.dismiss();
               router.push("/CreateAccount");
             }}
           />
@@ -98,9 +108,8 @@ const styles = StyleSheet.create({
   },
   createButtonText: {
     color: "#FB6D0B",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "bold",
-    marginLeft: 10,
   },
   container: {
     alignItems: "center",
