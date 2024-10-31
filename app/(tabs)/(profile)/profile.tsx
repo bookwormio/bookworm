@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  Button,
   ScrollView,
   StyleSheet,
   Text,
@@ -23,8 +22,7 @@ import ProfilePosts from "../../../components/profile/ProfilePosts";
 import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
 import WormLoader from "../../../components/wormloader/WormLoader";
 import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
-import { ServerBookshelfBadge, TabNames } from "../../../enums/Enums";
-import { addBadgeToUser } from "../../../services/firebase-services/ChallengesBadgesQueries";
+import { TabNames } from "../../../enums/Enums";
 import { newFetchUserInfo } from "../../../services/firebase-services/UserQueries";
 
 const Profile = () => {
@@ -70,18 +68,6 @@ const Profile = () => {
           <Text style={styles.nameText}>
             {userData.first} {userData.last}
           </Text>
-          <Button
-            title="Add Badge"
-            onPress={() => {
-              addBadgeToUser(
-                user?.uid ?? "",
-                ServerBookshelfBadge.FIRST_BOOK,
-                "3",
-              ).catch((error) => {
-                console.error("Error adding badge: ", error);
-              });
-            }}
-          />
           <Text style={styles.locText}>
             {userData.city === "" ? "" : userData.city}
             {userData.city !== "" && userData.state !== "" ? ", " : ""}
