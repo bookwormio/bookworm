@@ -2,8 +2,8 @@
   "expo": {
     "name": "bookworm.io",
     "slug": "bookworm",
-    "scheme": "BookWorm",
-    "version": "1.0.0",
+    "scheme": "bookworm",
+    "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/bookworm-icon.png",
     "userInterfaceStyle": "light",
