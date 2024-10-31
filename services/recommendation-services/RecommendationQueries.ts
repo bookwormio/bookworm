@@ -1,4 +1,4 @@
-import { apiUrl } from "../../recommendation.config";
+import { recomendationAPIUrl } from "../../recommendation.config";
 import { type BookVolumeInfo, type BookVolumeItem } from "../../types";
 import { fetchBookByVolumeID } from "../books-services/BookQueries";
 
@@ -8,7 +8,7 @@ import { fetchBookByVolumeID } from "../books-services/BookQueries";
  */
 export async function sendPing() {
   try {
-    const response = await fetch(`${apiUrl}/ping`);
+    const response = await fetch(`${recomendationAPIUrl}/ping`);
     if (!response.ok) {
       const warningMessage =
         response.status >= 400 && response.status < 500
@@ -40,7 +40,7 @@ export async function fetchRecommendationsFromAPI(
   }
 
   try {
-    const response = await fetch(`${apiUrl}/recommendation`, {
+    const response = await fetch(`${recomendationAPIUrl}/recommendation`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

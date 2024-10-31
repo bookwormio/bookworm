@@ -15,20 +15,36 @@ const GenerateRecommendationsPage = () => {
     data: generatedRecommendations,
     isLoading: isLoadingRecommendations,
     isError: isErrorRecommendations,
+    error: recommendationsError,
+    isSuccess: isSuccessRecommendations,
     refetch: refetchRecommendations,
     isRefetching: isRefetchingRecommendations,
   } = useGenerateRecommendationsQuery(user?.uid ?? "");
 
   const handleRefetchRecommendations = () => {
     refetchRecommendations().catch((error) => {
-      console.error("Failed to generate recommendations:", error);
-      Toast.show({
-        text1: "Error",
-        text2: "Failed to generate recommendations",
-        type: "error",
-      });
+      showToastError(error);
     });
   };
+
+  const showToastError = (
+    error: unknown,
+    message = "Failed to generate recommendations",
+  ) => {
+    console.error(message, error);
+    Toast.show({
+      text1: "Error",
+      text2: message,
+      type: "error",
+    });
+  };
+
+  if (
+    isErrorRecommendations ||
+    (isSuccessRecommendations && generatedRecommendations == null)
+  ) {
+    showToastError(recommendationsError ?? "No recommendations available");
+  }
 
   if (
     isLoadingRecommendations ||

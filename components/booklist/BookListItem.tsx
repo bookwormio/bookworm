@@ -24,7 +24,7 @@ const BookListItem = ({
 }: BookListItemProps) => {
   const navigateToBook = useNavigateToBook(bookID);
 
-  const handleClick = () => {
+  const handleBookClicked = () => {
     navigateToBook();
   };
 
@@ -35,7 +35,7 @@ const BookListItem = ({
         if (handleBookClickOverride != null) {
           handleBookClickOverride(bookID, volumeInfo);
         } else {
-          handleClick();
+          handleBookClicked();
         }
       }}
     >
