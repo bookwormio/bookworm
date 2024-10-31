@@ -295,3 +295,8 @@ interface DenyOtherBorrowRequestsParams {
   acceptedBorrowerUserName: string;
   bookID: string;
 }
+
+interface BadgeModel {
+  userID: string;
+  badgeID: ServerBadgeName;
+}

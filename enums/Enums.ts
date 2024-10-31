@@ -115,3 +115,56 @@ export enum BookBorrowButtonDisplay {
   REQUEST_AGAIN = "Request Again",
   REQUEST = "Request",
 }
+
+export enum ServerPostBadge {
+  FIRST_POST = "firstpost",
+}
+
+export enum ServerBookshelfBadge {
+  FIRST_BOOK = "firstbook",
+  ADDED_TEN_TO_BOOKSHELVES = "added_10_tobookshelves",
+  ADDED_TWENTYFIVE_TO_BOOKSHELVES = "added_25_tobookshelves",
+  ADDED_FIFTY_TO_BOOKSHELVES = "added_50_tobookshelves",
+}
+
+export enum ServerCompletionBadge {
+  COMPLETED_FIVE_BOOKS = "completed_5_books",
+  COMPLETED_TEN_BOOKS = "completed_10_books",
+  COMPLETED_TWENTYFIVE_BOOKS = "completed_25_books",
+}
+
+export enum ServerLendingBadge {
+  LENT_A_BOOK = "lentabook",
+  BORROWED_A_BOOK = "borrowedabook",
+}
+
+export enum ServerStreakBadge {
+  SEVEN_DAY_STREAK = "seven_day_streak",
+  THIRTY_DAY_STREAK = "thirty_day_streak",
+}
+
+// Used to display the book status in the UI
+export const badgeDisplayTitleMap: StringMap = {
+  [ServerPostBadge.FIRST_POST]: "First Post",
+  [ServerBookshelfBadge.FIRST_BOOK]: "Finished First Book",
+  [ServerBookshelfBadge.ADDED_TEN_TO_BOOKSHELVES]:
+    "Added 10 Books to Bookshelves",
+  [ServerBookshelfBadge.ADDED_TWENTYFIVE_TO_BOOKSHELVES]:
+    "Added 25 Books to Bookshelves",
+  [ServerBookshelfBadge.ADDED_FIFTY_TO_BOOKSHELVES]:
+    "Added 50 Books to Bookshelves",
+  [ServerCompletionBadge.COMPLETED_FIVE_BOOKS]: "Completed 5 Books",
+  [ServerCompletionBadge.COMPLETED_TEN_BOOKS]: "Completed 10 Books",
+  [ServerCompletionBadge.COMPLETED_TWENTYFIVE_BOOKS]: "Completed 25 Books",
+  [ServerLendingBadge.LENT_A_BOOK]: "Lent a Book",
+  [ServerLendingBadge.BORROWED_A_BOOK]: "Borrowed a Book",
+  [ServerStreakBadge.SEVEN_DAY_STREAK]: "Seven Day Reading Streak",
+  [ServerStreakBadge.THIRTY_DAY_STREAK]: "Thirty Day Reading Streak",
+};
+
+export type ServerBadgeName =
+  | ServerPostBadge
+  | ServerBookshelfBadge
+  | ServerCompletionBadge
+  | ServerLendingBadge
+  | ServerStreakBadge;
