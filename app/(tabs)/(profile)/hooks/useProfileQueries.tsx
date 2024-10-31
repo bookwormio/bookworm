@@ -1,11 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchBookByVolumeID } from "../../../../services/books-services/BookQueries";
 import {
   fetchUserData,
   getUserProfileURL,
 } from "../../../../services/firebase-services/UserQueries";
-import { getRecommendations } from "../../../../services/recommendation-services/RecommendationQueries";
-import { type BookVolumeInfo, type BookVolumeItem } from "../../../../types";
+import { fetchUserBookRecommendations } from "../../../../services/recommendation-services/RecommendationQueries";
 
 /**
  * Custom hook to fetch the profile picture URL for a given user.
@@ -51,38 +49,23 @@ export const useUserDataQuery = (userID?: string) => {
   });
 };
 
+/**
+ * Custom hook to fetch book recommendations for a given user.
+ *
+ * @param {string} userID - The ID of the user to fetch recommendations for.
+ * @returns {UseQueryResult<BookVolumeItem[]>} The result of the query, containing an array of book recommendations.
+ *
+ * @example
+ * const { data: recommendations, isLoading, isError, error } = useGenerateRecommendationsQuery(userID);
+ * // recommendations is of type BookVolumeItem[]
+ */
 export const useGenerateRecommendationsQuery = (userID: string) => {
   return useQuery({
     queryKey: ["recommendations", userID],
     queryFn: async () => {
-      return await temporaryRecommendationFunction(userID);
+      return await fetchUserBookRecommendations(userID);
     },
     enabled: userID != null && userID !== "",
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
-
-// TODO: Remove this
-async function temporaryRecommendationFunction(
-  userID: string,
-): Promise<BookVolumeItem[]> {
-  const recommendationIDs = await getRecommendations([userID]);
-  const volumeResults = await Promise.all(
-    recommendationIDs.map(async (volumeID) => ({
-      id: volumeID,
-      info: await fetchBookByVolumeID(volumeID),
-    })),
-  );
-
-  // Use type predicate to filter out nulls
-  const recommendationVolumeInfo = volumeResults.filter(
-    (result): result is { id: string; info: BookVolumeInfo } =>
-      result.info !== null,
-  );
-
-  const recommendationVolumeItems = recommendationVolumeInfo.map((result) => ({
-    id: result.id,
-    volumeInfo: result.info,
-  }));
-
-  return recommendationVolumeItems;
-}

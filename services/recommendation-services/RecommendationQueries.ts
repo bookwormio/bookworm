@@ -1,4 +1,6 @@
 import { apiUrl } from "../../recommendation.config";
+import { type BookVolumeInfo, type BookVolumeItem } from "../../types";
+import { fetchBookByVolumeID } from "../books-services/BookQueries";
 
 /**
  * Send a ping request to the API server
@@ -62,4 +64,43 @@ export async function getRecommendations(userIds: string[]): Promise<string[]> {
       `Error fetching recommendations: ${(error as Error).message}`,
     );
   }
+}
+
+/**
+ * Fetches and processes book recommendations for a given user.
+ *
+ * @param {string} userID - The ID of the user to fetch recommendations for.
+ * @returns {Promise<BookVolumeItem[]>} A promise that resolves to an array of book recommendations.
+ *
+ * @example
+ * const recommendations = await fetchUserBookRecommendations(userID);
+ * // recommendations is of type BookVolumeItem[]
+ */
+export async function fetchUserBookRecommendations(
+  userID: string,
+): Promise<BookVolumeItem[]> {
+  // Fetch recommendation IDs from API
+  const recommendationIDs = await getRecommendations([userID]);
+
+  // Fetch book info for each recommendation
+  const volumeResults = await Promise.all(
+    recommendationIDs.map(async (volumeID) => ({
+      id: volumeID,
+      info: await fetchBookByVolumeID(volumeID),
+    })),
+  );
+
+  // Use type predicate to filter out nulls
+  const recommendationVolumeInfo = volumeResults.filter(
+    (result): result is { id: string; info: BookVolumeInfo } =>
+      result.info !== null,
+  );
+
+  // map to BookVolumeItem type
+  const recommendationVolumeItems = recommendationVolumeInfo.map((result) => ({
+    id: result.id,
+    volumeInfo: result.info,
+  }));
+
+  return recommendationVolumeItems;
 }

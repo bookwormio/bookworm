@@ -123,7 +123,7 @@ const Profile = () => {
       />
       {profileTab === TabNames.BOOKSHELVES && user !== null ? (
         <View style={styles.shelves}>
-          <View style={{ paddingLeft: 20, paddingRight: 20 }}>
+          <View style={{ paddingLeft: 40, paddingRight: 40 }}>
             <BookWormButton
               title="Generate Recommendations"
               onPress={() => {

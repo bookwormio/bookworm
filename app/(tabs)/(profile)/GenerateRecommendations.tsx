@@ -1,19 +1,40 @@
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
+import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import BookList from "../../../components/booklist/BookList";
+import BookWormButton from "../../../components/button/BookWormButton";
 import WormLoader from "../../../components/wormloader/WormLoader";
 import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { useGenerateRecommendationsQuery } from "./hooks/useProfileQueries";
 
 const GenerateRecommendations = () => {
   const { user } = useAuth();
+
   const {
-    data: generatedRecommendationIDs,
+    data: generatedRecommendations,
     isLoading: isLoadingRecommendations,
+    isError: isErrorRecommendations,
+    refetch: refetchRecommendations,
+    isRefetching: isRefetchingRecommendations,
   } = useGenerateRecommendationsQuery(user?.uid ?? "");
 
-  if (isLoadingRecommendations || generatedRecommendationIDs == null) {
+  const handleRefetchRecommendations = () => {
+    refetchRecommendations().catch((error) => {
+      console.error("Failed to generate recommendations:", error);
+      Toast.show({
+        text1: "Error",
+        text2: "Failed to generate recommendations",
+        type: "error",
+      });
+    });
+  };
+
+  if (
+    isLoadingRecommendations ||
+    isRefetchingRecommendations ||
+    generatedRecommendations == null
+  ) {
     return (
       <View style={styles.loadingContainer}>
         <WormLoader />
@@ -21,18 +42,32 @@ const GenerateRecommendations = () => {
     );
   }
 
+  if (isErrorRecommendations) {
+    Toast.show({
+      text1: "Error",
+      text2: "Failed to generate recommendations",
+      type: "error",
+    });
+  }
   return (
     <View style={styles.container}>
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
       >
-        {generatedRecommendationIDs.map((book, index) => (
+        <BookWormButton
+          title="Regenerate Recommendations"
+          onPress={() => {
+            handleRefetchRecommendations();
+          }}
+        />
+        {generatedRecommendations.map((book, index) => (
           <View style={styles.bookContainer} key={index}>
             <BookList volumes={[book]} />
           </View>
         ))}
       </ScrollView>
+      <Toast />
     </View>
   );
 };
