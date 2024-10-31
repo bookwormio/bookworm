@@ -127,7 +127,7 @@ const Profile = () => {
             <BookWormButton
               title="Generate Recommendations"
               onPress={() => {
-                router.push("/GenerateRecommendations");
+                router.push("/GenerateRecommendationsPage");
               }}
             />
           </View>

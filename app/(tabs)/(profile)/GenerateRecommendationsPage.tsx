@@ -8,7 +8,7 @@ import WormLoader from "../../../components/wormloader/WormLoader";
 import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { useGenerateRecommendationsQuery } from "./hooks/useProfileQueries";
 
-const GenerateRecommendations = () => {
+const GenerateRecommendationsPage = () => {
   const { user } = useAuth();
 
   const {
@@ -72,7 +72,7 @@ const GenerateRecommendations = () => {
   );
 };
 
-export default GenerateRecommendations;
+export default GenerateRecommendationsPage;
 
 const styles = StyleSheet.create({
   container: {

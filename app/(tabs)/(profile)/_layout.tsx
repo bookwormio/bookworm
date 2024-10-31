@@ -54,7 +54,7 @@ const ProfileLayout = () => {
           }}
         />
         <Stack.Screen
-          name="GenerateRecommendations"
+          name="GenerateRecommendationsPage"
           options={{
             headerShown: true,
             headerTitle: "Generate Recommendations",
