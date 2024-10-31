@@ -53,6 +53,14 @@ const ProfileLayout = () => {
             headerLeft: () => <BackButton />,
           }}
         />
+        <Stack.Screen
+          name="GenerateRecommendationsPage"
+          options={{
+            headerShown: true,
+            headerTitle: "Generate Recommendations",
+            headerLeft: () => <BackButton />,
+          }}
+        />
       </Stack>
     </KeyboardAvoidingView>
   );

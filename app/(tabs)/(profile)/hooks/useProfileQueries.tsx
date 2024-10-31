@@ -3,6 +3,7 @@ import {
   fetchUserData,
   getUserProfileURL,
 } from "../../../../services/firebase-services/UserQueries";
+import { fetchUserBookRecommendations } from "../../../../services/recommendation-services/RecommendationQueries";
 
 /**
  * Custom hook to fetch the profile picture URL for a given user.
@@ -45,5 +46,26 @@ export const useUserDataQuery = (userID?: string) => {
       const userdata = await fetchUserData(userID);
       return userdata;
     },
+  });
+};
+
+/**
+ * Custom hook to fetch book recommendations for a given user.
+ *
+ * @param {string} userID - The ID of the user to fetch recommendations for.
+ * @returns {UseQueryResult<BookVolumeItem[]>} The result of the query, containing an array of book recommendations.
+ *
+ * @example
+ * const { data: recommendations, isLoading, isError, error } = useGenerateRecommendationsQuery(userID);
+ * // recommendations is of type BookVolumeItem[]
+ */
+export const useGenerateRecommendationsQuery = (userID: string) => {
+  return useQuery({
+    queryKey: ["recommendations", userID],
+    queryFn: async () => {
+      return await fetchUserBookRecommendations(userID);
+    },
+    enabled: userID != null && userID !== "",
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
