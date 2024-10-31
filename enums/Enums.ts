@@ -121,13 +121,13 @@ export enum ServerPostBadge {
 }
 
 export enum ServerBookshelfBadge {
-  FIRST_BOOK = "firstbook",
   ADDED_TEN_TO_BOOKSHELVES = "added_10_tobookshelves",
   ADDED_TWENTYFIVE_TO_BOOKSHELVES = "added_25_tobookshelves",
   ADDED_FIFTY_TO_BOOKSHELVES = "added_50_tobookshelves",
 }
 
 export enum ServerCompletionBadge {
+  COMPLETED_FIRST_BOOK = "completed_1_book",
   COMPLETED_FIVE_BOOKS = "completed_5_books",
   COMPLETED_TEN_BOOKS = "completed_10_books",
   COMPLETED_TWENTYFIVE_BOOKS = "completed_25_books",
@@ -146,7 +146,7 @@ export enum ServerStreakBadge {
 // Used to display the book status in the UI
 export const badgeDisplayTitleMap: StringMap = {
   [ServerPostBadge.FIRST_POST]: "First Post",
-  [ServerBookshelfBadge.FIRST_BOOK]: "Finished First Book",
+  [ServerCompletionBadge.COMPLETED_FIRST_BOOK]: "Finished First Book",
   [ServerBookshelfBadge.ADDED_TEN_TO_BOOKSHELVES]:
     "Added 10 Books to Bookshelves",
   [ServerBookshelfBadge.ADDED_TWENTYFIVE_TO_BOOKSHELVES]:
