@@ -38,7 +38,7 @@ export function generateUserRoute(
   }
 
   if (currentUserID !== navigateToUserID) {
-    const pathName = `/${prefix ?? ""}user/${navigateToUserID}`;
+    const pathName = `/${prefix ?? ""}/user/${navigateToUserID}`;
     return pathName;
   }
 
@@ -51,4 +51,24 @@ export function generateUserRoute(
  */
 export function generateNewPostBookSearchRoute(): string {
   return `/${NEW_POST_BOOK_FOLDER}/${NEW_POST_BOOK_SEARCH}`;
+}
+
+export function generatePostRoute(postID?: string, prefix?: string): string {
+  if (postID == null) {
+    throw new Error("Book ID is null or undefined");
+  }
+  const pathName = `/${prefix}/${postID}`;
+  return pathName;
+}
+
+export function generateFollowListRoute(
+  userID?: string,
+  followersfirst?: boolean,
+  prefix?: string,
+): string {
+  if (userID == null || followersfirst == null) {
+    throw new Error("user ID or followersfirst is null or undefined");
+  }
+  const pathName = `${prefix}/${userID}?followersfirst=${followersfirst}`;
+  return pathName;
 }

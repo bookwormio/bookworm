@@ -1,40 +1,38 @@
-import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type UserSearchDisplayModel } from "../../types";
+import { useAuth } from "../auth/context";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
+import { useNavigateToUser } from "../profile/hooks/useRouteHooks";
 
 interface UserListItemProps {
   user: UserSearchDisplayModel;
   routePrefix: string;
 }
 
-const UserListItem = ({ user, routePrefix }: UserListItemProps) => {
-  const handleUserClick = ({ user }: { user: UserSearchDisplayModel }) => {
-    router.push({
-      pathname: `/${routePrefix}/user/${user.id}`,
-    });
-  };
+const UserListItem = ({ user: userInfo, routePrefix }: UserListItemProps) => {
+  const { user } = useAuth();
+  const navigateToUser = useNavigateToUser(user?.uid, userInfo.id);
 
   return (
     <TouchableOpacity
       style={styles.container}
       onPress={() => {
-        handleUserClick({ user });
+        navigateToUser();
       }}
     >
       <View style={styles.imageContainer}>
         <ProfilePicture
-          userID={user.id}
+          userID={userInfo.id}
           size={40}
-          overrideProfilePic={user.profilePicURL}
+          overrideProfilePic={userInfo.profilePicURL}
         />
       </View>
 
       <View style={styles.infoContainer}>
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
           <Text style={styles.userName}>
-            {user.firstName} {user.lastName}
+            {userInfo.firstName} {userInfo.lastName}
           </Text>
         </Text>
       </View>

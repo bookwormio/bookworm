@@ -19,7 +19,7 @@ const BackButton = ({ waitForKeyBoardDismiss }: BackButtonProps) => {
             if (waitForKeyBoardDismiss === true) {
               setTimeout(() => {
                 router.back();
-              }, 20);
+              }, 25);
             } else {
               router.back();
             }

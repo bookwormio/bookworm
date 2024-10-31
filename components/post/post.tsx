@@ -10,11 +10,12 @@ import {
 } from "react-native";
 import { type PostModel } from "../../types";
 
-import { router } from "expo-router";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
-import { generateUserRoute } from "../../utilities/routeUtils";
 import { useAuth } from "../auth/context";
-import { useNavigateToBook } from "../profile/hooks/useRouteHooks";
+import {
+  useNavigateToBook,
+  useNavigateToUser,
+} from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import { usePageValidation } from "./hooks/usePageValidation";
 import LikeComment from "./LikeComment";
@@ -59,13 +60,7 @@ const Post = ({
   if (currentPost !== undefined) {
     post = currentPost;
   }
-
-  const handleNavigateToUser = () => {
-    const userRoute = generateUserRoute(user?.uid, post.user.id, undefined);
-    if (userRoute != null) {
-      router.push(userRoute);
-    }
-  };
+  const navigateToUser = useNavigateToUser(user?.uid, post.user.id);
 
   const navigateToBook = useNavigateToBook(post.bookid);
 
@@ -79,7 +74,7 @@ const Post = ({
             <TouchableOpacity
               disabled={isCurrentUsersPost}
               onPress={() => {
-                handleNavigateToUser();
+                navigateToUser();
               }}
             >
               <ProfilePicture userID={post.user.id} size={40} />
@@ -93,7 +88,7 @@ const Post = ({
                 <Text
                   style={styles.userName}
                   onPress={() => {
-                    handleNavigateToUser();
+                    navigateToUser();
                   }}
                   disabled={isCurrentUsersPost}
                 >
@@ -110,7 +105,7 @@ const Post = ({
                 <Text
                   style={styles.userName}
                   onPress={() => {
-                    handleNavigateToUser();
+                    navigateToUser();
                   }}
                   disabled={isCurrentUsersPost}
                 >

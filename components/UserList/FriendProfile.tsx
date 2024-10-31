@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router, useSegments } from "expo-router";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
@@ -25,6 +25,7 @@ import {
 import ProfileBookShelves from "../profile/BookShelf/ProfileBookShelves";
 import ViewData from "../profile/Data/ViewData";
 import FriendProfilePosts from "../profile/FriendProfilePosts";
+import { useNavigateToFollowList } from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import ProfileTabSelector from "../profile/ProfileTabSelector";
 import WormLoader from "../wormloader/WormLoader";
@@ -49,7 +50,8 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     useState<boolean>(false);
 
   const queryClient = useQueryClient();
-  const segments = useSegments();
+
+  const navigateToFollowList = useNavigateToFollowList(friendUserID);
 
   const { data: friendData, isLoading: friendIsLoading } = useQuery({
     queryKey: ["frienddata", friendUserID],
@@ -259,19 +261,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         <TouchableOpacity
           style={styles.textWrap}
           onPress={() => {
-            if (segments[1] === "(posts)") {
-              router.push({
-                pathname: `postsfollow/${friendUserID}?followersfirst=true`,
-              });
-            } else if (segments[1] === "(search)") {
-              router.push({
-                pathname: `searchfollow/${friendUserID}?followersfirst=true`,
-              });
-            } else if (segments[1] === "(profile)") {
-              router.push({
-                pathname: `profilefollow/${friendUserID}?followersfirst=true`,
-              });
-            }
+            navigateToFollowList(true);
           }}
         >
           <Text style={styles.followTitle}>Followers</Text>
@@ -280,19 +270,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         <TouchableOpacity
           style={styles.textWrap}
           onPress={() => {
-            if (segments[1] === "(posts)") {
-              router.push({
-                pathname: `postsfollow/${friendUserID}?followersfirst=false`,
-              });
-            } else if (segments[1] === "(search)") {
-              router.push({
-                pathname: `searchfollow/${friendUserID}?followersfirst=false`,
-              });
-            } else if (segments[1] === "(profile)") {
-              router.push({
-                pathname: `profilefollow/${friendUserID}?followersfirst=false`,
-              });
-            }
+            navigateToFollowList(false);
           }}
         >
           <Text style={styles.followTitle}>Following</Text>
