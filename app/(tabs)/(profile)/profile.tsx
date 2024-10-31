@@ -64,18 +64,15 @@ const Profile = () => {
         <View style={styles.defaultImageContainer}>
           <ProfilePicture userID={user?.uid ?? ""} size={60} />
         </View>
-
-        <View style={styles.profileHeader}>
-          <View>
-            <Text style={styles.nameText}>
-              {userData.first} {userData.last}
-            </Text>
-            <Text style={styles.locText}>
-              {userData.city === "" ? "" : userData.city}
-              {userData.city !== "" && userData.state !== "" ? ", " : ""}
-              {userData.state === "" ? "" : userData.state}
-            </Text>
-          </View>
+        <View>
+          <Text style={styles.nameText}>
+            {userData.first} {userData.last}
+          </Text>
+          <Text style={styles.locText}>
+            {userData.city === "" ? "" : userData.city}
+            {userData.city !== "" && userData.state !== "" ? ", " : ""}
+            {userData.state === "" ? "" : userData.state}
+          </Text>
         </View>
       </View>
       <View>
@@ -203,10 +200,6 @@ const styles = StyleSheet.create({
   },
   followTitle: { fontSize: 15 },
   followAmount: { fontSize: 18, fontWeight: "bold" },
-  profileHeader: {
-    flexDirection: "row",
-    width: "100%",
-  },
   shelves: {
     marginTop: 20,
   },
