@@ -1,21 +1,21 @@
 import {
-    collection,
-    doc,
-    getDocs,
-    orderBy,
-    query,
-    serverTimestamp,
-    setDoc,
-    where,
+  collection,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
 } from "firebase/firestore";
 import {
-    ServerBookshelfBadge,
-    ServerBookShelfName,
-    ServerCompletionBadge,
-    ServerLendingBadge,
-    ServerPostBadge,
-    ServerStreakBadge,
-    type ServerBadgeName,
+  ServerBookshelfBadge,
+  ServerBookShelfName,
+  ServerCompletionBadge,
+  ServerLendingBadge,
+  ServerPostBadge,
+  ServerStreakBadge,
+  type ServerBadgeName,
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
 
@@ -32,31 +32,28 @@ export async function addBadgeToUser(
   badgeID: ServerBadgeName,
   postID?: string,
 ): Promise<void> {
-  const badges = await getExistingEarnedBadges(userID);
-  if (!badges.includes(badgeID)) {
-    const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
-    const badgeDocRef = doc(
-      collection(userBadgeCollectDocRef, "badges"),
-      badgeID,
-    );
-    try {
-      if (postID === null) {
-        await setDoc(
-          badgeDocRef,
-          { received_at: serverTimestamp() },
-          { merge: true },
-        );
-      } else {
-        await setDoc(
-          badgeDocRef,
-          { received_at: serverTimestamp(), postID },
-          { merge: true },
-        );
-      }
-    } catch (error) {
-      console.error("Error adding badge: ", error);
-      throw new Error("Could not add badge to user");
+  const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
+  const badgeDocRef = doc(
+    collection(userBadgeCollectDocRef, "badges"),
+    badgeID as string,
+  );
+  try {
+    if (postID === null) {
+      await setDoc(
+        badgeDocRef,
+        { received_at: serverTimestamp() },
+        { merge: true },
+      );
+    } else {
+      await setDoc(
+        badgeDocRef,
+        { received_at: serverTimestamp(), postID },
+        { merge: true },
+      );
     }
+  } catch (error) {
+    console.error("Error adding badge: ", error);
+    throw new Error("Could not add badge to user");
   }
 }
 
