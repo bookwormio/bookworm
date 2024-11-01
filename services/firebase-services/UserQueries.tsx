@@ -394,13 +394,7 @@ export async function fetchUsersBySearch(
         id: doc.id,
         firstName: doc.data().first,
         lastName: doc.data().last,
-        profilePicURL: "",
       };
-
-      const profilePicURL = await getUserProfileURL(doc.id);
-      if (profilePicURL != null) {
-        userData.profilePicURL = profilePicURL;
-      }
 
       usersData.push(userData);
     });
@@ -492,16 +486,10 @@ export async function getFollowDetailByID(
       if (followDetailDoc.exists()) {
         const data = followDetailDoc.data();
 
-        const profilePicURL = await getUserProfileURL(followDetailDoc.id);
-        let profilePic = "";
-        if (profilePicURL != null) {
-          profilePic = profilePicURL;
-        }
         return {
           id: followDetailDoc.id,
           firstName: data.first ?? "",
           lastName: data.last ?? "",
-          profilePicURL: profilePic ?? "",
         } satisfies UserSearchDisplayModel;
       }
       return null;
