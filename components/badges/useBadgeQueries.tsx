@@ -15,6 +15,12 @@ import {
     getExistingEarnedBadges,
 } from "../../services/firebase-services/ChallengesBadgesQueries";
 
+/**
+ * Custom hook to retrieve existing earned badges for a user.
+ *
+ * @param {string} userID - The ID of the user whose badges are to be retrieved.
+ * @returns {QueryResult<ServerBadgeName[]>} - The query result containing badges data and loading state.
+ */
 export const useGetExistingEarnedBadges = (userID: string) => {
   return useQuery({
     queryKey: ["badges", userID],
@@ -33,6 +39,12 @@ export const useGetExistingEarnedBadges = (userID: string) => {
   });
 };
 
+/**
+ * Checks and updates badge completion for a new post.
+ *
+ * @param {string} userID - The ID of the user.
+ * @param {string} postID - The ID of the post.
+ */
 export const newPostBadgeChecks = (userID: string, postID: string) => {
   const { data: badges, isLoading: badgesLoading } =
     useGetExistingEarnedBadges(userID);
@@ -75,6 +87,11 @@ export const newPostBadgeChecks = (userID: string, postID: string) => {
   }
 };
 
+/**
+ * Checks for badges related to a new book request.
+ *
+ * @param {string} userID - The ID of the user.
+ */
 export const newBookRequestBadgeCheck = (userID: string) => {
   const { data: badges, isLoading: badgesLoading } =
     useGetExistingEarnedBadges(userID);
@@ -92,6 +109,11 @@ export const newBookRequestBadgeCheck = (userID: string) => {
   }
 };
 
+/**
+ * Custom hook to check for completion badges.
+ *
+ * @returns {UseMutationResult<void, Error, { userID: string; postID: string }, unknown>} - The mutation result for checking completion badges.
+ */
 export const useCheckForCompletionBadges = () => {
   return useMutation({
     mutationFn: async ({
@@ -106,6 +128,11 @@ export const useCheckForCompletionBadges = () => {
   });
 };
 
+/**
+ * Custom hook to check for post badges.
+ *
+ * @returns {UseMutationResult<void, Error, { userID: string; postID: string }, unknown>} - The mutation result for checking post badges.
+ */
 export const useCheckForPostBadges = () => {
   return useMutation({
     mutationFn: async ({
@@ -120,6 +147,11 @@ export const useCheckForPostBadges = () => {
   });
 };
 
+/**
+ * Custom hook to check for bookshelf badges.
+ *
+ * @returns {UseMutationResult<void, Error, { userID: string; postID: string }, unknown>} - The mutation result for checking bookshelf badges.
+ */
 export const useCheckForBookShelfBadges = () => {
   return useMutation({
     mutationFn: async ({
@@ -134,6 +166,11 @@ export const useCheckForBookShelfBadges = () => {
   });
 };
 
+/**
+ * Custom hook to check for lending badges.
+ *
+ * @returns {UseMutationResult<void, Error, { userID: string }, unknown>} - The mutation result for checking lending badges.
+ */
 export const useCheckForLendingBadges = () => {
   return useMutation({
     mutationFn: async ({ userID }: { userID: string }) => {
@@ -142,6 +179,11 @@ export const useCheckForLendingBadges = () => {
   });
 };
 
+/**
+ * Custom hook to check for streak badges.
+ *
+ * @returns {UseMutationResult<void, Error, { userID: string; postID: string }, unknown>} - The mutation result for checking streak badges.
+ */
 export const useCheckForStreakBadges = () => {
   return useMutation({
     mutationFn: async ({

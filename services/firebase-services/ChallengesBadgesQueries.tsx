@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import {
   collection,
   doc,
@@ -32,6 +33,7 @@ export async function addBadgeToUser(
   badgeID: ServerBadgeName,
   postID?: string,
 ): Promise<void> {
+  const queryClient = useQueryClient();
   const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
   const badgeDocRef = doc(
     collection(userBadgeCollectDocRef, "badges"),
@@ -43,13 +45,25 @@ export async function addBadgeToUser(
         badgeDocRef,
         { received_at: serverTimestamp() },
         { merge: true },
-      );
+      ).then(() => {
+        queryClient
+          .invalidateQueries({ queryKey: ["badges", userID] })
+          .catch((error) => {
+            console.error("Error invalidating queries:", error);
+          });
+      });
     } else {
       await setDoc(
         badgeDocRef,
         { received_at: serverTimestamp(), postID },
         { merge: true },
-      );
+      ).then(() => {
+        queryClient
+          .invalidateQueries({ queryKey: ["badges", userID] })
+          .catch((error) => {
+            console.error("Error invalidating queries:", error);
+          });
+      });
     }
   } catch (error) {
     console.error("Error adding badge: ", error);
