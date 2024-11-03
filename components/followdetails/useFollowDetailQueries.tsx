@@ -26,14 +26,15 @@ export const useGetFollowersByID = (userID: string, maxUsers?: number) => {
 /**
  * Gets neccessary data to display following in a list
  * @param userID
+ * @param maxUsers
  * @returns {UserSearchDisplayModel[]} - array of user data
  */
-export const useGetFollowingByID = (userID: string) => {
+export const useGetFollowingByID = (userID: string, maxUsers?: number) => {
   return useQuery({
     queryKey: ["following", userID],
     enabled: userID != null && userID !== "",
     queryFn: async () => {
-      return await getFollowingByID(userID ?? "");
+      return await getFollowingByID(userID ?? "", maxUsers);
     },
   });
 };

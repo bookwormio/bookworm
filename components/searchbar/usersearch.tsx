@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchUsersBySearch } from "../../services/firebase-services/UserQueries";
 import { type UserSearchDisplayModel } from "../../types";
 import { useAuth } from "../auth/context";
-import { useGetFollowersByID } from "../followdetails/useFollowDetailQueries";
+import { useGetFollowingByID } from "../followdetails/useFollowDetailQueries";
 import UserList from "../UserList/UserList";
 import WormLoader from "../wormloader/WormLoader";
 import SearchBar from "./searchbar";
@@ -34,7 +34,7 @@ const UserSearch = ({
   );
   const MAX_USERS = 10;
 
-  const { data: followingUsersData } = useGetFollowersByID(
+  const { data: followingUsersData } = useGetFollowingByID(
     user?.uid ?? "",
     MAX_USERS,
   );
