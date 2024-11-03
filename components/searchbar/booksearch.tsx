@@ -12,7 +12,7 @@ import SearchBar from "./searchbar";
 import {
   filterBookShelfBooksByTitle,
   mapAndSortPreloadedBooks,
-  removeDuplicateBooks,
+  removeDuplicates,
 } from "./util/searchBarUtils";
 
 const BOOK_SEARCH_PLACEHOLDER = "Search for books";
@@ -101,7 +101,10 @@ const BookSearch = ({
 
     // Remove duplicates and coalesce the fetched books with the filtered book shelf books
     setBooks(
-      removeDuplicateBooks([...filteredBookShelfBooks, ...fetchBookData]),
+      removeDuplicates<BookVolumeItem>([
+        ...filteredBookShelfBooks,
+        ...fetchBookData,
+      ]),
     );
   }, [fetchBookData, searchPhrase]);
 

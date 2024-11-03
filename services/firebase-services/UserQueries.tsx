@@ -9,6 +9,7 @@ import {
   getCountFromServer,
   getDoc,
   getDocs,
+  limit,
   or,
   orderBy,
   query,
@@ -431,8 +432,13 @@ export async function getNumberOfFollowersByUserID(
  */
 export async function getFollowersByUserID(
   userID: string,
+  maxUsers?: number,
 ): Promise<UserSearchDisplayModel[]> {
-  return await getFollowDetailByID(userID, ServerFollowDetailType.FOLLOWING);
+  return await getFollowDetailByID(
+    userID,
+    ServerFollowDetailType.FOLLOWING,
+    maxUsers,
+  );
 }
 
 /**
@@ -442,8 +448,13 @@ export async function getFollowersByUserID(
  */
 export async function getFollowingByID(
   userID: string,
+  maxUsers?: number,
 ): Promise<UserSearchDisplayModel[]> {
-  return await getFollowDetailByID(userID, ServerFollowDetailType.FOLLOWER);
+  return await getFollowDetailByID(
+    userID,
+    ServerFollowDetailType.FOLLOWER,
+    maxUsers,
+  );
 }
 
 /**
@@ -454,51 +465,73 @@ export async function getFollowingByID(
 export async function getFollowDetailByID(
   userID: string,
   type: ServerFollowDetailType,
+  maxUsers?: number,
 ): Promise<UserSearchDisplayModel[]> {
-  const followDetailQuery = query(
-    collection(DB, "relationships"),
-    where(type, "==", userID),
-    where("follow_status", "==", "following"),
-  );
+  try {
+    const followDetailConstraints = [
+      where(type, "==", userID),
+      where("follow_status", "==", "following"),
+      orderBy("created_at", "desc"),
+    ];
 
-  const followDetailSnapshot = await getDocs(followDetailQuery);
+    let followDetailQuery;
 
-  let followDetailIDs;
-  if (type === ServerFollowDetailType.FOLLOWING) {
-    followDetailIDs = Array.from(
-      new Set(
-        followDetailSnapshot.docs.map((doc) => String(doc.data().follower)),
-      ),
+    // Limit the number of users to fetch if maxUsers is provided
+    if (maxUsers != null && maxUsers > 0) {
+      followDetailQuery = query(
+        collection(DB, "relationships"),
+        ...followDetailConstraints,
+        limit(maxUsers),
+      );
+    } else {
+      followDetailQuery = query(
+        collection(DB, "relationships"),
+        ...followDetailConstraints,
+      );
+    }
+
+    const followDetailSnapshot = await getDocs(followDetailQuery);
+
+    let followDetailIDs;
+    if (type === ServerFollowDetailType.FOLLOWING) {
+      followDetailIDs = Array.from(
+        new Set(
+          followDetailSnapshot.docs.map((doc) => String(doc.data().follower)),
+        ),
+      );
+    } else {
+      followDetailIDs = Array.from(
+        new Set(
+          followDetailSnapshot.docs.map((doc) => String(doc.data().following)),
+        ),
+      );
+    }
+
+    const followDetailData = await Promise.all(
+      followDetailIDs.map(async (followerID) => {
+        const followDetailDocRef = doc(DB, "user_collection", followerID);
+        const followDetailDoc = await getDoc(followDetailDocRef);
+
+        if (followDetailDoc.exists()) {
+          const data = followDetailDoc.data();
+
+          return {
+            id: followDetailDoc.id,
+            firstName: data.first ?? "",
+            lastName: data.last ?? "",
+          } satisfies UserSearchDisplayModel;
+        }
+        return null;
+      }),
     );
-  } else {
-    followDetailIDs = Array.from(
-      new Set(
-        followDetailSnapshot.docs.map((doc) => String(doc.data().following)),
-      ),
-    );
+
+    return followDetailData.filter(
+      (data) => data !== null,
+    ) as UserSearchDisplayModel[];
+  } catch (error) {
+    console.error(`Error fetching ${type}:`, error);
+    return [];
   }
-
-  const followDetailData = await Promise.all(
-    followDetailIDs.map(async (followerID) => {
-      const followDetailDocRef = doc(DB, "user_collection", followerID);
-      const followDetailDoc = await getDoc(followDetailDocRef);
-
-      if (followDetailDoc.exists()) {
-        const data = followDetailDoc.data();
-
-        return {
-          id: followDetailDoc.id,
-          firstName: data.first ?? "",
-          lastName: data.last ?? "",
-        } satisfies UserSearchDisplayModel;
-      }
-      return null;
-    }),
-  );
-
-  return followDetailData.filter(
-    (data) => data !== null,
-  ) as UserSearchDisplayModel[];
 }
 
 /**

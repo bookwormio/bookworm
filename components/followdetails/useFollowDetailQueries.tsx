@@ -10,14 +10,15 @@ import {
 /**
  * Gets neccessary data to display followers in a list
  * @param userID
+ * @param maxUsers
  * @returns {UserSearchDisplayModel[]} - array of user data
  */
-export const useGetFollowersByID = (userID: string) => {
+export const useGetFollowersByID = (userID: string, maxUsers?: number) => {
   return useQuery({
     queryKey: ["followers", userID],
     enabled: userID != null && userID !== "",
     queryFn: async () => {
-      return await getFollowersByUserID(userID ?? "");
+      return await getFollowersByUserID(userID ?? "", maxUsers);
     },
   });
 };

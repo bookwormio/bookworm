@@ -5,9 +5,14 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchUsersBySearch } from "../../services/firebase-services/UserQueries";
 import { type UserSearchDisplayModel } from "../../types";
 import { useAuth } from "../auth/context";
+import { useGetFollowersByID } from "../followdetails/useFollowDetailQueries";
 import UserList from "../UserList/UserList";
 import WormLoader from "../wormloader/WormLoader";
 import SearchBar from "./searchbar";
+import {
+  filterFollowingUsersBySearchPhrase,
+  removeDuplicates,
+} from "./util/searchBarUtils";
 
 const USER_SEARCH_PLACEHOLDER = "Search for users";
 
@@ -26,6 +31,12 @@ const UserSearch = ({
   const [users, setUsers] = useState<UserSearchDisplayModel[]>([]);
   const [searchClicked, setSearchClicked] = useState<boolean>(
     searchPhrase !== "",
+  );
+  const MAX_USERS = 10;
+
+  const { data: followingUsersData } = useGetFollowersByID(
+    user?.uid ?? "",
+    MAX_USERS,
   );
 
   const { data: fetchUsersData, isLoading } = useQuery({
@@ -46,10 +57,43 @@ const UserSearch = ({
   });
 
   useEffect(() => {
-    if (fetchUsersData !== undefined && fetchUsersData !== null) {
-      setUsers(fetchUsersData);
+    if (searchPhrase == null || searchPhrase === "") {
+      setUsers(followingUsersData ?? []);
+      return;
     }
-  }, [fetchUsersData]);
+
+    // Get filtered following users if available
+    const filteredFollowingUsers =
+      followingUsersData != null
+        ? filterFollowingUsersBySearchPhrase(followingUsersData, searchPhrase)
+        : [];
+
+    // If only following users data is available
+    if (filteredFollowingUsers.length > 0 && fetchUsersData == null) {
+      setUsers(filteredFollowingUsers);
+      return;
+    }
+
+    // If only fetched users data is available
+    if (fetchUsersData != null && followingUsersData == null) {
+      setUsers(fetchUsersData);
+      return;
+    }
+
+    // If both data sources are available, combine them
+    if (fetchUsersData != null && followingUsersData != null) {
+      setUsers(
+        removeDuplicates<UserSearchDisplayModel>([
+          ...filteredFollowingUsers,
+          ...fetchUsersData,
+        ]),
+      );
+      return;
+    }
+
+    // If no data is available
+    setUsers([]);
+  }, [searchPhrase, followingUsersData, fetchUsersData]);
 
   return (
     <View style={styles.container}>
