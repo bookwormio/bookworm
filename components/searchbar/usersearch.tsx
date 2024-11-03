@@ -11,7 +11,7 @@ import WormLoader from "../wormloader/WormLoader";
 import SearchBar from "./searchbar";
 import {
   filterFollowingUsersBySearchPhrase,
-  removeDuplicates,
+  removeDuplicatesByID,
 } from "./util/searchBarUtils";
 
 const USER_SEARCH_PLACEHOLDER = "Search for users";
@@ -57,6 +57,7 @@ const UserSearch = ({
   });
 
   useEffect(() => {
+    // If search phrase is empty, just show following users
     if (searchPhrase == null || searchPhrase === "") {
       setUsers(followingUsersData ?? []);
       return;
@@ -83,7 +84,7 @@ const UserSearch = ({
     // If both data sources are available, combine them
     if (fetchUsersData != null && followingUsersData != null) {
       setUsers(
-        removeDuplicates<UserSearchDisplayModel>([
+        removeDuplicatesByID<UserSearchDisplayModel>([
           ...filteredFollowingUsers,
           ...fetchUsersData,
         ]),

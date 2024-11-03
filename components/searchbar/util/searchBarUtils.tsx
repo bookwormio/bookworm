@@ -84,9 +84,9 @@ interface HasID {
  *
  * @example
  * // With books
- * const uniqueBooks = removeDuplicates<BookVolumeItem>(books);
+ * const uniqueBooks = removeDuplicatesByID<BookVolumeItem>(books);
  */
-export function removeDuplicates<T extends HasID>(objects: T[]): T[] {
+export function removeDuplicatesByID<T extends HasID>(objects: T[]): T[] {
   const uniqueObjects = new Map<string, T>();
 
   objects.forEach((object) => {
