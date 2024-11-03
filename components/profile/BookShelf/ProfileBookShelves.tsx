@@ -1,15 +1,19 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { type ServerBookShelfName } from "../../../enums/Enums";
+import { useAuth } from "../../auth/context";
 import WormLoader from "../../wormloader/WormLoader";
+import { useGetAllBorrowingBooksForUser } from "../hooks/useBookBorrowQueries";
 import { useGetBooksForBookshelves } from "../hooks/useBookshelfQueries";
 import BookShelf from "./BookShelf";
+import BorrowingBookShelf from "./BorrowingBookShelf";
 
 interface BookShelvesProp {
   userID: string;
 }
 
 const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
+  const { user } = useAuth();
   // Initialize the bookShelves state with all shelves empty
 
   const {
@@ -18,6 +22,18 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
     isError,
     error,
   } = useGetBooksForBookshelves(userID ?? "");
+
+  const {
+    data: borrowingBooks,
+    isLoading: isLoadingBorrowingBooks,
+    isError: isErrorBorrowingBooks,
+    error: errorBorrowingBooks,
+    isSuccess: isSuccessBorrowingBooks,
+  } = useGetAllBorrowingBooksForUser(userID);
+
+  if (isSuccessBorrowingBooks) {
+    console.log(borrowingBooks);
+  }
 
   if (isLoadingBooks) {
     return (
@@ -45,6 +61,11 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
           userID={userID}
         />
       ))}
+      {user?.uid === userID && (
+        <BorrowingBookShelf
+          bookBorrowModels={borrowingBooks ?? []}
+        ></BorrowingBookShelf>
+      )}
     </View>
   );
 };

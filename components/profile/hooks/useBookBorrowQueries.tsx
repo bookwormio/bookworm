@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  getAllBorrowingBooksForUser,
   getLendingLibraryBookStatuses,
   lendBookToUser,
   returnBookToUser,
@@ -96,5 +97,17 @@ export const useReturnBook = () => {
         queryKey: ["lendingStatuses"],
       });
     },
+  });
+};
+
+// TODO: maybe this should get bookIDS and then fetch the books from those user's bookshelves
+export const useGetAllBorrowingBooksForUser = (userID: string) => {
+  return useQuery({
+    queryKey: ["borrowingBooks", userID],
+    queryFn: async () => {
+      return await getAllBorrowingBooksForUser(userID);
+    },
+    enabled: userID != null && userID !== "",
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };

@@ -71,11 +71,19 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
   }
 
   const shelfNameDisplay = bookShelfDisplayMap[shelfName];
+  // TODO move this to a constant
+  const lendingSubtitle = "Books you are willing to lend";
 
   return (
     <View style={styles.list}>
       <View style={styles.heading}>
-        <Text style={styles.title}>{shelfNameDisplay}</Text>
+        <View>
+          <Text style={styles.title}>{shelfNameDisplay}</Text>
+          {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
+            userID === user?.uid && (
+              <Text style={styles.subtitle}>{lendingSubtitle}</Text>
+            )}
+        </View>
         <Text style={styles.length}>{books.length}</Text>
       </View>
       <FlatList
@@ -173,5 +181,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 50,
+  },
+  subtitle: {
+    paddingTop: 3,
+    fontSize: 14,
+    color: "#666",
+    fontStyle: "italic",
   },
 });
