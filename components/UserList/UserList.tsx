@@ -13,7 +13,7 @@ const UserList = ({ users, showFollowStatus }: UserListProps) => {
       {users.map((value) => (
         <UserListItem
           key={value.id}
-          user={value}
+          userToDisplay={value}
           showFollowStatus={showFollowStatus}
         ></UserListItem>
       ))}

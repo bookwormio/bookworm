@@ -1,20 +1,24 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { type UserSearchDisplayModel } from "../../types";
 import { useAuth } from "../auth/context";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import { useNavigateToUser } from "../profile/hooks/useRouteHooks";
+import FollowButton from "./FollowButton";
 
 interface UserListItemProps {
-  user: UserSearchDisplayModel;
+  userToDisplay: UserSearchDisplayModel;
   showFollowStatus?: boolean;
 }
 
 const UserListItem = ({
-  user: userInfo,
-  showFollowStatus,
+  userToDisplay: userInfo,
+  showFollowStatus = false,
 }: UserListItemProps) => {
   const { user } = useAuth();
+  const { data: currentUserData } = useUserDataQuery(user?.uid);
+
   const navigateToUser = useNavigateToUser(user?.uid, userInfo.id);
 
   return (
@@ -29,16 +33,20 @@ const UserListItem = ({
       </View>
 
       <View style={styles.infoContainer}>
-        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-          <Text style={styles.userName}>
+        <View style={styles.userInfoRow}>
+          <Text style={styles.userName} numberOfLines={1} ellipsizeMode="tail">
             {userInfo.firstName} {userInfo.lastName}
           </Text>
-          {showFollowStatus != null &&
-            showFollowStatus &&
-            userInfo?.followStatus !== null && (
-              <Text> - {userInfo.followStatus}</Text>
-            )}
-        </Text>
+          {showFollowStatus && (
+            <FollowButton
+              friendUserID={userInfo.id}
+              myFullName={`${currentUserData?.first} ${currentUserData?.last}`}
+              textStyle={{
+                fontSize: 12,
+              }}
+            />
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -63,13 +71,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
   },
-  title: {
+  userInfoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 5,
   },
   userName: {
     fontSize: 16,
     fontWeight: "bold",
-    textAlign: "left",
+    flex: 1, // Allow text to shrink if needed
+    marginRight: 10, // Space between name and button
   },
   placeholderImage: {
     position: "absolute",

@@ -1,24 +1,14 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
-import { APP_BACKGROUND_COLOR } from "../../constants/constants";
-import { ServerNotificationType, TabNames } from "../../enums/Enums";
-import {
-  followUserByID,
-  unfollowUserByID,
-} from "../../services/firebase-services/FriendQueries";
-import { createNotification } from "../../services/firebase-services/NotificationQueries";
+import { TabNames } from "../../enums/Enums";
 import { fetchFriendData } from "../../services/firebase-services/UserQueries";
-import {
-  type ConnectionModel,
-  type FriendRequestNotification,
-} from "../../types";
 import { useAuth } from "../auth/context";
+import BookWormButton from "../button/BookWormButton";
 import {
-  useGetIsFollowing,
   useGetNumberOfFollowersByUserID,
   useGetNumberOfFollowingByUserID,
 } from "../followdetails/useFollowDetailQueries";
@@ -28,13 +18,9 @@ import FriendProfilePosts from "../profile/FriendProfilePosts";
 import { useNavigateToFollowList } from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import ProfileTabSelector from "../profile/ProfileTabSelector";
+import { sharedProfileStyles } from "../profile/styles/SharedProfileStyles";
 import WormLoader from "../wormloader/WormLoader";
-
-enum LocalFollowStatus {
-  FOLLOWING = "following",
-  NOT_FOLLOWING = "not following",
-  LOADING = "loading",
-}
+import FollowButon from "./FollowButton";
 
 interface FriendProfileProps {
   friendUserID: string;
@@ -43,13 +29,6 @@ interface FriendProfileProps {
 const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   const { user } = useAuth();
   const [profileTab, setProfileTab] = useState("shelf");
-  const [followStatus, setFollowStatus] = useState<string>(
-    LocalFollowStatus.LOADING,
-  );
-  const [followStatusFetched, setFollowStatusFetched] =
-    useState<boolean>(false);
-
-  const queryClient = useQueryClient();
 
   const navigateToFollowList = useNavigateToFollowList(friendUserID);
 
@@ -67,164 +46,21 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     user?.uid,
   );
 
-  const { data: isFollowingData, isLoading: isLoadingIsFollowingData } =
-    useGetIsFollowing(user?.uid ?? "", friendUserID);
-
   const { data: numFollowersData, isLoading: isLoadingNumFollowersData } =
     useGetNumberOfFollowersByUserID(friendUserID ?? "");
 
   const { data: numFollowingData, isLoading: isLoadingNumFollowingData } =
     useGetNumberOfFollowingByUserID(friendUserID ?? "");
 
-  const handleInvalidateFollowDetails = async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: ["numfollowers", friendUserID],
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["numfollowing", user?.uid],
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["followers", friendUserID],
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["following", user?.uid],
-      }),
-    ]);
-  };
-
-  const followMutation = useMutation({
-    mutationFn: followUserByID,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey:
-          user?.uid != null && friendUserID !== null
-            ? ["followingstatus", friendUserID, user?.uid]
-            : ["followingstatus"],
-      });
-      await handleInvalidateFollowDetails();
-      setFollowStatusFetched(true);
-    },
-  });
-
-  const unfollowMutation = useMutation({
-    mutationFn: unfollowUserByID,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey:
-          user?.uid != null && friendUserID !== null
-            ? ["followingstatus", friendUserID, user?.uid]
-            : ["followingstatus"],
-      });
-      await handleInvalidateFollowDetails();
-      setFollowStatusFetched(true);
-    },
-  });
-
-  const notifyMutation = useMutation({
-    mutationFn: createNotification,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["notifications", friendUserID],
-      });
-    },
-  });
-
-  useEffect(() => {
-    if (user?.uid !== undefined && friendUserID !== undefined) {
-      if (isFollowingData !== null && isFollowingData !== undefined) {
-        setFollowStatus(
-          isFollowingData
-            ? LocalFollowStatus.FOLLOWING
-            : LocalFollowStatus.NOT_FOLLOWING,
-        );
-        setFollowStatusFetched(true); // Set follow status fetched
-      }
-    }
-  }, [isFollowingData]);
-
-  const handleFollowButtonPressed = () => {
-    if (followStatus === LocalFollowStatus.LOADING) {
-      // Do nothing if follow status is still loading
-    } else if (followStatus === LocalFollowStatus.FOLLOWING) {
-      // if following -> unfollow
-      void handleUnfollow();
-    } else if (followStatus === LocalFollowStatus.NOT_FOLLOWING) {
-      // if not following -> follow
-      void handleFollow();
-    }
-  };
-
-  const handleFollow = async () => {
-    const currentUserID = user?.uid;
-    if (
-      currentUserID === undefined ||
-      friendUserID === undefined ||
-      userData == null
-    ) {
-      console.error(
-        "Either current user ID is undefined or friend user ID is undefined",
-      );
-      return;
-    }
-
-    try {
-      // Immediately update the visual follow status before the db has been updated
-      setFollowStatus(LocalFollowStatus.LOADING);
-      setFollowStatusFetched(false);
-      const connection: ConnectionModel = {
-        currentUserID,
-        friendUserID,
-      };
-      followMutation.mutate(connection);
-      if (user !== undefined && user !== null) {
-        const FRnotify: FriendRequestNotification = {
-          receiver: friendUserID,
-          sender: user?.uid,
-          sender_name: userData.first + " " + userData.last,
-          type: ServerNotificationType.FRIEND_REQUEST,
-        };
-        notifyMutation.mutate(FRnotify);
-      }
-    } catch (error) {
-      setFollowStatus(LocalFollowStatus.NOT_FOLLOWING);
-      console.error("Error occurred while following user:", error);
-    }
-  };
-
-  const handleUnfollow = async () => {
-    const currentUserID = user?.uid;
-    if (currentUserID === undefined || friendUserID === undefined) {
-      console.error(
-        "Either current user ID is undefined or friend user ID is undefined",
-      );
-      return;
-    }
-
-    try {
-      setFollowStatus(LocalFollowStatus.LOADING);
-      setFollowStatusFetched(false);
-      const connection: ConnectionModel = {
-        currentUserID,
-        friendUserID,
-      };
-      unfollowMutation.mutate(connection);
-    } catch (error) {
-      setFollowStatus(LocalFollowStatus.FOLLOWING);
-      console.error("Error occurred while unfollowing user:", error);
-    }
-  };
-
   if (
     friendIsLoading ||
     isLoadingUserData ||
     friendData == null ||
-    isLoadingIsFollowingData ||
     isLoadingNumFollowersData ||
     isLoadingNumFollowingData
   ) {
     return (
-      <View style={styles.loading}>
+      <View style={sharedProfileStyles.loading}>
         <WormLoader />
       </View>
     );
@@ -232,22 +68,18 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
 
   return (
     <ScrollView
-      stickyHeaderIndices={[3]}
-      style={{
-        flexGrow: 1,
-        height: "100%",
-        backgroundColor: APP_BACKGROUND_COLOR,
-      }}
+      stickyHeaderIndices={[4]}
+      style={sharedProfileStyles.scrollContainer}
     >
-      <View style={styles.imageTextContainer}>
-        <View style={styles.profilePicContainer}>
+      <View style={sharedProfileStyles.imageTextContainer}>
+        <View style={sharedProfileStyles.defaultImageContainer}>
           <ProfilePicture userID={friendUserID} size={60} />
         </View>
         <View>
-          <Text style={styles.nameText}>
+          <Text style={sharedProfileStyles.nameText}>
             {friendData.first} {friendData.last}
           </Text>
-          <Text style={styles.locText}>
+          <Text style={sharedProfileStyles.locText}>
             {friendData.city === "" ? "" : friendData.city}
             {friendData.city !== "" && friendData.state !== "" ? ", " : ""}
             {friendData.state === "" ? "" : friendData.state}
@@ -255,53 +87,48 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         </View>
       </View>
       <View>
-        <Text style={styles.bioWrap}>{friendData.bio}</Text>
+        <Text style={sharedProfileStyles.bioWrap}>{friendData.bio}</Text>
       </View>
-      <View style={styles.imageTextContainer}>
+      <View style={sharedProfileStyles.imageTextContainer}>
         <TouchableOpacity
-          style={styles.textWrap}
+          style={sharedProfileStyles.textWrap}
           onPress={() => {
             navigateToFollowList(true);
           }}
         >
-          <Text style={styles.followTitle}>Followers</Text>
-          <Text style={styles.followAmount}>{numFollowersData ?? "-"}</Text>
+          <Text style={sharedProfileStyles.followTitle}>Followers</Text>
+          <Text style={sharedProfileStyles.followAmount}>
+            {numFollowersData ?? "-"}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.textWrap}
+          style={sharedProfileStyles.textWrap}
           onPress={() => {
             navigateToFollowList(false);
           }}
         >
-          <Text style={styles.followTitle}>Following</Text>
-          <Text style={styles.followAmount}>{numFollowingData ?? "-"}</Text>
+          <Text style={sharedProfileStyles.followTitle}>Following</Text>
+          <Text style={sharedProfileStyles.followAmount}>
+            {numFollowingData ?? "-"}
+          </Text>
         </TouchableOpacity>
-        <View style={styles.buttoncontainer}>
-          {/* TODO: move follow button to seperate component */}
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleFollowButtonPressed}
-            disabled={!followStatusFetched}
-          >
-            <Text style={styles.buttonText}>
-              {followStatus === LocalFollowStatus.LOADING
-                ? "Loading..."
-                : followStatus === LocalFollowStatus.FOLLOWING
-                  ? "Following"
-                  : "Follow"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              router.push({
-                pathname: `/recommendation/${friendUserID}`,
-              });
-            }}
-          >
-            <Text style={styles.buttonText}>Recommend</Text>
-          </TouchableOpacity>
-        </View>
+      </View>
+      <View style={sharedProfileStyles.outerButtonsContainer}>
+        <FollowButon
+          friendUserID={friendData.id}
+          myFullName={userData?.first + " " + userData?.last}
+        />
+        <BookWormButton
+          title={"Recommend"}
+          // textStyle={{
+          //   fontSize: 12,
+          // }}
+          onPress={() => {
+            router.push({
+              pathname: `/recommendation/${friendUserID}`,
+            });
+          }}
+        />
       </View>
       <ProfileTabSelector
         profileTab={profileTab}
@@ -321,68 +148,3 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   );
 };
 export default FriendProfile;
-
-const styles = StyleSheet.create({
-  imageTextContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginLeft: 20,
-    marginTop: 20,
-  },
-  nameText: {
-    paddingLeft: 20,
-    fontSize: 30,
-    marginTop: -25,
-  },
-  loading: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: APP_BACKGROUND_COLOR,
-  },
-  buttoncontainer: {
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    paddingRight: 20,
-    flex: 1,
-    flexDirection: "column",
-  },
-  button: {
-    paddingVertical: 2,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#FB6D0B",
-    marginBottom: 10,
-  },
-  buttonText: {
-    color: "#FB6D0B",
-  },
-  profilePicContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-    alignSelf: "flex-start",
-    marginLeft: 5,
-  },
-  followTitle: { fontSize: 15 },
-  followAmount: { fontSize: 18, fontWeight: "bold" },
-  locText: {
-    paddingLeft: 20,
-  },
-  textWrap: {
-    paddingLeft: 11,
-    paddingBottom: 20,
-  },
-  bioWrap: {
-    paddingLeft: 30,
-    paddingRight: 30,
-    fontSize: 15,
-    paddingBottom: 5,
-  },
-});
