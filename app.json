@@ -4,7 +4,7 @@
     "slug": "bookworm",
     "scheme": "bookworm.io",
     "owner": "bookwormio",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/bookworm-icon.png",
     "userInterfaceStyle": "light",
