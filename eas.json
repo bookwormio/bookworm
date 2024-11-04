@@ -29,6 +29,9 @@
         "EXPO_PUBLIC_FIREBASE_APP_ID": "1:90311569106:web:d8d7c2fe041e67beda470b",
         "EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID": "G-FBB1BW3BFM",
         "GOOGLE_BOOKS_API_KEY": "AIzaSyDdLpV4nXjFf-Z62gCpNC9hqK6km6UB58s"
+      },
+      "ios": {
+        "simulator": true
       }
     },
     "production": {
