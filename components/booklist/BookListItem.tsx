@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type BookVolumeInfo } from "../../types";
+import { useNavigateToBook } from "../profile/hooks/useRouteHooks";
 
 interface BookListItemProps {
   bookID: string;
