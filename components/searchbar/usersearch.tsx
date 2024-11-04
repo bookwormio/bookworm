@@ -111,7 +111,7 @@ const UserSearch = ({
       >
         {users.map((user) => (
           <View style={styles.userContainer} key={user.id}>
-            <UserList routePrefix={routePrefix} users={[user]} />
+            <UserList users={[user]} showFollowStatus={true} />
           </View>
         ))}
         {isLoading && (

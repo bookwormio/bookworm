@@ -7,7 +7,8 @@ import {
 import {
   type BookRequestNotificationStatus,
   type ServerBookBorrowStatus,
-  type ServerNotificationType,
+  type ServerFollowStatus,
+  type ServerNotificationType
 } from "../enums/Enums";
 
 interface LineDataPointModel {
@@ -23,6 +24,7 @@ interface UserSearchDisplayModel {
   id: string;
   firstName: string;
   lastName: string;
+  followStatus?: ServerFollowStatus;
 }
 
 interface UserDataModel {

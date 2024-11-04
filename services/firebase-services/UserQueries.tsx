@@ -20,7 +20,11 @@ import {
   where,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { ServerBookShelfName, ServerFollowDetailType } from "../../enums/Enums";
+import {
+  ServerBookShelfName,
+  ServerFollowDetailType,
+  type ServerFollowStatus,
+} from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
   type BookShelfBookModel,
@@ -460,7 +464,9 @@ export async function getFollowingByID(
 /**
  * Method to retrieve the followers' detailed data for a user.
  * @param userID - The uid of the current user.
- * @returns {Promise<UserSearchDisplayModel[]>} - An array of followers' detailed data.
+ * @param type - The type of follow relationship to query (following or follower).
+ * @param maxUsers - Optional limit on the number of users to retrieve.
+ * @returns {Promise<UserSearchDisplayModel[]>} - An array of followers' detailed data including follow status.
  */
 export async function getFollowDetailByID(
   userID: string,
@@ -474,42 +480,35 @@ export async function getFollowDetailByID(
       orderBy("created_at", "desc"),
     ];
 
-    let followDetailQuery;
-
-    // Limit the number of users to fetch if maxUsers is provided
-    if (maxUsers != null && maxUsers > 0) {
-      followDetailQuery = query(
-        collection(DB, "relationships"),
-        ...followDetailConstraints,
-        limit(maxUsers),
-      );
-    } else {
-      followDetailQuery = query(
-        collection(DB, "relationships"),
-        ...followDetailConstraints,
-      );
-    }
+    const followDetailQuery = query(
+      collection(DB, "relationships"),
+      ...followDetailConstraints,
+      ...(maxUsers != null && maxUsers > 0 ? [limit(maxUsers)] : []),
+    );
 
     const followDetailSnapshot = await getDocs(followDetailQuery);
 
-    let followDetailIDs;
-    if (type === ServerFollowDetailType.FOLLOWING) {
-      followDetailIDs = Array.from(
-        new Set(
-          followDetailSnapshot.docs.map((doc) => String(doc.data().follower)),
-        ),
+    // Get the IDs and create a map of relationship statuses
+    const relationshipStatusMap = new Map<string, ServerFollowStatus>();
+    const followDetailIDs = followDetailSnapshot.docs.map((doc) => {
+      const data = doc.data();
+      const targetId =
+        type === ServerFollowDetailType.FOLLOWING
+          ? String(data.follower)
+          : String(data.following);
+      relationshipStatusMap.set(
+        targetId,
+        data.follow_status as ServerFollowStatus,
       );
-    } else {
-      followDetailIDs = Array.from(
-        new Set(
-          followDetailSnapshot.docs.map((doc) => String(doc.data().following)),
-        ),
-      );
-    }
+      return targetId;
+    });
+
+    // Remove duplicates from IDs
+    const uniqueFollowDetailIDs = Array.from(new Set(followDetailIDs));
 
     const followDetailData = await Promise.all(
-      followDetailIDs.map(async (followerID) => {
-        const followDetailDocRef = doc(DB, "user_collection", followerID);
+      uniqueFollowDetailIDs.map(async (followerId) => {
+        const followDetailDocRef = doc(DB, "user_collection", followerId);
         const followDetailDoc = await getDoc(followDetailDocRef);
 
         if (followDetailDoc.exists()) {

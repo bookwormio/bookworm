@@ -277,6 +277,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           <Text style={styles.followAmount}>{numFollowingData ?? "-"}</Text>
         </TouchableOpacity>
         <View style={styles.buttoncontainer}>
+          {/* TODO: move follow button to seperate component */}
           <TouchableOpacity
             style={styles.button}
             onPress={handleFollowButtonPressed}

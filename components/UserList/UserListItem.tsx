@@ -7,10 +7,13 @@ import { useNavigateToUser } from "../profile/hooks/useRouteHooks";
 
 interface UserListItemProps {
   user: UserSearchDisplayModel;
-  routePrefix: string;
+  showFollowStatus?: boolean;
 }
 
-const UserListItem = ({ user: userInfo, routePrefix }: UserListItemProps) => {
+const UserListItem = ({
+  user: userInfo,
+  showFollowStatus,
+}: UserListItemProps) => {
   const { user } = useAuth();
   const navigateToUser = useNavigateToUser(user?.uid, userInfo.id);
 
@@ -30,6 +33,11 @@ const UserListItem = ({ user: userInfo, routePrefix }: UserListItemProps) => {
           <Text style={styles.userName}>
             {userInfo.firstName} {userInfo.lastName}
           </Text>
+          {showFollowStatus != null &&
+            showFollowStatus &&
+            userInfo?.followStatus !== null && (
+              <Text> - {userInfo.followStatus}</Text>
+            )}
         </Text>
       </View>
     </TouchableOpacity>
