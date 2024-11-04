@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "BookWorm",
-    "slug": "BookWorm",
-    "scheme": "BookWorm",
+    "name": "bookworm.io",
+    "slug": "bookworm",
+    "scheme": "bookworm.io",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/bookworm-icon.png",
@@ -27,6 +27,18 @@
     "plugins": [
       "expo-router",
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "7d65960e-a8fb-46ff-8df9-2e57a6226322"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.rilescode.BookWorm",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs access to your camera to take photos.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select photos."
+      }
+    }
   }
 }
