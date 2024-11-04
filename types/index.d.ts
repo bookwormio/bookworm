@@ -7,7 +7,6 @@ import {
 import {
   type BookRequestNotificationStatus,
   type ServerBookBorrowStatus,
-  type ServerBookShelfName,
   type ServerNotificationType,
 } from "../enums/Enums";
 
@@ -93,7 +92,6 @@ interface BookVolumeItem {
   etag?: string;
   selfLink?: string;
   volumeInfo: BookVolumeInfo;
-  bookShelf?: ServerBookShelfName;
 }
 
 interface BooksResponse {
