@@ -212,13 +212,11 @@ const styles = StyleSheet.create({
     width: 180, // custom width
     height: 250, // custom height
     borderRadius: 2,
-    overflow: "hidden", // Ensure the image is clipped to the border radius
   },
   defaultImageStyle: {
     width: 250,
     height: 250,
     borderRadius: 0,
-    overflow: "hidden", // Ensure the image is clipped to the border radius
   },
   imageContainer: {
     marginRight: 10,
