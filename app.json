@@ -35,11 +35,7 @@
       }
     },
     "ios": {
-      "bundleIdentifier": "com.rilescode.BookWorm",
-      "infoPlist": {
-        "NSCameraUsageDescription": "This app needs access to your camera to take photos.",
-        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select photos."
-      }
+      "bundleIdentifier": "com.rilescode.BookWorm"
     }
   }
 }
