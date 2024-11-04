@@ -1,6 +1,7 @@
-import { recomendationAPIUrl } from "../../recommendation.config";
 import { type BookVolumeInfo, type BookVolumeItem } from "../../types";
 import { fetchBookByVolumeID } from "../books-services/BookQueries";
+
+const recomendationAPIUrl = process.env.EXPO_PUBLIC_RECOMMENDATION_API_URL;
 
 /**
  * Send a ping request to the API server
