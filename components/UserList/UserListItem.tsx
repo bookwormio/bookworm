@@ -22,11 +22,7 @@ const UserListItem = ({ user: userInfo, routePrefix }: UserListItemProps) => {
       }}
     >
       <View style={styles.imageContainer}>
-        <ProfilePicture
-          userID={userInfo.id}
-          size={40}
-          overrideProfilePic={userInfo.profilePicURL}
-        />
+        <ProfilePicture userID={userInfo.id} size={40} />
       </View>
 
       <View style={styles.infoContainer}>

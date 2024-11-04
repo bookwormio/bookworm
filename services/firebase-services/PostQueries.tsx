@@ -16,7 +16,11 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import React from "react";
-import { BLURHASH, FIRST_IMG_STYLE, IMG_STYLE } from "../../constants/constants";
+import {
+  BLURHASH,
+  FIRST_IMG_STYLE,
+  IMG_STYLE,
+} from "../../constants/constants";
 import { DB, STORAGE } from "../../firebase.config";
 import {
   type CommentModel,
