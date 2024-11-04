@@ -24,7 +24,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
 
   const navigateToPost = useNavigateToPost();
 
-  const navigateToUser = useNavigateToUser(notif.sender);
+  const navigateToUser = useNavigateToUser(user?.uid, notif.sender);
 
   return (
     <TouchableOpacity
