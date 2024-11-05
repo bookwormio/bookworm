@@ -43,6 +43,12 @@ const NotificationItem = ({ notif }: NotifProp) => {
           notif.type === ServerNotificationType.BOOK_REQUEST_RESPONSE
         ) {
           navigateToBook();
+        } else if (notif.type === ServerNotificationType.BADGE) {
+          if (notif.postID != null) {
+            console.log("navigate to post page");
+          } else {
+            console.log("navigate to badge page");
+          }
         }
       }}
     >
@@ -52,7 +58,9 @@ const NotificationItem = ({ notif }: NotifProp) => {
             navigateToUser();
           }}
         >
-          <ProfilePicture userID={notif.sender} size={50} />
+          {notif.sender != null && (
+            <ProfilePicture userID={notif.sender} size={50} />
+          )}
         </TouchableOpacity>
         <NotificationItemContent
           notification={notif}

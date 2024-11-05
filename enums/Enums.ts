@@ -44,6 +44,7 @@ export enum ServerNotificationType {
   RECOMMENDATION = "RECOMMENDATION",
   BOOK_REQUEST = "BOOK_REQUEST",
   BOOK_REQUEST_RESPONSE = "BOOK_REQUEST_RESPONSE",
+  BADGE = "BADGE",
 }
 
 export const NotificationTitleMap: StringMap = {
@@ -52,6 +53,7 @@ export const NotificationTitleMap: StringMap = {
   [ServerNotificationType.COMMENT]: "New Comment",
   [ServerNotificationType.RECOMMENDATION]: "New Recommendation",
   [ServerNotificationType.BOOK_REQUEST]: "New Book Request",
+  [ServerNotificationType.BADGE]: "New Badge",
 };
 
 export const NotificationMessageMap: StringMap = {
@@ -60,6 +62,7 @@ export const NotificationMessageMap: StringMap = {
   [ServerNotificationType.COMMENT]: "commented on your post:",
   [ServerNotificationType.RECOMMENDATION]: "thinks you should read",
   [ServerNotificationType.BOOK_REQUEST]: "requested to borrow",
+  [ServerNotificationType.BADGE]: "You earned a badge: ",
 };
 
 export enum BookRequestNotificationStatus {

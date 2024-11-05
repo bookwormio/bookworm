@@ -214,16 +214,23 @@ interface FullNotificationModel {
   notifID: string;
   receiver: string;
   comment?: string;
-  sender: string;
-  sender_name: string;
+  sender?: string;
+  sender_name?: string;
   created: Timestamp;
   read_at: Timestamp | null;
   postID?: string;
   bookID?: string;
+  badgeID?: ServerBadgeName;
   bookTitle?: string;
   custom_message?: string;
   bookRequestStatus?: BookRequestNotificationStatus;
   type: ServerNotificationType;
+}
+
+interface BadgeNotification extends BasicNotificationModel {
+  type: ServerNotificationType.BADGE;
+  postID?: string;
+  badgeID: string;
 }
 
 interface FriendRequestNotification extends BasicNotificationModel {
@@ -271,7 +278,8 @@ type NotificationModel =
   | RecommendationNotification
   | BookRequestNotification
   | BookRequestAcceptedNotification
-  | BookRequestDeniedNotification;
+  | BookRequestDeniedNotification
+  | BadgeNotification;
 
 interface BookBorrowModel {
   bookID: string;

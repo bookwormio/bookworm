@@ -61,8 +61,6 @@ export async function createNotification(
     // Omit notifID from the full notification object because it's auto-generated
     const fullNotif: Omit<FullNotificationModel, "notifID"> = {
       receiver: notif.receiver,
-      sender: notif.sender,
-      sender_name: notif.sender_name,
       created: serverTimestamp() as Timestamp,
       // haven't implement read_at yet
       read_at: null,
@@ -70,27 +68,41 @@ export async function createNotification(
       /// ... used to conditionally add fields to an object
       ...(notif.type === ServerNotificationType.LIKE && {
         postID: notif.postID,
+        sender: notif.sender,
+        sender_name: notif.sender_name,
       }),
       ...(notif.type === ServerNotificationType.COMMENT && {
         postID: notif.postID,
         comment: notif.comment,
+        sender: notif.sender,
+        sender_name: notif.sender_name,
       }),
       ...(notif.type === ServerNotificationType.RECOMMENDATION && {
         bookID: notif.bookID,
         bookTitle: notif.bookTitle,
         custom_message: notif.custom_message ?? "",
+        sender: notif.sender,
+        sender_name: notif.sender_name,
       }),
       ...(notif.type === ServerNotificationType.BOOK_REQUEST && {
         bookID: notif.bookID,
         bookTitle: notif.bookTitle,
         custom_message: notif.custom_message ?? "",
         bookRequestStatus: notif.bookRequestStatus,
+        sender: notif.sender,
+        sender_name: notif.sender_name,
       }),
       ...(notif.type === ServerNotificationType.BOOK_REQUEST_RESPONSE && {
         bookID: notif.bookID,
         bookTitle: notif.bookTitle,
         custom_message: notif.custom_message ?? "",
         bookRequestStatus: notif.bookRequestStatus,
+        sender: notif.sender,
+        sender_name: notif.sender_name,
+      }),
+      ...(notif.type === ServerNotificationType.BADGE && {
+        postID: notif.postID,
+        badgeID: notif.badgeID,
       }),
     };
 
@@ -164,6 +176,7 @@ export async function getAllFullNotifications(
         read_at: notifDoc.data().read_at,
         postID: notifDoc.data().postID,
         bookID: notifDoc.data().bookID,
+        badgeID: notifDoc.data().badgeID,
         bookTitle: notifDoc.data().bookTitle,
         custom_message: notifDoc.data().custom_message,
         bookRequestStatus: notifDoc.data().bookRequestStatus,
@@ -270,7 +283,7 @@ export const denyOtherBorrowRequests = async (
 
         // create a denial notification
         const denialNotification = createBookResponseNotification(
-          notifData.sender,
+          notifData.sender ?? "",
           lenderUserID,
           acceptedBorrowerUserName,
           bookID,
