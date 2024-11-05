@@ -23,7 +23,6 @@ interface UserSearchDisplayModel {
   id: string;
   firstName: string;
   lastName: string;
-  followStatus?: ServerFollowStatus;
 }
 
 interface UserDataModel {
