@@ -28,6 +28,7 @@ import { type ServerBookShelfName } from "../../enums/Enums";
 import { fetchBookByVolumeID } from "../../services/books-services/BookQueries";
 import { type BookVolumeInfo } from "../../types";
 import { useAuth } from "../auth/context";
+import { useBadgeChecking } from "../badges/useBadgeQueries";
 import BookshelfAddButtons from "../profile/BookShelf/BookshelfAddButtons";
 import {
   useAddBookToShelf,
@@ -179,6 +180,8 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     } finally {
       setPendingChanges({ add: [], remove: [] });
     }
+
+    await useBadgeChecking(user?.uid);
   };
   // callbacks
   const handlePresentModalPress = useCallback(() => {
