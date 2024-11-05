@@ -4,10 +4,8 @@ import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
-import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { TabNames } from "../../enums/Enums";
 import { fetchFriendData } from "../../services/firebase-services/UserQueries";
-import { useAuth } from "../auth/context";
 import BookWormButton from "../button/BookWormButton";
 import {
   useGetNumberOfFollowersByUserID,
@@ -28,7 +26,6 @@ interface FriendProfileProps {
 }
 
 const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
-  const { user } = useAuth();
   const [profileTab, setProfileTab] = useState("shelf");
 
   const navigateToFollowList = useNavigateToFollowList(friendUserID);
@@ -42,11 +39,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
     staleTime: 60000, // Set stale time to 1 minute
   });
 
-  // getting userdata
-  const { data: userData, isLoading: isLoadingUserData } = useUserDataQuery(
-    user?.uid,
-  );
-
   const { data: numFollowersData, isLoading: isLoadingNumFollowersData } =
     useGetNumberOfFollowersByUserID(friendUserID ?? "");
 
@@ -55,7 +47,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
 
   if (
     friendIsLoading ||
-    isLoadingUserData ||
     friendData == null ||
     isLoadingNumFollowersData ||
     isLoadingNumFollowingData
@@ -115,10 +106,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         </TouchableOpacity>
       </View>
       <View style={sharedProfileStyles.outerButtonsContainer}>
-        <FollowButon
-          friendUserID={friendData.id}
-          myFullName={userData?.first + " " + userData?.last}
-        />
+        <FollowButon friendUserID={friendData.id} />
         <BookWormButton
           title={"Recommend"}
           // textStyle={{

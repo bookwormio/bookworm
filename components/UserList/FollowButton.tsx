@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { type TextStyle } from "react-native";
+import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { FollowButtonDisplay, ServerNotificationType } from "../../enums/Enums";
 import {
   followUserByID,
@@ -17,19 +18,18 @@ import { useGetIsFollowing } from "../followdetails/useFollowDetailQueries";
 
 interface FollowButtonProps {
   friendUserID: string;
-  myFullName: string;
   textStyle?: TextStyle;
 }
 
-const FollowButton = ({
-  friendUserID,
-  myFullName,
-  textStyle,
-}: FollowButtonProps) => {
+const FollowButton = ({ friendUserID, textStyle }: FollowButtonProps) => {
   const queryClient = useQueryClient();
 
   const { user } = useAuth();
   const currentUserID = user?.uid;
+  const { data: currentUserData, isLoading: currentUserDataLoading } =
+    useUserDataQuery(currentUserID);
+
+  const myFullName = currentUserData?.first + " " + currentUserData?.last;
 
   const { data: isFollowing, isLoading: isLoadingFollowStatus } =
     useGetIsFollowing(user?.uid ?? "", friendUserID);
@@ -126,7 +126,8 @@ const FollowButton = ({
   const isLoading =
     isLoadingFollowStatus ||
     unfollowMutation.isPending ||
-    followMutation.isPending;
+    followMutation.isPending ||
+    currentUserDataLoading;
 
   const buttonTitle = isLoading
     ? FollowButtonDisplay.LOADING

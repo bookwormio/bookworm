@@ -1,6 +1,5 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { type UserSearchDisplayModel } from "../../types";
 import { useAuth } from "../auth/context";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
@@ -17,7 +16,6 @@ const UserListItem = ({
   showFollowStatus = false,
 }: UserListItemProps) => {
   const { user } = useAuth();
-  const { data: currentUserData } = useUserDataQuery(user?.uid);
 
   const navigateToUser = useNavigateToUser(user?.uid, userInfo.id);
 
@@ -40,7 +38,6 @@ const UserListItem = ({
           {showFollowStatus && (
             <FollowButton
               friendUserID={userInfo.id}
-              myFullName={`${currentUserData?.first} ${currentUserData?.last}`}
               textStyle={{
                 fontSize: 12,
               }}
