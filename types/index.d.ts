@@ -7,8 +7,7 @@ import {
 import {
   type BookRequestNotificationStatus,
   type ServerBookBorrowStatus,
-  type ServerFollowStatus,
-  type ServerNotificationType
+  type ServerNotificationType,
 } from "../enums/Enums";
 
 interface LineDataPointModel {

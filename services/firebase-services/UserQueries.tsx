@@ -20,11 +20,7 @@ import {
   where,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import {
-  ServerBookShelfName,
-  ServerFollowDetailType,
-  type ServerFollowStatus,
-} from "../../enums/Enums";
+import { ServerBookShelfName, ServerFollowDetailType } from "../../enums/Enums";
 import { DB, STORAGE } from "../../firebase.config";
 import {
   type BookShelfBookModel,
@@ -488,27 +484,26 @@ export async function getFollowDetailByID(
 
     const followDetailSnapshot = await getDocs(followDetailQuery);
 
-    // Get the IDs and create a map of relationship statuses
-    const relationshipStatusMap = new Map<string, ServerFollowStatus>();
-    const followDetailIDs = followDetailSnapshot.docs.map((doc) => {
-      const data = doc.data();
-      const targetId =
-        type === ServerFollowDetailType.FOLLOWING
-          ? String(data.follower)
-          : String(data.following);
-      relationshipStatusMap.set(
-        targetId,
-        data.follow_status as ServerFollowStatus,
+    // Get unique IDs based on relationship type
+    let followDetailIDs;
+    if (type === ServerFollowDetailType.FOLLOWING) {
+      followDetailIDs = Array.from(
+        new Set(
+          followDetailSnapshot.docs.map((doc) => String(doc.data().follower)),
+        ),
       );
-      return targetId;
-    });
+    } else {
+      followDetailIDs = Array.from(
+        new Set(
+          followDetailSnapshot.docs.map((doc) => String(doc.data().following)),
+        ),
+      );
+    }
 
-    // Remove duplicates from IDs
-    const uniqueFollowDetailIDs = Array.from(new Set(followDetailIDs));
-
+    // Fetch user details for each ID
     const followDetailData = await Promise.all(
-      uniqueFollowDetailIDs.map(async (followerId) => {
-        const followDetailDocRef = doc(DB, "user_collection", followerId);
+      followDetailIDs.map(async (followerID) => {
+        const followDetailDocRef = doc(DB, "user_collection", followerID);
         const followDetailDoc = await getDoc(followDetailDocRef);
 
         if (followDetailDoc.exists()) {
