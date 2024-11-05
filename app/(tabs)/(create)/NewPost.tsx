@@ -2,6 +2,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -37,7 +38,10 @@ import {
   useRemoveBookFromShelf,
 } from "../../../components/profile/hooks/useBookshelfQueries";
 import WormLoader from "../../../components/wormloader/WormLoader";
-import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
+import {
+  APP_BACKGROUND_COLOR,
+  POSTS_ROUTE_PREFIX,
+} from "../../../constants/constants";
 import { ServerBookShelfName } from "../../../enums/Enums";
 import { createPost } from "../../../services/firebase-services/PostQueries";
 import { type CreatePostModel } from "../../../types";
@@ -190,7 +194,9 @@ const NewPost = () => {
         });
       }
       const post = await useGetLatestPostInfo(user?.uid);
-      await useBadgeChecking(user?.uid, post?.id);
+      await useBadgeChecking(user?.uid, post?.id).then(() => {
+        router.push(POSTS_ROUTE_PREFIX);
+      });
     }
   };
 
