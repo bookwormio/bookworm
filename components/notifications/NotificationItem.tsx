@@ -20,7 +20,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
 
   const navigateToBook = useNavigateToBook(notif.bookID);
 
-  const navigateToPost = useNavigateToPost(notif.postID);
+  const navigateToPost = useNavigateToPost();
 
   const navigateToUser = useNavigateToUser(notif.sender);
 
@@ -43,7 +43,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
           navigateToBook();
         } else if (notif.type === ServerNotificationType.BADGE) {
           if (notif.postID != null) {
-            navigateToPost();
+            useNavigateToPost(notif.postID);
           } else {
             console.log("navigate to page with list of badges");
           }
