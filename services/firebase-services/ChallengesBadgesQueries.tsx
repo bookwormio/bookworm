@@ -28,7 +28,7 @@ import { DB } from "../../firebase.config";
  *
  * @param {string} userID - The ID of the user to whom the badge will be added.
  * @param {ServerBadgeName} badgeID - The ID of the badge to be added.
- * @param {string} [postID] - Optional ID of the post associated with the badge.
+ * @param {string} [postID] - Optional ID of the post associated with the badge. (optional)
  * @returns {Promise<void>} - A promise that resolves when the badge has been added.
  * @throws {Error} If the badge cannot be added to the user.
  */
@@ -90,13 +90,13 @@ export async function getExistingEarnedBadges(
  * Checks for completion badges based on the user's finished books.
  *
  * @param {string} userID - The ID of the user.
- * @param {string} postID - The ID of the post associated with the badge.
+ * @param {string} postID - The ID of the post associated with the badge. (optional)
  * @returns {Promise<void>} - A promise that resolves when the checks are complete.
  * @throws {Error} If there is an issue checking the existence of the completion badge.
  */
 export async function checkForCompletionBadges(
   userID: string,
-  postID: string,
+  postID?: string,
 ): Promise<void> {
   try {
     const COMPLETION_THRESHOLDS = [
@@ -171,13 +171,13 @@ export async function checkForPostBadges(
  * Checks for bookshelf badges based on the user's bookshelves.
  *
  * @param {string} userID - The ID of the user.
- * @param {string} postID - The ID of the post associated with the badge.
+ * @param {string} postID - The ID of the post associated with the badge. (optional)
  * @returns {Promise<void>} - A promise that resolves when the checks are complete.
  * @throws {Error} If there is an issue checking the existence of the bookshelf badges.
  */
 export async function checkForBookShelfBadges(
   userID: string,
-  postID: string,
+  postID?: string,
 ): Promise<void> {
   try {
     const bookShelfNames = [

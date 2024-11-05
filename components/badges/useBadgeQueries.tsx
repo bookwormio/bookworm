@@ -67,9 +67,9 @@ export const useGetExistingEarnedBadges = (userID: string) => {
  * Checks and updates badge completion for a new post.
  *
  * @param {string} userID - The ID of the user.
- * @param {string} postID - The ID of the post.
+ * @param {string} postID - The ID of the post. (optional)
  */
-export const useNewPostBadgeChecks = (userID: string, postID: string) => {
+export const useBadgeChecking = (userID: string, postID?: string) => {
   const { data: badges, isLoading: badgesLoading } =
     useGetExistingEarnedBadges(userID);
   const { mutate: completionBadgeMutation } = useCheckForCompletionBadges();
@@ -81,13 +81,14 @@ export const useNewPostBadgeChecks = (userID: string, postID: string) => {
     if (!areAllBadgesEarned(badgesSet, completionBadges)) {
       completionBadgeMutation({ userID, postID });
     }
-    if (!areAllBadgesEarned(badgesSet, postBadges)) {
+    // we have to have a postID for post badges
+    if (!areAllBadgesEarned(badgesSet, postBadges) && postID != null) {
       postBadgeMutation({ userID, postID });
     }
     if (!areAllBadgesEarned(badgesSet, bookshelfBadges)) {
       bookShelfBadgeMutation({ userID, postID });
     }
-    if (!areAllBadgesEarned(badgesSet, streakBadges)) {
+    if (!areAllBadgesEarned(badgesSet, streakBadges) && postID != null) {
       streakBadgeMutation({ userID, postID });
     }
   }
@@ -113,7 +114,7 @@ export const newBookRequestBadgeCheck = (userID: string) => {
 /**
  * Custom hook to check for completion badges.
  *
- * @returns {UseMutationResult<void, Error, { userID: string; postID: string }, unknown>} - The mutation result for checking completion badges.
+ * @returns {UseMutationResult<void, Error, { userID: string; postID?: string }, unknown>} - The mutation result for checking completion badges.
  */
 export const useCheckForCompletionBadges = () => {
   return useMutation({
@@ -122,7 +123,7 @@ export const useCheckForCompletionBadges = () => {
       postID,
     }: {
       userID: string;
-      postID: string;
+      postID?: string;
     }) => {
       await checkForCompletionBadges(userID, postID);
     },
@@ -151,7 +152,7 @@ export const useCheckForPostBadges = () => {
 /**
  * Custom hook to check for bookshelf badges.
  *
- * @returns {UseMutationResult<void, Error, { userID: string; postID: string }, unknown>} - The mutation result for checking bookshelf badges.
+ * @returns {UseMutationResult<void, Error, { userID: string; postID?: string }, unknown>} - The mutation result for checking bookshelf badges.
  */
 export const useCheckForBookShelfBadges = () => {
   return useMutation({
@@ -160,7 +161,7 @@ export const useCheckForBookShelfBadges = () => {
       postID,
     }: {
       userID: string;
-      postID: string;
+      postID?: string;
     }) => {
       await checkForBookShelfBadges(userID, postID);
     },
