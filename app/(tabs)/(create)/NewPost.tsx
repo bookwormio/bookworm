@@ -13,6 +13,10 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
+import {
+  useBadgeChecking,
+  useGetLatestPostInfo,
+} from "../../../components/badges/useBadgeQueries";
 import BookmarkSlider from "../../../components/bookmark/hooks/BookmarkSlider";
 import {
   useGetBookmarkForBook,
@@ -50,7 +54,7 @@ const NewPost = () => {
   const [textboxFocused, setTextboxFocused] = useState(false);
   const [shareDisabled, setShareDisabled] = useState(true);
 
-  const { mutate: setBookmark } = useSetBookmarkForBook();
+  const { mutateAsync: setBookmark } = useSetBookmarkForBook();
   const postMutation = useMutation({ mutationFn: createPost });
 
   const addBookMutation = useAddBookToShelf();
@@ -78,7 +82,7 @@ const NewPost = () => {
     }
   }, [selectedBook, text]);
 
-  const createNewPost = () => {
+  const createNewPost = async () => {
     if (user != null) {
       setLoading(true);
       const post: CreatePostModel = {
@@ -137,11 +141,11 @@ const NewPost = () => {
     return false;
   };
 
-  const handleShareClicked = () => {
+  const handleShareClicked = async () => {
     if (user?.uid == null || selectedBook == null) return;
     if (!fieldsMissing()) {
-      createNewPost();
-      setBookmark({
+      await createNewPost();
+      await setBookmark({
         userID: user?.uid,
         bookID: selectedBook?.id,
         bookmark: currentBookmark,
@@ -152,7 +156,7 @@ const NewPost = () => {
       }
       if (currentBookmark === selectedBook.pageCount) {
         if (!isBookInFinished(selectedBook.id, bookshelves)) {
-          addBookMutation.mutate({
+          await addBookMutation.mutateAsync({
             userID: user.uid,
             bookID: selectedBook.id,
             volumeInfo: convertFlatBookToBookShelfBook(selectedBook),
@@ -160,7 +164,7 @@ const NewPost = () => {
           });
         }
         if (isBookInCurrentlyReading(selectedBook.id, bookshelves)) {
-          removeBookMutation.mutate({
+          await removeBookMutation.mutateAsync({
             userID: user.uid,
             bookID: selectedBook.id,
             shelfName: ServerBookShelfName.CURRENTLY_READING,
@@ -170,7 +174,7 @@ const NewPost = () => {
       // if currentBookmark does not equal page count
       else {
         if (!isBookInCurrentlyReading(selectedBook.id, bookshelves)) {
-          addBookMutation.mutate({
+          await addBookMutation.mutateAsync({
             userID: user.uid,
             bookID: selectedBook.id,
             volumeInfo: convertFlatBookToBookShelfBook(selectedBook),
@@ -179,12 +183,14 @@ const NewPost = () => {
         }
       }
       if (isBookInWantToRead(selectedBook.id, bookshelves)) {
-        removeBookMutation.mutate({
+        await removeBookMutation.mutateAsync({
           userID: user.uid,
           bookID: selectedBook.id,
           shelfName: ServerBookShelfName.WANT_TO_READ,
         });
       }
+      const post = await useGetLatestPostInfo(user?.uid);
+      await useBadgeChecking(user?.uid, post?.id);
     }
   };
 
@@ -297,7 +303,11 @@ const NewPost = () => {
       <View style={styles.buttonContainer}>
         <BookWormButton
           title="Share!"
-          onPress={handleShareClicked}
+          onPress={() => {
+            handleShareClicked().catch((error) => {
+              console.log(error);
+            });
+          }}
           disabled={shareDisabled}
         />
       </View>

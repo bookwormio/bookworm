@@ -15,6 +15,7 @@ import {
   checkForStreakBadges,
   getExistingEarnedBadges,
 } from "../../services/firebase-services/ChallengesBadgesQueries";
+import { fetchPostsByUserID } from "../../services/firebase-services/PostQueries";
 
 const lendingBadges = [
   ServerLendingBadge.BORROWED_A_BOOK,
@@ -57,13 +58,17 @@ export const useGetExistingEarnedBadges = (userID: string) => {
   });
 };
 
+// export const getMostRecentPost = (userID: string) => {
+
+// };
+
 /**
  * Checks and updates badge completion for a new post.
  *
  * @param {string} userID - The ID of the user.
  * @param {string} postID - The ID of the post. (optional)
  */
-export const useBadgeChecking = (userID: string, postID?: string) => {
+export const useBadgeChecking = async (userID: string, postID?: string) => {
   const { data: badges, isLoading: badgesLoading } =
     useGetExistingEarnedBadges(userID);
   const { mutate: completionBadgeMutation } = useCheckForCompletionBadges();
@@ -217,3 +222,24 @@ const areAllBadgesEarned = (
 ) => {
   return badges.every((badge) => badgesSet.has(badge));
 };
+
+/**
+ * Gets the most recent post for user
+ * @param userID - ID of user
+ * @returns the post info of the latest post
+ */
+export async function useGetLatestPostInfo(userID: string) {
+  try {
+    const posts = await fetchPostsByUserID(userID);
+
+    // Check if there are any posts
+    if (posts.length === 0) {
+      return null; // No posts found
+    }
+
+    return posts[0]; // Return the most recent post
+  } catch (error) {
+    console.error("Error fetching latest post by User IDs", error);
+    return null; // Return null on error
+  }
+}
