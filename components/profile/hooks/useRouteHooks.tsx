@@ -153,7 +153,7 @@ export const usePostRouteInfo = (): PostRouteInfo => {
  * @param {string} [postID] - The ID of the post to navigate to.
  * @returns {Function} - Function to navigate to the post page.
  */
-export const useNavigateToPost = () => {
+export const useNavigateToPost = (postID?: string) => {
   const router = useRouter();
   const { prefix } = usePostRouteInfo();
 

@@ -3,6 +3,7 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import {
+  badgeDisplayTitleMap,
   BookRequestNotificationStatus,
   ServerNotificationType,
 } from "../../enums/Enums";
@@ -226,7 +227,9 @@ const NotificationItemContent = ({
     <View style={styles.notifTextContainer}>
       <Text style={styles.notifTitle}>{notificationTitle}</Text>
       <Text style={styles.notifMessage}>
-        <Text style={{ fontWeight: "bold" }}>{notification.sender_name}</Text>
+        <Text style={{ fontWeight: "bold" }}>
+          {notification.sender_name ?? ""}
+        </Text>
         <Text>
           {" "}
           {notificationMessage}
@@ -241,6 +244,12 @@ const NotificationItemContent = ({
             : ""}
           {notification.type === ServerNotificationType.BOOK_REQUEST_RESPONSE
             ? " " + notification.bookTitle
+            : ""}
+          {notification.type === ServerNotificationType.BADGE
+            ? " " +
+              (notification.badgeID != null
+                ? badgeDisplayTitleMap[notification.badgeID]
+                : "")
             : ""}
           {notification.custom_message != null &&
           notification.custom_message !== ""

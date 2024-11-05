@@ -2,7 +2,6 @@ import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { ServerNotificationType } from "../../enums/Enums";
 import { type FullNotificationModel } from "../../types";
-import { useAuth } from "../auth/context";
 import {
   useNavigateToBook,
   useNavigateToPost,
@@ -17,12 +16,11 @@ interface NotifProp {
 }
 
 const NotificationItem = ({ notif }: NotifProp) => {
-  const { user } = useAuth();
   const time = calculateTimeSinceNotification(notif.created.toDate());
 
   const navigateToBook = useNavigateToBook(notif.bookID);
 
-  const navigateToPost = useNavigateToPost();
+  const navigateToPost = useNavigateToPost(notif.postID);
 
   const navigateToUser = useNavigateToUser(notif.sender);
 
@@ -45,9 +43,9 @@ const NotificationItem = ({ notif }: NotifProp) => {
           navigateToBook();
         } else if (notif.type === ServerNotificationType.BADGE) {
           if (notif.postID != null) {
-            console.log("navigate to post page");
+            navigateToPost();
           } else {
-            console.log("navigate to badge page");
+            console.log("navigate to page with list of badges");
           }
         }
       }}
