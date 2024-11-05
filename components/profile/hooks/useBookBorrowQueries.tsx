@@ -27,7 +27,7 @@ export const useGetLendingLibraryBookStatuses = (
     queryKey: ["lendingStatuses", ownerID, currentUserID],
     queryFn: async () =>
       await getLendingLibraryBookStatuses(ownerID, currentUserID, bookIDs),
-    enabled: bookIDs.length > 0,
+    enabled: bookIDs.length > 0 && ownerID != null && currentUserID != null,
     staleTime: 60000,
   });
 };

@@ -6,6 +6,12 @@ export enum ServerFollowStatus {
   UNFOLLOWED = "unfollowed",
 }
 
+export enum FollowButtonDisplay {
+  FOLLOW = "Follow",
+  FOLLOWING = "Following",
+  LOADING = "Loading...",
+}
+
 // Reflects the status of book in Firestore
 export enum ServerBookShelfName {
   CURRENTLY_READING = "currently_reading",
