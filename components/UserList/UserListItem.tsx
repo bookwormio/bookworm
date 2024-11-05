@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontWeight: "bold",
-    flex: 1, // Allow text to shrink if needed
-    marginRight: 10, // Space between name and button
+    flex: 1,
+    marginRight: 10,
   },
   placeholderImage: {
     position: "absolute",
