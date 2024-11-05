@@ -1,19 +1,51 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-    ServerBookshelfBadge,
-    ServerCompletionBadge,
-    ServerLendingBadge,
-    ServerPostBadge,
-    ServerStreakBadge,
+  type ServerBadgeName,
+  ServerBookshelfBadge,
+  ServerCompletionBadge,
+  ServerLendingBadge,
+  ServerPostBadge,
+  ServerStreakBadge,
 } from "../../enums/Enums";
 import {
-    checkForBookShelfBadges,
-    checkForCompletionBadges,
-    checkForLendingBadges,
-    checkForPostBadges,
-    checkForStreakBadges,
-    getExistingEarnedBadges,
+  checkForBookShelfBadges,
+  checkForCompletionBadges,
+  checkForLendingBadges,
+  checkForPostBadges,
+  checkForStreakBadges,
+  getExistingEarnedBadges,
 } from "../../services/firebase-services/ChallengesBadgesQueries";
+
+// post badge
+// bookshelf badge
+// completion badge
+// lending badge
+// streak badge
+
+const lendingBadges = [
+  ServerLendingBadge.BORROWED_A_BOOK,
+  ServerLendingBadge.LENT_A_BOOK,
+];
+
+const postBadges = [ServerPostBadge.FIRST_POST];
+
+const completionBadges = [
+  ServerCompletionBadge.COMPLETED_FIRST_BOOK,
+  ServerCompletionBadge.COMPLETED_FIVE_BOOKS,
+  ServerCompletionBadge.COMPLETED_TEN_BOOKS,
+  ServerCompletionBadge.COMPLETED_TWENTY_FIVE_BOOKS,
+];
+
+const bookshelfBadges = [
+  ServerBookshelfBadge.ADDED_TEN_BOOKS,
+  ServerBookshelfBadge.ADDED_TWENTY_FIVE_BOOKS,
+  ServerBookshelfBadge.ADDED_FIFTY_BOOKS,
+];
+
+const streakBadges = [
+  ServerStreakBadge.SEVEN_DAY_STREAK,
+  ServerStreakBadge.THIRTY_DAY_STREAK,
+];
 
 /**
  * Custom hook to retrieve existing earned badges for a user.
@@ -24,17 +56,9 @@ import {
 export const useGetExistingEarnedBadges = (userID: string) => {
   return useQuery({
     queryKey: ["badges", userID],
+    enabled: userID != null,
     queryFn: async () => {
-      try {
-        if (userID == null || userID === "") {
-          throw new Error("User ID is required");
-        }
-        return await getExistingEarnedBadges(userID);
-      } catch (error) {
-        throw new Error(
-          `Error fetching user badges: ${(error as Error).message}`,
-        );
-      }
+      return await getExistingEarnedBadges(userID);
     },
   });
 };
@@ -45,43 +69,25 @@ export const useGetExistingEarnedBadges = (userID: string) => {
  * @param {string} userID - The ID of the user.
  * @param {string} postID - The ID of the post.
  */
-export const newPostBadgeChecks = (userID: string, postID: string) => {
+export const useNewPostBadgeChecks = (userID: string, postID: string) => {
   const { data: badges, isLoading: badgesLoading } =
     useGetExistingEarnedBadges(userID);
-  const { mutate: completionBadgenMutation } = useCheckForCompletionBadges();
+  const { mutate: completionBadgeMutation } = useCheckForCompletionBadges();
   const { mutate: postBadgeMutation } = useCheckForPostBadges();
   const { mutate: bookShelfBadgeMutation } = useCheckForBookShelfBadges();
   const { mutate: streakBadgeMutation } = useCheckForStreakBadges();
   if (!badgesLoading) {
     const badgesSet = new Set(badges);
-    if (
-      !(
-        badgesSet.has(ServerCompletionBadge.COMPLETED_FIRST_BOOK) &&
-        badgesSet.has(ServerCompletionBadge.COMPLETED_FIVE_BOOKS) &&
-        badgesSet.has(ServerCompletionBadge.COMPLETED_TEN_BOOKS) &&
-        badgesSet.has(ServerCompletionBadge.COMPLETED_TWENTYFIVE_BOOKS)
-      )
-    ) {
-      completionBadgenMutation({ userID, postID });
+    if (!areAllBadgesEarned(badgesSet, completionBadges)) {
+      completionBadgeMutation({ userID, postID });
     }
-    if (!badgesSet.has(ServerPostBadge.FIRST_POST)) {
+    if (!areAllBadgesEarned(badgesSet, postBadges)) {
       postBadgeMutation({ userID, postID });
     }
-    if (
-      !(
-        badgesSet.has(ServerBookshelfBadge.ADDED_TEN_TO_BOOKSHELVES) &&
-        badgesSet.has(ServerBookshelfBadge.ADDED_TWENTYFIVE_TO_BOOKSHELVES) &&
-        badgesSet.has(ServerBookshelfBadge.ADDED_FIFTY_TO_BOOKSHELVES)
-      )
-    ) {
+    if (!areAllBadgesEarned(badgesSet, bookshelfBadges)) {
       bookShelfBadgeMutation({ userID, postID });
     }
-    if (
-      !(
-        badgesSet.has(ServerStreakBadge.SEVEN_DAY_STREAK) &&
-        badgesSet.has(ServerStreakBadge.THIRTY_DAY_STREAK)
-      )
-    ) {
+    if (!areAllBadgesEarned(badgesSet, streakBadges)) {
       streakBadgeMutation({ userID, postID });
     }
   }
@@ -98,12 +104,7 @@ export const newBookRequestBadgeCheck = (userID: string) => {
   const { mutate: lendingBadgeMutation } = useCheckForLendingBadges();
   if (!badgesLoading) {
     const badgesSet = new Set(badges);
-    if (
-      !(
-        badgesSet.has(ServerLendingBadge.BORROWED_A_BOOK) &&
-        badgesSet.has(ServerLendingBadge.LENT_A_BOOK)
-      )
-    ) {
+    if (!areAllBadgesEarned(badgesSet, lendingBadges)) {
       lendingBadgeMutation({ userID });
     }
   }
@@ -196,4 +197,11 @@ export const useCheckForStreakBadges = () => {
       await checkForStreakBadges(userID, postID);
     },
   });
+};
+
+const areAllBadgesEarned = (
+  badgesSet: Set<ServerBadgeName>,
+  badges: ServerBadgeName[],
+) => {
+  return badges.every((badge) => badgesSet.has(badge));
 };

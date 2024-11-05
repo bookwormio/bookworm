@@ -117,25 +117,25 @@ export enum BookBorrowButtonDisplay {
 }
 
 export enum ServerPostBadge {
-  FIRST_POST = "firstpost",
+  FIRST_POST = "first_post",
 }
 
 export enum ServerBookshelfBadge {
-  ADDED_TEN_TO_BOOKSHELVES = "added_10_tobookshelves",
-  ADDED_TWENTYFIVE_TO_BOOKSHELVES = "added_25_tobookshelves",
-  ADDED_FIFTY_TO_BOOKSHELVES = "added_50_tobookshelves",
+  ADDED_TEN_BOOKS = "added_10_books",
+  ADDED_TWENTY_FIVE_BOOKS = "added_25_books",
+  ADDED_FIFTY_BOOKS = "added_50_books",
 }
 
 export enum ServerCompletionBadge {
   COMPLETED_FIRST_BOOK = "completed_1_book",
   COMPLETED_FIVE_BOOKS = "completed_5_books",
   COMPLETED_TEN_BOOKS = "completed_10_books",
-  COMPLETED_TWENTYFIVE_BOOKS = "completed_25_books",
+  COMPLETED_TWENTY_FIVE_BOOKS = "completed_25_books",
 }
 
 export enum ServerLendingBadge {
-  LENT_A_BOOK = "lentabook",
-  BORROWED_A_BOOK = "borrowedabook",
+  LENT_A_BOOK = "lent_a_book",
+  BORROWED_A_BOOK = "borrowed_a_book",
 }
 
 export enum ServerStreakBadge {
@@ -145,19 +145,22 @@ export enum ServerStreakBadge {
 
 // Used to display the book status in the UI
 export const badgeDisplayTitleMap: StringMap = {
+  // post badges
   [ServerPostBadge.FIRST_POST]: "First Post",
-  [ServerCompletionBadge.COMPLETED_FIRST_BOOK]: "Finished First Book",
-  [ServerBookshelfBadge.ADDED_TEN_TO_BOOKSHELVES]:
-    "Added 10 Books to Bookshelves",
-  [ServerBookshelfBadge.ADDED_TWENTYFIVE_TO_BOOKSHELVES]:
+  // bookshelf badges
+  [ServerBookshelfBadge.ADDED_TEN_BOOKS]: "Added 10 Books to Bookshelves",
+  [ServerBookshelfBadge.ADDED_TWENTY_FIVE_BOOKS]:
     "Added 25 Books to Bookshelves",
-  [ServerBookshelfBadge.ADDED_FIFTY_TO_BOOKSHELVES]:
-    "Added 50 Books to Bookshelves",
+  [ServerBookshelfBadge.ADDED_FIFTY_BOOKS]: "Added 50 Books to Bookshelves",
+  // completion badges
+  [ServerCompletionBadge.COMPLETED_FIRST_BOOK]: "Completed First Book",
   [ServerCompletionBadge.COMPLETED_FIVE_BOOKS]: "Completed 5 Books",
   [ServerCompletionBadge.COMPLETED_TEN_BOOKS]: "Completed 10 Books",
-  [ServerCompletionBadge.COMPLETED_TWENTYFIVE_BOOKS]: "Completed 25 Books",
+  [ServerCompletionBadge.COMPLETED_TWENTY_FIVE_BOOKS]: "Completed 25 Books",
+  // lending badges
   [ServerLendingBadge.LENT_A_BOOK]: "Lent a Book",
   [ServerLendingBadge.BORROWED_A_BOOK]: "Borrowed a Book",
+  // streak badges
   [ServerStreakBadge.SEVEN_DAY_STREAK]: "Seven Day Reading Streak",
   [ServerStreakBadge.THIRTY_DAY_STREAK]: "Thirty Day Reading Streak",
 };

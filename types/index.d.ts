@@ -6,6 +6,7 @@ import {
 
 import {
   type BookRequestNotificationStatus,
+  type ServerBadgeName,
   type ServerBookBorrowStatus,
   type ServerBookShelfName,
   type ServerNotificationType,

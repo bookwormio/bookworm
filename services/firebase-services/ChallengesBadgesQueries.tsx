@@ -2,21 +2,24 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   collection,
   doc,
+  type DocumentData,
+  getCountFromServer,
   getDocs,
   orderBy,
   query,
+  type QuerySnapshot,
   serverTimestamp,
   setDoc,
   where,
 } from "firebase/firestore";
 import {
+  type ServerBadgeName,
   ServerBookshelfBadge,
   ServerBookShelfName,
   ServerCompletionBadge,
   ServerLendingBadge,
   ServerPostBadge,
   ServerStreakBadge,
-  type ServerBadgeName,
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
 
@@ -27,6 +30,7 @@ import { DB } from "../../firebase.config";
  * @param {ServerBadgeName} badgeID - The ID of the badge to be added.
  * @param {string} [postID] - Optional ID of the post associated with the badge.
  * @returns {Promise<void>} - A promise that resolves when the badge has been added.
+ * @throws {Error} If the badge cannot be added to the user.
  */
 export async function addBadgeToUser(
   userID: string,
@@ -39,32 +43,18 @@ export async function addBadgeToUser(
     collection(userBadgeCollectDocRef, "badges"),
     badgeID as string,
   );
+  const badgeData = {
+    received_at: serverTimestamp(),
+    ...(postID != null && { postID }), // Only add postID if it exists
+  };
+
   try {
-    if (postID === null) {
-      await setDoc(
-        badgeDocRef,
-        { received_at: serverTimestamp() },
-        { merge: true },
-      ).then(() => {
-        queryClient
-          .invalidateQueries({ queryKey: ["badges", userID] })
-          .catch((error) => {
-            console.error("Error invalidating queries:", error);
-          });
+    await setDoc(badgeDocRef, badgeData, { merge: true });
+    await queryClient
+      .invalidateQueries({ queryKey: ["badges", userID] })
+      .catch((error) => {
+        console.error("Error invalidating queries:", error);
       });
-    } else {
-      await setDoc(
-        badgeDocRef,
-        { received_at: serverTimestamp(), postID },
-        { merge: true },
-      ).then(() => {
-        queryClient
-          .invalidateQueries({ queryKey: ["badges", userID] })
-          .catch((error) => {
-            console.error("Error invalidating queries:", error);
-          });
-      });
-    }
   } catch (error) {
     console.error("Error adding badge: ", error);
     throw new Error("Could not add badge to user");
@@ -76,6 +66,7 @@ export async function addBadgeToUser(
  *
  * @param {string} userID - The ID of the user whose badges are to be retrieved.
  * @returns {Promise<ServerBadgeName[]>} - A promise that resolves to an array of earned badge IDs.
+ * @throws {Error} If the badges cannot be fetched.
  */
 export async function getExistingEarnedBadges(
   userID: string,
@@ -88,11 +79,11 @@ export async function getExistingEarnedBadges(
     badgeDocs.forEach((doc) => {
       badges.push(doc.id as ServerBadgeName);
     });
-    console.log(badges);
     return badges;
   } catch (error) {
-    console.error("Error getting user's badges", error);
-    return [];
+    throw new Error(
+      `Failed to fetch badges for user ${userID}: ${(error as Error).message}`,
+    );
   }
 }
 
@@ -102,56 +93,40 @@ export async function getExistingEarnedBadges(
  * @param {string} userID - The ID of the user.
  * @param {string} postID - The ID of the post associated with the badge.
  * @returns {Promise<void>} - A promise that resolves when the checks are complete.
+ * @throws {Error} If there is an issue checking the existence of the completion badge.
  */
 export async function checkForCompletionBadges(
   userID: string,
   postID: string,
 ): Promise<void> {
-  const userBookShelfDocRef = doc(DB, "bookshelf_collection", userID);
-  const finishedBooksCollectionRef = collection(
-    userBookShelfDocRef,
-    ServerBookShelfName.FINISHED,
-  );
-  let numberFinishedBooks = 0;
   try {
-    const finishedBooks = await getDocs(finishedBooksCollectionRef);
-    numberFinishedBooks = finishedBooks.size;
+    const COMPLETION_THRESHOLDS = [
+      { count: 1, badge: ServerCompletionBadge.COMPLETED_FIRST_BOOK },
+      { count: 5, badge: ServerCompletionBadge.COMPLETED_FIVE_BOOKS },
+      { count: 10, badge: ServerCompletionBadge.COMPLETED_TEN_BOOKS },
+      { count: 25, badge: ServerCompletionBadge.COMPLETED_TWENTY_FIVE_BOOKS },
+    ] as const;
+    const userBookShelfDocRef = doc(DB, "bookshelf_collection", userID);
+    const finishedBooksCollectionRef = collection(
+      userBookShelfDocRef,
+      ServerBookShelfName.FINISHED,
+    );
+    let numberFinishedBooks = 0;
+    const completionSnapshot = await getCountFromServer(
+      finishedBooksCollectionRef,
+    );
+    numberFinishedBooks = completionSnapshot.data().count;
+    const matchingThreshold = COMPLETION_THRESHOLDS.find(
+      ({ count }) => count === numberFinishedBooks,
+    );
+
+    if (matchingThreshold != null) {
+      await addBadgeToUser(userID, matchingThreshold.badge, postID);
+    }
   } catch (error) {
-    console.error("Error getting user's finished books", error);
-  }
-  if (numberFinishedBooks === 1) {
-    await addBadgeToUser(
-      userID,
-      ServerCompletionBadge.COMPLETED_FIRST_BOOK,
-      postID,
-    );
-  }
-  if (numberFinishedBooks === 5) {
-    await addBadgeToUser(
-      userID,
-      ServerCompletionBadge.COMPLETED_FIVE_BOOKS,
-      postID,
-    );
-  }
-  if (numberFinishedBooks === 5) {
-    await addBadgeToUser(
-      userID,
-      ServerCompletionBadge.COMPLETED_FIVE_BOOKS,
-      postID,
-    );
-  }
-  if (numberFinishedBooks === 10) {
-    await addBadgeToUser(
-      userID,
-      ServerCompletionBadge.COMPLETED_TEN_BOOKS,
-      postID,
-    );
-  }
-  if (numberFinishedBooks === 25) {
-    await addBadgeToUser(
-      userID,
-      ServerCompletionBadge.COMPLETED_TWENTYFIVE_BOOKS,
-      postID,
+    console.error("Error to check for completion badges", error);
+    throw new Error(
+      `Failed to check for completion badges for user ${userID}: ${(error as Error).message}`,
     );
   }
 }
@@ -162,21 +137,34 @@ export async function checkForCompletionBadges(
  * @param {string} userID - The ID of the user.
  * @param {string} postID - The ID of the post associated with the badge.
  * @returns {Promise<void>} - A promise that resolves when the checks are complete.
+ * @throws {Error} If there is an issue checking the existence of the post badges.
  */
 export async function checkForPostBadges(
   userID: string,
   postID: string,
 ): Promise<void> {
-  const postsQuery = query(
-    collection(DB, "posts"),
-    where("user", "==", userID),
-    orderBy("created", "desc"),
-  );
-  const postsSnapshot = await getDocs(postsQuery);
-  const numberPosts = postsSnapshot.size;
-
-  if (numberPosts === 1) {
-    await addBadgeToUser(userID, ServerPostBadge.FIRST_POST, postID);
+  try {
+    const POST_THRESHOLDS = [
+      { count: 1, badge: ServerPostBadge.FIRST_POST },
+    ] as const;
+    const postsQuery = query(
+      collection(DB, "posts"),
+      where("user", "==", userID),
+      orderBy("created", "desc"),
+    );
+    const postsSnapshot = await getCountFromServer(postsQuery);
+    const numberPosts = postsSnapshot.data().count;
+    const matchingThreshold = POST_THRESHOLDS.find(
+      ({ count }) => count === numberPosts,
+    );
+    if (matchingThreshold != null) {
+      await addBadgeToUser(userID, matchingThreshold.badge, postID);
+    }
+  } catch (error) {
+    console.error("Error to check for post badges", error);
+    throw new Error(
+      `Failed to check for post badges for user ${userID}: ${(error as Error).message}`,
+    );
   }
 }
 
@@ -186,20 +174,26 @@ export async function checkForPostBadges(
  * @param {string} userID - The ID of the user.
  * @param {string} postID - The ID of the post associated with the badge.
  * @returns {Promise<void>} - A promise that resolves when the checks are complete.
+ * @throws {Error} If there is an issue checking the existence of the bookshelf badges.
  */
 export async function checkForBookShelfBadges(
   userID: string,
   postID: string,
 ): Promise<void> {
-  const userBookShelfDocRef = doc(DB, "bookshelf_collection", userID);
   const bookShelfNames = [
     ServerBookShelfName.FINISHED,
     ServerBookShelfName.CURRENTLY_READING,
     ServerBookShelfName.LENDING_LIBRARY,
     ServerBookShelfName.WANT_TO_READ,
   ];
+  const BOOKSHELF_THRESHOLDS = [
+    { count: 10, badge: ServerBookshelfBadge.ADDED_TEN_BOOKS },
+    { count: 25, badge: ServerBookshelfBadge.ADDED_TWENTY_FIVE_BOOKS },
+    { count: 50, badge: ServerBookshelfBadge.ADDED_FIFTY_BOOKS },
+  ] as const;
   let numBooks = 0;
   try {
+    const userBookShelfDocRef = doc(DB, "bookshelf_collection", userID);
     const uniqueBooks = new Set<string>();
     for (const shelfName of bookShelfNames) {
       const bookShelfCollectionRef = collection(userBookShelfDocRef, shelfName);
@@ -209,28 +203,16 @@ export async function checkForBookShelfBadges(
       });
     }
     numBooks = uniqueBooks.size;
+    const matchingThreshold = BOOKSHELF_THRESHOLDS.find(
+      ({ count }) => count === numBooks,
+    );
+    if (matchingThreshold != null) {
+      await addBadgeToUser(userID, matchingThreshold.badge, postID);
+    }
   } catch (error) {
-    console.error("Error counting unique books: ", error);
-  }
-  if (numBooks === 10) {
-    await addBadgeToUser(
-      userID,
-      ServerBookshelfBadge.ADDED_TEN_TO_BOOKSHELVES,
-      postID,
-    );
-  }
-  if (numBooks === 25) {
-    await addBadgeToUser(
-      userID,
-      ServerBookshelfBadge.ADDED_TWENTYFIVE_TO_BOOKSHELVES,
-      postID,
-    );
-  }
-  if (numBooks === 50) {
-    await addBadgeToUser(
-      userID,
-      ServerBookshelfBadge.ADDED_FIFTY_TO_BOOKSHELVES,
-      postID,
+    console.error("Error checking for bookshelf badges: ", error);
+    throw new Error(
+      `Failed to check for bookshelf badges for user ${userID}: ${(error as Error).message}`,
     );
   }
 }
@@ -240,29 +222,41 @@ export async function checkForBookShelfBadges(
  *
  * @param {string} userID - The ID of the user.
  * @returns {Promise<void>} - A promise that resolves when the checks are complete.
+ * @throws {Error} If there is an issue checking the existence of the lending badges.
  */
 export async function checkForLendingBadges(userID: string): Promise<void> {
-  const lenderQuery = query(
-    collection(DB, "borrowing_collection"),
-    where("lending_user", "==", userID),
-    where("borrow_status", "==", "borrowing"),
-  );
+  try {
+    const lenderQuery = query(
+      collection(DB, "borrowing_collection"),
+      where("lending_user", "==", userID),
+      where("borrow_status", "==", "borrowing"),
+    );
 
-  const borrowerQuery = query(
-    collection(DB, "borrowing_collection"),
-    where("borrowing_user", "==", userID),
-    where("borrow_status", "==", "borrowing"),
-  );
-  const lenderSnapshot = await getDocs(lenderQuery);
-  const borrowSnapshot = await getDocs(borrowerQuery);
-  const lenderNumber = lenderSnapshot.size;
-  const borrowerNumber = borrowSnapshot.size;
+    const borrowerQuery = query(
+      collection(DB, "borrowing_collection"),
+      where("borrowing_user", "==", userID),
+      where("borrow_status", "==", "borrowing"),
+    );
 
-  if (lenderNumber === 1) {
-    await addBadgeToUser(userID, ServerLendingBadge.LENT_A_BOOK);
-  }
-  if (borrowerNumber === 1) {
-    await addBadgeToUser(userID, ServerLendingBadge.BORROWED_A_BOOK);
+    // await getCountFromServer(postsQuery)
+    const [lenderSnapshot, borrowSnapshot] = await Promise.all([
+      getCountFromServer(lenderQuery),
+      getCountFromServer(borrowerQuery),
+    ]);
+    const lenderNumber = lenderSnapshot.data().count;
+    const borrowerNumber = borrowSnapshot.data().count;
+
+    if (lenderNumber === 1) {
+      await addBadgeToUser(userID, ServerLendingBadge.LENT_A_BOOK);
+    }
+    if (borrowerNumber === 1) {
+      await addBadgeToUser(userID, ServerLendingBadge.BORROWED_A_BOOK);
+    }
+  } catch (error) {
+    console.error("Error checking for lending badges: ", error);
+    throw new Error(
+      `Failed to check for lending badges for user ${userID}: ${(error as Error).message}`,
+    );
   }
 }
 
@@ -272,15 +266,45 @@ export async function checkForLendingBadges(userID: string): Promise<void> {
  * @param {string} userID - The ID of the user.
  * @param {string} postID - The ID of the post associated with the badge.
  * @returns {Promise<void>} - A promise that resolves when the checks are complete.
+ * @throws {Error} If there is an issue checking the existence of the streak badges.
  */
 export async function checkForStreakBadges(userID: string, postID: string) {
-  const postsQuery = query(
-    collection(DB, "posts"),
-    where("user", "==", userID),
-    orderBy("created", "asc"),
-  );
+  try {
+    const STREAK_THRESHOLDS = [
+      { count: 7, badge: ServerStreakBadge.SEVEN_DAY_STREAK },
+      { count: 30, badge: ServerStreakBadge.THIRTY_DAY_STREAK },
+    ] as const;
+    const postsQuery = query(
+      collection(DB, "posts"),
+      where("user", "==", userID),
+      orderBy("created", "asc"),
+    );
+    const postsSnapshot = await getDocs(postsQuery);
+    const streakCount = await calculateMaxStreakCount(postsSnapshot);
+    const matchingThreshold = STREAK_THRESHOLDS.find(
+      ({ count }) => count === streakCount,
+    );
+    if (matchingThreshold != null) {
+      await addBadgeToUser(userID, matchingThreshold.badge, postID);
+    }
+  } catch (error) {
+    console.error("Error checking for streak badges: ", error);
+    throw new Error(
+      `Failed to check for streak badges for user ${userID}: ${(error as Error).message}`,
+    );
+  }
+}
+
+/**
+ * Calculates the maximum amount of days the user posted everyday.
+ * @param postsSnapshot - Snapshot of posts data
+ * @returns - highest amount of daily consecutive posts (streak)
+ */
+export async function calculateMaxStreakCount(
+  postsSnapshot: QuerySnapshot<DocumentData, DocumentData>,
+) {
   let streakCount = 1;
-  const postsSnapshot = await getDocs(postsQuery);
+
   for (let i = 1; i < postsSnapshot.size; i++) {
     const lastPostDate = postsSnapshot.docs[i - 1].data().created.toDate();
     const currentPostDate = postsSnapshot.docs[i].data().created.toDate();
@@ -288,17 +312,13 @@ export async function checkForStreakBadges(userID: string, postID: string) {
       lastPostDate.getTime() - currentPostDate.getTime(),
     );
     const differenceInDays = differenceInMillis / (1000 * 60 * 60 * 24);
+
     if (differenceInDays === 1) {
       streakCount += 1;
     } else {
       streakCount = 1;
     }
-    if (streakCount === 7) {
-      await addBadgeToUser(userID, ServerStreakBadge.SEVEN_DAY_STREAK, postID);
-    }
-    if (streakCount === 30) {
-      await addBadgeToUser(userID, ServerStreakBadge.THIRTY_DAY_STREAK, postID);
-      return;
-    }
   }
+
+  return streakCount;
 }
