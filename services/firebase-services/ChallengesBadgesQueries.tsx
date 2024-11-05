@@ -37,18 +37,17 @@ export async function addBadgeToUser(
   badgeID: ServerBadgeName,
   postID?: string,
 ): Promise<void> {
-  const queryClient = useQueryClient();
-  const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
-  const badgeDocRef = doc(
-    collection(userBadgeCollectDocRef, "badges"),
-    badgeID as string,
-  );
-  const badgeData = {
-    received_at: serverTimestamp(),
-    ...(postID != null && { postID }), // Only add postID if it exists
-  };
-
   try {
+    const queryClient = useQueryClient();
+    const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
+    const badgeDocRef = doc(
+      collection(userBadgeCollectDocRef, "badges"),
+      badgeID as string,
+    );
+    const badgeData = {
+      received_at: serverTimestamp(),
+      ...(postID != null && { postID }), // Only add postID if it exists
+    };
     await setDoc(badgeDocRef, badgeData, { merge: true });
     await queryClient
       .invalidateQueries({ queryKey: ["badges", userID] })
@@ -71,9 +70,9 @@ export async function addBadgeToUser(
 export async function getExistingEarnedBadges(
   userID: string,
 ): Promise<ServerBadgeName[]> {
-  const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
-  const badgesCollectionRef = collection(userBadgeCollectDocRef, "badges");
   try {
+    const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
+    const badgesCollectionRef = collection(userBadgeCollectDocRef, "badges");
     const badgeDocs = await getDocs(badgesCollectionRef);
     const badges: ServerBadgeName[] = [];
     badgeDocs.forEach((doc) => {
@@ -180,19 +179,19 @@ export async function checkForBookShelfBadges(
   userID: string,
   postID: string,
 ): Promise<void> {
-  const bookShelfNames = [
-    ServerBookShelfName.FINISHED,
-    ServerBookShelfName.CURRENTLY_READING,
-    ServerBookShelfName.LENDING_LIBRARY,
-    ServerBookShelfName.WANT_TO_READ,
-  ];
-  const BOOKSHELF_THRESHOLDS = [
-    { count: 10, badge: ServerBookshelfBadge.ADDED_TEN_BOOKS },
-    { count: 25, badge: ServerBookshelfBadge.ADDED_TWENTY_FIVE_BOOKS },
-    { count: 50, badge: ServerBookshelfBadge.ADDED_FIFTY_BOOKS },
-  ] as const;
-  let numBooks = 0;
   try {
+    const bookShelfNames = [
+      ServerBookShelfName.FINISHED,
+      ServerBookShelfName.CURRENTLY_READING,
+      ServerBookShelfName.LENDING_LIBRARY,
+      ServerBookShelfName.WANT_TO_READ,
+    ];
+    const BOOKSHELF_THRESHOLDS = [
+      { count: 10, badge: ServerBookshelfBadge.ADDED_TEN_BOOKS },
+      { count: 25, badge: ServerBookshelfBadge.ADDED_TWENTY_FIVE_BOOKS },
+      { count: 50, badge: ServerBookshelfBadge.ADDED_FIFTY_BOOKS },
+    ] as const;
+    let numBooks = 0;
     const userBookShelfDocRef = doc(DB, "bookshelf_collection", userID);
     const uniqueBooks = new Set<string>();
     for (const shelfName of bookShelfNames) {
