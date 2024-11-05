@@ -22,6 +22,20 @@ import {
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
 
+// likePostMutation.mutate({ postID });
+// const postToUpdate = posts.find((post) => post.id === postID);
+// if (postToUpdate !== undefined && user?.uid !== undefined) {
+//   const BNotify: LikeNotification = {
+//     receiver: postToUpdate.user.id,
+//     sender: user?.uid,
+//     sender_name: userData.first + " " + userData.last, // Use an empty string if user?.uid is undefined
+//     postID,
+//     type: ServerNotificationType.LIKE,
+//   };
+//   likeNotifyMutation.mutate(BNotify);
+// }
+// };
+
 /**
  * Adds a badge to a user in the Firestore database.
  *
