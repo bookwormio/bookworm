@@ -124,7 +124,6 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
           <Text style={styles.emptyShelfText}>No books available</Text>
         )}
       />
-      <Toast />
     </View>
   );
 };

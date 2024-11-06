@@ -2,7 +2,12 @@ import {
   SEARCH_SHELF_PRIORITY,
   type ServerBookShelfName,
 } from "../../../enums/Enums";
-import { type BookVolumeItem, type UserBookShelvesModel } from "../../../types";
+import { caseFoldNormalize } from "../../../services/util/queryUtils";
+import {
+  type BookVolumeItem,
+  type UserBookShelvesModel,
+  type UserSearchDisplayModel,
+} from "../../../types";
 
 /**
  * Maps and sorts preloaded books from various shelves into a single, prioritized list.
@@ -66,22 +71,52 @@ export function filterBookShelfBooksByTitle(
   });
 }
 
+interface HasID {
+  id: string;
+}
 /**
- * Removes duplicate books from an array of BookVolumeItems based on their IDs.
+ * Removes duplicate objects from an array based on their IDs.
+ * Works with any type that extends HasID interface.
  *
- * @param {BookVolumeItem[]} books - The array of books that may contain duplicates.
- * @returns {BookVolumeItem[]} A new array containing only unique books (first occurrence is kept).
+ * @template T - Type that extends HasID (must have an 'id' property of type string)
+ * @param {T[]} objects - The array of objects that may contain duplicates
+ * @returns {T[]} A new array containing only unique objects, keeping the first occurrence of each ID
+ *
+ * @example
+ * // With books
+ * const uniqueBooks = removeDuplicatesByID<BookVolumeItem>(books);
  */
-export function removeDuplicateBooks(
-  books: BookVolumeItem[],
-): BookVolumeItem[] {
-  const uniqueBooks = new Map<string, BookVolumeItem>();
+export function removeDuplicatesByID<T extends HasID>(objects: T[]): T[] {
+  const uniqueObjects = new Map<string, T>();
 
-  books.forEach((book) => {
-    if (!uniqueBooks.has(book.id)) {
-      uniqueBooks.set(book.id, book);
+  objects.forEach((object) => {
+    if (!uniqueObjects.has(object.id)) {
+      uniqueObjects.set(object.id, object);
     }
   });
 
-  return Array.from(uniqueBooks.values());
+  return Array.from(uniqueObjects.values());
+}
+
+/**
+ * Filters an array of users based on whether their full name (firstName + lastName)
+ * includes the search phrase.
+ * The search is case-insensitive.
+ *
+ * @param {UserSearchDisplayModel[]} followingUsers - Array of users to filter
+ * @param {string} searchPhrase - The search phrase to filter by
+ * @returns {UserSearchDisplayModel[]} Filtered array of users whose names include the search phrase
+ */
+export function filterFollowingUsersBySearchPhrase(
+  followingUsers: UserSearchDisplayModel[],
+  searchPhrase: string,
+): UserSearchDisplayModel[] {
+  const lowerSearchPhrase = caseFoldNormalize(searchPhrase);
+
+  return followingUsers.filter((user) => {
+    const fullName = caseFoldNormalize(
+      user.firstName.concat(" ", user.lastName),
+    );
+    return fullName.includes(lowerSearchPhrase);
+  });
 }

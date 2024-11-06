@@ -4,14 +4,19 @@ import { type UserSearchDisplayModel } from "../../types";
 import { useAuth } from "../auth/context";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import { useNavigateToUser } from "../profile/hooks/useRouteHooks";
+import FollowButton from "./FollowButton";
 
 interface UserListItemProps {
-  user: UserSearchDisplayModel;
-  routePrefix: string;
+  userToDisplay: UserSearchDisplayModel;
+  showFollowStatus?: boolean;
 }
 
-const UserListItem = ({ user: userInfo, routePrefix }: UserListItemProps) => {
+const UserListItem = ({
+  userToDisplay: userInfo,
+  showFollowStatus = false,
+}: UserListItemProps) => {
   const { user } = useAuth();
+
   const navigateToUser = useNavigateToUser(user?.uid, userInfo.id);
 
   return (
@@ -26,11 +31,21 @@ const UserListItem = ({ user: userInfo, routePrefix }: UserListItemProps) => {
       </View>
 
       <View style={styles.infoContainer}>
-        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-          <Text style={styles.userName}>
+        <View style={styles.userInfoRow}>
+          <Text style={styles.userName} numberOfLines={1} ellipsizeMode="tail">
             {userInfo.firstName} {userInfo.lastName}
           </Text>
-        </Text>
+          {showFollowStatus && (
+            <View style={styles.followButtonContainer}>
+              <FollowButton
+                friendUserID={userInfo.id}
+                textStyle={{
+                  fontSize: 12,
+                }}
+              />
+            </View>
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -52,16 +67,23 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   infoContainer: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
   },
-  title: {
+  userInfoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 5,
   },
   userName: {
     fontSize: 16,
     fontWeight: "bold",
-    textAlign: "left",
+    flex: 5,
+    marginRight: 10,
+  },
+  followButtonContainer: {
+    flex: 3,
   },
   placeholderImage: {
     position: "absolute",

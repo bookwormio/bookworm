@@ -2,12 +2,18 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useQuery } from "@tanstack/react-query";
+import { MAX_PREFETCH_USERS } from "../../constants/constants";
 import { fetchUsersBySearch } from "../../services/firebase-services/UserQueries";
 import { type UserSearchDisplayModel } from "../../types";
 import { useAuth } from "../auth/context";
+import { useGetFollowingByIDStatic } from "../followdetails/useFollowDetailQueries";
 import UserList from "../UserList/UserList";
 import WormLoader from "../wormloader/WormLoader";
 import SearchBar from "./searchbar";
+import {
+  filterFollowingUsersBySearchPhrase,
+  removeDuplicatesByID,
+} from "./util/searchBarUtils";
 
 const USER_SEARCH_PLACEHOLDER = "Search for users";
 
@@ -28,6 +34,11 @@ const UserSearch = ({
     searchPhrase !== "",
   );
 
+  const { data: followingUsersData } = useGetFollowingByIDStatic(
+    user?.uid ?? "",
+    MAX_PREFETCH_USERS,
+  );
+
   const { data: fetchUsersData, isLoading } = useQuery({
     queryKey: ["searchusers", searchPhrase],
     queryFn: async () => {
@@ -46,10 +57,44 @@ const UserSearch = ({
   });
 
   useEffect(() => {
-    if (fetchUsersData !== undefined && fetchUsersData !== null) {
-      setUsers(fetchUsersData);
+    // If search phrase is empty, just show following users
+    if (searchPhrase == null || searchPhrase === "") {
+      setUsers(followingUsersData ?? []);
+      return;
     }
-  }, [fetchUsersData]);
+
+    // Get filtered following users if available
+    const filteredFollowingUsers =
+      followingUsersData != null
+        ? filterFollowingUsersBySearchPhrase(followingUsersData, searchPhrase)
+        : [];
+
+    // If only following users data is available
+    if (filteredFollowingUsers.length > 0 && fetchUsersData == null) {
+      setUsers(filteredFollowingUsers);
+      return;
+    }
+
+    // If only fetched users data is available
+    if (fetchUsersData != null && followingUsersData == null) {
+      setUsers(fetchUsersData);
+      return;
+    }
+
+    // If both data sources are available, combine them
+    if (fetchUsersData != null && followingUsersData != null) {
+      setUsers(
+        removeDuplicatesByID<UserSearchDisplayModel>([
+          ...filteredFollowingUsers,
+          ...fetchUsersData,
+        ]),
+      );
+      return;
+    }
+
+    // If no data is available
+    setUsers([]);
+  }, [searchPhrase, followingUsersData, fetchUsersData]);
 
   return (
     <View style={styles.container}>
@@ -66,7 +111,7 @@ const UserSearch = ({
       >
         {users.map((user) => (
           <View style={styles.userContainer} key={user.id}>
-            <UserList routePrefix={routePrefix} users={[user]} />
+            <UserList users={[user]} showFollowStatus={true} />
           </View>
         ))}
         {isLoading && (

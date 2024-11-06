@@ -4,17 +4,17 @@ import { type UserSearchDisplayModel } from "../../types";
 import UserListItem from "./UserListItem";
 interface UserListProps {
   users: UserSearchDisplayModel[];
-  routePrefix: string;
+  showFollowStatus?: boolean;
 }
 
-const UserList = ({ users, routePrefix }: UserListProps) => {
+const UserList = ({ users, showFollowStatus }: UserListProps) => {
   return (
     <View>
       {users.map((value) => (
         <UserListItem
-          routePrefix={routePrefix}
           key={value.id}
-          user={value}
+          userToDisplay={value}
+          showFollowStatus={showFollowStatus}
         ></UserListItem>
       ))}
     </View>
