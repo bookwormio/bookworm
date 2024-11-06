@@ -146,8 +146,12 @@ export enum ServerStreakBadge {
   THIRTY_DAY_STREAK = "thirty_day_streak",
 }
 
+type BadgeDisplayMap = {
+  [K in ServerBadgeName]: string;
+};
+
 // Used to display the book status in the UI
-export const badgeDisplayTitleMap: StringMap = {
+export const badgeDisplayTitleMap: BadgeDisplayMap = {
   // post badges
   [ServerPostBadge.FIRST_POST]: "First Post",
   // bookshelf badges

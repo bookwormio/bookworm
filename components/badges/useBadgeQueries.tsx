@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   type ServerBadgeName,
   ServerBookshelfBadge,
@@ -15,12 +15,6 @@ import {
   checkForStreakBadges,
   getExistingEarnedBadges,
 } from "../../services/firebase-services/ChallengesBadgesQueries";
-
-// post badge
-// bookshelf badge
-// completion badge
-// lending badge
-// streak badge
 
 const lendingBadges = [
   ServerLendingBadge.BORROWED_A_BOOK,
@@ -80,19 +74,36 @@ export const useBadgeChecking = (userID: string, postID?: string) => {
     const badgesSet = new Set(badges);
     if (!areAllBadgesEarned(badgesSet, completionBadges)) {
       completionBadgeMutation({ userID, postID });
+      invalidateBadgeQuery(userID);
     }
     // we have to have a postID for post badges
     if (!areAllBadgesEarned(badgesSet, postBadges) && postID != null) {
       postBadgeMutation({ userID, postID });
+      invalidateBadgeQuery(userID);
     }
     if (!areAllBadgesEarned(badgesSet, bookshelfBadges)) {
       bookShelfBadgeMutation({ userID, postID });
+      invalidateBadgeQuery(userID);
     }
     if (!areAllBadgesEarned(badgesSet, streakBadges) && postID != null) {
       streakBadgeMutation({ userID, postID });
+      invalidateBadgeQuery(userID);
     }
   }
 };
+
+/**
+ * Invalidating the badges query
+ * @param userID - ID of User
+ */
+function invalidateBadgeQuery(userID: string) {
+  const queryClient = useQueryClient();
+  queryClient
+    .invalidateQueries({ queryKey: ["badges", userID] })
+    .catch((error) => {
+      console.error("Error invalidating queries:", error);
+    });
+}
 
 /**
  * Checks for badges related to a new book request.
