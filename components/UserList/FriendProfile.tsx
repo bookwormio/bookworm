@@ -3,7 +3,6 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import Toast from "react-native-toast-message";
 import { TabNames } from "../../enums/Enums";
 import { fetchFriendData } from "../../services/firebase-services/UserQueries";
 import BookWormButton from "../button/BookWormButton";
@@ -133,7 +132,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       ) : (
         <Text>Tab DNE</Text>
       )}
-      <Toast />
     </ScrollView>
   );
 };

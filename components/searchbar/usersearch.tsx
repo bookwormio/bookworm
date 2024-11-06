@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useQuery } from "@tanstack/react-query";
+import { MAX_PREFETCH_USERS } from "../../constants/constants";
 import { fetchUsersBySearch } from "../../services/firebase-services/UserQueries";
 import { type UserSearchDisplayModel } from "../../types";
 import { useAuth } from "../auth/context";
@@ -32,11 +33,10 @@ const UserSearch = ({
   const [searchClicked, setSearchClicked] = useState<boolean>(
     searchPhrase !== "",
   );
-  const MAX_USERS = 10;
 
   const { data: followingUsersData } = useGetFollowingByID(
     user?.uid ?? "",
-    MAX_USERS,
+    MAX_PREFETCH_USERS,
   );
 
   const { data: fetchUsersData, isLoading } = useQuery({

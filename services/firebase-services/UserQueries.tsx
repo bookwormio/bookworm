@@ -485,20 +485,17 @@ export async function getFollowDetailByID(
     const followDetailSnapshot = await getDocs(followDetailQuery);
 
     // Get unique IDs based on relationship type
-    let followDetailIDs;
-    if (type === ServerFollowDetailType.FOLLOWING) {
-      followDetailIDs = Array.from(
-        new Set(
-          followDetailSnapshot.docs.map((doc) => String(doc.data().follower)),
+    const followDetailIDs = Array.from(
+      new Set(
+        followDetailSnapshot.docs.map((doc) =>
+          String(
+            type === ServerFollowDetailType.FOLLOWING
+              ? doc.data().follower
+              : doc.data().following,
+          ),
         ),
-      );
-    } else {
-      followDetailIDs = Array.from(
-        new Set(
-          followDetailSnapshot.docs.map((doc) => String(doc.data().following)),
-        ),
-      );
-    }
+      ),
+    );
 
     // Fetch user details for each ID
     const followDetailData = await Promise.all(

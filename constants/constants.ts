@@ -87,3 +87,5 @@ export const BORROW_BOOK_COLLECTION_REF = "borrowing_collection";
 
 export const BOOK_AUTO_DENIAL_NOTIFICATION_MESSAGE =
   "This book is being lent to someone else.";
+
+export const MAX_PREFETCH_USERS = 10;
