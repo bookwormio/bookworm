@@ -20,6 +20,8 @@ export enum ServerBookShelfName {
   LENDING_LIBRARY = "lending_library",
 }
 
+export const BORROWING_SHELF_NAME = "borrowing";
+
 // Used to display the book status in the UI
 type StringMap = Record<string, string>;
 export const bookShelfDisplayMap: StringMap = {
@@ -27,6 +29,12 @@ export const bookShelfDisplayMap: StringMap = {
   [ServerBookShelfName.WANT_TO_READ]: "Want to Read",
   [ServerBookShelfName.FINISHED]: "Finished",
   [ServerBookShelfName.LENDING_LIBRARY]: "Lending Library",
+  [BORROWING_SHELF_NAME]: "Currently Borrowing",
+};
+
+export const bookShelfSubtitle: StringMap = {
+  [ServerBookShelfName.LENDING_LIBRARY]: "Books you are willing to lend",
+  [BORROWING_SHELF_NAME]: "This is only visible to you",
 };
 
 export const SEARCH_SHELF_PRIORITY = [

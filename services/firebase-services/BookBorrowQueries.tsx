@@ -25,6 +25,7 @@ import {
 import {
   convertBorrowDocToModel,
   makeBorrowDocID,
+  mapBookshelfDocToBookShelfBookModel,
   validateBorrowParams,
 } from "../util/bookBorrowUtils";
 import { getBookRequestStatusForBooks } from "./NotificationQueries";
@@ -333,34 +334,14 @@ export async function getFullBorrowedBooksForUser(
         if (!bookDoc.exists()) {
           return null;
         }
-
-        const bookData = bookDoc.data();
-
         // TODO share logic with getBooksFromUserBookShelves
-        return {
-          id: bookDoc.id,
-          created: bookData.created,
-          volumeInfo: {
-            title: bookData?.title,
-            subtitle: bookData?.subtitle,
-            authors: bookData?.authors,
-            publisher: bookData?.publisher,
-            publishedDate: bookData?.publishedDate,
-            description: bookData?.description,
-            pageCount: bookData?.pageCount,
-            categories: bookData?.categories,
-            maturityRating: bookData?.maturityRating,
-            previewLink: bookData?.previewLink,
-            averageRating: bookData?.averageRating,
-            ratingsCount: bookData?.ratingsCount,
-            language: bookData?.language,
-            mainCategory: bookData?.mainCategory,
-            thumbnail: bookData?.thumbnail,
-          },
-        };
+        return await mapBookshelfDocToBookShelfBookModel(bookDoc);
       },
     );
 
+    // Yes, this is an n+1.
+    // Firebase does not have a getAllDocs, and because these books are in separate collections
+    // we need to fetch them one by one. 😞
     const bookShelfBooks = (await Promise.all(bookPromises)).filter(
       (book): book is BookShelfBookModel => book !== null,
     );

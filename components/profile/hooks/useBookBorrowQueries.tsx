@@ -101,7 +101,6 @@ export const useReturnBook = () => {
   });
 };
 
-// TODO: maybe this should get bookIDS and then fetch the books from those user's bookshelves
 export const useGetAllBorrowingBooksForUser = (userID: string) => {
   return useQuery({
     queryKey: ["borrowingBooks", userID],

@@ -2,7 +2,7 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import { type BookBorrowModel } from "../../types";
+import { type BookBorrowModel, type BookShelfBookModel } from "../../types";
 
 /**
  * Converts a Firestore document snapshot to a BookBorrowModel.
@@ -61,4 +61,37 @@ export function validateBorrowParams(
   if (bookID == null || bookID === "") {
     throw new Error("Book ID is invalid");
   }
+}
+
+/**
+ * Converts a Firestore document snapshot to a BookShelfBookModel.
+ *
+ * @param {QueryDocumentSnapshot<DocumentData, DocumentData>} bookDoc - The Firestore document snapshot.
+ * @returns {Promise<BookShelfBookModel>} The converted BookShelfBookModel object.
+ */
+export async function mapBookshelfDocToBookShelfBookModel(
+  bookDoc: QueryDocumentSnapshot<DocumentData, DocumentData>,
+): Promise<BookShelfBookModel> {
+  const bookData = bookDoc.data();
+  return {
+    id: bookDoc.id,
+    created: bookData.created,
+    volumeInfo: {
+      title: bookData?.title,
+      subtitle: bookData?.subtitle,
+      authors: bookData?.authors,
+      publisher: bookData?.publisher,
+      publishedDate: bookData?.publishedDate,
+      description: bookData?.description,
+      pageCount: bookData?.pageCount,
+      categories: bookData?.categories,
+      maturityRating: bookData?.maturityRating,
+      previewLink: bookData?.previewLink,
+      averageRating: bookData?.averageRating,
+      ratingsCount: bookData?.ratingsCount,
+      language: bookData?.language,
+      mainCategory: bookData?.mainCategory,
+      thumbnail: bookData?.thumbnail,
+    },
+  };
 }

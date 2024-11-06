@@ -1,13 +1,11 @@
 import React from "react";
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
-import { bookShelfDisplayMap, ServerBookShelfName } from "../../../enums/Enums";
+import {
+  bookShelfDisplayMap,
+  bookShelfSubtitle,
+  ServerBookShelfName,
+} from "../../../enums/Enums";
 import { type BookShelfBookModel } from "../../../types";
 import { useAuth } from "../../auth/context";
 import { useGetLendingLibraryBookStatuses } from "../hooks/useBookBorrowQueries";
@@ -15,6 +13,7 @@ import { useRemoveBookFromShelf } from "../hooks/useBookshelfQueries";
 import { useBookRouteInfo } from "../hooks/useRouteHooks";
 import BookBorrowButton from "./BookBorrowButton";
 import BookShelfBook from "./BookShelfBook";
+import { sharedBookshelfStyles } from "./styles/SharedBookshelfStyles";
 
 interface BookShelfProps {
   shelfName: ServerBookShelfName;
@@ -70,29 +69,29 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
     });
   }
 
-  // TODO clean this up
-  const shelfNameDisplay = bookShelfDisplayMap[shelfName] ?? shelfName;
+  const shelfNameDisplay = bookShelfDisplayMap[shelfName];
   // TODO move this to a constant
-  const lendingSubtitle = "Books you are willing to lend";
 
   return (
-    <View style={styles.list}>
-      <View style={styles.heading}>
+    <View style={sharedBookshelfStyles.list}>
+      <View style={sharedBookshelfStyles.heading}>
         <View>
-          <Text style={styles.title}>{shelfNameDisplay}</Text>
+          <Text style={sharedBookshelfStyles.title}>{shelfNameDisplay}</Text>
           {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
             userID === user?.uid && (
-              <Text style={styles.subtitle}>{lendingSubtitle}</Text>
+              <Text style={sharedBookshelfStyles.subtitle}>
+                {bookShelfSubtitle[shelfName]}
+              </Text>
             )}
         </View>
-        <Text style={styles.length}>{books.length}</Text>
+        <Text style={sharedBookshelfStyles.length}>{books.length}</Text>
       </View>
       <FlatList
         horizontal
         scrollEventThrottle={1}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.listContainer}
-        style={styles.flatList}
+        contentContainerStyle={sharedBookshelfStyles.listContainer}
+        style={sharedBookshelfStyles.flatList}
         data={books}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
@@ -116,7 +115,7 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
             )}
             {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
               userID !== user?.uid && (
-                <View style={styles.buttonContainer}>
+                <View style={sharedBookshelfStyles.buttonContainer}>
                   <BookBorrowButton
                     bookID={item.id}
                     bookTitle={item.volumeInfo?.title ?? ""}
@@ -130,7 +129,9 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
           </View>
         )}
         ListEmptyComponent={() => (
-          <Text style={styles.emptyShelfText}>No books available</Text>
+          <Text style={sharedBookshelfStyles.emptyShelfText}>
+            No books available
+          </Text>
         )}
       />
     </View>
@@ -138,55 +139,3 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
 };
 
 export default BookShelf;
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    flexGrow: 0,
-  },
-  listContainer: {
-    padding: 20,
-    minHeight: 200, // Ensure the container has a minimum height
-  },
-  title: {
-    fontSize: 17,
-    fontWeight: "bold",
-  },
-  length: {
-    fontSize: 17,
-  },
-  list: {
-    paddingTop: 0,
-  },
-  heading: {
-    paddingTop: 20,
-    paddingHorizontal: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  flatList: {
-    flexGrow: 0, // Prevent FlatList from stretching
-    minHeight: 150, // Minimum height to maintain the layout even when empty
-  },
-  emptyShelfText: {
-    // Styling for the empty shelf text
-    color: "#666",
-    fontStyle: "italic",
-  },
-  buttonContainer: {
-    width: 120,
-    marginRight: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 50,
-  },
-  subtitle: {
-    paddingTop: 3,
-    fontSize: 14,
-    color: "#666",
-    fontStyle: "italic",
-  },
-});

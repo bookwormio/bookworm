@@ -31,6 +31,7 @@ import {
   type UserSearchDisplayModel,
 } from "../../types";
 
+import { mapBookshelfDocToBookShelfBookModel } from "../util/bookBorrowUtils";
 import { caseFoldNormalize } from "../util/queryUtils";
 
 /**
@@ -583,29 +584,7 @@ export async function addBookToUserBookshelf(
     // Fetch the book data after adding it to the user's bookshelf
     const bookSnapshot = await getDoc(bookshelfRef);
     if (bookSnapshot.exists()) {
-      const bookData = bookSnapshot.data();
-      const book: BookShelfBookModel = {
-        id: bookSnapshot.id,
-        created: bookData.created,
-        volumeInfo: {
-          title: bookData?.title,
-          subtitle: bookData?.subtitle,
-          authors: bookData?.authors,
-          publisher: bookData?.publisher,
-          publishedDate: bookData?.publishedDate,
-          description: bookData?.description,
-          pageCount: bookData?.pageCount,
-          categories: bookData?.categories,
-          maturityRating: bookData?.maturityRating,
-          previewLink: bookData?.previewLink,
-          averageRating: bookData?.averageRating,
-          ratingsCount: bookData?.ratingsCount,
-          language: bookData?.language,
-          mainCategory: bookData?.mainCategory,
-          thumbnail: bookData?.thumbnail,
-        },
-      };
-
+      const book = await mapBookshelfDocToBookShelfBookModel(bookSnapshot);
       return { success: true, book };
     } else {
       console.error("Failed to fetch book data after adding to bookshelf.");
@@ -664,31 +643,13 @@ export async function getBooksFromUserBookShelves(
       );
 
       const bookshelfSnapshot = await getDocs(bookshelfQuery);
-      userBookShelves[shelf] = [];
-      bookshelfSnapshot.forEach((doc) => {
-        const bookData = doc.data();
-        userBookShelves[shelf].push({
-          id: doc.id,
-          created: bookData.created,
-          volumeInfo: {
-            title: bookData?.title,
-            subtitle: bookData?.subtitle,
-            authors: bookData?.authors,
-            publisher: bookData?.publisher,
-            publishedDate: bookData?.publishedDate,
-            description: bookData?.description,
-            pageCount: bookData?.pageCount,
-            categories: bookData?.categories,
-            maturityRating: bookData?.maturityRating,
-            previewLink: bookData?.previewLink,
-            averageRating: bookData?.averageRating,
-            ratingsCount: bookData?.ratingsCount,
-            language: bookData?.language,
-            mainCategory: bookData?.mainCategory,
-            thumbnail: bookData?.thumbnail,
-          },
-        });
-      });
+      const books = await Promise.all(
+        bookshelfSnapshot.docs.map(
+          async (doc) => await mapBookshelfDocToBookShelfBookModel(doc),
+        ),
+      );
+
+      userBookShelves[shelf] = books;
     }
 
     return userBookShelves;

@@ -1,11 +1,13 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import Toast from "react-native-toast-message";
 import { type ServerBookShelfName } from "../../../enums/Enums";
 import { useAuth } from "../../auth/context";
 import WormLoader from "../../wormloader/WormLoader";
 import { useGetAllBorrowingBooksForUser } from "../hooks/useBookBorrowQueries";
 import { useGetBooksForBookshelves } from "../hooks/useBookshelfQueries";
 import BookShelf from "./BookShelf";
+import BorrowingBookShelf from "./BorrowingBookShelf";
 
 interface BookShelvesProp {
   userID: string;
@@ -18,34 +20,27 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
   const {
     data: bookShelves,
     isLoading: isLoadingBooks,
-    isError,
-    error,
+    isError: isErrorShelfBooks,
   } = useGetBooksForBookshelves(userID ?? "");
 
   const {
     data: borrowingBooks,
     isLoading: isLoadingBorrowingBooks,
     isError: isErrorBorrowingBooks,
-    error: errorBorrowingBooks,
-    isSuccess: isSuccessBorrowingBooks,
   } = useGetAllBorrowingBooksForUser(userID);
 
-  if (isSuccessBorrowingBooks) {
-    console.log(borrowingBooks);
+  if (isErrorBorrowingBooks || isErrorShelfBooks) {
+    Toast.show({
+      type: "error",
+      text1: "Error",
+      text2: "An error occurred while fetching the books",
+    });
   }
 
   if (isLoadingBooks) {
     return (
       <View style={styles.container}>
         <WormLoader style={{ width: 50, height: 50 }} />
-      </View>
-    );
-  }
-
-  if (isError) {
-    return (
-      <View style={styles.container}>
-        <Text>Error: {error.message}</Text>
       </View>
     );
   }
@@ -61,10 +56,9 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
         />
       ))}
       {/* TODO clean this up */}
-      {user?.uid === userID && (
-        <BookShelf
+      {user?.uid === userID && !isLoadingBorrowingBooks && (
+        <BorrowingBookShelf
           key={"borrowing"}
-          shelfName={"borrowing" as ServerBookShelfName}
           books={borrowingBooks ?? []}
           userID={userID}
         />
