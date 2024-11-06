@@ -204,8 +204,8 @@ type UserBookShelvesModel = Record<string, BookShelfBookModel[]>;
 
 interface BasicNotificationModel {
   receiver: string;
-  sender?: string;
-  sender_name?: string;
+  sender: string;
+  sender_name: string;
 }
 
 interface FullNotificationModel {
