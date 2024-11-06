@@ -114,7 +114,6 @@ const MoreInfo = () => {
       <View style={styles.container}>
         <Text style={styles.header}>A little bit about you...</Text>
         <Text style={styles.subheader}>Enter some details about yourself</Text>
-        <Toast />
         <TouchableOpacity
           style={styles.defaultImageContainer}
           onPress={() => {

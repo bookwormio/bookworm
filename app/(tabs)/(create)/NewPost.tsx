@@ -301,7 +301,6 @@ const NewPost = () => {
           disabled={shareDisabled}
         />
       </View>
-      <Toast />
     </ScrollView>
   );
 };

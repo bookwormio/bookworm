@@ -133,7 +133,6 @@ const CreateAccount = () => {
           }}
         />
       </View>
-      <Toast />
     </ScrollView>
   );
 };

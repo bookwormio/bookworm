@@ -90,6 +90,22 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     }
   }, [inBookshelves]);
 
+  // if book not loading in time, show toast message
+  useEffect(() => {
+    const loadingTimeout = setTimeout(() => {
+      if (isLoadingBook) {
+        Toast.show({
+          type: "error",
+          text1: "Loading Error",
+          text2: "Failed to load book data. Please try again later.",
+        });
+      }
+    }, 10000);
+    return () => {
+      clearTimeout(loadingTimeout);
+    };
+  }, [isLoadingBook]);
+
   const handleToggleShelf = (shelfName: ServerBookShelfName) => {
     if (selectedShelves.includes(shelfName)) {
       setSelectedShelves((prev) => prev.filter((shelf) => shelf !== shelfName));
@@ -256,7 +272,6 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
           </View>
         </BottomSheetModal>
       </View>
-      <Toast />
     </BottomSheetModalProvider>
   );
 };

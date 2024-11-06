@@ -266,7 +266,6 @@ const BookBorrowButton = ({
           fontSize: 12,
         }}
       ></BookWormButton>
-      <Toast />
     </View>
   );
 };
