@@ -203,11 +203,9 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
         checkForCompletion({ userID: user?.uid ?? "" });
       if (!areAllBadgesEarned(badgesSet, bookshelfBadges))
         checkForBookshelf({ userID: user?.uid ?? "" });
-      queryClient
-        .invalidateQueries({ queryKey: ["badges", user?.uid ?? ""] })
-        .catch((error) => {
-          console.error("Error invalidating queries:", error);
-        });
+      await queryClient.invalidateQueries({
+        queryKey: ["badges", user?.uid ?? ""],
+      });
     }
   };
   // callbacks

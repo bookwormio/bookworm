@@ -239,6 +239,13 @@ export async function checkForLendingBadges(userID: string): Promise<void> {
     const lenderNumber = lenderSnapshot.data().count;
     const borrowerNumber = borrowSnapshot.data().count;
 
+    console.log(
+      "number book lending",
+      lenderNumber,
+      "number books borrowing",
+      borrowerNumber,
+    );
+
     if (lenderNumber === 1) {
       await addBadgeToUser(userID, ServerLendingBadge.LENT_A_BOOK);
     }
