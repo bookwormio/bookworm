@@ -8,6 +8,7 @@ import {
   lendBookToUser,
   returnBookToUser,
 } from "../../../services/firebase-services/BookBorrowQueries";
+import { type BookBorrowModel, type BookShelfBookModel } from "../../../types";
 
 /**
  * Custom hook to fetch lending statuses for multiple books.
@@ -101,16 +102,37 @@ export const useReturnBook = () => {
   });
 };
 
+export interface BorrowingBookshelfModel {
+  borrowInfo: BookBorrowModel;
+  bookShelfInfo: BookShelfBookModel;
+}
+
 export const useGetAllBorrowingBooksForUser = (userID: string) => {
   return useQuery({
     queryKey: ["borrowingBooks", userID],
     queryFn: async () => {
-      // TODO: maybe delegate responsibility to the caller (borrowing bookshelf) to fetch the books
       const borrowModels = await getAllBorrowingBooksForUser(userID);
-      const fullModels = await getFullBorrowedBooksForUser(
+      const bookShelfModels = await getFullBorrowedBooksForUser(
         userID,
         borrowModels,
       );
+
+      const borrowModelMap = new Map(
+        borrowModels.map((model) => [model.bookID, model]),
+      );
+
+      const fullModels: BorrowingBookshelfModel[] = bookShelfModels
+        .map((bookModel) => {
+          const borrowInfo = borrowModelMap.get(bookModel.id);
+          if (borrowInfo == null) return null;
+
+          return {
+            borrowInfo,
+            bookShelfInfo: bookModel,
+          };
+        })
+        .filter((model): model is BorrowingBookshelfModel => model !== null);
+
       return fullModels;
     },
     enabled: userID != null && userID !== "",

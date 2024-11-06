@@ -232,6 +232,7 @@ const BookBorrowButton = ({
     );
   };
 
+  // TODO: add an alert to confirm the return to the owner
   const handleBookReturnClicked = (bookID: string) => {
     if (user == null) {
       Toast.show({

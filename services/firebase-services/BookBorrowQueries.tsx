@@ -174,7 +174,11 @@ async function getAllBooksForUser(
 ): Promise<BookBorrowModel[]> {
   try {
     const bookRef = collection(DB, BORROW_BOOK_COLLECTION_REF);
-    const q = query(bookRef, where(userType, "==", userID));
+    const q = query(
+      bookRef,
+      where(userType, "==", userID),
+      where("borrow_status", "==", ServerBookBorrowStatus.BORROWING),
+    );
     const bookSnapshot = await getDocs(q);
     return bookSnapshot.docs.map(convertBorrowDocToModel);
   } catch (error) {

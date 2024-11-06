@@ -2,16 +2,18 @@ import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
 import {
+  BookRequestNotificationStatus,
   bookShelfDisplayMap,
   bookShelfSubtitle,
   BORROWING_SHELF_NAME,
 } from "../../../enums/Enums";
-import { type BookShelfBookModel } from "../../../types";
+import { type BorrowingBookshelfModel } from "../hooks/useBookBorrowQueries";
+import BookBorrowButton from "./BookBorrowButton";
 import BookShelfBook from "./BookShelfBook";
 import { sharedBookshelfStyles } from "./styles/SharedBookshelfStyles";
 
 interface BorrowingBookShelfProps {
-  books: BookShelfBookModel[];
+  books: BorrowingBookshelfModel[];
   userID: string;
 }
 
@@ -35,14 +37,27 @@ const BorrowingBookShelf = ({ books, userID }: BorrowingBookShelfProps) => {
         contentContainerStyle={sharedBookshelfStyles.listContainer}
         style={sharedBookshelfStyles.flatList}
         data={books}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.bookShelfInfo.id}
         renderItem={({ item }) => (
           <View>
             <TouchableOpacity>
-              {item.volumeInfo != null && (
-                <BookShelfBook book={item.volumeInfo} bookID={item.id} />
+              {item.bookShelfInfo.volumeInfo != null && (
+                <BookShelfBook
+                  book={item.bookShelfInfo.volumeInfo}
+                  bookID={item.bookShelfInfo.id}
+                />
               )}
             </TouchableOpacity>
+            <View style={sharedBookshelfStyles.buttonContainer}>
+              <BookBorrowButton
+                bookID={item.bookShelfInfo.id}
+                bookTitle={item.bookShelfInfo.volumeInfo?.title ?? ""}
+                bookOwnerID={item.borrowInfo.lendingUserID}
+                borrowInfo={item.borrowInfo}
+                requestStatus={BookRequestNotificationStatus.ACCEPTED}
+                isLoading={false}
+              />
+            </View>
           </View>
         )}
         ListEmptyComponent={() => (
@@ -57,55 +72,3 @@ const BorrowingBookShelf = ({ books, userID }: BorrowingBookShelfProps) => {
 };
 
 export default BorrowingBookShelf;
-
-// TODO share styles with BookShelf
-// const styles = StyleSheet.create({
-//   container: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     justifyContent: "space-between",
-//     width: "100%",
-//     flexGrow: 0,
-//   },
-//   listContainer: {
-//     padding: 20,
-//     minHeight: 200,
-//   },
-//   title: {
-//     fontSize: 17,
-//     fontWeight: "bold",
-//   },
-//   length: {
-//     fontSize: 17,
-//   },
-//   list: {
-//     paddingTop: 0,
-//   },
-//   heading: {
-//     paddingTop: 20,
-//     paddingHorizontal: 10,
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//   },
-//   flatList: {
-//     flexGrow: 0,
-//     minHeight: 150,
-//   },
-//   emptyShelfText: {
-//     color: "#666",
-//     fontStyle: "italic",
-//   },
-//   buttonContainer: {
-//     width: 120,
-//     marginRight: 20,
-//     alignItems: "center",
-//     justifyContent: "center",
-//     height: 50,
-//   },
-//   subtitle: {
-//     paddingTop: 3,
-//     fontSize: 14,
-//     color: "#666",
-//     fontStyle: "italic",
-//   },
-// });
