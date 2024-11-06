@@ -58,7 +58,7 @@ const NewPost = () => {
   const [textboxFocused, setTextboxFocused] = useState(false);
   const [shareDisabled, setShareDisabled] = useState(true);
 
-  const { mutateAsync: setBookmark } = useSetBookmarkForBook();
+  const { mutate: setBookmark } = useSetBookmarkForBook();
   const postMutation = useMutation({ mutationFn: createPost });
 
   const addBookMutation = useAddBookToShelf();
@@ -149,7 +149,7 @@ const NewPost = () => {
     if (user?.uid == null || selectedBook == null) return;
     if (!fieldsMissing()) {
       await createNewPost();
-      await setBookmark({
+      setBookmark({
         userID: user?.uid,
         bookID: selectedBook?.id,
         bookmark: currentBookmark,
