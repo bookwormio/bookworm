@@ -14,9 +14,14 @@ import { BORROW_BOOK_COLLECTION_REF } from "../../constants/constants";
 import {
   ServerBookBorrowRole,
   ServerBookBorrowStatus,
+  ServerBookShelfName,
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
-import { type BookBorrowModel, type BookStatusModel } from "../../types";
+import {
+  type BookBorrowModel,
+  type BookShelfBookModel,
+  type BookStatusModel,
+} from "../../types";
 import {
   convertBorrowDocToModel,
   makeBorrowDocID,
@@ -302,6 +307,69 @@ export async function getLendingLibraryBookStatuses(
   } catch (error) {
     throw new Error(
       `Error getting lending library book statuses: ${(error as Error).message}`,
+    );
+  }
+}
+
+export async function getFullBorrowedBooksForUser(
+  userID: string,
+  borrowedBooks: BookBorrowModel[],
+): Promise<BookShelfBookModel[]> {
+  try {
+    const lendingShelf = ServerBookShelfName.LENDING_LIBRARY;
+
+    const bookPromises = borrowedBooks.map(
+      async (borrowedBook): Promise<BookShelfBookModel | null> => {
+        const bookshelfRef = doc(
+          DB,
+          "bookshelf_collection",
+          borrowedBook.lendingUserID,
+          lendingShelf,
+          borrowedBook.bookID,
+        );
+
+        const bookDoc = await getDoc(bookshelfRef);
+
+        if (!bookDoc.exists()) {
+          return null;
+        }
+
+        const bookData = bookDoc.data();
+
+        // TODO share logic with getBooksFromUserBookShelves
+        return {
+          id: bookDoc.id,
+          created: bookData.created,
+          volumeInfo: {
+            title: bookData?.title,
+            subtitle: bookData?.subtitle,
+            authors: bookData?.authors,
+            publisher: bookData?.publisher,
+            publishedDate: bookData?.publishedDate,
+            description: bookData?.description,
+            pageCount: bookData?.pageCount,
+            categories: bookData?.categories,
+            maturityRating: bookData?.maturityRating,
+            previewLink: bookData?.previewLink,
+            averageRating: bookData?.averageRating,
+            ratingsCount: bookData?.ratingsCount,
+            language: bookData?.language,
+            mainCategory: bookData?.mainCategory,
+            thumbnail: bookData?.thumbnail,
+          },
+        };
+      },
+    );
+
+    const bookShelfBooks = (await Promise.all(bookPromises)).filter(
+      (book): book is BookShelfBookModel => book !== null,
+    );
+
+    return bookShelfBooks;
+  } catch (error) {
+    console.error("Error fetching borrowed books: ", error);
+    throw new Error(
+      `Failed to fetch borrowed books for user ${userID}: ${(error as Error).message}`,
     );
   }
 }

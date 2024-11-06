@@ -70,7 +70,8 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
     });
   }
 
-  const shelfNameDisplay = bookShelfDisplayMap[shelfName];
+  // TODO clean this up
+  const shelfNameDisplay = bookShelfDisplayMap[shelfName] ?? shelfName;
   // TODO move this to a constant
   const lendingSubtitle = "Books you are willing to lend";
 

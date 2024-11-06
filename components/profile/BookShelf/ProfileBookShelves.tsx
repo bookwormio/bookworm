@@ -6,7 +6,6 @@ import WormLoader from "../../wormloader/WormLoader";
 import { useGetAllBorrowingBooksForUser } from "../hooks/useBookBorrowQueries";
 import { useGetBooksForBookshelves } from "../hooks/useBookshelfQueries";
 import BookShelf from "./BookShelf";
-import BorrowingBookShelf from "./BorrowingBookShelf";
 
 interface BookShelvesProp {
   userID: string;
@@ -61,10 +60,14 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
           userID={userID}
         />
       ))}
+      {/* TODO clean this up */}
       {user?.uid === userID && (
-        <BorrowingBookShelf
-          bookBorrowModels={borrowingBooks ?? []}
-        ></BorrowingBookShelf>
+        <BookShelf
+          key={"borrowing"}
+          shelfName={"borrowing" as ServerBookShelfName}
+          books={borrowingBooks ?? []}
+          userID={userID}
+        />
       )}
     </View>
   );

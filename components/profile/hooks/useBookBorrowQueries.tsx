@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getAllBorrowingBooksForUser,
+  getFullBorrowedBooksForUser,
   getLendingLibraryBookStatuses,
   lendBookToUser,
   returnBookToUser,
@@ -105,7 +106,13 @@ export const useGetAllBorrowingBooksForUser = (userID: string) => {
   return useQuery({
     queryKey: ["borrowingBooks", userID],
     queryFn: async () => {
-      return await getAllBorrowingBooksForUser(userID);
+      // TODO: maybe delegate responsibility to the caller (borrowing bookshelf) to fetch the books
+      const borrowModels = await getAllBorrowingBooksForUser(userID);
+      const fullModels = await getFullBorrowedBooksForUser(
+        userID,
+        borrowModels,
+      );
+      return fullModels;
     },
     enabled: userID != null && userID !== "",
     staleTime: 10 * 60 * 1000, // 10 minutes
