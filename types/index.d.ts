@@ -214,8 +214,8 @@ interface FullNotificationModel {
   notifID: string;
   receiver: string;
   comment?: string;
-  sender?: string;
-  sender_name?: string;
+  sender: string;
+  sender_name: string;
   created: Timestamp;
   read_at: Timestamp | null;
   postID?: string;
