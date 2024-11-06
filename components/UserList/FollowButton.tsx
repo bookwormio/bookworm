@@ -1,20 +1,19 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { type TextStyle } from "react-native";
 import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { FollowButtonDisplay, ServerNotificationType } from "../../enums/Enums";
-import {
-  followUserByID,
-  unfollowUserByID,
-} from "../../services/firebase-services/FriendQueries";
-import { createNotification } from "../../services/firebase-services/NotificationQueries";
 import {
   type ConnectionModel,
   type FriendRequestNotification,
 } from "../../types";
 import { useAuth } from "../auth/context";
 import BookWormButton from "../button/BookWormButton";
-import { useGetIsFollowing } from "../followdetails/useFollowDetailQueries";
+import {
+  useFollowMutation,
+  useGetIsFollowing,
+  useUnfollowMutation,
+} from "../followdetails/useFollowDetailQueries";
+import { useCreateNotification } from "../notifications/hooks/useNotificationQueries";
 
 interface FollowButtonProps {
   friendUserID: string;
@@ -22,8 +21,6 @@ interface FollowButtonProps {
 }
 
 const FollowButton = ({ friendUserID, textStyle }: FollowButtonProps) => {
-  const queryClient = useQueryClient();
-
   const { user } = useAuth();
   const currentUserID = user?.uid;
   const { data: currentUserData, isLoading: currentUserDataLoading } =
@@ -34,25 +31,9 @@ const FollowButton = ({ friendUserID, textStyle }: FollowButtonProps) => {
   const { data: isFollowing, isLoading: isLoadingFollowStatus } =
     useGetIsFollowing(user?.uid ?? "", friendUserID);
 
-  const invalidateFollowQueries = async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: ["numfollowers", friendUserID],
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["numfollowing", user?.uid],
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["followers", friendUserID],
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["following", user?.uid],
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["followingstatus", friendUserID, user?.uid],
-      }),
-    ]);
-  };
+  const followMutation = useFollowMutation();
+  const unfollowMutation = useUnfollowMutation();
+  const notifyMutation = useCreateNotification();
 
   const handleFollowButtonPressed = () => {
     if (isLoading) {
@@ -60,25 +41,6 @@ const FollowButton = ({ friendUserID, textStyle }: FollowButtonProps) => {
     }
     void (isFollowing === true ? handleUnfollow() : handleFollow());
   };
-
-  const followMutation = useMutation({
-    mutationFn: followUserByID,
-    onSuccess: invalidateFollowQueries,
-  });
-
-  const unfollowMutation = useMutation({
-    mutationFn: unfollowUserByID,
-    onSuccess: invalidateFollowQueries,
-  });
-
-  const notifyMutation = useMutation({
-    mutationFn: createNotification,
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["notifications", friendUserID],
-      });
-    },
-  });
 
   const handleFollow = async () => {
     if (currentUserID == null || friendUserID == null || myFullName == null) {
@@ -92,14 +54,14 @@ const FollowButton = ({ friendUserID, textStyle }: FollowButtonProps) => {
     };
 
     try {
-      followMutation.mutate(connection);
+      followMutation.mutate({ connection });
       const notification: FriendRequestNotification = {
         receiver: friendUserID,
         sender: currentUserID,
         sender_name: myFullName,
         type: ServerNotificationType.FRIEND_REQUEST,
       };
-      notifyMutation.mutate(notification);
+      notifyMutation.mutate({ notification });
     } catch (error) {
       console.error("Error following user:", error);
     }
@@ -117,7 +79,7 @@ const FollowButton = ({ friendUserID, textStyle }: FollowButtonProps) => {
     };
 
     try {
-      unfollowMutation.mutate(connection);
+      unfollowMutation.mutate({ connection });
     } catch (error) {
       console.error("Error unfollowing user:", error);
     }
