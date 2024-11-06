@@ -1,9 +1,9 @@
 import React from "react";
 import {
   BACKWARDS_PROGRESS_COLOR,
+  BOOKWORM_LIGHT_GREEN,
   FIRST_PROGRESS_COLOR,
   REMAINING_PROGRESS_COLOR,
-  SECOND_PROGRESS_COLOR,
 } from "../../../constants/constants";
 import ProgressBar from "./ProgressBar";
 
@@ -35,7 +35,7 @@ const PagesProgressBar = ({
         { progress: firstProgress, color: FIRST_PROGRESS_COLOR },
         {
           progress: secondProgress,
-          color: isBackwards ? BACKWARDS_PROGRESS_COLOR : SECOND_PROGRESS_COLOR,
+          color: isBackwards ? BACKWARDS_PROGRESS_COLOR : BOOKWORM_LIGHT_GREEN,
         },
         { progress: remainingProgress, color: REMAINING_PROGRESS_COLOR },
       ]}

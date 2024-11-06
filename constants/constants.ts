@@ -1,4 +1,5 @@
 import { type ImageStyle, type StyleProp } from "react-native";
+import { ServerBookShelfName } from "../enums/Enums";
 
 export const DAYS_OF_WEEK = [
   "Sunday",
@@ -57,9 +58,21 @@ export const NEW_POST_BOOK_SEARCH = "createbooksearch";
 export const BLURHASH = "LBN-4dMwIUWC~WRj%M^+-;4n4nWC";
 
 export const FIRST_PROGRESS_COLOR = "rgb(88, 166, 92)";
-export const SECOND_PROGRESS_COLOR = "rgb(169, 207, 96)";
+export const BOOKWORM_LIGHT_GREEN = "#A9CF60";
 export const BACKWARDS_PROGRESS_COLOR = "rgb(255, 99, 71)";
 export const REMAINING_PROGRESS_COLOR = "rgb(229, 232, 249)";
+export const VIOLET = "#7CA4E9";
+export const LIGHT_ORANGE = "#FF9E5B";
+export const SALMON = "#FFAA93";
+
+export const BOOKSHELF_CHIP_COLORS = {
+  [ServerBookShelfName.CURRENTLY_READING]: VIOLET, // #7CA4E9
+  [ServerBookShelfName.WANT_TO_READ]: LIGHT_ORANGE, // #FF9E5B
+  [ServerBookShelfName.FINISHED]: BOOKWORM_LIGHT_GREEN, // #A9CF60
+  [ServerBookShelfName.LENDING_LIBRARY]: SALMON, // #FFAA93
+  // TODO: update once we have borrowing library
+  // [ServerBookShelfName.BORROWING]: [LIGHT_GOLD, DARK_GOLD],
+};
 
 export const POST_IMAGE_HEIGHT = 250;
 export const POST_IMAGE_WIDTH = 250;
