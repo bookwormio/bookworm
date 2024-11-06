@@ -2,8 +2,8 @@ import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
 import {
-  bookShelfDisplayMap,
-  bookShelfSubtitle,
+  BOOKSHELF_DISPLAY_NAMES,
+  BOOKSHELF_SUBTITLES,
   ServerBookShelfName,
 } from "../../../enums/Enums";
 import { type BookShelfBookModel } from "../../../types";
@@ -69,8 +69,7 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
     });
   }
 
-  const shelfNameDisplay = bookShelfDisplayMap[shelfName];
-  // TODO move this to a constant
+  const shelfNameDisplay = BOOKSHELF_DISPLAY_NAMES[shelfName];
 
   return (
     <View style={sharedBookshelfStyles.list}>
@@ -80,7 +79,7 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
           {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
             userID === user?.uid && (
               <Text style={sharedBookshelfStyles.subtitle}>
-                {bookShelfSubtitle[shelfName]}
+                {BOOKSHELF_SUBTITLES[shelfName]}
               </Text>
             )}
         </View>

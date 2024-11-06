@@ -2,7 +2,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
-  bookShelfDisplayMap,
+  BOOKSHELF_DISPLAY_NAMES,
   type ServerBookShelfName,
 } from "../../../enums/Enums";
 import WormLoader from "../../wormloader/WormLoader";
@@ -18,7 +18,7 @@ const BookshelfAddButtons = ({
   onToggleShelf,
   isDisabled,
 }: BookshelfAddButtonsProps) => {
-  const shelfItems = Object.entries(bookShelfDisplayMap).map(
+  const shelfItems = Object.entries(BOOKSHELF_DISPLAY_NAMES).map(
     ([value, label]) => ({
       label,
       value: value as ServerBookShelfName,

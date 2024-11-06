@@ -141,7 +141,7 @@ async function updateBorrowStatus(
  * @returns {Promise<BookBorrowModel[]>} A promise that resolves to an array of BookBorrowModel objects.
  * @throws {Error} If there's an error retrieving the books.
  */
-export async function getAllBorrowingBooksForUser(
+export async function getBorrowingBookModelsForUser(
   userID: string,
 ): Promise<BookBorrowModel[]> {
   return await getAllBooksForUser(userID, ServerBookBorrowRole.BORROWER);
@@ -316,7 +316,7 @@ export async function getLendingLibraryBookStatuses(
   }
 }
 
-export async function getFullBorrowedBooksForUser(
+export async function getBorrowedBookShelfBooksForUser(
   userID: string,
   borrowedBooks: BookBorrowModel[],
 ): Promise<BookShelfBookModel[]> {
@@ -338,7 +338,6 @@ export async function getFullBorrowedBooksForUser(
         if (!bookDoc.exists()) {
           return null;
         }
-        // TODO share logic with getBooksFromUserBookShelves
         return await mapBookshelfDocToBookShelfBookModel(bookDoc);
       },
     );

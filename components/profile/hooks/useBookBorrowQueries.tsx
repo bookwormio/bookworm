@@ -2,8 +2,8 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  getAllBorrowingBooksForUser,
-  getFullBorrowedBooksForUser,
+  getBorrowedBookShelfBooksForUser,
+  getBorrowingBookModelsForUser,
   getLendingLibraryBookStatuses,
   lendBookToUser,
   returnBookToUser,
@@ -121,8 +121,8 @@ export const useGetAllBorrowingBooksForUser = (userID: string) => {
   return useQuery({
     queryKey: ["borrowingBooks", userID],
     queryFn: async () => {
-      const borrowModels = await getAllBorrowingBooksForUser(userID);
-      const bookShelfModels = await getFullBorrowedBooksForUser(
+      const borrowModels = await getBorrowingBookModelsForUser(userID);
+      const bookShelfModels = await getBorrowedBookShelfBooksForUser(
         userID,
         borrowModels,
       );

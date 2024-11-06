@@ -15,7 +15,6 @@ interface BookShelvesProp {
 
 const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
   const { user } = useAuth();
-  // Initialize the bookShelves state with all shelves empty
 
   const {
     data: bookShelves,
@@ -55,7 +54,7 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
           userID={userID}
         />
       ))}
-      {/* TODO clean this up */}
+      {/* Show borrowing shelf only if the user is viewing their own profile */}
       {user?.uid === userID && !isLoadingBorrowingBooks && (
         <BorrowingBookShelf
           key={"borrowing"}

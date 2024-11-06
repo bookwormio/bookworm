@@ -3,8 +3,8 @@ import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
 import {
   BookRequestNotificationStatus,
-  bookShelfDisplayMap,
-  bookShelfSubtitle,
+  BOOKSHELF_DISPLAY_NAMES,
+  BOOKSHELF_SUBTITLES,
   BORROWING_SHELF_NAME,
 } from "../../../enums/Enums";
 
@@ -19,8 +19,8 @@ interface BorrowingBookShelfProps {
 }
 
 const BorrowingBookShelf = ({ books, userID }: BorrowingBookShelfProps) => {
-  const shelfNameDisplay = bookShelfDisplayMap[BORROWING_SHELF_NAME];
-  const shelfSubtitle = bookShelfSubtitle[BORROWING_SHELF_NAME];
+  const shelfNameDisplay = BOOKSHELF_DISPLAY_NAMES[BORROWING_SHELF_NAME];
+  const shelfSubtitle = BOOKSHELF_SUBTITLES[BORROWING_SHELF_NAME];
 
   return (
     <View style={sharedBookshelfStyles.list}>
