@@ -7,7 +7,8 @@ import {
   bookShelfSubtitle,
   BORROWING_SHELF_NAME,
 } from "../../../enums/Enums";
-import { type BorrowingBookshelfModel } from "../hooks/useBookBorrowQueries";
+
+import { type BorrowingBookshelfModel } from "../../../types";
 import BookBorrowButton from "./BookBorrowButton";
 import BookShelfBook from "./BookShelfBook";
 import { sharedBookshelfStyles } from "./styles/SharedBookshelfStyles";

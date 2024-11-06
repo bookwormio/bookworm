@@ -21,7 +21,7 @@ import {
 import {
   createBookResponseNotification,
   formatNotification,
-  formatSenderName,
+  formatUserFullName,
 } from "./util/notificationUtils";
 
 interface NotificationItemContentProps {
@@ -133,13 +133,13 @@ const NotificationItemContent = ({
             bookID: notificationTyped.bookID,
             message: "",
             requestStatus: BookRequestNotificationStatus.ACCEPTED,
-            senderName: formatSenderName(userData.first, userData.last),
+            senderName: formatUserFullName(userData.first, userData.last),
             notification: notificationTyped,
           }),
           handleRejectOtherRequests(
             notificationTyped.receiver,
             notificationTyped.sender,
-            formatSenderName(userData.first, userData.last),
+            formatUserFullName(userData.first, userData.last),
             notificationTyped.bookID,
           ),
           handleUpdateBookRequestStatus(
@@ -177,7 +177,7 @@ const NotificationItemContent = ({
           bookID: notificationTyped.bookID,
           message: message ?? "",
           requestStatus: BookRequestNotificationStatus.DENIED,
-          senderName: formatSenderName(userData.first, userData.last),
+          senderName: formatUserFullName(userData.first, userData.last),
           notification: notificationTyped,
         }),
         handleUpdateBookRequestStatus(

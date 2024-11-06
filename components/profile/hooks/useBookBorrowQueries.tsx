@@ -8,7 +8,7 @@ import {
   lendBookToUser,
   returnBookToUser,
 } from "../../../services/firebase-services/BookBorrowQueries";
-import { type BookBorrowModel, type BookShelfBookModel } from "../../../types";
+import { combineBorrowingAndShelfData } from "../../../services/util/bookBorrowUtils";
 
 /**
  * Custom hook to fetch lending statuses for multiple books.
@@ -95,18 +95,28 @@ export const useReturnBook = () => {
       return await returnBookToUser(borrowerUserID, lenderUserID, bookID);
     },
     onSuccess: async (data, { lenderUserID }) => {
-      await queryClient.invalidateQueries({
-        queryKey: ["lendingStatuses"],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["lendingStatuses"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["borrowingBooks"],
+        }),
+      ]);
     },
   });
 };
 
-export interface BorrowingBookshelfModel {
-  borrowInfo: BookBorrowModel;
-  bookShelfInfo: BookShelfBookModel;
-}
-
+/**
+ * Hook to fetch all books a user is currently borrowing.
+ * Combines borrowing status and book details into a single data structure.
+ *
+ * @param userID - The ID of the user to fetch borrowed books for
+ * @returns Query result containing combined borrowing and book information
+ *
+ * @example
+ * const { data: borrowedBooks, isLoading } = useGetAllBorrowingBooksForUser(userID);
+ */
 export const useGetAllBorrowingBooksForUser = (userID: string) => {
   return useQuery({
     queryKey: ["borrowingBooks", userID],
@@ -117,23 +127,7 @@ export const useGetAllBorrowingBooksForUser = (userID: string) => {
         borrowModels,
       );
 
-      const borrowModelMap = new Map(
-        borrowModels.map((model) => [model.bookID, model]),
-      );
-
-      const fullModels: BorrowingBookshelfModel[] = bookShelfModels
-        .map((bookModel) => {
-          const borrowInfo = borrowModelMap.get(bookModel.id);
-          if (borrowInfo == null) return null;
-
-          return {
-            borrowInfo,
-            bookShelfInfo: bookModel,
-          };
-        })
-        .filter((model): model is BorrowingBookshelfModel => model !== null);
-
-      return fullModels;
+      return combineBorrowingAndShelfData(borrowModels, bookShelfModels);
     },
     enabled: userID != null && userID !== "",
     staleTime: 10 * 60 * 1000, // 10 minutes

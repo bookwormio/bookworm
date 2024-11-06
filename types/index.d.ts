@@ -290,6 +290,11 @@ interface BookStatusModel {
   requestStatus?: BookRequestNotificationStatus;
 }
 
+export interface BorrowingBookshelfModel {
+  borrowInfo: BookBorrowModel;
+  bookShelfInfo: BookShelfBookModel;
+}
+
 interface UpdateBorrowNotificationParams {
   notifID: string;
   newStatus: BookRequestNotificationStatus;

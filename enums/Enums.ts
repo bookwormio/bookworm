@@ -121,7 +121,7 @@ export enum BookBorrowButtonDisplay {
   LOADING = "Loading...",
   UNAVAILABLE = "Unavailable",
   REQUESTED = "Requested",
-  RETURN = "Return",
+  RETURN = "Return Book",
   REQUEST_AGAIN = "Request Again",
   REQUEST = "Request",
 }

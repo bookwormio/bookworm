@@ -2,7 +2,11 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import { type BookBorrowModel, type BookShelfBookModel } from "../../types";
+import {
+  type BookBorrowModel,
+  type BookShelfBookModel,
+  type BorrowingBookshelfModel,
+} from "../../types";
 
 /**
  * Converts a Firestore document snapshot to a BookBorrowModel.
@@ -95,3 +99,33 @@ export async function mapBookshelfDocToBookShelfBookModel(
     },
   };
 }
+
+/**
+ * Combines book shelf models with their corresponding borrow information
+ *
+ * @param {BookBorrowModel[]} borrowModels - The borrow information for the books.
+ * @param {BookShelfBookModel[]} bookShelfModels - The book shelf information for the books.
+ * @returns {BorrowingBookshelfModel[]} An array of combined borrow and shelf information.
+ */
+export const combineBorrowingAndShelfData = (
+  borrowModels: BookBorrowModel[],
+  bookShelfModels: BookShelfBookModel[],
+): BorrowingBookshelfModel[] => {
+  const borrowModelMap = new Map(
+    borrowModels.map((model) => [model.bookID, model]),
+  );
+
+  const fullModels: BorrowingBookshelfModel[] = bookShelfModels
+    .map((bookModel) => {
+      const borrowInfo = borrowModelMap.get(bookModel.id);
+      if (borrowInfo == null) return null;
+
+      return {
+        borrowInfo,
+        bookShelfInfo: bookModel,
+      };
+    })
+    .filter((model): model is BorrowingBookshelfModel => model !== null);
+
+  return fullModels;
+};
