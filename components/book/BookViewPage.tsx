@@ -5,7 +5,7 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import React, {
   useCallback,
@@ -28,7 +28,16 @@ import { type ServerBookShelfName } from "../../enums/Enums";
 import { fetchBookByVolumeID } from "../../services/books-services/BookQueries";
 import { type BookVolumeInfo } from "../../types";
 import { useAuth } from "../auth/context";
-import { useBadgeChecking } from "../badges/useBadgeQueries";
+import {
+  areAllBadgesEarned,
+  bookshelfBadges,
+  completionBadges,
+} from "../badges/badgeUtils";
+import {
+  useCheckForBookShelfBadges,
+  useCheckForCompletionBadges,
+  useGetExistingEarnedBadges,
+} from "../badges/useBadgeQueries";
 import BookshelfAddButtons from "../profile/BookShelf/BookshelfAddButtons";
 import {
   useAddBookToShelf,
@@ -43,6 +52,7 @@ interface BookViewProps {
 
 const BookViewPage = ({ bookID }: BookViewProps) => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [bookData, setBookData] = useState<BookVolumeInfo | null>(null);
   const [selectedShelves, setSelectedShelves] = useState<ServerBookShelfName[]>(
     [],
@@ -54,6 +64,11 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
 
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const { mutate: checkForCompletion } = useCheckForCompletionBadges();
+  const { mutate: checkForBookshelf } = useCheckForBookShelfBadges();
+  const { data: badges, isLoading: isLoadingBadges } =
+    useGetExistingEarnedBadges(user?.uid ?? "");
 
   // variables
   const snapPoints = useMemo(() => ["25%", "50%", "100%"], []);
@@ -164,6 +179,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
 
     try {
       await Promise.all([...addPromises, ...removePromises]);
+      console.log("finished adding");
       if (pendingChanges.add.length > 0 || pendingChanges.remove.length > 0) {
         Toast.show({
           type: "success",
@@ -180,8 +196,19 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     } finally {
       setPendingChanges({ add: [], remove: [] });
     }
-
-    await useBadgeChecking(user?.uid);
+    console.log("about to badge check");
+    if (!isLoadingBadges) {
+      const badgesSet = new Set(badges);
+      if (!areAllBadgesEarned(badgesSet, completionBadges))
+        checkForCompletion({ userID: user?.uid ?? "" });
+      if (!areAllBadgesEarned(badgesSet, bookshelfBadges))
+        checkForBookshelf({ userID: user?.uid ?? "" });
+      queryClient
+        .invalidateQueries({ queryKey: ["badges", user?.uid ?? ""] })
+        .catch((error) => {
+          console.error("Error invalidating queries:", error);
+        });
+    }
   };
   // callbacks
   const handlePresentModalPress = useCallback(() => {

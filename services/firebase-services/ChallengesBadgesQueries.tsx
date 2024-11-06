@@ -71,6 +71,7 @@ export async function getExistingEarnedBadges(
     badgeDocs.forEach((doc) => {
       badges.push(doc.id as ServerBadgeName);
     });
+    console.log("get existing earned badges from query", badges);
     return badges;
   } catch (error) {
     throw new Error(
