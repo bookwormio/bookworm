@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import Toast from "react-native-toast-message";
 import Post from "../../components/post/post";
 import { usePostsContext } from "../../components/post/PostsContext";
 import { fetchPostByPostID } from "../../services/firebase-services/PostQueries";
@@ -34,7 +33,6 @@ const ViewPost = ({ postID, fromProfile }: ViewPostProps) => {
 
   return (
     <View style={styles.container}>
-      <Toast />
       {isLoading && (
         <View style={styles.feedLoading}>
           <WormLoader />

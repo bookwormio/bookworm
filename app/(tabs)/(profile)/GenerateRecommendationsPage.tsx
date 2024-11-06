@@ -83,7 +83,6 @@ const GenerateRecommendationsPage = () => {
           </View>
         ))}
       </ScrollView>
-      <Toast />
     </View>
   );
 };

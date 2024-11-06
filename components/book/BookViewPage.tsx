@@ -272,7 +272,6 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
           </View>
         </BottomSheetModal>
       </View>
-      <Toast />
     </BottomSheetModalProvider>
   );
 };
