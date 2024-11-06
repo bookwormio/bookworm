@@ -45,6 +45,39 @@ export const useGetFollowingByID = (userID: string, maxUsers?: number) => {
 };
 
 /**
+ * Fetches following users data once and caches it permanently.
+ * Attempts to use existing cached data before making a new request.
+ *
+ * @param userID - User ID to fetch following list for
+ * @param maxUsers - Optional maximum number of users to fetch
+ */
+export const useGetFollowingByIDStatic = (
+  userID: string,
+  maxUsers?: number,
+) => {
+  const queryClient = useQueryClient();
+
+  return useQuery({
+    queryKey: ["staticFollowing", userID],
+    enabled: userID != null && userID !== "",
+    queryFn: async () => {
+      // First try to get data from the original query's cache
+      const cachedData = queryClient.getQueryData(["following", userID]);
+      if (cachedData != null) {
+        return cachedData;
+      }
+      // If no cached data, fetch fresh
+      return await getFollowingByID(userID ?? "", maxUsers);
+    },
+    staleTime: Infinity,
+    gcTime: Infinity,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+};
+
+/**
  * Gets number of followers for that user
  * @param userID
  * @returns {number} - number of followers

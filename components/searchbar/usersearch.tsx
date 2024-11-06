@@ -6,7 +6,7 @@ import { MAX_PREFETCH_USERS } from "../../constants/constants";
 import { fetchUsersBySearch } from "../../services/firebase-services/UserQueries";
 import { type UserSearchDisplayModel } from "../../types";
 import { useAuth } from "../auth/context";
-import { useGetFollowingByID } from "../followdetails/useFollowDetailQueries";
+import { useGetFollowingByIDStatic } from "../followdetails/useFollowDetailQueries";
 import UserList from "../UserList/UserList";
 import WormLoader from "../wormloader/WormLoader";
 import SearchBar from "./searchbar";
@@ -34,7 +34,7 @@ const UserSearch = ({
     searchPhrase !== "",
   );
 
-  const { data: followingUsersData } = useGetFollowingByID(
+  const { data: followingUsersData } = useGetFollowingByIDStatic(
     user?.uid ?? "",
     MAX_PREFETCH_USERS,
   );
