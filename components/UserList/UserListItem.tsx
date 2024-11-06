@@ -36,12 +36,14 @@ const UserListItem = ({
             {userInfo.firstName} {userInfo.lastName}
           </Text>
           {showFollowStatus && (
-            <FollowButton
-              friendUserID={userInfo.id}
-              textStyle={{
-                fontSize: 12,
-              }}
-            />
+            <View style={styles.followButtonContainer}>
+              <FollowButton
+                friendUserID={userInfo.id}
+                textStyle={{
+                  fontSize: 12,
+                }}
+              />
+            </View>
           )}
         </View>
       </View>
@@ -65,7 +67,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   infoContainer: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
   },
   userInfoRow: {
@@ -77,8 +79,11 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontWeight: "bold",
-    flex: 1,
+    flex: 5,
     marginRight: 10,
+  },
+  followButtonContainer: {
+    flex: 3,
   },
   placeholderImage: {
     position: "absolute",
