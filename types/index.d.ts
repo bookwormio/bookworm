@@ -6,6 +6,7 @@ import {
 
 import {
   type BookRequestNotificationStatus,
+  type ServerBadgeName,
   type ServerBookBorrowStatus,
   type ServerNotificationType,
 } from "../enums/Enums";
@@ -217,10 +218,17 @@ interface FullNotificationModel {
   read_at: Timestamp | null;
   postID?: string;
   bookID?: string;
+  badgeID?: ServerBadgeName;
   bookTitle?: string;
   custom_message?: string;
   bookRequestStatus?: BookRequestNotificationStatus;
   type: ServerNotificationType;
+}
+
+interface BadgeNotification extends BasicNotificationModel {
+  type: ServerNotificationType.BADGE;
+  postID?: string;
+  badgeID: string;
 }
 
 interface FriendRequestNotification extends BasicNotificationModel {
@@ -268,7 +276,8 @@ type NotificationModel =
   | RecommendationNotification
   | BookRequestNotification
   | BookRequestAcceptedNotification
-  | BookRequestDeniedNotification;
+  | BookRequestDeniedNotification
+  | BadgeNotification;
 
 interface BookBorrowModel {
   bookID: string;
@@ -292,4 +301,9 @@ interface DenyOtherBorrowRequestsParams {
   acceptedBorrowerUserID: string;
   acceptedBorrowerUserName: string;
   bookID: string;
+}
+
+interface BadgeModel {
+  userID: string;
+  badgeID: ServerBadgeName;
 }

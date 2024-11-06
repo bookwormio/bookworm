@@ -43,6 +43,7 @@ export enum ServerNotificationType {
   RECOMMENDATION = "RECOMMENDATION",
   BOOK_REQUEST = "BOOK_REQUEST",
   BOOK_REQUEST_RESPONSE = "BOOK_REQUEST_RESPONSE",
+  BADGE = "BADGE",
 }
 
 export const NotificationTitleMap: StringMap = {
@@ -51,6 +52,7 @@ export const NotificationTitleMap: StringMap = {
   [ServerNotificationType.COMMENT]: "New Comment",
   [ServerNotificationType.RECOMMENDATION]: "New Recommendation",
   [ServerNotificationType.BOOK_REQUEST]: "New Book Request",
+  [ServerNotificationType.BADGE]: "New Badge",
 };
 
 export const NotificationMessageMap: StringMap = {
@@ -59,6 +61,7 @@ export const NotificationMessageMap: StringMap = {
   [ServerNotificationType.COMMENT]: "commented on your post:",
   [ServerNotificationType.RECOMMENDATION]: "thinks you should read",
   [ServerNotificationType.BOOK_REQUEST]: "requested to borrow",
+  [ServerNotificationType.BADGE]: "You earned a badge: ",
 };
 
 export enum BookRequestNotificationStatus {
@@ -114,3 +117,63 @@ export enum BookBorrowButtonDisplay {
   REQUEST_AGAIN = "Request Again",
   REQUEST = "Request",
 }
+
+export enum ServerPostBadge {
+  FIRST_POST = "first_post",
+}
+
+export enum ServerBookshelfBadge {
+  ADDED_TEN_BOOKS = "added_10_books",
+  ADDED_TWENTY_FIVE_BOOKS = "added_25_books",
+  ADDED_FIFTY_BOOKS = "added_50_books",
+}
+
+export enum ServerCompletionBadge {
+  COMPLETED_FIRST_BOOK = "completed_1_book",
+  COMPLETED_FIVE_BOOKS = "completed_5_books",
+  COMPLETED_TEN_BOOKS = "completed_10_books",
+  COMPLETED_TWENTY_FIVE_BOOKS = "completed_25_books",
+}
+
+export enum ServerLendingBadge {
+  LENT_A_BOOK = "lent_a_book",
+  BORROWED_A_BOOK = "borrowed_a_book",
+}
+
+export enum ServerStreakBadge {
+  SEVEN_DAY_STREAK = "seven_day_streak",
+  THIRTY_DAY_STREAK = "thirty_day_streak",
+}
+
+type BadgeDisplayMap = {
+  [K in ServerBadgeName]: string;
+};
+
+// Used to display the book status in the UI
+export const badgeDisplayTitleMap: BadgeDisplayMap = {
+  // post badges
+  [ServerPostBadge.FIRST_POST]: "First Post",
+  // bookshelf badges
+  [ServerBookshelfBadge.ADDED_TEN_BOOKS]: "Added 10 Books to Bookshelves",
+  [ServerBookshelfBadge.ADDED_TWENTY_FIVE_BOOKS]:
+    "Added 25 Books to Bookshelves",
+  [ServerBookshelfBadge.ADDED_FIFTY_BOOKS]: "Added 50 Books to Bookshelves",
+  // completion badges
+  [ServerCompletionBadge.COMPLETED_FIRST_BOOK]: "Completed First Book",
+  [ServerCompletionBadge.COMPLETED_FIVE_BOOKS]: "Completed 5 Books",
+  [ServerCompletionBadge.COMPLETED_TEN_BOOKS]: "Completed 10 Books",
+  [ServerCompletionBadge.COMPLETED_TWENTY_FIVE_BOOKS]: "Completed 25 Books",
+  // lending badges
+  [ServerLendingBadge.LENT_A_BOOK]: "Lent a Book",
+  [ServerLendingBadge.BORROWED_A_BOOK]: "Borrowed a Book",
+  // streak badges
+  [ServerStreakBadge.SEVEN_DAY_STREAK]: "Seven Day Reading Streak",
+  [ServerStreakBadge.THIRTY_DAY_STREAK]: "Thirty Day Reading Streak",
+};
+
+export type ServerBadgeName =
+  | ServerPostBadge
+  | ServerBookshelfBadge
+  | ServerCompletionBadge
+  | ServerLendingBadge
+  | ServerStreakBadge;
