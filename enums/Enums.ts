@@ -189,3 +189,10 @@ export type ServerBadgeName =
   | ServerCompletionBadge
   | ServerLendingBadge
   | ServerStreakBadge;
+
+export const BOOKSHELF_CHIP_DISPLAY: StringMap = {
+  [ServerBookShelfName.CURRENTLY_READING]: "Reading",
+  [ServerBookShelfName.WANT_TO_READ]: "Want to Read",
+  [ServerBookShelfName.FINISHED]: "Finished",
+  [ServerBookShelfName.LENDING_LIBRARY]: "Library",
+};

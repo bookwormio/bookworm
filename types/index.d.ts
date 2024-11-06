@@ -92,6 +92,7 @@ interface BookVolumeItem {
   etag?: string;
   selfLink?: string;
   volumeInfo: BookVolumeInfo;
+  bookShelf?: ServerBookShelfName;
 }
 
 interface BooksResponse {
