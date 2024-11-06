@@ -13,8 +13,6 @@ interface BookshelfListChipProps {
 const BookshelfListChip = ({ bookShelf }: BookshelfListChipProps) => {
   const backgroundColor = BOOKSHELF_CHIP_COLORS[bookShelf]; // Default to LIGHT_SALMON
 
-  console.log("bookShelf", bookShelf);
-  console.log("backgroundColor", backgroundColor);
   return (
     <View style={[styles.container, { backgroundColor }]}>
       <Text style={styles.text}>{BOOKSHELF_CHIP_DISPLAY[bookShelf]}</Text>
