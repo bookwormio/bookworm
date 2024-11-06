@@ -108,9 +108,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         <FollowButon friendUserID={friendData.id} />
         <BookWormButton
           title={"Recommend"}
-          // textStyle={{
-          //   fontSize: 12,
-          // }}
           onPress={() => {
             router.push({
               pathname: `/recommendation/${friendUserID}`,
