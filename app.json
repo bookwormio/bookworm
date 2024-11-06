@@ -1,9 +1,10 @@
 {
   "expo": {
-    "name": "BookWorm",
-    "slug": "BookWorm",
-    "scheme": "BookWorm",
-    "version": "1.0.0",
+    "name": "bookworm.io",
+    "slug": "bookworm",
+    "scheme": "bookworm.io",
+    "owner": "bookwormio",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/bookworm-icon.png",
     "userInterfaceStyle": "light",
@@ -19,7 +20,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/bookworm-adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.rilescode.BookWorm"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -27,6 +29,14 @@
     "plugins": [
       "expo-router",
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "7d65960e-a8fb-46ff-8df9-2e57a6226322"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.rilescode.BookWorm"
+    }
   }
 }

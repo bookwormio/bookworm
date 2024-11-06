@@ -101,8 +101,8 @@ export const useUserRouteInfo = (): UserRouteInfo => {
 
 /**
  * Hook to navigate to a user detail page using the provided user and friend IDs.
- * @param {string} [userID] - The ID of the user to navigate to.
- * @param {string} [friendID] - Optional friend ID for user navigation.
+ * @param {string} [userID] - The ID of the current user.
+ * @param {string} [friendID] - The ID of the user to navigate to.
  * @returns {Function} - Function to navigate to the user page.
  */
 export const useNavigateToUser = (userID?: string, friendID?: string) => {

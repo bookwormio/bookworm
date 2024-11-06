@@ -23,13 +23,6 @@ export const bookShelfDisplayMap: StringMap = {
   [ServerBookShelfName.LENDING_LIBRARY]: "Lending Library",
 };
 
-export const BOOKSHELF_CHIP_DISPLAY: StringMap = {
-  [ServerBookShelfName.CURRENTLY_READING]: "Reading",
-  [ServerBookShelfName.WANT_TO_READ]: "Want to Read",
-  [ServerBookShelfName.FINISHED]: "Finished",
-  [ServerBookShelfName.LENDING_LIBRARY]: "Library",
-};
-
 export const SEARCH_SHELF_PRIORITY = [
   ServerBookShelfName.CURRENTLY_READING, // Display first on search results
   ServerBookShelfName.WANT_TO_READ,
