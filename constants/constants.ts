@@ -70,8 +70,6 @@ export const BOOKSHELF_CHIP_COLORS = {
   [ServerBookShelfName.WANT_TO_READ]: LIGHT_ORANGE, // #FF9E5B
   [ServerBookShelfName.FINISHED]: BOOKWORM_LIGHT_GREEN, // #A9CF60
   [ServerBookShelfName.LENDING_LIBRARY]: SALMON, // #FFAA93
-  // TODO: update once we have borrowing library
-  // [ServerBookShelfName.BORROWING]: [LIGHT_GOLD, DARK_GOLD],
 };
 
 export const POST_IMAGE_HEIGHT = 250;
