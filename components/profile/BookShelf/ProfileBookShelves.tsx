@@ -1,36 +1,45 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import Toast from "react-native-toast-message";
 import { type ServerBookShelfName } from "../../../enums/Enums";
+import { useAuth } from "../../auth/context";
 import WormLoader from "../../wormloader/WormLoader";
+import { useGetAllBorrowingBooksForUser } from "../hooks/useBookBorrowQueries";
 import { useGetBooksForBookshelves } from "../hooks/useBookshelfQueries";
 import BookShelf from "./BookShelf";
+import BorrowingBookShelf from "./BorrowingBookShelf";
 
 interface BookShelvesProp {
   userID: string;
 }
 
 const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
-  // Initialize the bookShelves state with all shelves empty
+  const { user } = useAuth();
 
   const {
     data: bookShelves,
     isLoading: isLoadingBooks,
-    isError,
-    error,
+    isError: isErrorShelfBooks,
   } = useGetBooksForBookshelves(userID ?? "");
+
+  const {
+    data: borrowingBooks,
+    isLoading: isLoadingBorrowingBooks,
+    isError: isErrorBorrowingBooks,
+  } = useGetAllBorrowingBooksForUser(userID);
+
+  if (isErrorBorrowingBooks || isErrorShelfBooks) {
+    Toast.show({
+      type: "error",
+      text1: "Error",
+      text2: "An error occurred while fetching the books",
+    });
+  }
 
   if (isLoadingBooks) {
     return (
       <View style={styles.container}>
         <WormLoader style={{ width: 50, height: 50 }} />
-      </View>
-    );
-  }
-
-  if (isError) {
-    return (
-      <View style={styles.container}>
-        <Text>Error: {error.message}</Text>
       </View>
     );
   }
@@ -45,6 +54,14 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
           userID={userID}
         />
       ))}
+      {/* Show borrowing shelf only if the user is viewing their own profile */}
+      {user?.uid === userID && !isLoadingBorrowingBooks && (
+        <BorrowingBookShelf
+          key={"borrowing"}
+          books={borrowingBooks ?? []}
+          userID={userID}
+        />
+      )}
     </View>
   );
 };

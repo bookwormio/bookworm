@@ -31,6 +31,7 @@ import {
   type UserSearchDisplayModel,
 } from "../../types";
 
+import { mapBookshelfDocToBookShelfBookModel } from "../util/bookBorrowUtils";
 import { caseFoldNormalize } from "../util/queryUtils";
 
 /**
@@ -548,7 +549,7 @@ export async function getNumberOfFollowingByUserID(
  * @param {string} bookID - The ID of the book to be added.
  * @param {BookshelfVolumeInfo} bookVolumeInfo - The book's volume information.
  * @param {string} bookshelfName - The name of the bookshelf where the book will be added.
- * @returns {Promise<{ success: boolean; book?: BookShelfBookModel }>} A promise that resolves with an object containing the success status and, if successful, the book information.
+ * @returns {Promise<BookShelfBookModel>} A promise that resolves with the book information.
  * @throws {Error} Throws an error if user ID is null or book ID is undefined.
  */
 export async function addBookToUserBookshelf(
@@ -556,7 +557,7 @@ export async function addBookToUserBookshelf(
   bookID: string,
   bookVolumeInfo: BookshelfVolumeInfo,
   bookshelfName: string,
-): Promise<{ success: boolean; book?: BookShelfBookModel }> {
+): Promise<BookShelfBookModel> {
   try {
     const userDocRef = doc(collection(DB, "bookshelf_collection"), userID);
     const bookshelfRef = doc(collection(userDocRef, bookshelfName), bookID);
@@ -583,37 +584,15 @@ export async function addBookToUserBookshelf(
     // Fetch the book data after adding it to the user's bookshelf
     const bookSnapshot = await getDoc(bookshelfRef);
     if (bookSnapshot.exists()) {
-      const bookData = bookSnapshot.data();
-      const book: BookShelfBookModel = {
-        id: bookSnapshot.id,
-        created: bookData.created,
-        volumeInfo: {
-          title: bookData?.title,
-          subtitle: bookData?.subtitle,
-          authors: bookData?.authors,
-          publisher: bookData?.publisher,
-          publishedDate: bookData?.publishedDate,
-          description: bookData?.description,
-          pageCount: bookData?.pageCount,
-          categories: bookData?.categories,
-          maturityRating: bookData?.maturityRating,
-          previewLink: bookData?.previewLink,
-          averageRating: bookData?.averageRating,
-          ratingsCount: bookData?.ratingsCount,
-          language: bookData?.language,
-          mainCategory: bookData?.mainCategory,
-          thumbnail: bookData?.thumbnail,
-        },
-      };
-
-      return { success: true, book };
+      const book = mapBookshelfDocToBookShelfBookModel(bookSnapshot);
+      return book;
     } else {
       console.error("Failed to fetch book data after adding to bookshelf.");
-      return { success: false };
+      throw new Error("Failed to fetch book data after adding to bookshelf.");
     }
   } catch (error) {
     console.error("Error adding book to user bookshelf:", error);
-    return { success: false };
+    throw new Error("Failed to add book to user bookshelf.");
   }
 }
 
@@ -664,31 +643,11 @@ export async function getBooksFromUserBookShelves(
       );
 
       const bookshelfSnapshot = await getDocs(bookshelfQuery);
-      userBookShelves[shelf] = [];
-      bookshelfSnapshot.forEach((doc) => {
-        const bookData = doc.data();
-        userBookShelves[shelf].push({
-          id: doc.id,
-          created: bookData.created,
-          volumeInfo: {
-            title: bookData?.title,
-            subtitle: bookData?.subtitle,
-            authors: bookData?.authors,
-            publisher: bookData?.publisher,
-            publishedDate: bookData?.publishedDate,
-            description: bookData?.description,
-            pageCount: bookData?.pageCount,
-            categories: bookData?.categories,
-            maturityRating: bookData?.maturityRating,
-            previewLink: bookData?.previewLink,
-            averageRating: bookData?.averageRating,
-            ratingsCount: bookData?.ratingsCount,
-            language: bookData?.language,
-            mainCategory: bookData?.mainCategory,
-            thumbnail: bookData?.thumbnail,
-          },
-        });
-      });
+      const books = bookshelfSnapshot.docs.map((doc) =>
+        mapBookshelfDocToBookShelfBookModel(doc),
+      );
+
+      userBookShelves[shelf] = books;
     }
 
     return userBookShelves;

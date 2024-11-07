@@ -2,10 +2,13 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  getBorrowedBookShelfBooksForUser,
+  getBorrowingBookModelsForUser,
   getLendingLibraryBookStatuses,
   lendBookToUser,
   returnBookToUser,
 } from "../../../services/firebase-services/BookBorrowQueries";
+import { combineBorrowingAndShelfData } from "../../../services/util/bookBorrowUtils";
 
 /**
  * Custom hook to fetch lending statuses for multiple books.
@@ -92,9 +95,41 @@ export const useReturnBook = () => {
       return await returnBookToUser(borrowerUserID, lenderUserID, bookID);
     },
     onSuccess: async (data, { lenderUserID }) => {
-      await queryClient.invalidateQueries({
-        queryKey: ["lendingStatuses"],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["lendingStatuses"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["borrowingBooks"],
+        }),
+      ]);
     },
+  });
+};
+
+/**
+ * Hook to fetch all books a user is currently borrowing.
+ * Combines borrowing status and book details into a single data structure.
+ *
+ * @param userID - The ID of the user to fetch borrowed books for
+ * @returns Query result containing combined borrowing and book information
+ *
+ * @example
+ * const { data: borrowedBooks, isLoading } = useGetAllBorrowingBooksForUser(userID);
+ */
+export const useGetAllBorrowingBooksForUser = (userID: string) => {
+  return useQuery({
+    queryKey: ["borrowingBooks", userID],
+    queryFn: async () => {
+      const borrowModels = await getBorrowingBookModelsForUser(userID);
+      const bookShelfModels = await getBorrowedBookShelfBooksForUser(
+        userID,
+        borrowModels,
+      );
+
+      return combineBorrowingAndShelfData(borrowModels, bookShelfModels);
+    },
+    enabled: userID != null && userID !== "",
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };

@@ -14,12 +14,18 @@ import { BORROW_BOOK_COLLECTION_REF } from "../../constants/constants";
 import {
   ServerBookBorrowRole,
   ServerBookBorrowStatus,
+  ServerBookShelfName,
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
-import { type BookBorrowModel, type BookStatusModel } from "../../types";
+import {
+  type BookBorrowModel,
+  type BookShelfBookModel,
+  type BookStatusModel,
+} from "../../types";
 import {
   convertBorrowDocToModel,
   makeBorrowDocID,
+  mapBookshelfDocToBookShelfBookModel,
   validateBorrowParams,
 } from "../util/bookBorrowUtils";
 import { getBookRequestStatusForBooks } from "./NotificationQueries";
@@ -135,7 +141,7 @@ async function updateBorrowStatus(
  * @returns {Promise<BookBorrowModel[]>} A promise that resolves to an array of BookBorrowModel objects.
  * @throws {Error} If there's an error retrieving the books.
  */
-export async function getAllBorrowingBooksForUser(
+export async function getBorrowingBookModelsForUser(
   userID: string,
 ): Promise<BookBorrowModel[]> {
   return await getAllBooksForUser(userID, ServerBookBorrowRole.BORROWER);
@@ -168,7 +174,11 @@ async function getAllBooksForUser(
 ): Promise<BookBorrowModel[]> {
   try {
     const bookRef = collection(DB, BORROW_BOOK_COLLECTION_REF);
-    const q = query(bookRef, where(userType, "==", userID));
+    const q = query(
+      bookRef,
+      where(userType, "==", userID),
+      where("borrow_status", "==", ServerBookBorrowStatus.BORROWING),
+    );
     const bookSnapshot = await getDocs(q);
     return bookSnapshot.docs.map(convertBorrowDocToModel);
   } catch (error) {
@@ -302,6 +312,60 @@ export async function getLendingLibraryBookStatuses(
   } catch (error) {
     throw new Error(
       `Error getting lending library book statuses: ${(error as Error).message}`,
+    );
+  }
+}
+
+/**
+ * Fetches full book details for all books a user is borrowing.
+ * Makes individual queries to each lending user's bookshelf due to Firestore collection limitations.
+ *
+ * @param userID - ID of the borrowing user
+ * @param borrowedBooks - Array of books the user is currently borrowing
+ * @returns Array of full book details from lenders' bookshelves, excluding any deleted books
+ * @throws Error if fetching fails
+ */
+export async function getBorrowedBookShelfBooksForUser(
+  userID: string,
+  borrowedBooks: BookBorrowModel[],
+): Promise<BookShelfBookModel[]> {
+  try {
+    const lendingShelf = ServerBookShelfName.LENDING_LIBRARY;
+
+    // Create a promise for each borrowed book to fetch the bookshelf doc
+    const bookPromises = borrowedBooks.map(
+      async (borrowedBook): Promise<BookShelfBookModel | null> => {
+        const bookshelfRef = doc(
+          DB,
+          "bookshelf_collection",
+          borrowedBook.lendingUserID,
+          lendingShelf,
+          borrowedBook.bookID,
+        );
+
+        const bookDoc = await getDoc(bookshelfRef);
+
+        if (!bookDoc.exists()) {
+          return null;
+        }
+        return mapBookshelfDocToBookShelfBookModel(bookDoc);
+      },
+    );
+
+    // Yes, this is an n+1.
+    // Firebase does not have a getAllDocs, and because these books are in separate collections
+    // we need to fetch them one by one. 😞
+
+    // Filter out any null values (books that were not found in the bookshelf)
+    const bookShelfBooks = (await Promise.all(bookPromises)).filter(
+      (book): book is BookShelfBookModel => book !== null,
+    );
+
+    return bookShelfBooks;
+  } catch (error) {
+    console.error("Error fetching borrowed books: ", error);
+    throw new Error(
+      `Failed to fetch borrowed books for user ${userID}: ${(error as Error).message}`,
     );
   }
 }

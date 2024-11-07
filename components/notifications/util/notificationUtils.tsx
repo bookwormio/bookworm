@@ -100,12 +100,12 @@ export const createBookResponseNotification = (
 };
 
 /**
- * Formats the sender name by concatenating the first and last name.
+ * Formats A user's name by concatenating the first and last name.
  *
- * @param first The first name of the sender
- * @param last The last name of the sender
- * @returns The formatted sender name
+ * @param first The first name of the user
+ * @param last The last name of the user
+ * @returns The formatted user name
  */
-export const formatSenderName = (first: string, last: string) => {
+export const formatUserFullName = (first: string, last: string) => {
   return `${first ?? ""} ${last ?? ""}`.trim();
 };

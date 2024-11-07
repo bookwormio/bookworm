@@ -17,6 +17,7 @@ import {
 import { useAuth } from "../../auth/context";
 import BookWormButton from "../../button/BookWormButton";
 import { useCreateNotification } from "../../notifications/hooks/useNotificationQueries";
+import { formatUserFullName } from "../../notifications/util/notificationUtils";
 import { useReturnBook } from "../hooks/useBookBorrowQueries";
 
 interface BookBorrowButtonProps {
@@ -47,6 +48,9 @@ const BookBorrowButton = ({
   const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
     user?.uid,
   );
+  const { data: bookOwnerData, isLoading: isBookOwnerDataLoading } =
+    useUserDataQuery(bookOwnerID);
+
   const notifyMutation = useCreateNotification();
   const returnMutation = useReturnBook();
   const queryClient = useQueryClient();
@@ -58,7 +62,7 @@ const BookBorrowButton = ({
     borrowInfo?.borrowStatus === ServerBookBorrowStatus.RETURNED;
 
   const getButtonState = (): ButtonState => {
-    if (isLoading || isUserDataLoading) {
+    if (isLoading || isUserDataLoading || isBookOwnerDataLoading) {
       // Case: Loading state while fetching data
       return {
         title: BookBorrowButtonDisplay.LOADING,
@@ -233,19 +237,35 @@ const BookBorrowButton = ({
   };
 
   const handleBookReturnClicked = (bookID: string) => {
-    if (user == null) {
+    if (user == null || bookOwnerData == null) {
       Toast.show({
         type: "error",
         text1: "Error returning book",
-        text2: "User is not logged in",
+        text2: "User data is missing",
       });
       return;
     }
-    returnMutation.mutate({
-      borrowerUserID: user.uid,
-      lenderUserID: bookOwnerID,
-      bookID,
-    });
+    Alert.alert(
+      `Return ${bookTitle} to ${formatUserFullName(bookOwnerData.first, bookOwnerData.last)}`,
+      "You will have to manually return the book to the owner",
+      [
+        {
+          text: "Cancel",
+          onPress: () => {},
+          style: "cancel",
+        },
+        {
+          text: "Return",
+          onPress: () => {
+            returnMutation.mutate({
+              borrowerUserID: user.uid,
+              lenderUserID: bookOwnerID,
+              bookID,
+            });
+          },
+        },
+      ],
+    );
   };
 
   const buttonState = getButtonState();

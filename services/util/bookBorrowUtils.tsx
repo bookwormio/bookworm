@@ -2,7 +2,11 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import { type BookBorrowModel } from "../../types";
+import {
+  type BookBorrowModel,
+  type BookShelfBookModel,
+  type BorrowingBookshelfModel,
+} from "../../types";
 
 /**
  * Converts a Firestore document snapshot to a BookBorrowModel.
@@ -62,3 +66,66 @@ export function validateBorrowParams(
     throw new Error("Book ID is invalid");
   }
 }
+
+/**
+ * Converts a Firestore document snapshot to a BookShelfBookModel.
+ *
+ * @param {QueryDocumentSnapshot<DocumentData, DocumentData>} bookDoc - The Firestore document snapshot.
+ * @returns {BookShelfBookModel} The converted BookShelfBookModel object.
+ */
+export function mapBookshelfDocToBookShelfBookModel(
+  bookDoc: QueryDocumentSnapshot<DocumentData, DocumentData>,
+): BookShelfBookModel {
+  const bookData = bookDoc.data();
+  return {
+    id: bookDoc.id,
+    created: bookData.created,
+    volumeInfo: {
+      title: bookData?.title,
+      subtitle: bookData?.subtitle,
+      authors: bookData?.authors,
+      publisher: bookData?.publisher,
+      publishedDate: bookData?.publishedDate,
+      description: bookData?.description,
+      pageCount: bookData?.pageCount,
+      categories: bookData?.categories,
+      maturityRating: bookData?.maturityRating,
+      previewLink: bookData?.previewLink,
+      averageRating: bookData?.averageRating,
+      ratingsCount: bookData?.ratingsCount,
+      language: bookData?.language,
+      mainCategory: bookData?.mainCategory,
+      thumbnail: bookData?.thumbnail,
+    },
+  };
+}
+
+/**
+ * Combines book shelf models with their corresponding borrow information
+ *
+ * @param {BookBorrowModel[]} borrowModels - The borrow information for the books.
+ * @param {BookShelfBookModel[]} bookShelfModels - The book shelf information for the books.
+ * @returns {BorrowingBookshelfModel[]} An array of combined borrow and shelf information.
+ */
+export const combineBorrowingAndShelfData = (
+  borrowModels: BookBorrowModel[],
+  bookShelfModels: BookShelfBookModel[],
+): BorrowingBookshelfModel[] => {
+  const borrowModelMap = new Map(
+    borrowModels.map((model) => [model.bookID, model]),
+  );
+
+  const fullModels: BorrowingBookshelfModel[] = bookShelfModels
+    .map((bookModel) => {
+      const borrowInfo = borrowModelMap.get(bookModel.id);
+      if (borrowInfo == null) return null;
+
+      return {
+        borrowInfo,
+        bookShelfInfo: bookModel,
+      };
+    })
+    .filter((model): model is BorrowingBookshelfModel => model !== null);
+
+  return fullModels;
+};

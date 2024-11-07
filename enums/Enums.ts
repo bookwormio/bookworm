@@ -20,13 +20,25 @@ export enum ServerBookShelfName {
   LENDING_LIBRARY = "lending_library",
 }
 
+// Borrowing books are not stored in user's bookshelves
+export const BORROWING_SHELF_NAME = "borrowing" as const;
+
+type BookShelfName = ServerBookShelfName | typeof BORROWING_SHELF_NAME;
+
 // Used to display the book status in the UI
 type StringMap = Record<string, string>;
-export const bookShelfDisplayMap: StringMap = {
+
+export const BOOKSHELF_DISPLAY_NAMES: Record<BookShelfName, string> = {
   [ServerBookShelfName.CURRENTLY_READING]: "Currently Reading",
   [ServerBookShelfName.WANT_TO_READ]: "Want to Read",
   [ServerBookShelfName.FINISHED]: "Finished",
   [ServerBookShelfName.LENDING_LIBRARY]: "Lending Library",
+  [BORROWING_SHELF_NAME]: "Currently Borrowing",
+};
+
+export const BOOKSHELF_SUBTITLES: Partial<Record<BookShelfName, string>> = {
+  [ServerBookShelfName.LENDING_LIBRARY]: "Books you are willing to lend",
+  [BORROWING_SHELF_NAME]: "This is only visible to you",
 };
 
 export const SEARCH_SHELF_PRIORITY = [
@@ -113,7 +125,7 @@ export enum BookBorrowButtonDisplay {
   LOADING = "Loading...",
   UNAVAILABLE = "Unavailable",
   REQUESTED = "Requested",
-  RETURN = "Return",
+  RETURN = "Return Book",
   REQUEST_AGAIN = "Request Again",
   REQUEST = "Request",
 }
