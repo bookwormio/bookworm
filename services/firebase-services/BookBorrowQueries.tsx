@@ -316,6 +316,15 @@ export async function getLendingLibraryBookStatuses(
   }
 }
 
+/**
+ * Fetches full book details for all books a user is borrowing.
+ * Makes individual queries to each lending user's bookshelf due to Firestore collection limitations.
+ *
+ * @param userID - ID of the borrowing user
+ * @param borrowedBooks - Array of books the user is currently borrowing
+ * @returns Array of full book details from lenders' bookshelves, excluding any deleted books
+ * @throws Error if fetching fails
+ */
 export async function getBorrowedBookShelfBooksForUser(
   userID: string,
   borrowedBooks: BookBorrowModel[],
@@ -323,6 +332,7 @@ export async function getBorrowedBookShelfBooksForUser(
   try {
     const lendingShelf = ServerBookShelfName.LENDING_LIBRARY;
 
+    // Create a promise for each borrowed book to fetch the bookshelf doc
     const bookPromises = borrowedBooks.map(
       async (borrowedBook): Promise<BookShelfBookModel | null> => {
         const bookshelfRef = doc(
@@ -338,13 +348,15 @@ export async function getBorrowedBookShelfBooksForUser(
         if (!bookDoc.exists()) {
           return null;
         }
-        return await mapBookshelfDocToBookShelfBookModel(bookDoc);
+        return mapBookshelfDocToBookShelfBookModel(bookDoc);
       },
     );
 
     // Yes, this is an n+1.
     // Firebase does not have a getAllDocs, and because these books are in separate collections
     // we need to fetch them one by one. 😞
+
+    // Filter out any null values (books that were not found in the bookshelf)
     const bookShelfBooks = (await Promise.all(bookPromises)).filter(
       (book): book is BookShelfBookModel => book !== null,
     );

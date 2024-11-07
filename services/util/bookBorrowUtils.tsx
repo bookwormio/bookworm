@@ -71,11 +71,11 @@ export function validateBorrowParams(
  * Converts a Firestore document snapshot to a BookShelfBookModel.
  *
  * @param {QueryDocumentSnapshot<DocumentData, DocumentData>} bookDoc - The Firestore document snapshot.
- * @returns {Promise<BookShelfBookModel>} The converted BookShelfBookModel object.
+ * @returns {BookShelfBookModel} The converted BookShelfBookModel object.
  */
-export async function mapBookshelfDocToBookShelfBookModel(
+export function mapBookshelfDocToBookShelfBookModel(
   bookDoc: QueryDocumentSnapshot<DocumentData, DocumentData>,
-): Promise<BookShelfBookModel> {
+): BookShelfBookModel {
   const bookData = bookDoc.data();
   return {
     id: bookDoc.id,

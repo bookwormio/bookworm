@@ -549,7 +549,7 @@ export async function getNumberOfFollowingByUserID(
  * @param {string} bookID - The ID of the book to be added.
  * @param {BookshelfVolumeInfo} bookVolumeInfo - The book's volume information.
  * @param {string} bookshelfName - The name of the bookshelf where the book will be added.
- * @returns {Promise<{ success: boolean; book?: BookShelfBookModel }>} A promise that resolves with an object containing the success status and, if successful, the book information.
+ * @returns {Promise<BookShelfBookModel>} A promise that resolves with the book information.
  * @throws {Error} Throws an error if user ID is null or book ID is undefined.
  */
 export async function addBookToUserBookshelf(
@@ -557,7 +557,7 @@ export async function addBookToUserBookshelf(
   bookID: string,
   bookVolumeInfo: BookshelfVolumeInfo,
   bookshelfName: string,
-): Promise<{ success: boolean; book?: BookShelfBookModel }> {
+): Promise<BookShelfBookModel> {
   try {
     const userDocRef = doc(collection(DB, "bookshelf_collection"), userID);
     const bookshelfRef = doc(collection(userDocRef, bookshelfName), bookID);
@@ -584,15 +584,15 @@ export async function addBookToUserBookshelf(
     // Fetch the book data after adding it to the user's bookshelf
     const bookSnapshot = await getDoc(bookshelfRef);
     if (bookSnapshot.exists()) {
-      const book = await mapBookshelfDocToBookShelfBookModel(bookSnapshot);
-      return { success: true, book };
+      const book = mapBookshelfDocToBookShelfBookModel(bookSnapshot);
+      return book;
     } else {
       console.error("Failed to fetch book data after adding to bookshelf.");
-      return { success: false };
+      throw new Error("Failed to fetch book data after adding to bookshelf.");
     }
   } catch (error) {
     console.error("Error adding book to user bookshelf:", error);
-    return { success: false };
+    throw new Error("Failed to add book to user bookshelf.");
   }
 }
 
@@ -643,10 +643,8 @@ export async function getBooksFromUserBookShelves(
       );
 
       const bookshelfSnapshot = await getDocs(bookshelfQuery);
-      const books = await Promise.all(
-        bookshelfSnapshot.docs.map(
-          async (doc) => await mapBookshelfDocToBookShelfBookModel(doc),
-        ),
+      const books = bookshelfSnapshot.docs.map((doc) =>
+        mapBookshelfDocToBookShelfBookModel(doc),
       );
 
       userBookShelves[shelf] = books;

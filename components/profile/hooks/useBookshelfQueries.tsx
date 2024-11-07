@@ -104,9 +104,9 @@ export const useAddBookToShelf = () => {
     // Only update cache once addBookToUserBookshelf is successful
     onSuccess: async (data, { userID, bookID, shelfName, volumeInfo }) => {
       // Access the returned book data
-      const { success, book } = data;
+      const book = data;
 
-      if (success && book != null) {
+      if (book != null) {
         if (volumeInfo != null) {
           // Update the bookshelves with the new book and volume info
           queryClient.setQueryData<UserBookShelvesModel>(
