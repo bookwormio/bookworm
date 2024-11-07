@@ -49,6 +49,7 @@ export function mapAndSortPreloadedBooks(
   return Array.from(uniqueBooks.values()).map((book) => ({
     id: book.id,
     volumeInfo: book.volumeInfo,
+    bookShelf: book.shelf,
   }));
 }
 
