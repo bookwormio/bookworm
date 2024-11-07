@@ -65,8 +65,8 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  const { mutate: checkForCompletion } = useCheckForCompletionBadges();
-  const { mutate: checkForBookshelf } = useCheckForBookShelfBadges();
+  const { mutate: checkForCompletionBadge } = useCheckForCompletionBadges();
+  const { mutate: checkForBookshelfBadge } = useCheckForBookShelfBadges();
   const { data: badges, isLoading: isLoadingBadges } =
     useGetExistingEarnedBadges(user?.uid ?? "");
 
@@ -200,9 +200,9 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     if (!isLoadingBadges) {
       const badgesSet = new Set(badges);
       if (!areAllBadgesEarned(badgesSet, completionBadges))
-        checkForCompletion({ userID: user?.uid ?? "" });
+        checkForCompletionBadge({ userID: user?.uid ?? "" });
       if (!areAllBadgesEarned(badgesSet, bookshelfBadges))
-        checkForBookshelf({ userID: user?.uid ?? "" });
+        checkForBookshelfBadge({ userID: user?.uid ?? "" });
       await queryClient.invalidateQueries({
         queryKey: ["badges", user?.uid ?? ""],
       });

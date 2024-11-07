@@ -1,10 +1,10 @@
 import {
-    ServerBookshelfBadge,
-    ServerCompletionBadge,
-    ServerLendingBadge,
-    ServerPostBadge,
-    ServerStreakBadge,
-    type ServerBadgeName,
+  ServerBookshelfBadge,
+  ServerCompletionBadge,
+  ServerLendingBadge,
+  ServerPostBadge,
+  ServerStreakBadge,
+  type ServerBadgeName,
 } from "../../enums/Enums";
 import { fetchPostsByUserID } from "../../services/firebase-services/PostQueries";
 

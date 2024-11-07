@@ -1,7 +1,8 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -13,7 +14,21 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
-import { useGetLatestPostInfo } from "../../../components/badges/badgeUtils";
+import {
+  areAllBadgesEarned,
+  bookshelfBadges,
+  completionBadges,
+  postBadges,
+  streakBadges,
+  useGetLatestPostInfo,
+} from "../../../components/badges/badgeUtils";
+import {
+  useCheckForBookShelfBadges,
+  useCheckForCompletionBadges,
+  useCheckForPostBadges,
+  useCheckForStreakBadges,
+  useGetExistingEarnedBadges,
+} from "../../../components/badges/useBadgeQueries";
 import BookmarkSlider from "../../../components/bookmark/hooks/BookmarkSlider";
 import {
   useGetBookmarkForBook,
@@ -42,7 +57,18 @@ import { useNewPostContext } from "./NewPostContext";
 
 const NewPost = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
   const [text, setText] = useState("");
+
+  const { mutateAsync: checkForCompletionBadge } =
+    useCheckForCompletionBadges();
+  const { mutateAsync: checkForBookshelfBadge } = useCheckForBookShelfBadges();
+  const { mutateAsync: checkForPostBadge } = useCheckForPostBadges();
+  const { mutateAsync: checkForStreakBadge } = useCheckForStreakBadges();
+
+  const { data: badges, isLoading: isLoadingBadges } =
+    useGetExistingEarnedBadges(user?.uid ?? "");
 
   const { selectedBook, setSelectedBook } = useNewPostContext();
 
@@ -142,6 +168,7 @@ const NewPost = () => {
     if (user?.uid == null || selectedBook == null) return;
     if (!fieldsMissing()) {
       await createNewPost();
+      router.push("posts");
       setBookmark({
         userID: user?.uid,
         bookID: selectedBook?.id,
@@ -187,10 +214,51 @@ const NewPost = () => {
         });
       }
       const post = await useGetLatestPostInfo(user?.uid);
-      // TODO: Badge Code GOES HERE
-      // await useBadgeChecking(user?.uid, post?.id).then(() => {
-      //   router.push(POSTS_ROUTE_PREFIX);
-      // });
+
+      if (!isLoadingBadges) {
+        const badgesSet = new Set(badges);
+        const promises = [];
+
+        // Add the necessary badge-check functions to the promises array if conditions are met
+        if (!areAllBadgesEarned(badgesSet, completionBadges)) {
+          promises.push(
+            checkForCompletionBadge({
+              userID: user?.uid ?? "",
+              postID: post?.id,
+            }),
+          );
+        }
+        if (!areAllBadgesEarned(badgesSet, bookshelfBadges)) {
+          promises.push(
+            checkForBookshelfBadge({
+              userID: user?.uid ?? "",
+              postID: post?.id,
+            }),
+          );
+        }
+        if (!areAllBadgesEarned(badgesSet, postBadges) && post?.id != null) {
+          promises.push(
+            checkForPostBadge({
+              userID: user?.uid ?? "",
+              postID: post?.id,
+            }),
+          );
+        }
+        if (!areAllBadgesEarned(badgesSet, streakBadges) && post?.id != null) {
+          promises.push(
+            checkForStreakBadge({
+              userID: user?.uid ?? "",
+              postID: post?.id,
+            }),
+          );
+        }
+        // Use Promise.all to run the badge-check functions concurrently
+        await Promise.all(promises);
+
+        await queryClient.invalidateQueries({
+          queryKey: ["badges", user?.uid ?? ""],
+        });
+      }
     }
   };
 

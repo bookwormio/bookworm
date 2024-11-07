@@ -67,7 +67,6 @@ export const useCheckForPostBadges = () => {
  * @returns {UseMutationResult<void, Error, { userID: string; postID?: string }, unknown>} - The mutation result for checking bookshelf badges.
  */
 export const useCheckForBookShelfBadges = () => {
-  console.log("check for bookshelf badges");
   return useMutation({
     mutationFn: async ({
       userID,

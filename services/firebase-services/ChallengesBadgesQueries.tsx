@@ -93,6 +93,7 @@ export async function checkForCompletionBadges(
   postID?: string,
 ): Promise<void> {
   try {
+    console.log("check for completion query");
     const COMPLETION_THRESHOLDS = [
       { count: 1, badge: ServerCompletionBadge.COMPLETED_FIRST_BOOK },
       { count: 5, badge: ServerCompletionBadge.COMPLETED_FIVE_BOOKS },
@@ -137,6 +138,7 @@ export async function checkForPostBadges(
   postID: string,
 ): Promise<void> {
   try {
+    console.log("check for post query");
     const POST_THRESHOLDS = [
       { count: 1, badge: ServerPostBadge.FIRST_POST },
     ] as const;
@@ -173,6 +175,7 @@ export async function checkForBookShelfBadges(
   userID: string,
   postID?: string,
 ): Promise<void> {
+  console.log("query check for bookshelf badges");
   try {
     const bookShelfNames = [
       ServerBookShelfName.FINISHED,
@@ -219,6 +222,7 @@ export async function checkForBookShelfBadges(
  */
 export async function checkForLendingBadges(userID: string): Promise<void> {
   try {
+    console.log("check for lending query");
     const lenderQuery = query(
       collection(DB, "borrowing_collection"),
       where("lending_user", "==", userID),
@@ -270,6 +274,7 @@ export async function checkForLendingBadges(userID: string): Promise<void> {
  */
 export async function checkForStreakBadges(userID: string, postID: string) {
   try {
+    console.log("check for streak query");
     const STREAK_THRESHOLDS = [
       { count: 7, badge: ServerStreakBadge.SEVEN_DAY_STREAK },
       { count: 30, badge: ServerStreakBadge.THIRTY_DAY_STREAK },
