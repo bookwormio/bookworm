@@ -65,8 +65,8 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  const { mutate: checkForCompletionBadge } = useCheckForCompletionBadges();
-  const { mutate: checkForBookshelfBadge } = useCheckForBookShelfBadges();
+  const { mutateAsync: checkForCompletion } = useCheckForCompletionBadges();
+  const { mutateAsync: checkForBookshelf } = useCheckForBookShelfBadges();
   const { data: badges, isLoading: isLoadingBadges } =
     useGetExistingEarnedBadges(user?.uid ?? "");
 
@@ -199,13 +199,19 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     console.log("about to badge check");
     if (!isLoadingBadges) {
       const badgesSet = new Set(badges);
-      if (!areAllBadgesEarned(badgesSet, completionBadges))
-        checkForCompletionBadge({ userID: user?.uid ?? "" });
-      if (!areAllBadgesEarned(badgesSet, bookshelfBadges))
-        checkForBookshelfBadge({ userID: user?.uid ?? "" });
-      await queryClient.invalidateQueries({
-        queryKey: ["badges", user?.uid ?? ""],
-      });
+      const promises = [];
+      if (!areAllBadgesEarned(badgesSet, completionBadges)) {
+        promises.push(checkForCompletion({ userID: user?.uid ?? "" }));
+      }
+      if (!areAllBadgesEarned(badgesSet, bookshelfBadges)) {
+        promises.push(checkForBookshelf({ userID: user?.uid ?? "" }));
+      }
+      if (promises.length > 0) {
+        await Promise.all(promises);
+        await queryClient.invalidateQueries({
+          queryKey: ["badges", user?.uid ?? ""],
+        });
+      }
     }
   };
   // callbacks

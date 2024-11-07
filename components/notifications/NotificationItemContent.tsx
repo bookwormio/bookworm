@@ -39,7 +39,7 @@ const NotificationItemContent = ({
   const updateBorrowNotificationStatus = useUpdateBorrowNotificationStatus();
   const lendBookToUser = useLendBookToUser();
   const denyOtherBorrowRequests = useDenyOtherBorrowRequests();
-  const { mutate: checkForLendingBadge } = useCheckForLendingBadges();
+  const { mutateAsync: checkForLendingBadge } = useCheckForLendingBadges();
 
   const { user } = useAuth();
   const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
@@ -86,12 +86,16 @@ const NotificationItemContent = ({
       borrowerUserID,
       bookID,
     });
-    checkForLendingBadge({ userID: lenderUserID });
-    checkForLendingBadge({ userID: borrowerUserID });
-    await queryClient.invalidateQueries({ queryKey: ["badges", lenderUserID] });
-    await queryClient.invalidateQueries({
-      queryKey: ["badges", borrowerUserID],
-    });
+    await Promise.all([
+      checkForLendingBadge({ userID: lenderUserID }),
+      checkForLendingBadge({ userID: borrowerUserID }),
+    ]);
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["badges", lenderUserID] }),
+      queryClient.invalidateQueries({
+        queryKey: ["badges", borrowerUserID],
+      }),
+    ]);
   };
 
   const handleRejectOtherRequests = async (

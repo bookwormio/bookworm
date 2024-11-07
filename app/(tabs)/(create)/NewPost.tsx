@@ -220,6 +220,7 @@ const NewPost = () => {
         const promises = [];
 
         if (!areAllBadgesEarned(badgesSet, completionBadges)) {
+          console.log("what");
           promises.push(
             checkForCompletionBadge({
               userID: user?.uid ?? "",
@@ -228,6 +229,7 @@ const NewPost = () => {
           );
         }
         if (!areAllBadgesEarned(badgesSet, bookshelfBadges)) {
+          console.log("what");
           promises.push(
             checkForBookshelfBadge({
               userID: user?.uid ?? "",
@@ -236,6 +238,7 @@ const NewPost = () => {
           );
         }
         if (!areAllBadgesEarned(badgesSet, postBadges) && post?.id != null) {
+          console.log("what");
           promises.push(
             checkForPostBadge({
               userID: user?.uid ?? "",
@@ -244,6 +247,7 @@ const NewPost = () => {
           );
         }
         if (!areAllBadgesEarned(badgesSet, streakBadges) && post?.id != null) {
+          console.log("what");
           promises.push(
             checkForStreakBadge({
               userID: user?.uid ?? "",
@@ -251,13 +255,16 @@ const NewPost = () => {
             }),
           );
         }
-        await Promise.all(promises);
 
         // not included in the promise.all because they run concurrently in promise.all
         // I need them all the update before I invalidate the badge query
-        await queryClient.invalidateQueries({
-          queryKey: ["badges", user?.uid ?? ""],
-        });
+        if (promises.length > 0) {
+          console.log("more than one promise");
+          await Promise.all(promises);
+          await queryClient.invalidateQueries({
+            queryKey: ["badges", user?.uid ?? ""],
+          });
+        }
       }
     }
   };
