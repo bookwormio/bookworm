@@ -219,7 +219,6 @@ const NewPost = () => {
         const badgesSet = new Set(badges);
         const promises = [];
 
-        // Add the necessary badge-check functions to the promises array if conditions are met
         if (!areAllBadgesEarned(badgesSet, completionBadges)) {
           promises.push(
             checkForCompletionBadge({
@@ -252,9 +251,10 @@ const NewPost = () => {
             }),
           );
         }
-        // Use Promise.all to run the badge-check functions concurrently
         await Promise.all(promises);
 
+        // not included in the promise.all because they run concurrently in promise.all
+        // I need them all the update before I invalidate the badge query
         await queryClient.invalidateQueries({
           queryKey: ["badges", user?.uid ?? ""],
         });
