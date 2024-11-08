@@ -3,6 +3,7 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { badgeDisplayTitleMap } from "../../enums/Enums";
 import WormLoader from "../wormloader/WormLoader";
+import BadgePicture from "./BadgePicture";
 import { useGetExistingEarnedBadges } from "./useBadgeQueries";
 
 interface BadgePageProps {
@@ -18,7 +19,6 @@ const BadgePage = ({ userID }: BadgePageProps) => {
   }
   return (
     <View style={styles.container}>
-      <Text>{userID}</Text>
       <FlatList
         data={badges}
         keyExtractor={(item, index) => index.toString()}
@@ -26,6 +26,7 @@ const BadgePage = ({ userID }: BadgePageProps) => {
         columnWrapperStyle={styles.columnWrapper} // Optional, to add spacing between rows
         renderItem={({ item }) => (
           <View style={styles.badgeContainer}>
+            <BadgePicture badgeID={item} size={100} />
             <Text>{badgeDisplayTitleMap[item]}</Text>
           </View>
         )}

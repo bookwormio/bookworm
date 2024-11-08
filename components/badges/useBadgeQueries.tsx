@@ -1,10 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { type ServerBadgeName } from "../../enums/Enums";
 import {
   checkForBookShelfBadges,
   checkForCompletionBadges,
   checkForLendingBadges,
   checkForPostBadges,
   checkForStreakBadges,
+  getBadgeUrl,
   getExistingEarnedBadges,
 } from "../../services/firebase-services/ChallengesBadgesQueries";
 
@@ -108,6 +110,16 @@ export const useCheckForStreakBadges = () => {
       postID: string;
     }) => {
       await checkForStreakBadges(userID, postID);
+    },
+  });
+};
+
+export const useBadgePicQuery = (badgeID: ServerBadgeName) => {
+  return useQuery({
+    queryKey: badgeID != null ? ["badgepic", badgeID] : ["badgepic"],
+    enabled: badgeID != null,
+    queryFn: async () => {
+      return await getBadgeUrl(badgeID);
     },
   });
 };
