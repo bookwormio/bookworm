@@ -87,3 +87,14 @@ export function generateRecommendationRoute(
   const pathName = `/${prefix}/${friendUserID}`;
   return pathName;
 }
+
+export function generateBadgePageRoute(
+  userID: string,
+  prefix?: string,
+): string {
+  if (userID == null) {
+    throw new Error("User ID is null or undefined");
+  }
+  const pathName = `/${prefix}/${userID}`;
+  return pathName;
+}

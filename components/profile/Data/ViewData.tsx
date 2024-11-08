@@ -1,15 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { fetchPagesReadData } from "../../../services/firebase-services/DataQueries";
 import {
   type LineDataPointModel,
   type WeekDataPointModel,
 } from "../../../types";
+import { useAuth } from "../../auth/context";
 import ViewDataChart from "../../chart/ViewDataChart";
 import DataSnapShot from "../../datasnapshot/DataSnapShot";
 import WormLoader from "../../wormloader/WormLoader";
+import { useNavigateToBadgePage } from "../hooks/useRouteHooks";
 
 // TODO: Combine these functions into a single generic
 function aggregatePagesDataByWeek(
@@ -64,6 +72,9 @@ const ViewData = ({ userID }: ViewDataProps) => {
     },
   });
 
+  const { user } = useAuth();
+  const navigateToBadgePage = useNavigateToBadgePage(userID);
+
   if (isLoadingPagesData) {
     return (
       <View style={styles.container}>
@@ -86,6 +97,13 @@ const ViewData = ({ userID }: ViewDataProps) => {
   return (
     <ScrollView style={{ flex: 1 }}>
       <DataSnapShot userID={userID} isLoadingOther={isLoadingPagesData} />
+      {userID === user?.uid && (
+        <TouchableOpacity onPress={navigateToBadgePage}>
+          <View>
+            <Text>yo</Text>
+          </View>
+        </TouchableOpacity>
+      )}
       <View>
         <Text style={styles.dataType}>Pages Read:</Text>
         {aggregatedPagesData.length > 0 ? (

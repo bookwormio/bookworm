@@ -54,6 +54,14 @@ const ProfileLayout = () => {
           }}
         />
         <Stack.Screen
+          name="profilebadge/[userID]"
+          options={{
+            headerShown: true,
+            headerTitle: "Badges",
+            headerLeft: () => <BackButton />,
+          }}
+        />
+        <Stack.Screen
           name="GenerateRecommendationsPage"
           options={{
             headerShown: true,
