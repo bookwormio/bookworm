@@ -22,12 +22,12 @@ const BadgePage = ({ userID }: BadgePageProps) => {
       <FlatList
         data={badges}
         keyExtractor={(item, index) => index.toString()}
-        numColumns={3} // Display 3 items per row
-        columnWrapperStyle={styles.columnWrapper} // Optional, to add spacing between rows
+        numColumns={3}
+        columnWrapperStyle={styles.columnWrapper}
         renderItem={({ item }) => (
           <View style={styles.badgeContainer}>
             <BadgePicture badgeID={item} size={100} />
-            <Text>{badgeDisplayTitleMap[item]}</Text>
+            <Text style={styles.textStyle}>{badgeDisplayTitleMap[item]}</Text>
           </View>
         )}
       />
@@ -41,13 +41,18 @@ const styles = StyleSheet.create({
     backgroundColor: APP_BACKGROUND_COLOR,
   },
   columnWrapper: {
-    justifyContent: "space-between", // Space between badges in a row
+    justifyContent: "space-between",
   },
   badgeContainer: {
     flex: 1,
     alignItems: "center",
     marginVertical: 8,
-    marginHorizontal: 5, // Add some spacing between badges
+    marginHorizontal: 5,
+  },
+  textStyle: {
+    textAlign: "center",
+    fontSize: 14,
+    fontWeight: "bold",
   },
 });
 

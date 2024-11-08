@@ -75,7 +75,13 @@ export async function getExistingEarnedBadges(
   try {
     const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
     const badgesCollectionRef = collection(userBadgeCollectDocRef, "badges");
-    const badgeDocs = await getDocs(badgesCollectionRef);
+
+    const badgesQuery = query(
+      badgesCollectionRef,
+      orderBy("received_at", "asc"),
+    );
+
+    const badgeDocs = await getDocs(badgesQuery);
     const badges: ServerBadgeName[] = [];
     badgeDocs.forEach((doc) => {
       badges.push(doc.id as ServerBadgeName);
