@@ -38,7 +38,6 @@ const Profile = () => {
       return await newFetchUserInfo(user?.uid ?? "");
     },
   });
-
   const { data: followersCount, isLoading: isLoadingFollowersCount } =
     useGetNumberOfFollowersByUserID(user?.uid ?? "");
 
