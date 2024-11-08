@@ -17,7 +17,7 @@ import {
 export const useGetExistingEarnedBadges = (userID: string) => {
   return useQuery({
     queryKey: ["badges", userID],
-    enabled: userID != null,
+    enabled: userID != null && userID !== "",
     queryFn: async () => {
       return await getExistingEarnedBadges(userID);
     },

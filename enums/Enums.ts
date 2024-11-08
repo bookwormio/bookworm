@@ -123,6 +123,7 @@ export enum ServerPostBadge {
 }
 
 export enum ServerBookshelfBadge {
+  ADDED_FIRST_BOOK = "added_1_book",
   ADDED_TEN_BOOKS = "added_10_books",
   ADDED_TWENTY_FIVE_BOOKS = "added_25_books",
   ADDED_FIFTY_BOOKS = "added_50_books",
@@ -154,6 +155,7 @@ export const badgeDisplayTitleMap: BadgeDisplayMap = {
   // post badges
   [ServerPostBadge.FIRST_POST]: "First Post",
   // bookshelf badges
+  [ServerBookshelfBadge.ADDED_FIRST_BOOK]: "Added 1st Book to Bookshelves",
   [ServerBookshelfBadge.ADDED_TEN_BOOKS]: "Added 10 Books to Bookshelves",
   [ServerBookshelfBadge.ADDED_TWENTY_FIVE_BOOKS]:
     "Added 25 Books to Bookshelves",
@@ -170,6 +172,32 @@ export const badgeDisplayTitleMap: BadgeDisplayMap = {
   [ServerStreakBadge.SEVEN_DAY_STREAK]: "Seven Day Reading Streak",
   [ServerStreakBadge.THIRTY_DAY_STREAK]: "Thirty Day Reading Streak",
 };
+
+export const LENDING_BADGES = [
+  ServerLendingBadge.BORROWED_A_BOOK,
+  ServerLendingBadge.LENT_A_BOOK,
+];
+
+export const POST_BADGES = [ServerPostBadge.FIRST_POST];
+
+export const COMPLETION_BADGES = [
+  ServerCompletionBadge.COMPLETED_FIRST_BOOK,
+  ServerCompletionBadge.COMPLETED_FIVE_BOOKS,
+  ServerCompletionBadge.COMPLETED_TEN_BOOKS,
+  ServerCompletionBadge.COMPLETED_TWENTY_FIVE_BOOKS,
+];
+
+export const BOOKSHELF_BADGES = [
+  ServerBookshelfBadge.ADDED_FIRST_BOOK,
+  ServerBookshelfBadge.ADDED_TEN_BOOKS,
+  ServerBookshelfBadge.ADDED_TWENTY_FIVE_BOOKS,
+  ServerBookshelfBadge.ADDED_FIFTY_BOOKS,
+];
+
+export const STREAK_BADGES = [
+  ServerStreakBadge.SEVEN_DAY_STREAK,
+  ServerStreakBadge.THIRTY_DAY_STREAK,
+];
 
 export type ServerBadgeName =
   | ServerPostBadge

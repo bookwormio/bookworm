@@ -24,15 +24,15 @@ import {
 import HTMLView from "react-native-htmlview";
 import Toast from "react-native-toast-message";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
-import { type ServerBookShelfName } from "../../enums/Enums";
+import {
+  BOOKSHELF_BADGES,
+  COMPLETION_BADGES,
+  type ServerBookShelfName,
+} from "../../enums/Enums";
 import { fetchBookByVolumeID } from "../../services/books-services/BookQueries";
 import { type BookVolumeInfo } from "../../types";
 import { useAuth } from "../auth/context";
-import {
-  areAllBadgesEarned,
-  bookshelfBadges,
-  completionBadges,
-} from "../badges/badgeUtils";
+import { areAllBadgesEarned } from "../badges/badgeUtils";
 import {
   useCheckForBookShelfBadges,
   useCheckForCompletionBadges,
@@ -179,7 +179,6 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
 
     try {
       await Promise.all([...addPromises, ...removePromises]);
-      console.log("finished adding");
       if (pendingChanges.add.length > 0 || pendingChanges.remove.length > 0) {
         Toast.show({
           type: "success",
@@ -196,18 +195,19 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     } finally {
       setPendingChanges({ add: [], remove: [] });
     }
-    console.log("about to badge check");
     if (!isLoadingBadges) {
       const badgesSet = new Set(badges);
-      const promises = [];
-      if (!areAllBadgesEarned(badgesSet, completionBadges)) {
-        promises.push(checkForCompletion({ userID: user?.uid ?? "" }));
+      const checkBadgePromises = [];
+      if (!areAllBadgesEarned(badgesSet, COMPLETION_BADGES)) {
+        checkBadgePromises.push(
+          checkForCompletion({ userID: user?.uid ?? "" }),
+        );
       }
-      if (!areAllBadgesEarned(badgesSet, bookshelfBadges)) {
-        promises.push(checkForBookshelf({ userID: user?.uid ?? "" }));
+      if (!areAllBadgesEarned(badgesSet, BOOKSHELF_BADGES)) {
+        checkBadgePromises.push(checkForBookshelf({ userID: user?.uid ?? "" }));
       }
-      if (promises.length > 0) {
-        await Promise.all(promises);
+      if (checkBadgePromises.length > 0) {
+        await Promise.all(checkBadgePromises);
         await queryClient.invalidateQueries({
           queryKey: ["badges", user?.uid ?? ""],
         });

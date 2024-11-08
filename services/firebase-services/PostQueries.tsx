@@ -180,6 +180,7 @@ export async function fetchPostsByUserIDs(
  */
 export async function fetchPostsByUserID(
   userID: string | undefined,
+  postLimit?: number,
 ): Promise<PostModel[]> {
   if (userID !== undefined) {
     try {
@@ -187,6 +188,7 @@ export async function fetchPostsByUserID(
         collection(DB, "posts"),
         where("user", "==", userID),
         orderBy("created", "desc"),
+        ...(postLimit != null ? [limit(postLimit)] : []),
       );
       const postsSnapshot = await getDocs(postsQuery);
       const postsData: PostModel[] = [];

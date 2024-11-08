@@ -16,11 +16,7 @@ import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import {
   areAllBadgesEarned,
-  bookshelfBadges,
-  completionBadges,
-  postBadges,
-  streakBadges,
-  useGetLatestPostInfo,
+  getLatestPostInfo,
 } from "../../../components/badges/badgeUtils";
 import {
   useCheckForBookShelfBadges,
@@ -50,7 +46,13 @@ import {
 } from "../../../components/profile/hooks/useBookshelfQueries";
 import WormLoader from "../../../components/wormloader/WormLoader";
 import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
-import { ServerBookShelfName } from "../../../enums/Enums";
+import {
+  BOOKSHELF_BADGES,
+  COMPLETION_BADGES,
+  POST_BADGES,
+  ServerBookShelfName,
+  STREAK_BADGES,
+} from "../../../enums/Enums";
 import { createPost } from "../../../services/firebase-services/PostQueries";
 import { type CreatePostModel } from "../../../types";
 import { useNewPostContext } from "./NewPostContext";
@@ -213,42 +215,38 @@ const NewPost = () => {
           shelfName: ServerBookShelfName.WANT_TO_READ,
         });
       }
-      const post = await useGetLatestPostInfo(user?.uid);
+      const post = await getLatestPostInfo(user?.uid);
 
       if (!isLoadingBadges) {
         const badgesSet = new Set(badges);
-        const promises = [];
+        const checkBadgePromises = [];
 
-        if (!areAllBadgesEarned(badgesSet, completionBadges)) {
-          console.log("what");
-          promises.push(
+        if (!areAllBadgesEarned(badgesSet, COMPLETION_BADGES)) {
+          checkBadgePromises.push(
             checkForCompletionBadge({
               userID: user?.uid ?? "",
               postID: post?.id,
             }),
           );
         }
-        if (!areAllBadgesEarned(badgesSet, bookshelfBadges)) {
-          console.log("what");
-          promises.push(
+        if (!areAllBadgesEarned(badgesSet, BOOKSHELF_BADGES)) {
+          checkBadgePromises.push(
             checkForBookshelfBadge({
               userID: user?.uid ?? "",
               postID: post?.id,
             }),
           );
         }
-        if (!areAllBadgesEarned(badgesSet, postBadges) && post?.id != null) {
-          console.log("what");
-          promises.push(
+        if (!areAllBadgesEarned(badgesSet, POST_BADGES) && post?.id != null) {
+          checkBadgePromises.push(
             checkForPostBadge({
               userID: user?.uid ?? "",
               postID: post?.id,
             }),
           );
         }
-        if (!areAllBadgesEarned(badgesSet, streakBadges) && post?.id != null) {
-          console.log("what");
-          promises.push(
+        if (!areAllBadgesEarned(badgesSet, STREAK_BADGES) && post?.id != null) {
+          checkBadgePromises.push(
             checkForStreakBadge({
               userID: user?.uid ?? "",
               postID: post?.id,
@@ -258,9 +256,8 @@ const NewPost = () => {
 
         // not included in the promise.all because they run concurrently in promise.all
         // I need them all the update before I invalidate the badge query
-        if (promises.length > 0) {
-          console.log("more than one promise");
-          await Promise.all(promises);
+        if (checkBadgePromises.length > 0) {
+          await Promise.all(checkBadgePromises);
           await queryClient.invalidateQueries({
             queryKey: ["badges", user?.uid ?? ""],
           });

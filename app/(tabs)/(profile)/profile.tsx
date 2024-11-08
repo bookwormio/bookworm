@@ -9,7 +9,6 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
-import { useGetExistingEarnedBadges } from "../../../components/badges/useBadgeQueries";
 import BookWormButton from "../../../components/button/BookWormButton";
 import {
   useGetNumberOfFollowersByUserID,
@@ -46,15 +45,11 @@ const Profile = () => {
   const { data: followingCount, isLoading: isLoadingFollowingCount } =
     useGetNumberOfFollowingByUserID(user?.uid ?? "");
 
-  const { data: badges, isLoading: isLoadingBadges } =
-    useGetExistingEarnedBadges(user?.uid ?? "");
-
   if (
     isLoadingUserData ||
     userData == null ||
     isLoadingFollowersCount ||
-    isLoadingFollowingCount ||
-    isLoadingBadges
+    isLoadingFollowingCount
   ) {
     return (
       <View style={sharedProfileStyles.loading}>
@@ -62,7 +57,6 @@ const Profile = () => {
       </View>
     );
   }
-  console.log("badges", badges);
 
   return (
     <ScrollView
