@@ -38,15 +38,23 @@ export async function addBadgeToUser(
 ): Promise<void> {
   try {
     const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
-    const badgeDocRef = doc(
-      collection(userBadgeCollectDocRef, "badges"),
-      badgeID as string,
-    );
-    const badgeData = {
-      received_at: serverTimestamp(),
-      ...(postID != null && { postID }), // Only add postID if it exists
-    };
-    await setDoc(badgeDocRef, badgeData, { merge: true });
+    const badgesCollectionRef = collection(userBadgeCollectDocRef, "badges");
+    const badgeDocs = await getDocs(badgesCollectionRef);
+    const badges: ServerBadgeName[] = [];
+    badgeDocs.forEach((doc) => {
+      badges.push(doc.id as ServerBadgeName);
+    });
+    if (!badges.includes(badgeID)) {
+      const badgeDocRef = doc(
+        collection(userBadgeCollectDocRef, "badges"),
+        badgeID as string,
+      );
+      const badgeData = {
+        received_at: serverTimestamp(),
+        ...(postID != null && { postID }), // Only add postID if it exists
+      };
+      await setDoc(badgeDocRef, badgeData, { merge: true });
+    }
   } catch (error) {
     console.error("Error adding badge: ", error);
     throw new Error("Could not add badge to user");
@@ -108,13 +116,14 @@ export async function checkForCompletionBadges(
       finishedBooksCollectionRef,
     );
     numberFinishedBooks = completionSnapshot.data().count;
-    const matchingThreshold = COMPLETION_THRESHOLDS.find(
-      ({ count }) => count === numberFinishedBooks,
+    const matchingThresholds = COMPLETION_THRESHOLDS.filter(
+      ({ count }) => count <= numberFinishedBooks,
     );
-
-    if (matchingThreshold != null) {
-      await addBadgeToUser(userID, matchingThreshold.badge, postID);
-    }
+    await Promise.all(
+      matchingThresholds.map(async (threshold) => {
+        await addBadgeToUser(userID, threshold.badge, postID);
+      }),
+    );
   } catch (error) {
     console.error("Error to check for completion badges", error);
     throw new Error(
@@ -146,12 +155,14 @@ export async function checkForPostBadges(
     );
     const postsSnapshot = await getCountFromServer(postsQuery);
     const numberPosts = postsSnapshot.data().count;
-    const matchingThreshold = POST_THRESHOLDS.find(
-      ({ count }) => count === numberPosts,
+    const matchingThresholds = POST_THRESHOLDS.filter(
+      ({ count }) => count <= numberPosts,
     );
-    if (matchingThreshold != null) {
-      await addBadgeToUser(userID, matchingThreshold.badge, postID);
-    }
+    await Promise.all(
+      matchingThresholds.map(async (threshold) => {
+        await addBadgeToUser(userID, threshold.badge, postID);
+      }),
+    );
   } catch (error) {
     console.error("Error to check for post badges", error);
     throw new Error(
@@ -180,6 +191,7 @@ export async function checkForBookShelfBadges(
       ServerBookShelfName.WANT_TO_READ,
     ];
     const BOOKSHELF_THRESHOLDS = [
+      { count: 1, badge: ServerBookshelfBadge.ADDED_FIRST_BOOK },
       { count: 10, badge: ServerBookshelfBadge.ADDED_TEN_BOOKS },
       { count: 25, badge: ServerBookshelfBadge.ADDED_TWENTY_FIVE_BOOKS },
       { count: 50, badge: ServerBookshelfBadge.ADDED_FIFTY_BOOKS },
@@ -195,12 +207,14 @@ export async function checkForBookShelfBadges(
       });
     }
     numBooks = uniqueBooks.size;
-    const matchingThreshold = BOOKSHELF_THRESHOLDS.find(
-      ({ count }) => count === numBooks,
+    const matchingThresholds = BOOKSHELF_THRESHOLDS.filter(
+      ({ count }) => count <= numBooks,
     );
-    if (matchingThreshold != null) {
-      await addBadgeToUser(userID, matchingThreshold.badge, postID);
-    }
+    await Promise.all(
+      matchingThresholds.map(async (threshold) => {
+        await addBadgeToUser(userID, threshold.badge, postID);
+      }),
+    );
   } catch (error) {
     console.error("Error checking for bookshelf badges: ", error);
     throw new Error(
@@ -238,10 +252,10 @@ export async function checkForLendingBadges(userID: string): Promise<void> {
     const lenderNumber = lenderSnapshot.data().count;
     const borrowerNumber = borrowSnapshot.data().count;
 
-    if (lenderNumber === 1) {
+    if (lenderNumber >= 1) {
       await addBadgeToUser(userID, ServerLendingBadge.LENT_A_BOOK);
     }
-    if (borrowerNumber === 1) {
+    if (borrowerNumber >= 1) {
       await addBadgeToUser(userID, ServerLendingBadge.BORROWED_A_BOOK);
     }
   } catch (error) {
@@ -273,12 +287,15 @@ export async function checkForStreakBadges(userID: string, postID: string) {
     );
     const postsSnapshot = await getDocs(postsQuery);
     const streakCount = await calculateMaxStreakCount(postsSnapshot);
-    const matchingThreshold = STREAK_THRESHOLDS.find(
-      ({ count }) => count === streakCount,
+
+    const matchingThresholds = STREAK_THRESHOLDS.filter(
+      ({ count }) => count <= streakCount,
     );
-    if (matchingThreshold != null) {
-      await addBadgeToUser(userID, matchingThreshold.badge, postID);
-    }
+    await Promise.all(
+      matchingThresholds.map(async (threshold) => {
+        await addBadgeToUser(userID, threshold.badge, postID);
+      }),
+    );
   } catch (error) {
     console.error("Error checking for streak badges: ", error);
     throw new Error(

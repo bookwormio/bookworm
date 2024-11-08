@@ -5,7 +5,7 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import React, {
   useCallback,
@@ -24,10 +24,20 @@ import {
 import HTMLView from "react-native-htmlview";
 import Toast from "react-native-toast-message";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
-import { type ServerBookShelfName } from "../../enums/Enums";
+import {
+  BOOKSHELF_BADGES,
+  COMPLETION_BADGES,
+  type ServerBookShelfName,
+} from "../../enums/Enums";
 import { fetchBookByVolumeID } from "../../services/books-services/BookQueries";
 import { type BookVolumeInfo } from "../../types";
 import { useAuth } from "../auth/context";
+import { areAllBadgesEarned } from "../badges/badgeUtils";
+import {
+  useCheckForBookShelfBadges,
+  useCheckForCompletionBadges,
+  useGetExistingEarnedBadges,
+} from "../badges/useBadgeQueries";
 import BookshelfAddButtons from "../profile/BookShelf/BookshelfAddButtons";
 import {
   useAddBookToShelf,
@@ -42,6 +52,7 @@ interface BookViewProps {
 
 const BookViewPage = ({ bookID }: BookViewProps) => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [bookData, setBookData] = useState<BookVolumeInfo | null>(null);
   const [selectedShelves, setSelectedShelves] = useState<ServerBookShelfName[]>(
     [],
@@ -53,6 +64,11 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
 
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const { mutateAsync: checkForCompletion } = useCheckForCompletionBadges();
+  const { mutateAsync: checkForBookshelf } = useCheckForBookShelfBadges();
+  const { data: badges, isLoading: isLoadingBadges } =
+    useGetExistingEarnedBadges(user?.uid ?? "");
 
   // variables
   const snapPoints = useMemo(() => ["25%", "50%", "100%"], []);
@@ -178,6 +194,24 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
       });
     } finally {
       setPendingChanges({ add: [], remove: [] });
+    }
+    if (!isLoadingBadges) {
+      const badgesSet = new Set(badges);
+      const checkBadgePromises = [];
+      if (!areAllBadgesEarned(badgesSet, COMPLETION_BADGES)) {
+        checkBadgePromises.push(
+          checkForCompletion({ userID: user?.uid ?? "" }),
+        );
+      }
+      if (!areAllBadgesEarned(badgesSet, BOOKSHELF_BADGES)) {
+        checkBadgePromises.push(checkForBookshelf({ userID: user?.uid ?? "" }));
+      }
+      if (checkBadgePromises.length > 0) {
+        await Promise.all(checkBadgePromises);
+        await queryClient.invalidateQueries({
+          queryKey: ["badges", user?.uid ?? ""],
+        });
+      }
     }
   };
   // callbacks

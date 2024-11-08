@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
@@ -11,6 +12,7 @@ import {
   type FullNotificationModel,
 } from "../../types";
 import { useAuth } from "../auth/context";
+import { useCheckForLendingBadges } from "../badges/useBadgeQueries";
 import { useLendBookToUser } from "../profile/hooks/useBookBorrowQueries";
 import BookRequestNotificationActions from "./BookRequestNotificationActions";
 import {
@@ -37,11 +39,14 @@ const NotificationItemContent = ({
   const updateBorrowNotificationStatus = useUpdateBorrowNotificationStatus();
   const lendBookToUser = useLendBookToUser();
   const denyOtherBorrowRequests = useDenyOtherBorrowRequests();
+  const { mutateAsync: checkForLendingBadge } = useCheckForLendingBadges();
 
   const { user } = useAuth();
   const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
     user?.uid,
   );
+
+  const queryClient = useQueryClient();
 
   const handleSendBookResponseNotification = async ({
     bookID,
@@ -76,11 +81,21 @@ const NotificationItemContent = ({
     borrowerUserID: string,
     bookID: string,
   ) => {
-    lendBookToUser.mutate({
+    await lendBookToUser.mutateAsync({
       lenderUserID,
       borrowerUserID,
       bookID,
     });
+    await Promise.all([
+      checkForLendingBadge({ userID: lenderUserID }),
+      checkForLendingBadge({ userID: borrowerUserID }),
+    ]);
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["badges", lenderUserID] }),
+      queryClient.invalidateQueries({
+        queryKey: ["badges", borrowerUserID],
+      }),
+    ]);
   };
 
   const handleRejectOtherRequests = async (

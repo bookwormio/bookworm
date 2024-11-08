@@ -1,7 +1,8 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -13,6 +14,17 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
+import {
+  areAllBadgesEarned,
+  getLatestPostInfo,
+} from "../../../components/badges/badgeUtils";
+import {
+  useCheckForBookShelfBadges,
+  useCheckForCompletionBadges,
+  useCheckForPostBadges,
+  useCheckForStreakBadges,
+  useGetExistingEarnedBadges,
+} from "../../../components/badges/useBadgeQueries";
 import BookmarkSlider from "../../../components/bookmark/hooks/BookmarkSlider";
 import {
   useGetBookmarkForBook,
@@ -34,14 +46,31 @@ import {
 } from "../../../components/profile/hooks/useBookshelfQueries";
 import WormLoader from "../../../components/wormloader/WormLoader";
 import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
-import { ServerBookShelfName } from "../../../enums/Enums";
+import {
+  BOOKSHELF_BADGES,
+  COMPLETION_BADGES,
+  POST_BADGES,
+  ServerBookShelfName,
+  STREAK_BADGES,
+} from "../../../enums/Enums";
 import { createPost } from "../../../services/firebase-services/PostQueries";
 import { type CreatePostModel } from "../../../types";
 import { useNewPostContext } from "./NewPostContext";
 
 const NewPost = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
   const [text, setText] = useState("");
+
+  const { mutateAsync: checkForCompletionBadge } =
+    useCheckForCompletionBadges();
+  const { mutateAsync: checkForBookshelfBadge } = useCheckForBookShelfBadges();
+  const { mutateAsync: checkForPostBadge } = useCheckForPostBadges();
+  const { mutateAsync: checkForStreakBadge } = useCheckForStreakBadges();
+
+  const { data: badges, isLoading: isLoadingBadges } =
+    useGetExistingEarnedBadges(user?.uid ?? "");
 
   const { selectedBook, setSelectedBook } = useNewPostContext();
 
@@ -78,7 +107,7 @@ const NewPost = () => {
     }
   }, [selectedBook, text]);
 
-  const createNewPost = () => {
+  const createNewPost = async () => {
     if (user != null) {
       setLoading(true);
       const post: CreatePostModel = {
@@ -137,10 +166,11 @@ const NewPost = () => {
     return false;
   };
 
-  const handleShareClicked = () => {
+  const handleShareClicked = async () => {
     if (user?.uid == null || selectedBook == null) return;
     if (!fieldsMissing()) {
-      createNewPost();
+      await createNewPost();
+      router.push("posts");
       setBookmark({
         userID: user?.uid,
         bookID: selectedBook?.id,
@@ -152,7 +182,7 @@ const NewPost = () => {
       }
       if (currentBookmark === selectedBook.pageCount) {
         if (!isBookInFinished(selectedBook.id, bookshelves)) {
-          addBookMutation.mutate({
+          await addBookMutation.mutateAsync({
             userID: user.uid,
             bookID: selectedBook.id,
             volumeInfo: convertFlatBookToBookShelfBook(selectedBook),
@@ -160,7 +190,7 @@ const NewPost = () => {
           });
         }
         if (isBookInCurrentlyReading(selectedBook.id, bookshelves)) {
-          removeBookMutation.mutate({
+          await removeBookMutation.mutateAsync({
             userID: user.uid,
             bookID: selectedBook.id,
             shelfName: ServerBookShelfName.CURRENTLY_READING,
@@ -170,7 +200,7 @@ const NewPost = () => {
       // if currentBookmark does not equal page count
       else {
         if (!isBookInCurrentlyReading(selectedBook.id, bookshelves)) {
-          addBookMutation.mutate({
+          await addBookMutation.mutateAsync({
             userID: user.uid,
             bookID: selectedBook.id,
             volumeInfo: convertFlatBookToBookShelfBook(selectedBook),
@@ -179,11 +209,59 @@ const NewPost = () => {
         }
       }
       if (isBookInWantToRead(selectedBook.id, bookshelves)) {
-        removeBookMutation.mutate({
+        await removeBookMutation.mutateAsync({
           userID: user.uid,
           bookID: selectedBook.id,
           shelfName: ServerBookShelfName.WANT_TO_READ,
         });
+      }
+      const post = await getLatestPostInfo(user?.uid);
+
+      if (!isLoadingBadges) {
+        const badgesSet = new Set(badges);
+        const checkBadgePromises = [];
+
+        if (!areAllBadgesEarned(badgesSet, COMPLETION_BADGES)) {
+          checkBadgePromises.push(
+            checkForCompletionBadge({
+              userID: user?.uid ?? "",
+              postID: post?.id,
+            }),
+          );
+        }
+        if (!areAllBadgesEarned(badgesSet, BOOKSHELF_BADGES)) {
+          checkBadgePromises.push(
+            checkForBookshelfBadge({
+              userID: user?.uid ?? "",
+              postID: post?.id,
+            }),
+          );
+        }
+        if (!areAllBadgesEarned(badgesSet, POST_BADGES) && post?.id != null) {
+          checkBadgePromises.push(
+            checkForPostBadge({
+              userID: user?.uid ?? "",
+              postID: post?.id,
+            }),
+          );
+        }
+        if (!areAllBadgesEarned(badgesSet, STREAK_BADGES) && post?.id != null) {
+          checkBadgePromises.push(
+            checkForStreakBadge({
+              userID: user?.uid ?? "",
+              postID: post?.id,
+            }),
+          );
+        }
+
+        // not included in the promise.all because they run concurrently in promise.all
+        // I need them all the update before I invalidate the badge query
+        if (checkBadgePromises.length > 0) {
+          await Promise.all(checkBadgePromises);
+          await queryClient.invalidateQueries({
+            queryKey: ["badges", user?.uid ?? ""],
+          });
+        }
       }
     }
   };
@@ -297,7 +375,11 @@ const NewPost = () => {
       <View style={styles.buttonContainer}>
         <BookWormButton
           title="Share!"
-          onPress={handleShareClicked}
+          onPress={() => {
+            handleShareClicked().catch((error) => {
+              console.log(error);
+            });
+          }}
           disabled={shareDisabled}
         />
       </View>
