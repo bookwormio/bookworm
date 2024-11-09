@@ -116,7 +116,7 @@ export const useCheckForStreakBadges = () => {
 
 export const useBadgePicQuery = (badgeID: ServerBadgeName) => {
   return useQuery({
-    queryKey: badgeID != null ? ["badgepic", badgeID] : ["badgepic"],
+    queryKey: ["badgepic", badgeID],
     enabled: badgeID != null,
     queryFn: async () => {
       return await getBadgeUrl(badgeID);

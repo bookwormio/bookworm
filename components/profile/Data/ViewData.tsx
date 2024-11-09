@@ -1,12 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { fetchPagesReadData } from "../../../services/firebase-services/DataQueries";
 import {
@@ -14,6 +8,7 @@ import {
   type WeekDataPointModel,
 } from "../../../types";
 import { useAuth } from "../../auth/context";
+import BookWormButton from "../../button/BookWormButton";
 import ViewDataChart from "../../chart/ViewDataChart";
 import DataSnapShot from "../../datasnapshot/DataSnapShot";
 import WormLoader from "../../wormloader/WormLoader";
@@ -98,11 +93,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
     <ScrollView style={{ flex: 1 }}>
       <DataSnapShot userID={userID} isLoadingOther={isLoadingPagesData} />
       {userID === user?.uid && (
-        <TouchableOpacity onPress={navigateToBadgePage}>
-          <View>
-            <Text>yo</Text>
-          </View>
-        </TouchableOpacity>
+        <BookWormButton title="Badges" onPress={navigateToBadgePage} />
       )}
       <View>
         <Text style={styles.dataType}>Pages Read:</Text>

@@ -98,7 +98,7 @@ export async function getBadgeUrl(
   badgeID: ServerBadgeName,
 ): Promise<string | null> {
   try {
-    const storageRef = ref(STORAGE, "badges/" + "bookworm.png");
+    const storageRef = ref(STORAGE, "badges/" + badgeID + ".png");
     const url = await getDownloadURL(storageRef);
     return url;
   } catch (error) {

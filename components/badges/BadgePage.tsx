@@ -26,7 +26,7 @@ const BadgePage = ({ userID }: BadgePageProps) => {
         columnWrapperStyle={styles.columnWrapper}
         renderItem={({ item }) => (
           <View style={styles.badgeContainer}>
-            <BadgePicture badgeID={item} size={100} />
+            <BadgePicture badgeID={item} size={125} />
             <Text style={styles.textStyle}>{badgeDisplayTitleMap[item]}</Text>
           </View>
         )}
