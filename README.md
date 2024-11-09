@@ -2,7 +2,11 @@
 
 ### Installation
 
-Before running, you need to install homebrew, node, npx, and clone the repo
+
+
+Before running, you need to install Xcode, homebrew, node, npx, and clone the repo
+
+- Install Xcode and iOS simulator [here](https://developer.apple.com/documentation/safari-developer-tools/installing-xcode-and-simulators)
 
 - Install Homebrew:
   ```
@@ -21,11 +25,11 @@ Before running, you need to install homebrew, node, npx, and clone the repo
   ```
   git clone git@capstone-cs.eng.utah.edu:bookworm/bookworm.git
   ```
-- Install npm dependencies (from within `/bookwork/BookWorm/` )
+- Install npm dependencies (from within `/bookwork/` )
   ```
   npm install
   ```
-- Install npm dependencies (from within `/bookwork/BookWorm/functions` )
+- Install npm dependencies (from within `/bookwork/functions` )
 
   ```
   npm install
