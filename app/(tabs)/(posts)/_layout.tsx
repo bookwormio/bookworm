@@ -74,6 +74,13 @@ const PostsLayout = () => {
             headerLeft: () => <BackButton waitForKeyBoardDismiss={true} />,
           }}
         />
+        <Stack.Screen
+          name="postsrecommendation/[friendUserID]"
+          options={{
+            presentation: "modal",
+            headerTitle: "Leave a Recommendation",
+          }}
+        />
       </Stack>
     </KeyboardAvoidingView>
   );

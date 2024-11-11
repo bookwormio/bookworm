@@ -55,7 +55,9 @@ export const POSTS_FOLLOWLIST_PREFIX: string = "postsfollow";
 export const NEW_POST_BOOK_FOLDER = "createbook";
 export const NEW_POST_BOOK_SEARCH = "createbooksearch";
 
-export const SEARCH_RECOMMENDATION_PREFIX = "recommendation";
+export const SEARCH_RECOMMENDATION_PREFIX = "searchrecommendation";
+export const POSTS_RECOMMENDATION_PREFIX = "postsrecommendation";
+export const PROFILE_RECOMMENDATION_PREFIX = "profilerecommendation";
 
 export const BLURHASH = "LBN-4dMwIUWC~WRj%M^+-;4n4nWC";
 

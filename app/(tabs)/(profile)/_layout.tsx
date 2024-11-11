@@ -61,6 +61,13 @@ const ProfileLayout = () => {
             headerLeft: () => <BackButton />,
           }}
         />
+        <Stack.Screen
+          name="profilerecommendation/[friendUserID]"
+          options={{
+            presentation: "modal",
+            headerTitle: "Leave a Recommendation",
+          }}
+        />
       </Stack>
     </KeyboardAvoidingView>
   );
