@@ -94,13 +94,17 @@ export async function getExistingEarnedBadges(
   }
 }
 
+/**
+ * Fetches the url for the image of the badge
+ * @param badgeID ID of badge for image fetch
+ * @returns {string} badge URL
+ */
 export async function getBadgeUrl(
   badgeID: ServerBadgeName,
 ): Promise<string | null> {
   try {
     const storageRef = ref(STORAGE, "badges/" + badgeID + ".png");
-    const url = await getDownloadURL(storageRef);
-    return url;
+    return await getDownloadURL(storageRef);
   } catch (error) {
     console.error("Error fetching badge image ", error);
   }

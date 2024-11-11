@@ -61,6 +61,10 @@ export function generatePostRoute(postID?: string, prefix?: string): string {
   return pathName;
 }
 
+/**
+ * Generates a new follow list route.
+ * @returns The generated new follow list route
+ */
 export function generateFollowListRoute(
   userID?: string,
   followersfirst?: boolean,
@@ -88,8 +92,12 @@ export function generateRecommendationRoute(
   return pathName;
 }
 
+/**
+ * Generates a new badge route.
+ * @returns The generated new badge route
+ */
 export function generateBadgePageRoute(
-  userID: string,
+  userID?: string,
   prefix?: string,
 ): string {
   if (userID == null) {

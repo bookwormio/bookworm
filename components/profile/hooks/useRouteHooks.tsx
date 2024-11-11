@@ -290,6 +290,10 @@ interface BadgeRouteInfo {
   prefix: string;
 }
 
+/**
+ * Hook to get the current badges route info based on URL segments.
+ * @returns {BadgeRouteInfo} - Object containing the route type and prefix for badges.
+ */
 export const useBadgePageRouteInfo = (): BadgeRouteInfo => {
   const segments = useSegments();
 
@@ -299,6 +303,11 @@ export const useBadgePageRouteInfo = (): BadgeRouteInfo => {
   return { type: null, prefix: "" };
 };
 
+/**
+ * Hook to navigate to a badge page for a given user.
+ * @param {string} [userID] - The ID of the user whose badge page is being navigated to.
+ * @returns {Function} - Function to navigate to the badge page.
+ */
 export const useNavigateToBadgePage = (userID: string) => {
   const router = useRouter();
   const { prefix } = useBadgePageRouteInfo();

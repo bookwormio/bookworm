@@ -114,6 +114,11 @@ export const useCheckForStreakBadges = () => {
   });
 };
 
+/**
+ * Custom hook to get badge picture
+ * @param badgeID - ID of badge
+ * @returns  The mutation result for getting badge picture
+ */
 export const useBadgePicQuery = (badgeID: ServerBadgeName) => {
   return useQuery({
     queryKey: ["badgepic", badgeID],
