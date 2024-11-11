@@ -17,13 +17,12 @@ import React, {
 } from "react";
 import {
   FlatList,
-  Keyboard,
   PanResponder,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
@@ -226,8 +225,6 @@ const Posts = () => {
   const handlePresentModalPress = useCallback(() => {
     commentsModalRef.current?.present();
   }, []);
-
-  Keyboard.dismiss();
 
   const navigateToPost = useNavigateToPost();
 
