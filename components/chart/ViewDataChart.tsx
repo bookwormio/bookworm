@@ -35,6 +35,7 @@ for (let i = 0; i < 8; i++) {
     const weekStart = subWeeks(startOfWeek, i);
     weekKeys.push(format(weekStart, 'MMM dd'));
 };
+weekKeys.reverse();
 
 const matchDataToWeeks = (data: WeekDataPointModel[]) => {
   const dataset = [];
@@ -47,7 +48,6 @@ const matchDataToWeeks = (data: WeekDataPointModel[]) => {
       dataset.push(0);
     }
   }
-
   return dataset;
 };
 
