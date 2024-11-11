@@ -3,20 +3,24 @@ import {
   POSTS_BOOK_PREFIX,
   POSTS_FOLLOWLIST_PREFIX,
   POSTS_POST_PREFIX,
+  POSTS_RECOMMENDATION_PREFIX,
   POSTS_ROUTE_PREFIX,
   PROFILE_BOOK_PREFIX,
   PROFILE_FOLLOWLIST_PREFIX,
   PROFILE_POST_PREFIX,
+  PROFILE_RECOMMENDATION_PREFIX,
   PROFILE_ROUTE_PREFIX,
   SEARCH_BOOK_PREFIX,
   SEARCH_FOLLOWLIST_PREFIX,
   SEARCH_POST_PREFIX,
+  SEARCH_RECOMMENDATION_PREFIX,
   SEARCH_ROUTE_PREFIX,
 } from "../../../constants/constants";
 import {
   generateBookRoute,
   generateFollowListRoute,
   generatePostRoute,
+  generateRecommendationRoute,
   generateUserRoute,
 } from "../../../utilities/routeUtils";
 
@@ -219,4 +223,56 @@ export const useNavigateToFollowList = (userID?: string) => {
   }
 
   return navigateToFollowList;
+};
+
+const RECOMMENDATION_ROUTE_PREFIXES = {
+  SEARCH: SEARCH_RECOMMENDATION_PREFIX,
+  POSTS: POSTS_RECOMMENDATION_PREFIX,
+  PROFILE: PROFILE_RECOMMENDATION_PREFIX,
+} as const;
+
+type RecommendationRouteType = keyof typeof RECOMMENDATION_ROUTE_PREFIXES;
+
+interface RecommendationRouteInfo {
+  type: RecommendationRouteType | null;
+  prefix: string;
+}
+
+/**
+ * Hook to get the recommendation page route info based on URL segments.
+ * @returns {RecommendationRouteInfo} - Object containing the route type and prefix for the recommendation page.
+ */
+export const useRecommendationRouteInfo = (): RecommendationRouteInfo => {
+  const segments = useSegments();
+
+  if (segments.includes(SEARCH_ROUTE_PREFIX))
+    return { type: "SEARCH", prefix: RECOMMENDATION_ROUTE_PREFIXES.SEARCH };
+  if (segments.includes(POSTS_ROUTE_PREFIX))
+    return { type: "POSTS", prefix: RECOMMENDATION_ROUTE_PREFIXES.POSTS };
+  if (segments.includes(PROFILE_ROUTE_PREFIX))
+    return { type: "PROFILE", prefix: RECOMMENDATION_ROUTE_PREFIXES.PROFILE };
+  return { type: null, prefix: "" };
+};
+
+/**
+ * Hook to navigate to a recommendation page for a given user.
+ * @param {string} [friendUserID] - The ID of the user whose recommendation page is being navigated to.
+ * @returns {Function} - Function to navigate to the recommendation page.
+ */
+export const useNavigateToRecommendation = (friendUserID: string) => {
+  const router = useRouter();
+  const { prefix } = useRecommendationRouteInfo();
+
+  function navigateToRecommendation() {
+    if (friendUserID != null && friendUserID !== "") {
+      const recommendationRoute = generateRecommendationRoute(
+        friendUserID,
+        prefix,
+      );
+      if (recommendationRoute != null) {
+        router.push(recommendationRoute);
+      }
+    }
+  }
+  return navigateToRecommendation;
 };
