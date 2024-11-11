@@ -2,12 +2,9 @@ import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { BORROWING_SHELF_NAME } from "../../../enums/Enums";
-import {
-  type BookShelfBookModel,
-  type BookVolumeItem,
-  type BorrowingBookshelfModel,
-} from "../../../types";
+import { type BorrowingBookshelfModel } from "../../../types";
 import BookList from "../../booklist/BookList";
+import { mapAndSortPreloadedBooksWithDuplicates } from "../../searchbar/util/searchBarUtils";
 import WormLoader from "../../wormloader/WormLoader";
 import { useGetAllBorrowingBooksForUser } from "../hooks/useBookBorrowQueries";
 import { useGetBooksForBookshelves } from "../hooks/useBookshelfQueries";
@@ -26,28 +23,6 @@ const BookShelfListView = ({ userID, bookshelf }: BookShelfListViewProps) => {
     isLoading: boolean;
     isError: boolean;
   };
-  /**
-   * Converting BookShelfBookModel[] into BookVolumeItem[] using BookshelfVolumeInfo from books so we can use BookList component
-   * @param books contains info needed to map books and convert to BookVolumeItem
-   * @returns {BookVolumeItem} Correctly formatted books for BookList Component
-   */
-  function convertToBookVolumeItems(
-    books: BookShelfBookModel[],
-  ): BookVolumeItem[] {
-    return books.map((book) => ({
-      id: book.id,
-      volumeInfo: {
-        ...book.volumeInfo,
-        imageLinks: {
-          smallThumbnail: book.volumeInfo.thumbnail,
-        },
-      },
-      kind: undefined,
-      etag: undefined,
-      selfLink: undefined,
-      bookShelf: bookshelf,
-    }));
-  }
 
   if (isLoadingBooks) {
     return (
@@ -57,7 +32,12 @@ const BookShelfListView = ({ userID, bookshelf }: BookShelfListViewProps) => {
     );
   }
 
-  const selectedShelf = bookShelves?.[bookshelf];
+  let selectedShelf;
+  if (bookShelves != null && bookshelf !== BORROWING_SHELF_NAME) {
+    const sortedBooks = mapAndSortPreloadedBooksWithDuplicates(bookShelves);
+    selectedShelf = sortedBooks.filter((book) => book.bookShelf === bookshelf);
+  }
+
   if (selectedShelf == null && bookshelf !== BORROWING_SHELF_NAME) {
     return (
       <View style={styles.container}>
@@ -70,7 +50,7 @@ const BookShelfListView = ({ userID, bookshelf }: BookShelfListViewProps) => {
     <ScrollView style={styles.container}>
       {selectedShelf != null ? (
         <BookList
-          volumes={convertToBookVolumeItems(selectedShelf)}
+          volumes={selectedShelf}
           showRemoveButton={true}
           userID={userID}
           bookShelf={bookshelf}
