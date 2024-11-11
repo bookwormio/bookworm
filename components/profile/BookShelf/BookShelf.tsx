@@ -111,15 +111,21 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
             navigateToBookList(shelfName);
           }}
         >
-          <View>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={sharedBookshelfStyles.title}>{shelfNameDisplay}</Text>
-            {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
-              userID === user?.uid && (
-                <Text style={sharedBookshelfStyles.subtitle}>
-                  {BOOKSHELF_SUBTITLES[shelfName]}
-                </Text>
-              )}
+            <FontAwesome5
+              style={{ paddingLeft: 5 }}
+              name="chevron-right"
+              size={16}
+              color="#FB6D0B"
+            />
           </View>
+          {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
+            userID === user?.uid && (
+              <Text style={sharedBookshelfStyles.subtitle}>
+                {BOOKSHELF_SUBTITLES[shelfName]}
+              </Text>
+            )}
         </TouchableOpacity>
         <Text style={sharedBookshelfStyles.length}>{books.length}</Text>
       </View>

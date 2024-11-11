@@ -122,17 +122,21 @@ const BookListItem = ({
         </View>
         {bookShelf != null && <BookshelfListChip bookShelf={bookShelf} />}
       </TouchableOpacity>
-      {userID === user?.uid && bookID != null && bookShelf != null && (
-        <TouchableOpacity
-          onPress={() => {
-            handleRemoveClick(bookID, bookShelf, volumeInfo);
-          }}
-          disabled={removeBookPending}
-          style={styles.removeButtonContainer}
-        >
-          <FontAwesome5 name="minus-circle" size={20} color="#FB6D0B" />
-        </TouchableOpacity>
-      )}
+      {showRemoveButton != null &&
+        showRemoveButton &&
+        userID === user?.uid &&
+        bookID != null &&
+        bookShelf != null && (
+          <TouchableOpacity
+            onPress={() => {
+              handleRemoveClick(bookID, bookShelf, volumeInfo);
+            }}
+            disabled={removeBookPending}
+            style={styles.removeButtonContainer}
+          >
+            <FontAwesome5 name="minus-circle" size={20} color="#FB6D0B" />
+          </TouchableOpacity>
+        )}
     </View>
   );
 };
