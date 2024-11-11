@@ -49,29 +49,6 @@ const BookShelfListView = ({ userID, bookshelf }: BookShelfListViewProps) => {
     }));
   }
 
-  /**
-   * Converting BookShelfBookModel[] into BookVolumeItem[] using BookshelfVolumeInfo from books so we can use BookList component
-   * @param books contains info needed to map books and convert to BookVolumeItem
-   * @returns {BookVolumeItem} Correctly formatted books for BookList Component
-   */
-  function convertBorrowingToBookVolumeItems(
-    books: BorrowingBookshelfModel[],
-  ): BookVolumeItem[] {
-    return books.map((book) => ({
-      id: book.bookShelfInfo.id,
-      volumeInfo: {
-        ...book.bookShelfInfo.volumeInfo,
-        imageLinks: {
-          smallThumbnail: book.bookShelfInfo.volumeInfo.thumbnail,
-        },
-      },
-      kind: undefined,
-      etag: undefined,
-      selfLink: undefined,
-      bookShelf: bookshelf,
-    }));
-  }
-
   if (isLoadingBooks) {
     return (
       <View style={styles.loading}>
@@ -96,12 +73,14 @@ const BookShelfListView = ({ userID, bookshelf }: BookShelfListViewProps) => {
           volumes={convertToBookVolumeItems(selectedShelf)}
           showRemoveButton={true}
           userID={userID}
+          bookShelf={bookshelf}
         />
       ) : bookshelf === BORROWING_SHELF_NAME && borrowingBooks != null ? (
         <BookList
-          volumes={convertBorrowingToBookVolumeItems(borrowingBooks)}
           userID={userID}
           showRemoveButton={false}
+          borrowingBookShelf={true}
+          borrwingBooks={borrowingBooks}
         />
       ) : (
         <View>

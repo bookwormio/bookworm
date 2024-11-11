@@ -4,11 +4,17 @@ import React from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { closeKeyboardThen } from "../../app/util/keyboardHelpers";
 import {
+  BookRequestNotificationStatus,
   BOOKSHELF_DISPLAY_NAMES,
-  type ServerBookShelfName,
+  ServerBookShelfName,
 } from "../../enums/Enums";
-import { type BookVolumeInfo } from "../../types";
+import {
+  type BookStatusModel,
+  type BookVolumeInfo,
+  type BorrowingBookshelfModel,
+} from "../../types";
 import { useAuth } from "../auth/context";
+import BookBorrowButton from "../profile/BookShelf/BookBorrowButton";
 import { useRemoveBookFromShelf } from "../profile/hooks/useBookshelfQueries";
 import { useNavigateToBook } from "../profile/hooks/useRouteHooks";
 import BookshelfListChip from "./BookshelfListChip";
@@ -23,6 +29,10 @@ interface BookListItemProps {
   bookShelf?: ServerBookShelfName;
   showRemoveButton?: boolean;
   userID?: string;
+  lendingStatus?: BookStatusModel;
+  isLoadingLendingStatus?: boolean;
+  borrowingBookShelf?: boolean;
+  borrwingBook?: BorrowingBookshelfModel;
 }
 
 const BookListItem = ({
@@ -32,6 +42,10 @@ const BookListItem = ({
   bookShelf,
   showRemoveButton,
   userID,
+  lendingStatus,
+  isLoadingLendingStatus,
+  borrowingBookShelf,
+  borrwingBook,
 }: BookListItemProps) => {
   const navigateToBook = useNavigateToBook(bookID);
 
@@ -102,7 +116,11 @@ const BookListItem = ({
       >
         <View style={styles.imageContainer}>
           <Image
-            source={{ uri: volumeInfo?.imageLinks?.smallThumbnail }}
+            source={
+              borrowingBookShelf != null && borrowingBookShelf
+                ? { uri: borrwingBook?.bookShelfInfo.volumeInfo.thumbnail }
+                : { uri: volumeInfo?.imageLinks?.smallThumbnail }
+            }
             placeholder={require("../../assets/default_book.png")}
             cachePolicy={"memory-disk"}
             contentFit={"contain"}
@@ -122,6 +140,35 @@ const BookListItem = ({
         </View>
         {bookShelf != null && <BookshelfListChip bookShelf={bookShelf} />}
       </TouchableOpacity>
+      {bookShelf === ServerBookShelfName.LENDING_LIBRARY &&
+        userID !== user?.uid &&
+        userID != null &&
+        volumeInfo.title != null && (
+          <View style={styles.lendBorrowButtonContainer}>
+            <BookBorrowButton
+              bookID={bookID}
+              bookTitle={volumeInfo?.title}
+              bookOwnerID={userID}
+              borrowInfo={lendingStatus?.borrowInfo}
+              requestStatus={lendingStatus?.requestStatus}
+              isLoading={isLoadingLendingStatus ?? false}
+            />
+          </View>
+        )}
+      {borrowingBookShelf != null &&
+        borrowingBookShelf &&
+        borrwingBook != null && (
+          <View style={styles.lendBorrowButtonContainer}>
+            <BookBorrowButton
+              bookID={borrwingBook?.bookShelfInfo?.id}
+              bookTitle={borrwingBook?.bookShelfInfo?.volumeInfo?.title ?? ""}
+              bookOwnerID={borrwingBook?.borrowInfo?.lendingUserID}
+              borrowInfo={borrwingBook?.borrowInfo}
+              requestStatus={BookRequestNotificationStatus.ACCEPTED}
+              isLoading={false}
+            />
+          </View>
+        )}
       {showRemoveButton != null &&
         showRemoveButton &&
         userID === user?.uid &&
@@ -175,6 +222,11 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     alignItems: "center",
     justifyContent: "center",
+  },
+  lendBorrowButtonContainer: {
+    justifyContent: "center",
+    alignContent: "center",
+    alignSelf: "center",
   },
 });
 

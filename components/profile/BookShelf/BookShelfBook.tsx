@@ -46,13 +46,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 6,
     shadowRadius: 6,
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowOffset: { width: 0, height: 6 },
   },
   bookImage: {
     width: 120,
-    height: 150,
-    borderRadius: 10,
+    height: 190,
+    borderRadius: 2,
   },
   bookText: {
     width: 120,
