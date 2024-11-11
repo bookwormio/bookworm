@@ -126,15 +126,17 @@ const Profile = () => {
         tabs={[TabNames.BOOKSHELVES, TabNames.POSTS, TabNames.DATA]}
       />
       {profileTab === TabNames.BOOKSHELVES && user !== null ? (
-        <View /** style={styles.shelves} */>
-          {/** <View style={{ paddingLeft: 40, paddingRight: 40 }}>
-            <BookWormButton
-              title="Generate Recommendations"
-              onPress={() => {
-                router.push("/GenerateRecommendationsPage");
-              }}
-            />
-          </View> */}
+        <View style={styles.shelves}>
+          {
+            <View style={{ paddingLeft: 40, paddingRight: 40 }}>
+              <BookWormButton
+                title="Generate Recommendations"
+                onPress={() => {
+                  router.push("/GenerateRecommendationsPage");
+                }}
+              />
+            </View>
+          }
           <ProfileBookShelves userID={user?.uid} />
         </View>
       ) : profileTab === TabNames.POSTS ? (
