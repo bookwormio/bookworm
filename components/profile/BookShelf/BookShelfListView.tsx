@@ -2,19 +2,18 @@ import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { type BookShelfBookModel, type BookVolumeItem } from "../../../types";
-import { useAuth } from "../../auth/context";
 import BookList from "../../booklist/BookList";
 import WormLoader from "../../wormloader/WormLoader";
 import { useGetBooksForBookshelves } from "../hooks/useBookshelfQueries";
 
 interface BookShelfListViewProps {
+  userID: string;
   bookshelf: string;
 }
 
-const BookShelfListView = ({ bookshelf }: BookShelfListViewProps) => {
-  const { user } = useAuth();
+const BookShelfListView = ({ userID, bookshelf }: BookShelfListViewProps) => {
   const { data: bookShelves, isLoading: isLoadingBooks } =
-    useGetBooksForBookshelves(user?.uid ?? "");
+    useGetBooksForBookshelves(userID ?? "");
 
   function convertToBookVolumeItems(
     books: BookShelfBookModel[],

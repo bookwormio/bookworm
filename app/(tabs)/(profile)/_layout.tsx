@@ -77,7 +77,7 @@ const ProfileLayout = () => {
           }}
         />
         <Stack.Screen
-          name="profilebooklist/[bookshelf]"
+          name="profilebooklist/[userID]"
           options={{
             headerShown: true,
             headerTitle: "Book List",

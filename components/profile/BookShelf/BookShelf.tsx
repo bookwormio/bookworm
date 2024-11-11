@@ -1,4 +1,3 @@
-import { router } from "expo-router";
 import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
@@ -11,7 +10,10 @@ import { type BookShelfBookModel } from "../../../types";
 import { useAuth } from "../../auth/context";
 import { useGetLendingLibraryBookStatuses } from "../hooks/useBookBorrowQueries";
 import { useRemoveBookFromShelf } from "../hooks/useBookshelfQueries";
-import { useBookRouteInfo } from "../hooks/useRouteHooks";
+import {
+  useBookRouteInfo,
+  useNavigateToBookList,
+} from "../hooks/useRouteHooks";
 import BookBorrowButton from "./BookBorrowButton";
 import BookShelfBook from "./BookShelfBook";
 import { sharedBookshelfStyles } from "./styles/SharedBookshelfStyles";
@@ -29,6 +31,7 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
     useRemoveBookFromShelf();
 
   const { type: bookRouteType } = useBookRouteInfo();
+  const navigateToBookList = useNavigateToBookList(userID);
 
   const bookIds = books.map((book) => book.id);
 
@@ -78,9 +81,7 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
       <View style={sharedBookshelfStyles.heading}>
         <TouchableOpacity
           onPress={() => {
-            router.push({
-              pathname: `/profilebooklist/${shelfName}`,
-            });
+            navigateToBookList(shelfName);
           }}
         >
           <View>

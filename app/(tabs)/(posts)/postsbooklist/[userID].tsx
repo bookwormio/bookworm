@@ -3,9 +3,14 @@ import React from "react";
 import BookShelfListView from "../../../../components/profile/BookShelf/BookShelfListView";
 
 const BookListWrapper = () => {
+  const { userID } = useLocalSearchParams<{
+    userID: string;
+  }>();
   const { bookshelf } = useLocalSearchParams<{
     bookshelf: string;
   }>();
-  return <BookShelfListView bookshelf={bookshelf ?? ""} />;
+  return (
+    <BookShelfListView userID={userID ?? ""} bookshelf={bookshelf ?? ""} />
+  );
 };
 export default BookListWrapper;

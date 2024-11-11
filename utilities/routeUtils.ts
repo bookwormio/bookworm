@@ -106,3 +106,15 @@ export function generateBadgePageRoute(
   const pathName = `/${prefix}/${userID}`;
   return pathName;
 }
+
+export function generateBookListRoute(
+  userID: string,
+  bookshelf: string,
+  prefix?: string,
+): string {
+  if (userID == null || bookshelf == null) {
+    throw new Error("user ID or bookshelf is null or undefined");
+  }
+  const pathName = `${prefix}/${userID}?bookshelf=${bookshelf}`;
+  return pathName;
+}
