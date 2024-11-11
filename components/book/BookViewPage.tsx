@@ -21,7 +21,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import HTMLView from "react-native-htmlview";
 import Toast from "react-native-toast-message";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import {
@@ -252,38 +251,68 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
           style={styles.scrollContainer}
           contentContainerStyle={styles.scrollContent}
         >
-          <View>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+            }}
+          >
             <Image
               source={{ uri: bookData.imageLinks?.thumbnail }}
               cachePolicy={"memory-disk"}
               contentFit={"contain"}
               style={styles.image}
             />
-          </View>
-          <Text style={styles.title}>{bookData.title}</Text>
-          <Text style={styles.author}>
-            Author: {bookData.authors?.join(", ")}
-          </Text>
-          <View style={styles.dropdownContainer}>
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={handlePresentModalPress}
-            >
-              <View style={styles.addButtonContent}>
-                <AntDesign
-                  name="pluscircleo"
-                  size={20}
-                  color="white"
-                  style={styles.addButtonIcon}
-                />
-                <Text style={styles.addButtonText}>Add to Bookshelf</Text>
+            <View style={{ flex: 1, paddingLeft: 10 }}>
+              <Text style={styles.title}>{bookData.title}</Text>
+              <Text style={styles.author}>
+                by {bookData.authors?.join(", ")}
+              </Text>
+              {bookData?.mainCategory != null && (
+                <Text>{bookData?.mainCategory}</Text>
+              )}
+              <Text>{bookData.pageCount} pages</Text>
+              <View style={styles.dropdownContainer}>
+                <TouchableOpacity
+                  style={styles.addButton}
+                  onPress={handlePresentModalPress}
+                >
+                  <View style={styles.addButtonContent}>
+                    <AntDesign
+                      name="pluscircleo"
+                      size={20}
+                      color="white"
+                      style={styles.addButtonIcon}
+                    />
+                    <Text style={styles.addButtonText}>Add to Bookshelf</Text>
+                  </View>
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
+            </View>
           </View>
           {bookData.description !== null && (
-            <Text style={styles.description}>
-              Description: <HTMLView value={bookData.description ?? ""} />
-            </Text>
+            <View style={[styles.textBox]}>
+              <Text style={styles.textTitle}>Description</Text>
+              <Text style={styles.text}>{bookData.description ?? ""}</Text>
+            </View>
+          )}
+          {bookData.categories !== null && (
+            <View style={[styles.textBox]}>
+              <Text style={styles.textTitle}>Categories</Text>
+              {bookData?.categories?.map((category) => (
+                <Text key={category} style={styles.text}>
+                  {category}
+                </Text>
+              ))}
+            </View>
+          )}
+          {bookData?.publishedDate != null && bookData?.publisher != null && (
+            <View style={[styles.textBox]}>
+              <Text style={styles.textTitle}>Publisher</Text>
+              <Text style={styles.text}>
+                {bookData.publisher} | {bookData.publishedDate}
+              </Text>
+            </View>
           )}
         </ScrollView>
 
@@ -318,8 +347,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   scrollContainer: {
-    padding: 20,
-    flex: 1,
     width: "100%",
   },
   scrollContent: {
@@ -330,14 +357,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+    paddingBottom: 10,
+    flexWrap: "wrap",
   },
   author: {
-    fontSize: 18,
+    fontSize: 15,
     marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
+    flexWrap: "wrap",
   },
   image: {
     width: 128,
@@ -347,7 +373,7 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     width: "100%",
-    marginVertical: 10,
+    paddingTop: 20,
   },
   addButton: {
     backgroundColor: "#FB6D0B",
@@ -385,6 +411,23 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
+  },
+  textBox: {
+    backgroundColor: "#F5F5F5",
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 20,
+    flex: 1,
+    width: "100%",
+  },
+  text: {
+    fontSize: 16,
+    lineHeight: 20,
+  },
+  textTitle: {
+    fontSize: 16,
+    lineHeight: 20,
+    fontWeight: "bold",
   },
 });
 
