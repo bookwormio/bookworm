@@ -128,11 +128,7 @@ const BookListItem = ({
             handleRemoveClick(bookID, bookShelf, volumeInfo);
           }}
           disabled={removeBookPending}
-          style={{
-            paddingRight: 10,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          style={styles.removeButtonContainer}
         >
           <FontAwesome5 name="minus-circle" size={20} color="#FB6D0B" />
         </TouchableOpacity>
@@ -170,6 +166,11 @@ const styles = StyleSheet.create({
   },
   author: {
     fontSize: 14,
+  },
+  removeButtonContainer: {
+    paddingRight: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

@@ -1,12 +1,16 @@
+import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
 import {
   BOOKSHELF_DISPLAY_NAMES,
   BOOKSHELF_SUBTITLES,
   ServerBookShelfName,
 } from "../../../enums/Enums";
-import { type BookShelfBookModel } from "../../../types";
+import {
+  type BookShelfBookModel,
+  type BookshelfVolumeInfo,
+} from "../../../types";
 import { useAuth } from "../../auth/context";
 import { useGetLendingLibraryBookStatuses } from "../hooks/useBookBorrowQueries";
 import { useRemoveBookFromShelf } from "../hooks/useBookshelfQueries";
@@ -65,6 +69,30 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
     }
   };
 
+  const handleRemoveClick = (
+    bookID: string,
+    bookShelf: ServerBookShelfName,
+    volumeInfo: BookshelfVolumeInfo,
+  ) => {
+    Alert.alert(
+      "Confirmation",
+      `Do you want to remove ${volumeInfo.title} from ${BOOKSHELF_DISPLAY_NAMES[bookShelf]}?`,
+      [
+        {
+          text: "No",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            handleRemoveBook(bookID);
+          },
+        },
+      ],
+      { cancelable: true },
+    );
+  };
+
   if (isLendingStatusError) {
     Toast.show({
       type: "error",
@@ -114,12 +142,12 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
             {bookRouteType === "PROFILE" && userID === user?.uid && (
               <TouchableOpacity
                 onPress={() => {
-                  handleRemoveBook(item.id);
+                  handleRemoveClick(item.id, shelfName, item.volumeInfo);
                 }}
                 disabled={removeBookPending}
                 style={{ paddingTop: 2 }}
               >
-                <Text style={{ color: "#FB6D0B" }}>Remove</Text>
+                <FontAwesome5 name="minus-circle" size={20} color="#FB6D0B" />
               </TouchableOpacity>
             )}
             {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
