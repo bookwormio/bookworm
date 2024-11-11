@@ -76,6 +76,14 @@ const ProfileLayout = () => {
             headerTitle: "Leave a Recommendation",
           }}
         />
+        <Stack.Screen
+          name="profilebooklist/[bookshelf]"
+          options={{
+            headerShown: true,
+            headerTitle: "Book List",
+            headerLeft: () => <BackButton />,
+          }}
+        />
       </Stack>
     </KeyboardAvoidingView>
   );

@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
@@ -71,18 +72,27 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
 
   const shelfNameDisplay = BOOKSHELF_DISPLAY_NAMES[shelfName];
 
+  // TODO: Touchable Opacity Here
   return (
     <View style={sharedBookshelfStyles.list}>
       <View style={sharedBookshelfStyles.heading}>
-        <View>
-          <Text style={sharedBookshelfStyles.title}>{shelfNameDisplay}</Text>
-          {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
-            userID === user?.uid && (
-              <Text style={sharedBookshelfStyles.subtitle}>
-                {BOOKSHELF_SUBTITLES[shelfName]}
-              </Text>
-            )}
-        </View>
+        <TouchableOpacity
+          onPress={() => {
+            router.push({
+              pathname: `/profilebooklist/${shelfName}`,
+            });
+          }}
+        >
+          <View>
+            <Text style={sharedBookshelfStyles.title}>{shelfNameDisplay}</Text>
+            {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
+              userID === user?.uid && (
+                <Text style={sharedBookshelfStyles.subtitle}>
+                  {BOOKSHELF_SUBTITLES[shelfName]}
+                </Text>
+              )}
+          </View>
+        </TouchableOpacity>
         <Text style={sharedBookshelfStyles.length}>{books.length}</Text>
       </View>
       <FlatList

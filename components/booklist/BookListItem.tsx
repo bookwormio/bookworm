@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: 40,
-    height: 40,
+    height: 50,
   },
   infoContainer: {
     flex: 1, // Take up remaining space
