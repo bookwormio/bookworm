@@ -73,6 +73,10 @@ export function generateFollowListRoute(
   return pathName;
 }
 
+/**
+ * Generates a new recommendation page route.
+ * @returns The generated new recommendation page route.
+ */
 export function generateRecommendationRoute(
   friendUserID: string,
   prefix?: string,

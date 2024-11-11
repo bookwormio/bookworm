@@ -238,6 +238,10 @@ interface RecommendationRouteInfo {
   prefix: string;
 }
 
+/**
+ * Hook to get the recommendation page route info based on URL segments.
+ * @returns {RecommendationRouteInfo} - Object containing the route type and prefix for the recommendation page.
+ */
 export const useRecommendationRouteInfo = (): RecommendationRouteInfo => {
   const segments = useSegments();
 
@@ -250,6 +254,11 @@ export const useRecommendationRouteInfo = (): RecommendationRouteInfo => {
   return { type: null, prefix: "" };
 };
 
+/**
+ * Hook to navigate to a recommendation page for a given user.
+ * @param {string} [friendUserID] - The ID of the user whose recommendation page is being navigated to.
+ * @returns {Function} - Function to navigate to the recommendation page.
+ */
 export const useNavigateToRecommendation = (friendUserID: string) => {
   const router = useRouter();
   const { prefix } = useRecommendationRouteInfo();
