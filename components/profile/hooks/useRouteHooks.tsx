@@ -11,12 +11,14 @@ import {
   SEARCH_BOOK_PREFIX,
   SEARCH_FOLLOWLIST_PREFIX,
   SEARCH_POST_PREFIX,
+  SEARCH_RECOMMENDATION_PREFIX,
   SEARCH_ROUTE_PREFIX,
 } from "../../../constants/constants";
 import {
   generateBookRoute,
   generateFollowListRoute,
   generatePostRoute,
+  generateRecommendationRoute,
   generateUserRoute,
 } from "../../../utilities/routeUtils";
 
@@ -219,4 +221,42 @@ export const useNavigateToFollowList = (userID?: string) => {
   }
 
   return navigateToFollowList;
+};
+
+const RECOMMENDATION_ROUTE_PREFIXES = {
+  SEARCH: SEARCH_RECOMMENDATION_PREFIX,
+} as const;
+
+type RecommendationRouteType = keyof typeof RECOMMENDATION_ROUTE_PREFIXES;
+
+interface RecommendationRouteInfo {
+  type: RecommendationRouteType | null;
+  prefix: string;
+}
+
+export const useRecommendationRouteInfo = (): RecommendationRouteInfo => {
+  const segments = useSegments();
+
+  if (segments.includes(SEARCH_ROUTE_PREFIX))
+    return { type: "SEARCH", prefix: RECOMMENDATION_ROUTE_PREFIXES.SEARCH };
+
+  return { type: null, prefix: "" };
+};
+
+export const useNavigateToRecommendation = (friendUserID: string) => {
+  const router = useRouter();
+  const { prefix } = useRecommendationRouteInfo();
+
+  function navigateToRecommendation() {
+    if (friendUserID != null && friendUserID !== "") {
+      const recommendationRoute = generateRecommendationRoute(
+        friendUserID,
+        prefix,
+      );
+      if (recommendationRoute != null) {
+        router.push(recommendationRoute);
+      }
+    }
+  }
+  return navigateToRecommendation;
 };

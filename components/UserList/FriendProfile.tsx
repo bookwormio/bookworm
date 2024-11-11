@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { router } from "expo-router";
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
@@ -13,7 +12,10 @@ import {
 import ProfileBookShelves from "../profile/BookShelf/ProfileBookShelves";
 import ViewData from "../profile/Data/ViewData";
 import FriendProfilePosts from "../profile/FriendProfilePosts";
-import { useNavigateToFollowList } from "../profile/hooks/useRouteHooks";
+import {
+  useNavigateToFollowList,
+  useNavigateToRecommendation,
+} from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import ProfileTabSelector from "../profile/ProfileTabSelector";
 import { sharedProfileStyles } from "../profile/styles/SharedProfileStyles";
@@ -28,6 +30,8 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   const [profileTab, setProfileTab] = useState("shelf");
 
   const navigateToFollowList = useNavigateToFollowList(friendUserID);
+
+  const navigateToRecommendation = useNavigateToRecommendation(friendUserID);
 
   const { data: friendData, isLoading: friendIsLoading } = useQuery({
     queryKey: ["frienddata", friendUserID],
@@ -109,9 +113,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         <BookWormButton
           title={"Recommend"}
           onPress={() => {
-            router.push({
-              pathname: `/recommendation/${friendUserID}`,
-            });
+            navigateToRecommendation();
           }}
         />
       </View>

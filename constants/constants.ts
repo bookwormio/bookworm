@@ -55,6 +55,8 @@ export const POSTS_FOLLOWLIST_PREFIX: string = "postsfollow";
 export const NEW_POST_BOOK_FOLDER = "createbook";
 export const NEW_POST_BOOK_SEARCH = "createbooksearch";
 
+export const SEARCH_RECOMMENDATION_PREFIX = "recommendation";
+
 export const BLURHASH = "LBN-4dMwIUWC~WRj%M^+-;4n4nWC";
 
 export const FIRST_PROGRESS_COLOR = "rgb(88, 166, 92)";
