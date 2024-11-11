@@ -9,9 +9,16 @@ interface BookListProps {
     bookID: string,
     volumeInfo: BookVolumeInfo,
   ) => void;
+  showRemoveButton?: boolean;
+  userID?: string;
 }
 
-const BookList = ({ volumes, handleBookClickOverride }: BookListProps) => {
+const BookList = ({
+  volumes,
+  handleBookClickOverride,
+  showRemoveButton,
+  userID,
+}: BookListProps) => {
   return (
     <View>
       {/* TODO: potentially need to modify this key assignment */}
@@ -22,6 +29,8 @@ const BookList = ({ volumes, handleBookClickOverride }: BookListProps) => {
           volumeInfo={value.volumeInfo}
           handleBookClickOverride={handleBookClickOverride}
           bookShelf={value.bookShelf}
+          showRemoveButton={showRemoveButton}
+          userID={userID}
         ></BookListItem>
       ))}
     </View>

@@ -34,7 +34,7 @@ const BookShelfListView = ({ userID, bookshelf }: BookShelfListViewProps) => {
       kind: undefined,
       etag: undefined,
       selfLink: undefined,
-      bookShelf: undefined,
+      bookShelf: bookshelf,
     }));
   }
 
@@ -57,7 +57,11 @@ const BookShelfListView = ({ userID, bookshelf }: BookShelfListViewProps) => {
 
   return (
     <ScrollView style={styles.container}>
-      <BookList volumes={convertToBookVolumeItems(selectedShelf)} />
+      <BookList
+        volumes={convertToBookVolumeItems(selectedShelf)}
+        showRemoveButton={true}
+        userID={userID}
+      />
     </ScrollView>
   );
 };
