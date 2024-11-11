@@ -3,6 +3,7 @@ import { Dimensions, TouchableOpacity, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Rect, Svg, Text as TextSVG } from "react-native-svg";
 import { type WeekDataPointModel } from "../../types";
+import { format, subWeeks } from 'date-fns';
 
 interface ViewDataChartProps {
   aggregatedData: WeekDataPointModel[];
@@ -21,6 +22,35 @@ const getIncrement = (maxY: number) => {
   else return 1000;
 };
 
+const date = new Date(); 
+
+const startOfWeek = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate() - date.getDay()
+);
+
+const weekKeys: string[] = [];
+for (let i = 0; i < 8; i++) {
+    const weekStart = subWeeks(startOfWeek, i);
+    weekKeys.push(format(weekStart, 'MMM dd'));
+};
+
+const matchDataToWeeks = (data: WeekDataPointModel[]) => {
+  const dataset = [];
+
+  for (const weekKey of weekKeys) {
+    const weekData = data.find(({ x }) => format(x, 'MMM dd') === weekKey);
+    if (weekData) {
+      dataset.push(weekData.y);
+    } else {
+      dataset.push(0);
+    }
+  }
+
+  return dataset;
+};
+
 const ViewDataChart = ({ aggregatedData }: ViewDataChartProps) => {
   const [tooltipPos, setTooltipPos] = useState({
     x: 0,
@@ -29,12 +59,16 @@ const ViewDataChart = ({ aggregatedData }: ViewDataChartProps) => {
     value: 0,
   });
 
-  const dataset = aggregatedData.map(({ y }) => y);
+  const dataset = matchDataToWeeks(aggregatedData);
   const maxY = getMaxY(dataset);
   const increment = getIncrement(maxY);
 
+  console.log("aggdata", aggregatedData);
+  console.log("weekKeys", weekKeys);
+  console.log("dataset", dataset);
+
   const chartData = {
-    labels: aggregatedData.map(({ x }) => x.toDateString().slice(4, 10)),
+    labels: weekKeys,
     datasets: [
       {
         data: dataset,
@@ -75,9 +109,11 @@ const ViewDataChart = ({ aggregatedData }: ViewDataChartProps) => {
         data={chartData}
         width={Dimensions.get("window").width} // from react-native
         height={220}
+        fromZero={true}
         yAxisLabel="" // Ensuring it's empty to not append text
         yAxisSuffix="" // Also ensuring no suffix is added
-        yAxisInterval={increment} // Set dynamically based on data
+        // yAxisInterval={increment} // Set dynamically based on data
+        withOuterLines={false}
         chartConfig={{
           decimalPlaces: 0,
           backgroundGradientFrom: "#FFFFFF",
