@@ -56,35 +56,31 @@ const BookList = ({
             borrwingBook={value}
           ></BookListItem>
         ))}
-      {bookShelf != null &&
-        bookShelf === ServerBookShelfName.LENDING_LIBRARY &&
-        volumes?.map((value, index) => (
-          <BookListItem
-            key={index}
-            bookID={value.id}
-            volumeInfo={value.volumeInfo}
-            handleBookClickOverride={handleBookClickOverride}
-            bookShelf={value.bookShelf}
-            showRemoveButton={showRemoveButton}
-            userID={userID}
-            lendingStatus={lendingStatuses?.[value.id]}
-            isLoadingLendingStatus={isLoadingLendingStatus}
-          ></BookListItem>
-        ))}
-      {/* TODO: potentially need to modify this key assignment */}
-      {bookShelf != null &&
-        bookShelf !== ServerBookShelfName.LENDING_LIBRARY &&
-        volumes?.map((value, index) => (
-          <BookListItem
-            key={index}
-            bookID={value.id}
-            volumeInfo={value.volumeInfo}
-            handleBookClickOverride={handleBookClickOverride}
-            bookShelf={value.bookShelf}
-            showRemoveButton={showRemoveButton}
-            userID={userID}
-          ></BookListItem>
-        ))}
+      {bookShelf != null && bookShelf === ServerBookShelfName.LENDING_LIBRARY
+        ? volumes?.map((value, index) => (
+            <BookListItem
+              key={index}
+              bookID={value.id}
+              volumeInfo={value.volumeInfo}
+              handleBookClickOverride={handleBookClickOverride}
+              bookShelf={value.bookShelf}
+              showRemoveButton={showRemoveButton}
+              userID={userID}
+              lendingStatus={lendingStatuses?.[value.id]}
+              isLoadingLendingStatus={isLoadingLendingStatus}
+            ></BookListItem>
+          ))
+        : volumes?.map((value, index) => (
+            <BookListItem
+              key={index}
+              bookID={value.id}
+              volumeInfo={value.volumeInfo}
+              handleBookClickOverride={handleBookClickOverride}
+              bookShelf={value.bookShelf}
+              showRemoveButton={showRemoveButton}
+              userID={userID}
+            ></BookListItem>
+          ))}
     </View>
   );
 };
