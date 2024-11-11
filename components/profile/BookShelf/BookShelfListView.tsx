@@ -15,6 +15,11 @@ const BookShelfListView = ({ userID, bookshelf }: BookShelfListViewProps) => {
   const { data: bookShelves, isLoading: isLoadingBooks } =
     useGetBooksForBookshelves(userID ?? "");
 
+  /**
+   * Converting BookShelfBookModel[] into BookVolumeItem[] using BookshelfVolumeInfo from books so we can use BookList component
+   * @param books contains info needed to map books and convert to BookVolumeItem
+   * @returns {BookVolumeItem} Correctly formatted books for BookList Component
+   */
   function convertToBookVolumeItems(
     books: BookShelfBookModel[],
   ): BookVolumeItem[] {

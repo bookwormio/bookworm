@@ -75,7 +75,6 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
 
   const shelfNameDisplay = BOOKSHELF_DISPLAY_NAMES[shelfName];
 
-  // TODO: Touchable Opacity Here
   return (
     <View style={sharedBookshelfStyles.list}>
       <View style={sharedBookshelfStyles.heading}>

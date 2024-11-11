@@ -107,6 +107,10 @@ export function generateBadgePageRoute(
   return pathName;
 }
 
+/**
+ * Generates a new book list route.
+ * @returns The generated new book list route.
+ */
 export function generateBookListRoute(
   userID: string,
   bookshelf: string,

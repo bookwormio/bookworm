@@ -340,6 +340,10 @@ interface FollowListRouteInfo {
   prefix: string;
 }
 
+/**
+ * Hook to get the current book list route info based on URL segments.
+ * @returns {FollowListRouteInfo} - Object containing the route type and prefix for book lists.
+ */
 export const useBookListRouteInfo = (): FollowListRouteInfo => {
   const segments = useSegments();
 
@@ -353,6 +357,11 @@ export const useBookListRouteInfo = (): FollowListRouteInfo => {
   return { type: null, prefix: "" };
 };
 
+/**
+ * Hook to navigate to a book list page for a given user.
+ * @param {string} [userID] - The ID of the user whose book list is being navigated to.
+ * @returns {Function} - Function to navigate to the book list page.
+ */
 export const useNavigateToBookList = (userID: string) => {
   const router = useRouter();
   const { prefix } = useBookListRouteInfo();
