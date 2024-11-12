@@ -53,6 +53,13 @@ const SearchLayout = () => {
             headerLeft: () => <BackButton waitForKeyBoardDismiss={true} />,
           }}
         />
+        <Stack.Screen
+          name="BarcodeScanner"
+          options={{
+            presentation: "modal",
+            title: "Scan a Books Barcode",
+          }}
+        />
       </Stack>
     </KeyboardAvoidingView>
   );
