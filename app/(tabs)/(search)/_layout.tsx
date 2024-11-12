@@ -57,7 +57,7 @@ const SearchLayout = () => {
           name="BarcodeScanner"
           options={{
             presentation: "modal",
-            title: "Scan a Books Barcode",
+            title: "Scan a Book's Barcode",
           }}
         />
       </Stack>
