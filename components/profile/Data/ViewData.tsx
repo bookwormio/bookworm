@@ -105,12 +105,19 @@ const ViewData = ({ userID }: ViewDataProps) => {
         </View>
       )}
       <View>
-        <Text style={styles.dataType}>Pages Read:</Text>
-        {aggregatedPagesData.length > 0 ? (
-          <ViewDataChart aggregatedData={aggregatedPagesData}></ViewDataChart>
-        ) : (
-          <Text>No data to display</Text>
-        )}
+        <View style={styles.orangeBar}>
+          <Text style={styles.dataType}>Pages Read</Text>
+        </View>
+        <View style={styles.chartContainer}>
+          {aggregatedPagesData.length > 0 ? (
+            <ViewDataChart aggregatedData={aggregatedPagesData}></ViewDataChart>
+          ) : (
+            <Text>No data to display</Text>
+          )}
+        </View>
+        <View style={styles.orangeBar}>
+          <Text style={styles.dataType}>Books Completed</Text>
+        </View>
       </View>
     </ScrollView>
   );
@@ -125,6 +132,17 @@ const styles = StyleSheet.create({
     maxWidth: 960,
     marginHorizontal: "auto",
   },
+  orangeBar: {
+    backgroundColor: '#FB6D0B', // Orange color
+    padding: 10,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  chartContainer: {
+    overflow: 'hidden',
+    paddingRight: 40,
+    marginRight: -40, // Adjust this value to control the cropping
+  },
   input: {
     borderColor: "gray",
     width: "100%",
@@ -133,9 +151,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   dataType: {
-    fontSize: 36,
-    color: "#FB6D0B",
-    marginLeft: 10,
+    fontSize: 20,
+    color: "white",
   },
   loading: {
     flex: 1,

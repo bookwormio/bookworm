@@ -107,13 +107,13 @@ const ViewDataChart = ({ aggregatedData }: ViewDataChartProps) => {
               });
         }}
         data={chartData}
-        width={Dimensions.get("window").width} // from react-native
+        width={Dimensions.get("window").width + 40} // from react-native
         height={220}
         fromZero={true}
         yAxisLabel="" // Ensuring it's empty to not append text
         yAxisSuffix="" // Also ensuring no suffix is added
         // yAxisInterval={increment} // Set dynamically based on data
-        withOuterLines={false}
+        withVerticalLines={false}
         chartConfig={{
           decimalPlaces: 0,
           backgroundGradientFrom: "#FFFFFF",
@@ -140,6 +140,11 @@ const ViewDataChart = ({ aggregatedData }: ViewDataChartProps) => {
         style={{
           marginVertical: 8,
           borderRadius: 16,
+          marginLeft: -16,
+        }}
+        formatXLabel={(x) => {
+          const day = parseInt(x.slice(4, 6), 10);
+          return day > 7 ? '' : x.slice(0, 3);
         }}
         decorator={() => {
           // TODO FIX THIS DECORATOR TO HANDLE CLICK OFF
