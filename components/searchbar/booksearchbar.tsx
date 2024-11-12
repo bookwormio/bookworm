@@ -1,4 +1,5 @@
 import { Entypo, Feather } from "@expo/vector-icons";
+import { useCameraPermissions } from "expo-camera";
 import { router } from "expo-router";
 import React from "react";
 import {
@@ -26,6 +27,8 @@ const BookSearchBar = ({
   setClicked,
   placeholderText,
 }: SearchBarProps) => {
+  const [permission, requestPermission] = useCameraPermissions();
+
   return (
     <View style={styles.container}>
       <View
@@ -79,9 +82,19 @@ const BookSearchBar = ({
       {!clicked && (
         <TouchableOpacity
           onPress={() => {
-            router.push({
-              pathname: "/BarcodeScanner",
-            });
+            if (permission?.granted === false) {
+              requestPermission().then((response) => {
+                if (response.granted === true) {
+                  router.push({
+                    pathname: "/BarcodeScanner",
+                  });
+                }
+              });
+            } else {
+              router.push({
+                pathname: "/BarcodeScanner",
+              });
+            }
           }}
         >
           <Image
