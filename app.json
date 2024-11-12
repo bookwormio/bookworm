@@ -32,7 +32,13 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow bookworm.io to access your camera to scan books"
+          "cameraPermission": "Allow bookworm.io to access your camera to scan books."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow bookworm.io to access your photos to let you share them with your friends."
         }
       ]
     ],
@@ -42,7 +48,11 @@
       }
     },
     "ios": {
-      "bundleIdentifier": "com.rilescode.BookWorm"
+      "bundleIdentifier": "com.rilescode.BookWorm",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to scan a book's barcode.",
+        "NSPhotoLibraryUsageDescription": "This app uses the photo library to access images the user would like to post."
+      }
     }
   }
 }
