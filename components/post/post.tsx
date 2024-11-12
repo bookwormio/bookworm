@@ -155,9 +155,11 @@ const Post = ({
                 }
 
                 return (
-                  <View key={index} style={styles.imageContainer}>
-                    <View style={styles.defaultImageStyle}>{item}</View>
-                  </View>
+                  <TouchableOpacity>
+                    <View key={index} style={styles.imageContainer}>
+                      <View style={styles.defaultImageStyle}>{item}</View>
+                    </View>
+                  </TouchableOpacity>
                 );
               }}
             />
