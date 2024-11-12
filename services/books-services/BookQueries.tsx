@@ -121,6 +121,7 @@ export async function fetchBookVolumeIDByISBN(
           q: `isbn:${isbn}`,
           key: process.env.GOOGLE_BOOKS_API_KEY,
           projection: "full",
+          limit: 1,
         },
       },
     );
