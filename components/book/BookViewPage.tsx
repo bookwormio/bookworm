@@ -228,6 +228,15 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     [applyPendingChanges],
   );
 
+  function stripHTMLWithRegex(htmlString: string): string {
+    let textWithNewlines = htmlString.replace(/<\/?(br|p)[^>]*>/gi, "\n");
+    textWithNewlines = textWithNewlines.replace(/<\/?[^>]+(>|$)/g, "");
+
+    return textWithNewlines
+      .replace(/\s*\n\s*/g, "\n\n")
+      .replace(/ +/g, " ")
+      .trim();
+  }
   if (bookData == null || isLoadingBook) {
     return (
       <View style={styles.container}>
@@ -290,18 +299,21 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
               </View>
             </View>
           </View>
-          {bookData.description !== null && (
+          {bookData.description != null && (
             <View style={[styles.textBox]}>
               <Text style={styles.textTitle}>Description</Text>
-              <Text style={styles.text}>{bookData.description ?? ""}</Text>
+              <Text style={styles.text}>
+                {"\n"}
+                {stripHTMLWithRegex(bookData.description ?? "")}
+              </Text>
             </View>
           )}
-          {bookData.categories !== null && (
+          {bookData.categories != null && (
             <View style={[styles.textBox]}>
               <Text style={styles.textTitle}>Categories</Text>
               {bookData?.categories?.map((category) => (
                 <Text key={category} style={styles.text}>
-                  {category}
+                  {stripHTMLWithRegex(category)}
                 </Text>
               ))}
             </View>
@@ -310,11 +322,28 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
             <View style={[styles.textBox]}>
               <Text style={styles.textTitle}>Publisher</Text>
               <Text style={styles.text}>
-                {bookData.publisher} | {bookData.publishedDate}
+                {stripHTMLWithRegex(bookData.publisher)} |{" "}
+                {new Date(
+                  stripHTMLWithRegex(bookData.publishedDate),
+                ).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
               </Text>
             </View>
           )}
         </ScrollView>
+
+        {/* function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
+ */}
 
         <BottomSheetModal
           ref={bottomSheetModalRef}
