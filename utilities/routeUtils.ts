@@ -72,3 +72,18 @@ export function generateFollowListRoute(
   const pathName = `${prefix}/${userID}?followersfirst=${followersfirst}`;
   return pathName;
 }
+
+/**
+ * Generates a new recommendation page route.
+ * @returns The generated new recommendation page route.
+ */
+export function generateRecommendationRoute(
+  friendUserID: string,
+  prefix?: string,
+): string {
+  if (friendUserID == null) {
+    throw new Error("FriendUserID is null or undefined");
+  }
+  const pathName = `/${prefix}/${friendUserID}`;
+  return pathName;
+}

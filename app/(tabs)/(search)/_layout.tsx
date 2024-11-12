@@ -23,7 +23,7 @@ const SearchLayout = () => {
           }}
         />
         <Stack.Screen
-          name="recommendation/[friendUserID]"
+          name="searchrecommendation/[friendUserID]"
           options={{
             presentation: "modal",
             headerTitle: "Leave a Recommendation",
