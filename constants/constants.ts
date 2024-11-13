@@ -114,3 +114,5 @@ export const PROFILE_PLACEHOLDERS = {
   CITY: "City",
   STATE: "State",
 } as const;
+
+export const KEYBOARD_CLOSE_DELAY = 20;

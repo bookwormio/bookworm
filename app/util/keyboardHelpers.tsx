@@ -1,4 +1,5 @@
 import { Keyboard } from "react-native";
+import { KEYBOARD_CLOSE_DELAY } from "../../constants/constants";
 
 /**
  * Helper function to close the keyboard and then execute a callback
@@ -10,7 +11,7 @@ export function closeKeyboardThen(callback: () => void) {
     Keyboard.dismiss();
     setTimeout(() => {
       callback();
-    }, 20);
+    }, KEYBOARD_CLOSE_DELAY);
   } else {
     callback();
   }
