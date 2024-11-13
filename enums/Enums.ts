@@ -165,13 +165,12 @@ type BadgeDisplayMap = {
 // Used to display the book status in the UI
 export const badgeDisplayTitleMap: BadgeDisplayMap = {
   // post badges
-  [ServerPostBadge.FIRST_POST]: "First Post",
+  [ServerPostBadge.FIRST_POST]: "1st Post",
   // bookshelf badges
-  [ServerBookshelfBadge.ADDED_FIRST_BOOK]: "Added 1st Book to Bookshelves",
-  [ServerBookshelfBadge.ADDED_TEN_BOOKS]: "Added 10 Books to Bookshelves",
-  [ServerBookshelfBadge.ADDED_TWENTY_FIVE_BOOKS]:
-    "Added 25 Books to Bookshelves",
-  [ServerBookshelfBadge.ADDED_FIFTY_BOOKS]: "Added 50 Books to Bookshelves",
+  [ServerBookshelfBadge.ADDED_FIRST_BOOK]: "Added 1st Book",
+  [ServerBookshelfBadge.ADDED_TEN_BOOKS]: "Added 10 Books",
+  [ServerBookshelfBadge.ADDED_TWENTY_FIVE_BOOKS]: "Added 25 Books",
+  [ServerBookshelfBadge.ADDED_FIFTY_BOOKS]: "Added 50 Books",
   // completion badges
   [ServerCompletionBadge.COMPLETED_FIRST_BOOK]: "Completed First Book",
   [ServerCompletionBadge.COMPLETED_FIVE_BOOKS]: "Completed 5 Books",

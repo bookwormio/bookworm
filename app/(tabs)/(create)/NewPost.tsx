@@ -221,14 +221,6 @@ const NewPost = () => {
         const badgesSet = new Set(badges);
         const checkBadgePromises = [];
 
-        if (!areAllBadgesEarned(badgesSet, COMPLETION_BADGES)) {
-          checkBadgePromises.push(
-            checkForCompletionBadge({
-              userID: user?.uid ?? "",
-              postID: post?.id,
-            }),
-          );
-        }
         if (!areAllBadgesEarned(badgesSet, BOOKSHELF_BADGES)) {
           checkBadgePromises.push(
             checkForBookshelfBadge({
@@ -240,6 +232,14 @@ const NewPost = () => {
         if (!areAllBadgesEarned(badgesSet, POST_BADGES) && post?.id != null) {
           checkBadgePromises.push(
             checkForPostBadge({
+              userID: user?.uid ?? "",
+              postID: post?.id,
+            }),
+          );
+        }
+        if (!areAllBadgesEarned(badgesSet, COMPLETION_BADGES)) {
+          checkBadgePromises.push(
+            checkForCompletionBadge({
               userID: user?.uid ?? "",
               postID: post?.id,
             }),

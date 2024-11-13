@@ -61,6 +61,10 @@ export function generatePostRoute(postID?: string, prefix?: string): string {
   return pathName;
 }
 
+/**
+ * Generates a new follow list route.
+ * @returns The generated new follow list route
+ */
 export function generateFollowListRoute(
   userID?: string,
   followersfirst?: boolean,
@@ -85,5 +89,20 @@ export function generateRecommendationRoute(
     throw new Error("FriendUserID is null or undefined");
   }
   const pathName = `/${prefix}/${friendUserID}`;
+  return pathName;
+}
+
+/**
+ * Generates a new badge route.
+ * @returns The generated new badge route
+ */
+export function generateBadgePageRoute(
+  userID: string,
+  prefix?: string,
+): string {
+  if (userID == null) {
+    throw new Error("User ID is null or undefined");
+  }
+  const pathName = `/${prefix}/${userID}`;
   return pathName;
 }

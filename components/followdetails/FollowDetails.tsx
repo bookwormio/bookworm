@@ -13,10 +13,9 @@ import {
 interface UserProp {
   userID: string;
   followersfirst: string;
-  routePrefix: string;
 }
 
-const FollowDetails = ({ userID, followersfirst, routePrefix }: UserProp) => {
+const FollowDetails = ({ userID, followersfirst }: UserProp) => {
   const [profileTab, setProfileTab] = useState(
     followersfirst === "true" ? "followers" : "following",
   );
@@ -48,7 +47,7 @@ const FollowDetails = ({ userID, followersfirst, routePrefix }: UserProp) => {
         >
           {followers?.map((user) => (
             <View style={styles.userContainer} key={user.id}>
-              <UserList routePrefix={routePrefix} users={[user]} />
+              <UserList users={[user]} />
             </View>
           ))}
           {isLoadingFollowers && (
@@ -64,7 +63,7 @@ const FollowDetails = ({ userID, followersfirst, routePrefix }: UserProp) => {
         >
           {following?.map((user) => (
             <View style={styles.userContainer} key={user.id}>
-              <UserList routePrefix={routePrefix} users={[user]} />
+              <UserList users={[user]} />
             </View>
           ))}
           {isLoadingFollowing && (
