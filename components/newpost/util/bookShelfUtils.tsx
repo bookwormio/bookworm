@@ -65,3 +65,15 @@ export const convertFlatBookToBookShelfBook = (
     thumbnail: book?.image,
   };
 };
+
+/**
+ * Checks if the user has any books in their shelves.
+ * @param shelves - The user's bookshelves.
+ * @returns {boolean} - Whether the user has any books in their shelves.
+ */
+export const hasAnyBooks = (
+  shelves: UserBookShelvesModel | null | undefined,
+): boolean => {
+  if (shelves == null) return false;
+  return Object.values(shelves).some((shelf) => shelf.length > 0);
+};
