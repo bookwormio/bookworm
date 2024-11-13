@@ -40,6 +40,10 @@ const SearchBar = ({
           onFocus={() => {
             setClicked(true);
           }}
+          autoComplete="off"
+          autoCorrect={false}
+          spellCheck={false}
+          textContentType="none"
         />
         {/* cross Icon, depending on whether the search bar is clicked or not */}
         {clicked && (
