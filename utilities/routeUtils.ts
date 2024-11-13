@@ -97,7 +97,7 @@ export function generateRecommendationRoute(
  * @returns The generated new badge route
  */
 export function generateBadgePageRoute(
-  userID?: string,
+  userID: string,
   prefix?: string,
 ): string {
   if (userID == null) {

@@ -1,7 +1,14 @@
 import React from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { badgeDisplayTitleMap } from "../../enums/Enums";
+import { useNavigateToPost } from "../profile/hooks/useRouteHooks";
 import WormLoader from "../wormloader/WormLoader";
 import BadgePicture from "./BadgePicture";
 import { useGetExistingEarnedBadges } from "./useBadgeQueries";
@@ -14,6 +21,8 @@ const BadgePage = ({ userID }: BadgePageProps) => {
   const { data: badges, isLoading: isLoadingBadges } =
     useGetExistingEarnedBadges(userID);
 
+  const navigateToPost = useNavigateToPost();
+
   if (isLoadingBadges) {
     return <WormLoader />;
   }
@@ -25,10 +34,19 @@ const BadgePage = ({ userID }: BadgePageProps) => {
         numColumns={3}
         columnWrapperStyle={styles.columnWrapper}
         renderItem={({ item }) => (
-          <View style={styles.badgeContainer}>
-            <BadgePicture badgeID={item} size={125} />
-            <Text style={styles.textStyle}>{badgeDisplayTitleMap[item]}</Text>
-          </View>
+          <TouchableOpacity
+            style={styles.badgeContainer}
+            onPress={() => {
+              if (item.postID != null) {
+                navigateToPost(item.postID);
+              }
+            }}
+          >
+            <BadgePicture badgeID={item.badgeID} size={125} />
+            <Text style={styles.textStyle}>
+              {badgeDisplayTitleMap[item.badgeID]}
+            </Text>
+          </TouchableOpacity>
         )}
       />
     </View>
@@ -39,6 +57,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: APP_BACKGROUND_COLOR,
+    padding: 10,
+    paddingRight: 15,
   },
   columnWrapper: {
     justifyContent: "space-between",

@@ -17,7 +17,7 @@ interface BadgePictureProps {
 const BadgePicture = ({ badgeID, size }: BadgePictureProps) => {
   const dynamicStyles = {
     container: {
-      height: size,
+      height: size + 20,
       width: size,
     },
     image: {
@@ -48,6 +48,7 @@ const BadgePicture = ({ badgeID, size }: BadgePictureProps) => {
         <Image
           style={[styles.image, dynamicStyles.image]}
           source={BAGDE_ICONS[badgeID]}
+          cachePolicy={"memory-disk"}
         />
       )}
     </View>

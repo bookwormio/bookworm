@@ -310,6 +310,7 @@ interface DenyOtherBorrowRequestsParams {
 }
 
 interface BadgeModel {
-  userID: string;
   badgeID: ServerBadgeName;
+  postID?: string;
+  received_at: Timestamp;
 }
