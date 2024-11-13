@@ -17,7 +17,10 @@ import { useAuth } from "../../../components/auth/context";
 import BookWormButton from "../../../components/button/BookWormButton";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
 import WormLoader from "../../../components/wormloader/WormLoader";
-import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
+import {
+  APP_BACKGROUND_COLOR,
+  PROFILE_PLACEHOLDERS,
+} from "../../../constants/constants";
 import {
   newFetchUserInfo,
   updateUser,
@@ -140,48 +143,59 @@ const EditProfile = () => {
             />
           </TouchableOpacity>
           <View>
-            <Text style={styles.regtext}>First Name</Text>
+            <Text style={styles.regtext}>
+              {PROFILE_PLACEHOLDERS.FIRST_NAME}
+            </Text>
             <TextInput
               style={styles.input}
               value={editFirst}
-              placeholder={"first name"}
+              placeholder={PROFILE_PLACEHOLDERS.FIRST_NAME}
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="off"
               onChangeText={(text) => {
                 setEditFirst(text);
               }}
             />
           </View>
           <View>
-            <Text style={styles.regtext}>Last Name</Text>
+            <Text style={styles.regtext}>{PROFILE_PLACEHOLDERS.LAST_NAME}</Text>
             <TextInput
               style={styles.input}
               value={editLast}
-              placeholder={"last name"}
+              placeholder={PROFILE_PLACEHOLDERS.LAST_NAME}
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="off"
               onChangeText={(text) => {
                 setEditLast(text);
               }}
             />
           </View>
           <View>
-            <Text style={styles.regtext}>Phone Number</Text>
+            <Text style={styles.regtext}>{PROFILE_PLACEHOLDERS.PHONE}</Text>
             <TextInput
               style={styles.input}
               value={editPhone}
-              placeholder={"phone number"}
+              placeholder={PROFILE_PLACEHOLDERS.PHONE}
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="off"
+              keyboardType="phone-pad"
               onChangeText={(text) => {
                 setEditPhone(text);
               }}
             />
           </View>
           <View>
-            <Text style={styles.regtext}>Bio</Text>
+            <Text style={styles.regtext}>{PROFILE_PLACEHOLDERS.BIO}</Text>
             <TextInput
               style={styles.input}
               value={editBio}
-              placeholder={"bio"}
+              placeholder={PROFILE_PLACEHOLDERS.BIO}
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="off"
               multiline={true}
               onChangeText={(text) => {
                 setEditBio(text);
@@ -189,24 +203,28 @@ const EditProfile = () => {
             />
           </View>
           <View>
-            <Text style={styles.regtext}>City</Text>
+            <Text style={styles.regtext}>{PROFILE_PLACEHOLDERS.CITY}</Text>
             <TextInput
               style={styles.input}
               value={editCity}
-              placeholder={"city"}
+              placeholder={PROFILE_PLACEHOLDERS.CITY}
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="off"
               onChangeText={(text) => {
                 setEditCity(text);
               }}
             />
           </View>
           <View>
-            <Text style={styles.regtext}>State</Text>
+            <Text style={styles.regtext}>{PROFILE_PLACEHOLDERS.STATE}</Text>
             <TextInput
               style={styles.input}
               value={editState}
-              placeholder={"state"}
+              placeholder={PROFILE_PLACEHOLDERS.STATE}
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="off"
               onChangeText={(text) => {
                 setEditState(text);
               }}

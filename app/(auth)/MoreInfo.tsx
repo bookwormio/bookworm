@@ -15,7 +15,10 @@ import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
 import BookWormButton from "../../components/button/BookWormButton";
 import WormLoader from "../../components/wormloader/WormLoader";
-import { APP_BACKGROUND_COLOR } from "../../constants/constants";
+import {
+  APP_BACKGROUND_COLOR,
+  PROFILE_PLACEHOLDERS,
+} from "../../constants/constants";
 import { updateUser } from "../../services/firebase-services/UserQueries";
 import { type UserDataModel } from "../../types";
 
@@ -135,7 +138,7 @@ const MoreInfo = () => {
         <TextInput
           style={styles.input}
           value={username}
-          placeholder="Username"
+          placeholder={PROFILE_PLACEHOLDERS.USERNAME}
           onChangeText={(text) => {
             setUsername(text);
           }}
@@ -146,55 +149,70 @@ const MoreInfo = () => {
         <TextInput
           style={styles.input}
           value={first}
-          placeholder="First Name"
+          placeholder={PROFILE_PLACEHOLDERS.FIRST_NAME}
           onChangeText={(text) => {
             setFirst(text);
           }}
           autoCorrect={false}
           autoComplete="off"
+          autoCapitalize="none"
         />
         <TextInput
           style={styles.input}
           value={last}
-          placeholder="Last Name"
+          placeholder={PROFILE_PLACEHOLDERS.LAST_NAME}
           onChangeText={(text) => {
             setLast(text);
           }}
           autoCorrect={false}
           autoComplete="off"
+          autoCapitalize="none"
         />
         <TextInput
           style={styles.input}
           value={phone}
-          placeholder="Phone Number"
+          placeholder={PROFILE_PLACEHOLDERS.PHONE}
           onChangeText={(text) => {
             setPhone(text);
           }}
+          autoCorrect={false}
+          autoComplete="off"
+          autoCapitalize="none"
+          keyboardType="phone-pad"
         />
         <TextInput
           style={styles.input}
           value={bio}
-          placeholder="Bio"
+          placeholder={PROFILE_PLACEHOLDERS.BIO}
           multiline={true}
           onChangeText={(text) => {
             setBio(text);
           }}
+          autoCorrect={false}
+          autoComplete="off"
+          autoCapitalize="none"
         />
         <TextInput
           style={styles.input}
           value={city}
-          placeholder="City"
+          placeholder={PROFILE_PLACEHOLDERS.CITY}
           onChangeText={(text) => {
             setCity(text);
           }}
+          autoCorrect={false}
+          autoComplete="off"
+          autoCapitalize="none"
         />
         <TextInput
           style={styles.input}
           value={state}
-          placeholder="State"
+          placeholder={PROFILE_PLACEHOLDERS.STATE}
           onChangeText={(text) => {
             setState(text);
           }}
+          autoCorrect={false}
+          autoComplete="off"
+          autoCapitalize="none"
         />
         <BookWormButton
           title="Let's Go"
