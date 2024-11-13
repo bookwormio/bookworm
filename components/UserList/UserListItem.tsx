@@ -80,11 +80,11 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontWeight: "bold",
-    flex: 5,
+    flex: 6,
     marginRight: 10,
   },
   followButtonContainer: {
-    flex: 3,
+    flex: 4,
   },
   placeholderImage: {
     position: "absolute",
