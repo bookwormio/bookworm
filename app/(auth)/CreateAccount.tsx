@@ -73,6 +73,11 @@ const CreateAccount = () => {
           style={styles.input}
           value={email}
           placeholder="email"
+          keyboardType="email-address"
+          textContentType="none"
+          autoComplete="off"
+          spellCheck={false}
+          autoCorrect={false}
           autoCapitalize="none"
           onChangeText={(text) => {
             setEmail(text);
@@ -82,10 +87,12 @@ const CreateAccount = () => {
           style={styles.input}
           value={password}
           secureTextEntry={true}
-          textContentType="oneTimeCode"
           placeholder="password"
-          autoCapitalize="none"
+          textContentType="none"
           autoComplete="off"
+          autoCapitalize="none"
+          spellCheck={false}
+          autoCorrect={false}
           onChangeText={(text) => {
             setPassword(text);
           }}
