@@ -52,6 +52,10 @@ const BookSearchBar = ({
           onFocus={() => {
             setClicked(true);
           }}
+          autoComplete="off"
+          autoCorrect={false}
+          spellCheck={false}
+          textContentType="none"
         />
         {/* cross Icon, depending on whether the search bar is clicked or not */}
         {clicked && (
@@ -84,7 +88,7 @@ const BookSearchBar = ({
           onPress={() => {
             if (permission?.granted === false) {
               requestPermission().then((response) => {
-                if (response.granted === true) {
+                if (response.granted) {
                   router.push({
                     pathname: "/BarcodeScanner",
                   });
