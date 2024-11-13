@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import React from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
-import BackButton from "../../components/backbutton/BackButton";
+import BackButton from "../../components/buttons/BackButton";
 
 const AuthLayout = () => {
   return (

@@ -4,7 +4,7 @@ import {
   BookRequestActionDisplay,
   BookRequestNotificationStatus,
 } from "../../enums/Enums";
-import BookWormButton from "../button/BookWormButton";
+import BookWormButton from "../buttons/BookWormButton";
 
 interface BookRequestNotificationActionsProps {
   onAccept: () => void;

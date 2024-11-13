@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
 import BookList from "../../../components/booklist/BookList";
-import BookWormButton from "../../../components/button/BookWormButton";
+import BookWormButton from "../../../components/buttons/BookWormButton";
 import WormLoader from "../../../components/wormloader/WormLoader";
 import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { useGenerateRecommendationsQuery } from "./hooks/useProfileQueries";

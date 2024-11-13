@@ -32,7 +32,7 @@ import {
   useSetBookmarkForBook,
 } from "../../../components/bookmark/hooks/useBookmarkQueries";
 import BookDropdownButton from "../../../components/bookselect/BookDropdownButton";
-import BookWormButton from "../../../components/button/BookWormButton";
+import BookWormButton from "../../../components/buttons/BookWormButton";
 import {
   convertFlatBookToBookShelfBook,
   isBookInCurrentlyReading,

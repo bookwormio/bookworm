@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { useAuth } from "../../../components/auth/context";
-import BookWormButton from "../../../components/button/BookWormButton";
+import BookWormButton from "../../../components/buttons/BookWormButton";
 import {
   useGetNumberOfFollowersByUserID,
   useGetNumberOfFollowingByUserID,

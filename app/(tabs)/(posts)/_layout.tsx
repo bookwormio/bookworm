@@ -1,14 +1,8 @@
-import { FontAwesome5 } from "@expo/vector-icons";
-import { router, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import React from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
-import BackButton from "../../../components/backbutton/BackButton";
-import { BOOKWORM_ORANGE } from "../../../constants/constants";
+import { KeyboardAvoidingView, Platform } from "react-native";
+import BackButton from "../../../components/buttons/BackButton";
+import NotificationBell from "../../../components/buttons/NotificationBell";
 
 const PostsLayout = () => {
   return (
@@ -22,17 +16,7 @@ const PostsLayout = () => {
           options={{
             headerTitle: "Posts",
             headerShown: true,
-            headerRight: () => (
-              <TouchableOpacity
-                style={styles.newPost}
-                onPress={() => {
-                  router.push({ pathname: "notifications" });
-                }}
-                disabled={false}
-              >
-                <FontAwesome5 name="bell" size={20} color={BOOKWORM_ORANGE} />
-              </TouchableOpacity>
-            ),
+            headerRight: () => <NotificationBell />,
           }}
         />
         <Stack.Screen
@@ -111,13 +95,5 @@ const PostsLayout = () => {
     </KeyboardAvoidingView>
   );
 };
-
-const styles = StyleSheet.create({
-  newPost: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingRight: 2,
-  },
-});
 
 export default PostsLayout;
