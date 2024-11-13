@@ -127,6 +127,7 @@ const BookSearch = ({
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
       >
         {books.map((book, index) => (
           <View style={styles.bookContainer} key={index}>

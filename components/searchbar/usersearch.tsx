@@ -108,6 +108,7 @@ const UserSearch = ({
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
       >
         {users.map((user) => (
           <View style={styles.userContainer} key={user.id}>

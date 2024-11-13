@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { closeKeyboardThen } from "../../app/util/keyboardHelpers";
 import { type UserSearchDisplayModel } from "../../types";
 import { useAuth } from "../auth/context";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
@@ -23,7 +24,7 @@ const UserListItem = ({
     <TouchableOpacity
       style={styles.container}
       onPress={() => {
-        navigateToUser();
+        closeKeyboardThen(navigateToUser);
       }}
     >
       <View style={styles.imageContainer}>
