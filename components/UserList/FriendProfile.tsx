@@ -18,7 +18,7 @@ import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import ProfileTabSelector from "../profile/ProfileTabSelector";
 import { sharedProfileStyles } from "../profile/styles/SharedProfileStyles";
 import WormLoader from "../wormloader/WormLoader";
-import FollowButon from "./FollowButton";
+import FollowButton from "./FollowButton";
 import { useFetchFriendData } from "./hooks/useFriendQueries";
 
 interface FriendProfileProps {
@@ -111,7 +111,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           </Text>
         </TouchableOpacity>
         <View style={sharedProfileStyles.followButton}>
-          <FollowButon friendUserID={friendData.id} />
+          <FollowButton friendUserID={friendData.id} />
         </View>
       </View>
       <ProfileTabSelector
