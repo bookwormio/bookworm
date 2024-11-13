@@ -11,7 +11,6 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import { getDownloadURL, ref } from "firebase/storage";
 import {
   type ServerBadgeName,
   ServerBookshelfBadge,
@@ -21,7 +20,7 @@ import {
   ServerPostBadge,
   ServerStreakBadge,
 } from "../../enums/Enums";
-import { DB, STORAGE } from "../../firebase.config";
+import { DB } from "../../firebase.config";
 
 /**
  * Adds a badge to a user in the Firestore database.
@@ -92,23 +91,6 @@ export async function getExistingEarnedBadges(
       `Failed to fetch badges for user ${userID}: ${(error as Error).message}`,
     );
   }
-}
-
-/**
- * Fetches the url for the image of the badge
- * @param badgeID ID of badge for image fetch
- * @returns {string} badge URL
- */
-export async function getBadgeUrl(
-  badgeID: ServerBadgeName,
-): Promise<string | null> {
-  try {
-    const storageRef = ref(STORAGE, "badges/" + badgeID + ".png");
-    return await getDownloadURL(storageRef);
-  } catch (error) {
-    console.error("Error fetching badge image ", error);
-  }
-  return null;
 }
 
 /**
