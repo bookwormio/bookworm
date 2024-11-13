@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Image,
   Keyboard,
@@ -17,6 +17,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { signIn, isLoading } = useAuth();
+  const passwordRef = useRef<TextInput>(null);
 
   if (isLoading) {
     return (
@@ -42,12 +43,23 @@ const Login = () => {
           style={styles.input}
           value={email}
           placeholder="email"
+          keyboardType="email-address"
+          textContentType="emailAddress"
+          autoComplete="off"
+          spellCheck={false}
+          autoCorrect={false}
           autoCapitalize="none"
+          blurOnSubmit={false}
+          returnKeyType="next"
           onChangeText={(text) => {
             setEmail(text);
           }}
+          onSubmitEditing={() => {
+            passwordRef.current?.focus();
+          }}
         />
         <TextInput
+          ref={passwordRef}
           onSubmitEditing={() => {
             signIn(email, password);
           }}
@@ -55,7 +67,12 @@ const Login = () => {
           value={password}
           secureTextEntry={true}
           placeholder="password"
+          textContentType="password"
+          autoComplete="off"
           autoCapitalize="none"
+          spellCheck={false}
+          autoCorrect={false}
+          returnKeyType="go"
           onChangeText={(text) => {
             setPassword(text);
           }}
