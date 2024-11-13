@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { CameraView } from "expo-camera";
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -9,6 +10,7 @@ import { isValidISBN } from "../../../services/util/bookQueryUtils";
 const BarcodeScanner = () => {
   const router = useRouter();
   const [showScanError, setShowScanError] = useState(false);
+  const [lastScannedISBN, setLastScannedISBN] = useState("");
   const getVolumeIDMutation = useMutation({
     mutationFn: async (isbn: string) => await fetchBookVolumeIDByISBN(isbn),
   });
@@ -16,10 +18,23 @@ const BarcodeScanner = () => {
     getVolumeIDMutation.mutate(isbn, {
       onSuccess: (scannedVolumeID) => {
         if (scannedVolumeID !== null) {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           router.replace(`/searchbook/${scannedVolumeID}`);
         }
       },
     });
+  };
+
+  const handleBarcodeScanned = ({ data }: { data: string }) => {
+    if (data !== lastScannedISBN) {
+      if (isValidISBN(data)) {
+        setLastScannedISBN(data);
+        setShowScanError(false);
+        handleFetchVolumeID(data);
+      } else {
+        setShowScanError(true);
+      }
+    }
   };
 
   return (
@@ -30,15 +45,8 @@ const BarcodeScanner = () => {
           barcodeTypes: ["ean13"],
         }}
         style={StyleSheet.absoluteFillObject}
-        facing={"back"}
-        onBarcodeScanned={({ data }: { data: string }) => {
-          if (isValidISBN(data)) {
-            setShowScanError(false);
-            handleFetchVolumeID(data);
-          } else {
-            setShowScanError(true);
-          }
-        }}
+        facing="back"
+        onBarcodeScanned={handleBarcodeScanned}
       />
       <View style={styles.overlay}>
         <View style={styles.cutout} />
