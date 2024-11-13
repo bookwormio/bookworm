@@ -27,7 +27,7 @@ const BarcodeScanner = () => {
       <CameraView
         autofocus="on"
         barcodeScannerSettings={{
-          barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e", "code128"],
+          barcodeTypes: ["ean13"],
         }}
         style={StyleSheet.absoluteFillObject}
         facing={"back"}
