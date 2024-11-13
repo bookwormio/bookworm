@@ -1,4 +1,4 @@
-import { FontAwesome5 } from "@expo/vector-icons";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { Image } from "expo-image";
 import React from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -181,7 +181,7 @@ const BookListItem = ({
             disabled={removeBookPending}
             style={styles.removeButtonContainer}
           >
-            <FontAwesome5 name="minus-circle" size={20} color="#FB6D0B" />
+            <AntDesign name={"minuscircleo"} size={20} color={"#FB6D0B"} />
           </TouchableOpacity>
         )}
     </View>

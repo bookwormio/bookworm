@@ -1,4 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import React from "react";
 import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
@@ -117,7 +118,7 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
               style={{ paddingLeft: 5 }}
               name="chevron-right"
               size={16}
-              color="#FB6D0B"
+              color="black"
             />
           </View>
           {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
@@ -151,9 +152,9 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
                   handleRemoveClick(item.id, shelfName, item.volumeInfo);
                 }}
                 disabled={removeBookPending}
-                style={{ paddingTop: 2 }}
+                style={{ paddingTop: 3 }}
               >
-                <FontAwesome5 name="minus-circle" size={20} color="#FB6D0B" />
+                <AntDesign name={"minuscircleo"} size={20} color={"#FB6D0B"} />
               </TouchableOpacity>
             )}
             {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
