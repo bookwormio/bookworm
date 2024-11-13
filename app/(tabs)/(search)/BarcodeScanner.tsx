@@ -14,6 +14,7 @@ const BarcodeScanner = () => {
   const getVolumeIDMutation = useMutation({
     mutationFn: async (isbn: string) => await fetchBookVolumeIDByISBN(isbn),
   });
+
   const handleFetchVolumeID = (isbn: string) => {
     getVolumeIDMutation.mutate(isbn, {
       onSuccess: (scannedVolumeID) => {
