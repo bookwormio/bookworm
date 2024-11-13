@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     color: "#FB6D0B",
     fontSize: 12,
     minWidth: 20,
-    height: 1208,
+    height: 16,
     borderRadius: 8,
     textAlign: "left",
     overflow: "hidden",

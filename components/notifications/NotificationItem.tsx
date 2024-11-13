@@ -11,6 +11,7 @@ import {
   useNavigateToUser,
 } from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
+import { useMarkNotificationAsRead } from "./hooks/useNotificationQueries";
 import NotificationItemContent from "./NotificationItemContent";
 import { calculateTimeSinceNotification } from "./util/notificationUtils";
 
@@ -30,10 +31,15 @@ const NotificationItem = ({ notif }: NotifProp) => {
 
   const navigateToBadgePage = useNavigateToBadgePage(notif.receiver);
 
+  const markNotificationRead = useMarkNotificationAsRead();
+
   return (
     <TouchableOpacity
       style={styles.notif_container}
       onPress={() => {
+        if (notif.read_at == null) {
+          markNotificationRead.mutate({ notificationID: notif.notifID });
+        }
         if (
           notif.type === ServerNotificationType.LIKE ||
           notif.type === ServerNotificationType.COMMENT
@@ -79,6 +85,16 @@ const NotificationItem = ({ notif }: NotifProp) => {
           notification={notif}
           time={time}
         ></NotificationItemContent>
+        {notif.read_at == null && (
+          <View
+            style={{
+              backgroundColor: "#FB6D0B",
+              height: 10,
+              width: 10,
+              borderRadius: 5,
+            }}
+          ></View>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -92,7 +108,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     paddingBottom: 15,
     paddingTop: 15,
-    paddingRight: 40,
+    paddingRight: 20,
     borderBottomWidth: 2,
     borderBottomColor: "rgba(0, 0, 0, 0.1)",
   },

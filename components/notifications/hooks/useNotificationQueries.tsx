@@ -4,6 +4,7 @@ import {
   denyOtherBorrowRequests,
   getAllFullNotifications,
   getUnreadNotificationCount,
+  markNotificationAsRead,
   updateBorrowNotificationStatus,
 } from "../../../services/firebase-services/NotificationQueries";
 import {
@@ -124,10 +125,81 @@ export const useDenyOtherBorrowRequests = () => {
  */
 export const useGetUnreadNotificationCount = (userID: string) => {
   return useQuery({
-    queryKey: ["unreadNotifications", userID],
+    queryKey: ["unreadNotifications"],
     queryFn: async () => {
       return await getUnreadNotificationCount(userID);
     },
     enabled: userID != null && userID !== "",
+  });
+};
+
+/**
+ * Custom hook to mark a notification as read with optimistic updates.
+ * Updates both the notification status and unread count in cache.
+ *
+ * @returns Mutation hook for marking notifications as read
+ * @example
+ * const { mutate } = useMarkNotificationAsRead();
+ * mutate({ notificationID: "123" });
+ */
+export const useMarkNotificationAsRead = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ notificationID }: { notificationID: string }) => {
+      // Call the service function to mark the notification as read
+      await markNotificationAsRead(notificationID);
+    },
+    onMutate: async ({ notificationID }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["notifications"] });
+      await queryClient.cancelQueries({ queryKey: ["unreadNotifications"] });
+
+      // Snapshot the previous values
+      const previousNotifications = queryClient.getQueryData(["notifications"]);
+      const previousUnreadCount = queryClient.getQueryData([
+        "unreadNotifications",
+      ]);
+
+      // Optimistically update notifications
+      queryClient.setQueryData(["notifications"], (old: any) => {
+        if (old == null) return old;
+        return old.map((notification: any) => {
+          if (notification.id === notificationID) {
+            return {
+              ...notification,
+              read_at: new Date().toISOString(),
+            };
+          }
+          return notification;
+        });
+      });
+
+      // Optimistically update unread count
+      queryClient.setQueryData(["unreadNotifications"], (old: number) => {
+        if (typeof old === "number") {
+          return Math.max(0, old - 1);
+        }
+        return old;
+      });
+
+      // Return context with previous values
+      return { previousNotifications, previousUnreadCount };
+    },
+
+    onError: (_err, _variables, context) => {
+      // If mutation fails, restore previous values
+      if (context?.previousNotifications != null) {
+        queryClient.setQueryData(
+          ["notifications"],
+          context.previousNotifications,
+        );
+      }
+      if (context?.previousUnreadCount != null) {
+        queryClient.setQueryData(
+          ["unreadNotifications"],
+          context.previousUnreadCount,
+        );
+      }
+    },
   });
 };

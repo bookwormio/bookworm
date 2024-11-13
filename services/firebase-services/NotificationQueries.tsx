@@ -359,3 +359,25 @@ export async function getUnreadNotificationCount(
     return 0;
   }
 }
+
+/**
+ * Marks a notification as read in Firestore by updating its read_at timestamp.
+ *
+ * @param {string} notifID - The ID of the notification to mark as read
+ * @returns {Promise<void>}
+ * @throws {Error} Logs error if update fails
+ */
+export async function markNotificationAsRead(notifID: string): Promise<void> {
+  try {
+    const notifDocRef = doc(DB, "notifications", notifID);
+    await setDoc(
+      notifDocRef,
+      {
+        read_at: serverTimestamp(),
+      },
+      { merge: true },
+    );
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+  }
+}
