@@ -93,7 +93,16 @@ const ViewData = ({ userID }: ViewDataProps) => {
     <ScrollView style={{ flex: 1 }}>
       <DataSnapShot userID={userID} isLoadingOther={isLoadingPagesData} />
       {userID === user?.uid && (
-        <BookWormButton title="Badges" onPress={navigateToBadgePage} />
+        <View
+          style={{
+            paddingLeft: 40,
+            paddingRight: 40,
+            paddingTop: 20,
+            paddingBottom: 10,
+          }}
+        >
+          <BookWormButton title="Badges" onPress={navigateToBadgePage} />
+        </View>
       )}
       <View>
         <Text style={styles.dataType}>Pages Read:</Text>

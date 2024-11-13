@@ -10,7 +10,7 @@ import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { badgeDisplayTitleMap } from "../../enums/Enums";
 import { useNavigateToPost } from "../profile/hooks/useRouteHooks";
 import WormLoader from "../wormloader/WormLoader";
-import BadgePicture from "./BadgePicture";
+import BadgeIcon from "./BadgeIcon";
 import { useGetExistingEarnedBadges } from "./useBadgeQueries";
 
 interface BadgePageProps {
@@ -42,7 +42,7 @@ const BadgePage = ({ userID }: BadgePageProps) => {
               }
             }}
           >
-            <BadgePicture badgeID={item.badgeID} size={125} />
+            <BadgeIcon badgeID={item.badgeID} size={125} />
             <Text style={styles.textStyle}>
               {badgeDisplayTitleMap[item.badgeID]}
             </Text>

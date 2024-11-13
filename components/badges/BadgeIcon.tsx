@@ -14,7 +14,7 @@ interface BadgePictureProps {
   size: number;
 }
 
-const BadgePicture = ({ badgeID, size }: BadgePictureProps) => {
+const BadgeIcon = ({ badgeID, size }: BadgePictureProps) => {
   const dynamicStyles = {
     container: {
       height: size + 20,
@@ -55,7 +55,7 @@ const BadgePicture = ({ badgeID, size }: BadgePictureProps) => {
   );
 };
 
-export default BadgePicture;
+export default BadgeIcon;
 
 const styles = StyleSheet.create({
   container: {

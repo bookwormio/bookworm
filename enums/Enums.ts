@@ -165,7 +165,7 @@ type BadgeDisplayMap = {
 // Used to display the book status in the UI
 export const badgeDisplayTitleMap: BadgeDisplayMap = {
   // post badges
-  [ServerPostBadge.FIRST_POST]: "First Post",
+  [ServerPostBadge.FIRST_POST]: "1st Post",
   // bookshelf badges
   [ServerBookshelfBadge.ADDED_FIRST_BOOK]: "Added 1st Book",
   [ServerBookshelfBadge.ADDED_TEN_BOOKS]: "Added 10 Books",
