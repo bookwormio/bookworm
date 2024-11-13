@@ -2,9 +2,14 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useAuth } from "../auth/context";
+import { useGetUnreadNotificationCount } from "../notifications/hooks/useNotificationQueries";
 
 const NotificationBell = () => {
-  const unreadCount = 15;
+  const { user } = useAuth();
+  const { data: unreadCount, isSuccess: isSuccessUnreadCount } =
+    useGetUnreadNotificationCount(user?.uid ?? "");
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -14,7 +19,9 @@ const NotificationBell = () => {
     >
       <View style={styles.iconContainer}>
         <FontAwesome5 name="bell" size={20} color="#FB6D0B" />
-        <Text style={styles.badge}>{unreadCount}</Text>
+        {isSuccessUnreadCount && unreadCount > 0 && (
+          <Text style={styles.badge}>{unreadCount}</Text>
+        )}
       </View>
     </TouchableOpacity>
   );

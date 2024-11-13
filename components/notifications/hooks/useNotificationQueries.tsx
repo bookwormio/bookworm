@@ -3,6 +3,7 @@ import {
   createNotification,
   denyOtherBorrowRequests,
   getAllFullNotifications,
+  getUnreadNotificationCount,
   updateBorrowNotificationStatus,
 } from "../../../services/firebase-services/NotificationQueries";
 import {
@@ -111,5 +112,22 @@ export const useDenyOtherBorrowRequests = () => {
         queryKey: ["notifications"],
       });
     },
+  });
+};
+
+/**
+ * Hook to fetch unread notification count for a user.
+ * @param userID - User's ID
+ * @returns React Query result containing unread notification count
+ * @example
+ * const { data: unreadCount } = useGetUnreadNotificationCount(userID);
+ */
+export const useGetUnreadNotificationCount = (userID: string) => {
+  return useQuery({
+    queryKey: ["unreadNotifications", userID],
+    queryFn: async () => {
+      return await getUnreadNotificationCount(userID);
+    },
+    enabled: userID != null && userID !== "",
   });
 };

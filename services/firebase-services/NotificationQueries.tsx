@@ -1,7 +1,9 @@
 import {
   addDoc,
+  and,
   collection,
   doc,
+  getCountFromServer,
   getDocs,
   orderBy,
   query,
@@ -327,4 +329,33 @@ export async function sendBadgeNotification(
     ...(postID != null && { postID }),
   };
   await createNotification(notification);
+}
+
+/**
+ * Gets the count of unread notifications for a specific user.
+ * Looks for notifications where receiver is the userID and read_at is null.
+ *
+ * @param {string} userID - The ID of the user to get unread notifications for
+ * @returns {Promise<number>} The count of unread notifications, or 0 if error
+ */
+export async function getUnreadNotificationCount(
+  userID: string,
+): Promise<number> {
+  try {
+    const notifCollection = collection(DB, "notifications");
+
+    const q = query(
+      notifCollection,
+      and(where("receiver", "==", userID), where("read_at", "==", null)),
+    );
+
+    const snapshot = await getCountFromServer(q);
+
+    const count = snapshot.data().count;
+
+    return count;
+  } catch (error) {
+    console.log("Error getting unread notification count:", error);
+    return 0;
+  }
 }
