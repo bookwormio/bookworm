@@ -64,6 +64,7 @@ export const POSTS_RECOMMENDATION_PREFIX = "postsrecommendation";
 export const PROFILE_RECOMMENDATION_PREFIX = "profilerecommendation";
 
 export const PROFILE_BADGE_PREFIX = "profilebadge";
+export const POSTS_BADGE_PREFIX = "postsbadge";
 
 export const BLURHASH = "LBN-4dMwIUWC~WRj%M^+-;4n4nWC";
 

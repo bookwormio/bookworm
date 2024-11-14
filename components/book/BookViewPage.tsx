@@ -26,6 +26,7 @@ import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import {
   BOOKSHELF_BADGES,
   COMPLETION_BADGES,
+  type ServerBadgeName,
   type ServerBookShelfName,
 } from "../../enums/Enums";
 import { fetchBookByVolumeID } from "../../services/books-services/BookQueries";
@@ -68,7 +69,6 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
   const { mutateAsync: checkForBookshelf } = useCheckForBookShelfBadges();
   const { data: badges, isLoading: isLoadingBadges } =
     useGetExistingEarnedBadges(user?.uid ?? "");
-
   // variables
   const snapPoints = useMemo(() => ["25%", "50%", "100%"], []);
 
@@ -194,8 +194,11 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     } finally {
       setPendingChanges({ add: [], remove: [] });
     }
-    if (!isLoadingBadges) {
-      const badgesSet = new Set(badges);
+    if (!isLoadingBadges && badges != null) {
+      const badgesSet = new Set<ServerBadgeName>();
+      for (const badge of badges) {
+        badgesSet.add(badge.badgeID);
+      }
       const checkBadgePromises = [];
       if (!areAllBadgesEarned(badgesSet, BOOKSHELF_BADGES)) {
         checkBadgePromises.push(checkForBookshelf({ userID: user?.uid ?? "" }));

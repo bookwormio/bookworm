@@ -22,6 +22,7 @@ import {
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
 import { type BadgeModel } from "../../types";
+import { sendBadgeNotification } from "./NotificationQueries";
 
 /**
  * Adds a badge to a user in the Firestore database.
@@ -133,6 +134,7 @@ export async function checkForCompletionBadges(
     await Promise.all(
       matchingThresholds.map(async (threshold) => {
         await addBadgeToUser(userID, threshold.badge, postID);
+        await sendBadgeNotification(userID, threshold.badge, postID);
       }),
     );
   } catch (error) {
@@ -172,6 +174,7 @@ export async function checkForPostBadges(
     await Promise.all(
       matchingThresholds.map(async (threshold) => {
         await addBadgeToUser(userID, threshold.badge, postID);
+        await sendBadgeNotification(userID, threshold.badge, postID);
       }),
     );
   } catch (error) {
@@ -224,6 +227,7 @@ export async function checkForBookShelfBadges(
     await Promise.all(
       matchingThresholds.map(async (threshold) => {
         await addBadgeToUser(userID, threshold.badge, postID);
+        await sendBadgeNotification(userID, threshold.badge, postID);
       }),
     );
   } catch (error) {
@@ -265,9 +269,11 @@ export async function checkForLendingBadges(userID: string): Promise<void> {
 
     if (lenderNumber >= 1) {
       await addBadgeToUser(userID, ServerLendingBadge.LENT_A_BOOK);
+      await sendBadgeNotification(userID, ServerLendingBadge.LENT_A_BOOK);
     }
     if (borrowerNumber >= 1) {
       await addBadgeToUser(userID, ServerLendingBadge.BORROWED_A_BOOK);
+      await sendBadgeNotification(userID, ServerLendingBadge.BORROWED_A_BOOK);
     }
   } catch (error) {
     console.error("Error checking for lending badges: ", error);
@@ -305,6 +311,7 @@ export async function checkForStreakBadges(userID: string, postID: string) {
     await Promise.all(
       matchingThresholds.map(async (threshold) => {
         await addBadgeToUser(userID, threshold.badge, postID);
+        await sendBadgeNotification(userID, threshold.badge, postID);
       }),
     );
   } catch (error) {

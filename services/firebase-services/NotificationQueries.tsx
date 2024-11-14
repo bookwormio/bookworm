@@ -15,10 +15,12 @@ import { createBookResponseNotification } from "../../components/notifications/u
 import { BOOK_AUTO_DENIAL_NOTIFICATION_MESSAGE } from "../../constants/constants";
 import {
   BookRequestNotificationStatus,
+  type ServerBadgeName,
   ServerNotificationType,
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
 import {
+  type BadgeNotification,
   type FullNotificationModel,
   type NotificationModel,
 } from "../../types";
@@ -303,3 +305,19 @@ export const denyOtherBorrowRequests = async (
     );
   }
 };
+
+export async function sendBadgeNotification(
+  userID: string,
+  badgeID: ServerBadgeName,
+  postID?: string,
+) {
+  const notification: BadgeNotification = {
+    receiver: userID,
+    sender: userID,
+    sender_name: "",
+    type: ServerNotificationType.BADGE,
+    badgeID,
+    postID,
+  };
+  await createNotification(notification);
+}

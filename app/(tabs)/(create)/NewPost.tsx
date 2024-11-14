@@ -50,6 +50,7 @@ import {
   BOOKSHELF_BADGES,
   COMPLETION_BADGES,
   POST_BADGES,
+  type ServerBadgeName,
   ServerBookShelfName,
   STREAK_BADGES,
 } from "../../../enums/Enums";
@@ -217,8 +218,11 @@ const NewPost = () => {
       }
       const post = await getLatestPostInfo(user?.uid);
 
-      if (!isLoadingBadges) {
-        const badgesSet = new Set(badges);
+      if (!isLoadingBadges && badges != null) {
+        const badgesSet = new Set<ServerBadgeName>();
+        for (const badge of badges) {
+          badgesSet.add(badge.badgeID);
+        }
         const checkBadgePromises = [];
 
         if (!areAllBadgesEarned(badgesSet, BOOKSHELF_BADGES)) {

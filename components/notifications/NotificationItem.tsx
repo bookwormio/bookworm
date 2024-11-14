@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { ServerNotificationType } from "../../enums/Enums";
 import { type FullNotificationModel } from "../../types";
 import { useAuth } from "../auth/context";
+import BadgeIcon from "../badges/BadgeIcon";
 import {
   useNavigateToBadgePage,
   useNavigateToBook,
@@ -26,7 +27,6 @@ const NotificationItem = ({ notif }: NotifProp) => {
   const navigateToPost = useNavigateToPost();
 
   const navigateToUser = useNavigateToUser(user?.uid, notif.sender);
-
   const navigateToBadgePage = useNavigateToBadgePage(notif.receiver);
 
   return (
@@ -57,7 +57,11 @@ const NotificationItem = ({ notif }: NotifProp) => {
             navigateToUser();
           }}
         >
-          <ProfilePicture userID={notif.sender} size={50} />
+          {notif.type !== ServerNotificationType.BADGE ? (
+            <ProfilePicture userID={notif.sender} size={50} />
+          ) : notif.badgeID != null ? (
+            <BadgeIcon badgeID={notif.badgeID} size={50} />
+          ) : null}
         </TouchableOpacity>
         <NotificationItemContent
           notification={notif}

@@ -1,5 +1,6 @@
 import { useRouter, useSegments } from "expo-router";
 import {
+  POSTS_BADGE_PREFIX,
   POSTS_BOOK_PREFIX,
   POSTS_BOOKLIST_PREFIX,
   POSTS_FOLLOWLIST_PREFIX,
@@ -285,6 +286,7 @@ export const useNavigateToRecommendation = (friendUserID: string) => {
 
 const BADGE_ROUTE_PREFIXES = {
   PROFILE: PROFILE_BADGE_PREFIX,
+  POSTS: POSTS_BADGE_PREFIX,
 } as const;
 
 type BadgeRouteType = keyof typeof BADGE_ROUTE_PREFIXES;
@@ -303,6 +305,8 @@ export const useBadgePageRouteInfo = (): BadgeRouteInfo => {
 
   if (segments.includes(PROFILE_ROUTE_PREFIX))
     return { type: "PROFILE", prefix: BADGE_ROUTE_PREFIXES.PROFILE };
+  if (segments.includes(POSTS_ROUTE_PREFIX))
+    return { type: "POSTS", prefix: BADGE_ROUTE_PREFIXES.POSTS };
 
   return { type: null, prefix: "" };
 };

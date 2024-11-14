@@ -89,6 +89,14 @@ const PostsLayout = () => {
             headerLeft: () => <BackButton />,
           }}
         />
+        <Stack.Screen
+          name="postsbadge/[userID]"
+          options={{
+            headerShown: true,
+            headerTitle: "Badges",
+            headerLeft: () => <BackButton />,
+          }}
+        />
       </Stack>
     </KeyboardAvoidingView>
   );
