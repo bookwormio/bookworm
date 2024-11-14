@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white", // Orange color
     padding: 10,
     alignItems: "center",
-    marginBottom: 10,
+    marginTop: 10,
   },
   chartContainer: {
     overflow: "hidden",
