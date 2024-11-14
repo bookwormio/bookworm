@@ -54,6 +54,13 @@ const SearchLayout = () => {
           }}
         />
         <Stack.Screen
+          name="BarcodeScanner"
+          options={{
+            presentation: "modal",
+            title: "Scan a Book's Barcode",
+          }}
+        />
+        <Stack.Screen
           name="searchbooklist/[userID]"
           options={{
             headerShown: true,

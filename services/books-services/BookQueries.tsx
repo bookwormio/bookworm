@@ -101,3 +101,38 @@ export async function fetchBookByVolumeID(
     return null;
   }
 }
+
+/**
+ * Converts a books ISBN to their Google Books unique volumeID
+ * @param isbn - the ISBN of the book
+ * @returns {Promise<string | null>} - the books volumeID or null if not found
+ */
+export async function fetchBookVolumeIDByISBN(
+  isbn: string,
+): Promise<string | null> {
+  if (isbn === "") {
+    return null; // Return null if there's no volumeID
+  }
+  try {
+    const response = await axios.get(
+      "https://www.googleapis.com/books/v1/volumes",
+      {
+        params: {
+          q: `isbn:${isbn}`,
+          key: process.env.GOOGLE_BOOKS_API_KEY,
+          projection: "full",
+          limit: 1,
+        },
+      },
+    );
+    if (response.data.items != null && response.data.items.length > 0) {
+      const volumeID: string = response.data.items[0].id;
+      return volumeID;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching book by ISBN", error);
+    return null;
+  }
+}

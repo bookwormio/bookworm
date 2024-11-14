@@ -8,7 +8,7 @@ import { type BookVolumeInfo, type BookVolumeItem } from "../../types";
 import { useAuth } from "../auth/context";
 import BookList from "../booklist/BookList";
 import { useGetBooksForBookshelves } from "../profile/hooks/useBookshelfQueries";
-import SearchBar from "./searchbar";
+import BookSearchBar from "./booksearchbar";
 import {
   filterBookShelfBooksByTitle,
   mapAndSortPreloadedBooks,
@@ -117,7 +117,7 @@ const BookSearch = ({
 
   return (
     <View style={styles.container}>
-      <SearchBar
+      <BookSearchBar
         clicked={searchClicked}
         searchPhrase={searchPhrase}
         setSearchPhrase={setSearchPhrase}
