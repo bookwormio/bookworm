@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   fetchBooksFinishedData,
@@ -18,6 +18,8 @@ import ViewDataChart from "../../chart/ViewDataChart";
 import DataSnapShot from "../../datasnapshot/DataSnapShot";
 import WormLoader from "../../wormloader/WormLoader";
 import { useNavigateToBadgePage } from "../hooks/useRouteHooks";
+import { Link, useRouter } from "expo-router";
+import { CREATE_ROUTE_PREFIX } from "../../../constants/constants";
 
 // TODO: Combine these functions into a single generic
 function aggregatePagesDataByWeek(
@@ -103,6 +105,11 @@ const ViewData = ({ userID }: ViewDataProps) => {
     },
   });
 
+  const router = useRouter();
+  const navigateToMakePostPage = () => {
+    router.push({pathname: CREATE_ROUTE_PREFIX});
+  };
+
   const { user } = useAuth();
   const navigateToBadgePage = useNavigateToBadgePage(userID);
 
@@ -163,7 +170,14 @@ const ViewData = ({ userID }: ViewDataProps) => {
           {aggregatedPagesData.length > 0 ? (
             <ViewDataChart aggregatedData={aggregatedPagesData}></ViewDataChart>
           ) : (
-            <Text>No data to display</Text>
+            <View style={styles.noDataContainer}>
+              <Text style={styles.noData}>No data to display.</Text>
+              {userID === user?.uid && (
+                <TouchableOpacity onPress={navigateToMakePostPage}>
+                  <Text style={styles.makePost}> Make a post</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           )}
         </View>
         <View style={styles.titleBar}>
@@ -175,7 +189,14 @@ const ViewData = ({ userID }: ViewDataProps) => {
               aggregatedData={aggregatedBooksData}
             ></ViewBookBarChart>
           ) : (
-            <Text>No data to display</Text>
+            <View style={styles.noDataContainer}>
+              <Text style={styles.noData}>No data to display.</Text>
+              {userID === user?.uid && (
+                <TouchableOpacity onPress={navigateToMakePostPage}>
+                  <Text style={styles.makePost}> Make a post</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           )}
         </View>
       </View>
@@ -266,4 +287,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
+  noData: {
+    fontSize: 17,
+    color: "black",
+    textAlign: "center",
+    paddingTop: 10,
+  },
+  makePost: {
+    fontSize: 17,
+    color: '#FB6D0B',
+    paddingTop: 10,
+  },
+  noDataContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  }
 });
