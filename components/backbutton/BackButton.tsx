@@ -2,6 +2,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import { Keyboard, TouchableOpacity, View } from "react-native";
+import { closeKeyboardThen } from "../../app/util/keyboardHelpers";
 
 interface BackButtonProps {
   waitForKeyBoardDismiss?: boolean;
@@ -17,9 +18,9 @@ const BackButton = ({ waitForKeyBoardDismiss }: BackButtonProps) => {
           onPress={() => {
             Keyboard.dismiss();
             if (waitForKeyBoardDismiss === true) {
-              setTimeout(() => {
+              closeKeyboardThen(() => {
                 router.back();
-              }, 25);
+              });
             } else {
               router.back();
             }

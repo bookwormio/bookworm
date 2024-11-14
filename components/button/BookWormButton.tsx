@@ -52,6 +52,7 @@ const BookWormButton = ({
           isNegativeOption && styles.buttonTextNegative,
           disabled && styles.buttonTextDisabled,
         ]}
+        numberOfLines={1}
       >
         {title}
       </Text>

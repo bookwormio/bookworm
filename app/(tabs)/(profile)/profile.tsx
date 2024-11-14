@@ -14,8 +14,10 @@ import {
   useGetNumberOfFollowersByUserID,
   useGetNumberOfFollowingByUserID,
 } from "../../../components/followdetails/useFollowDetailQueries";
+import { hasAnyBooks } from "../../../components/newpost/util/bookShelfUtils";
 import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBookShelves";
 import ViewData from "../../../components/profile/Data/ViewData";
+import { useGetBooksForBookshelves } from "../../../components/profile/hooks/useBookshelfQueries";
 import { useNavigateToFollowList } from "../../../components/profile/hooks/useRouteHooks";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
 import ProfilePosts from "../../../components/profile/ProfilePosts";
@@ -30,6 +32,7 @@ const Profile = () => {
   const [profileTab, setProfileTab] = useState("shelf"); // Default to bookshelf
 
   const navigateToFollowList = useNavigateToFollowList(user?.uid);
+  const { data: bookShelves } = useGetBooksForBookshelves(user?.uid ?? "");
 
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
     queryKey: ["userdata", user?.uid],
@@ -38,7 +41,6 @@ const Profile = () => {
       return await newFetchUserInfo(user?.uid ?? "");
     },
   });
-
   const { data: followersCount, isLoading: isLoadingFollowersCount } =
     useGetNumberOfFollowersByUserID(user?.uid ?? "");
 
@@ -127,16 +129,23 @@ const Profile = () => {
       />
       {profileTab === TabNames.BOOKSHELVES && user !== null ? (
         <View style={styles.shelves}>
-          {
-            <View style={{ paddingLeft: 40, paddingRight: 40 }}>
+          <View style={{ paddingLeft: 40, paddingRight: 40 }}>
+            {hasAnyBooks(bookShelves) ? (
               <BookWormButton
                 title="Generate Recommendations"
                 onPress={() => {
                   router.push("/GenerateRecommendationsPage");
                 }}
               />
-            </View>
-          }
+            ) : (
+              <BookWormButton
+                title="Find Books"
+                onPress={() => {
+                  router.replace("/search");
+                }}
+              />
+            )}
+          </View>
           <ProfileBookShelves userID={user?.uid} />
         </View>
       ) : profileTab === TabNames.POSTS ? (

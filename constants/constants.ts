@@ -59,6 +59,8 @@ export const SEARCH_RECOMMENDATION_PREFIX = "searchrecommendation";
 export const POSTS_RECOMMENDATION_PREFIX = "postsrecommendation";
 export const PROFILE_RECOMMENDATION_PREFIX = "profilerecommendation";
 
+export const PROFILE_BADGE_PREFIX = "profilebadge";
+
 export const BLURHASH = "LBN-4dMwIUWC~WRj%M^+-;4n4nWC";
 
 export const FIRST_PROGRESS_COLOR = "rgb(88, 166, 92)";
@@ -104,3 +106,15 @@ export const BOOK_AUTO_DENIAL_NOTIFICATION_MESSAGE =
   "This book is being lent to someone else.";
 
 export const MAX_PREFETCH_USERS = 10;
+
+export const PROFILE_PLACEHOLDERS = {
+  USERNAME: "Username",
+  FIRST_NAME: "First Name",
+  LAST_NAME: "Last Name",
+  PHONE: "Phone Number",
+  BIO: "Bio",
+  CITY: "City",
+  STATE: "State",
+} as const;
+
+export const KEYBOARD_CLOSE_DELAY = 20;

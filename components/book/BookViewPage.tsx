@@ -197,13 +197,13 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     if (!isLoadingBadges) {
       const badgesSet = new Set(badges);
       const checkBadgePromises = [];
+      if (!areAllBadgesEarned(badgesSet, BOOKSHELF_BADGES)) {
+        checkBadgePromises.push(checkForBookshelf({ userID: user?.uid ?? "" }));
+      }
       if (!areAllBadgesEarned(badgesSet, COMPLETION_BADGES)) {
         checkBadgePromises.push(
           checkForCompletion({ userID: user?.uid ?? "" }),
         );
-      }
-      if (!areAllBadgesEarned(badgesSet, BOOKSHELF_BADGES)) {
-        checkBadgePromises.push(checkForBookshelf({ userID: user?.uid ?? "" }));
       }
       if (checkBadgePromises.length > 0) {
         await Promise.all(checkBadgePromises);

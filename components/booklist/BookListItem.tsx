@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { closeKeyboardThen } from "../../app/util/keyboardHelpers";
 import { type ServerBookShelfName } from "../../enums/Enums";
 import { type BookVolumeInfo } from "../../types";
 import { useNavigateToBook } from "../profile/hooks/useRouteHooks";
@@ -32,11 +33,13 @@ const BookListItem = ({
     <TouchableOpacity
       style={styles.container}
       onPress={() => {
-        if (handleBookClickOverride != null) {
-          handleBookClickOverride(bookID, volumeInfo);
-        } else {
-          handleBookClicked();
-        }
+        closeKeyboardThen(() => {
+          if (handleBookClickOverride != null) {
+            handleBookClickOverride(bookID, volumeInfo);
+          } else {
+            handleBookClicked();
+          }
+        });
       }}
     >
       <View style={styles.imageContainer}>

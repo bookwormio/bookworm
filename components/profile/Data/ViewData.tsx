@@ -7,9 +7,12 @@ import {
   type LineDataPointModel,
   type WeekDataPointModel,
 } from "../../../types";
+import { useAuth } from "../../auth/context";
+import BookWormButton from "../../button/BookWormButton";
 import ViewDataChart from "../../chart/ViewDataChart";
 import DataSnapShot from "../../datasnapshot/DataSnapShot";
 import WormLoader from "../../wormloader/WormLoader";
+import { useNavigateToBadgePage } from "../hooks/useRouteHooks";
 
 // TODO: Combine these functions into a single generic
 function aggregatePagesDataByWeek(
@@ -64,6 +67,9 @@ const ViewData = ({ userID }: ViewDataProps) => {
     },
   });
 
+  const { user } = useAuth();
+  const navigateToBadgePage = useNavigateToBadgePage(userID);
+
   if (isLoadingPagesData) {
     return (
       <View style={styles.container}>
@@ -86,6 +92,18 @@ const ViewData = ({ userID }: ViewDataProps) => {
   return (
     <ScrollView style={{ flex: 1 }}>
       <DataSnapShot userID={userID} isLoadingOther={isLoadingPagesData} />
+      {userID === user?.uid && (
+        <View
+          style={{
+            paddingLeft: 40,
+            paddingRight: 40,
+            paddingTop: 20,
+            paddingBottom: 10,
+          }}
+        >
+          <BookWormButton title="Badges" onPress={navigateToBadgePage} />
+        </View>
+      )}
       <View>
         <Text style={styles.dataType}>Pages Read:</Text>
         {aggregatedPagesData.length > 0 ? (

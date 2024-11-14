@@ -5,6 +5,7 @@ import {
   POSTS_POST_PREFIX,
   POSTS_RECOMMENDATION_PREFIX,
   POSTS_ROUTE_PREFIX,
+  PROFILE_BADGE_PREFIX,
   PROFILE_BOOK_PREFIX,
   PROFILE_FOLLOWLIST_PREFIX,
   PROFILE_POST_PREFIX,
@@ -17,6 +18,7 @@ import {
   SEARCH_ROUTE_PREFIX,
 } from "../../../constants/constants";
 import {
+  generateBadgePageRoute,
   generateBookRoute,
   generateFollowListRoute,
   generatePostRoute,
@@ -275,4 +277,48 @@ export const useNavigateToRecommendation = (friendUserID: string) => {
     }
   }
   return navigateToRecommendation;
+};
+
+const BADGE_ROUTE_PREFIXES = {
+  PROFILE: PROFILE_BADGE_PREFIX,
+} as const;
+
+type BadgeRouteType = keyof typeof BADGE_ROUTE_PREFIXES;
+
+interface BadgeRouteInfo {
+  type: BadgeRouteType | null;
+  prefix: string;
+}
+
+/**
+ * Hook to get the current badges route info based on URL segments.
+ * @returns {BadgeRouteInfo} - Object containing the route type and prefix for badges.
+ */
+export const useBadgePageRouteInfo = (): BadgeRouteInfo => {
+  const segments = useSegments();
+
+  if (segments.includes(PROFILE_ROUTE_PREFIX))
+    return { type: "PROFILE", prefix: BADGE_ROUTE_PREFIXES.PROFILE };
+
+  return { type: null, prefix: "" };
+};
+
+/**
+ * Hook to navigate to a badge page for a given user.
+ * @param {string} [userID] - The ID of the user whose badge page is being navigated to.
+ * @returns {Function} - Function to navigate to the badge page.
+ */
+export const useNavigateToBadgePage = (userID: string) => {
+  const router = useRouter();
+  const { prefix } = useBadgePageRouteInfo();
+
+  function navigateToBadgePage() {
+    if (userID != null && userID !== "") {
+      const badgeRoute = generateBadgePageRoute(userID, prefix);
+      if (badgeRoute != null) {
+        router.push(badgeRoute);
+      }
+    }
+  }
+  return navigateToBadgePage;
 };

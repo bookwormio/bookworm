@@ -3,6 +3,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import Post from "../../components/post/post";
 import { usePostsContext } from "../../components/post/PostsContext";
+import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { fetchPostByPostID } from "../../services/firebase-services/PostQueries";
 import WormLoader from "../wormloader/WormLoader";
 
@@ -34,7 +35,7 @@ const ViewPost = ({ postID, fromProfile }: ViewPostProps) => {
   return (
     <View style={styles.container}>
       {isLoading && (
-        <View style={styles.feedLoading}>
+        <View style={styles.loading}>
           <WormLoader />
         </View>
       )}
@@ -59,15 +60,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: APP_BACKGROUND_COLOR,
   },
-  feedLoading: {
+  loading: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
-    top: "50%",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   postContainer: {
     flex: 1,
     width: "100%",
+    backgroundColor: "#F2F2F2",
   },
 });

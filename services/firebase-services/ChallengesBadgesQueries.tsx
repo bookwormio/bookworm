@@ -21,6 +21,7 @@ import {
   ServerStreakBadge,
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
+import { type BadgeModel } from "../../types";
 
 /**
  * Adds a badge to a user in the Firestore database.
@@ -70,14 +71,24 @@ export async function addBadgeToUser(
  */
 export async function getExistingEarnedBadges(
   userID: string,
-): Promise<ServerBadgeName[]> {
+): Promise<BadgeModel[]> {
   try {
     const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
     const badgesCollectionRef = collection(userBadgeCollectDocRef, "badges");
-    const badgeDocs = await getDocs(badgesCollectionRef);
-    const badges: ServerBadgeName[] = [];
+
+    const badgesQuery = query(
+      badgesCollectionRef,
+      orderBy("received_at", "asc"),
+    );
+
+    const badgeDocs = await getDocs(badgesQuery);
+    const badges: BadgeModel[] = [];
     badgeDocs.forEach((doc) => {
-      badges.push(doc.id as ServerBadgeName);
+      badges.push({
+        badgeID: doc.id as ServerBadgeName,
+        received_at: doc.data().received_at ?? null,
+        postID: doc.data().postID ?? null,
+      });
     });
     return badges;
   } catch (error) {
