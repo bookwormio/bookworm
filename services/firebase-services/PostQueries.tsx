@@ -13,11 +13,7 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import {
-  ref,
-  uploadBytesResumable,
-  type StorageReference,
-} from "firebase/storage";
+import { ref, uploadBytesResumable } from "firebase/storage";
 import { DB, STORAGE } from "../../firebase.config";
 import {
   type CommentModel,
@@ -25,6 +21,7 @@ import {
   type PostModel,
   type UserModel,
 } from "../../types";
+import { makePostModelFromDoc } from "../util/postQueryUtils";
 import { getAllFollowing } from "./FriendQueries";
 import { fetchUser, fetchUsersByIDs } from "./UserQueries";
 
@@ -114,27 +111,7 @@ export async function fetchPostsByUserIDs(
       try {
         const user = userModels.find((user) => user.id === userID);
         if (user != null) {
-          const imageStorageRefs: StorageReference[] = [];
-          for (let index = 0; index < postDoc.data().image; index++) {
-            imageStorageRefs[index] = ref(
-              STORAGE,
-              `posts/${postDoc.id}/${index}`,
-            );
-          }
-          const post = {
-            id: postDoc.id,
-            bookid: postDoc.data().bookid,
-            booktitle: postDoc.data().booktitle,
-            created: postDoc.data().created,
-            text: postDoc.data().text,
-            user,
-            imageStorageRefs,
-            oldBookmark: postDoc.data().oldBookmark,
-            newBookmark: postDoc.data().newBookmark,
-            likes: postDoc.data().likes ?? [],
-            comments: (postDoc.data().comments as CommentModel[]) ?? [],
-            totalPages: postDoc.data().totalPages,
-          };
+          const post = makePostModelFromDoc(postDoc, user);
           postsData.push(post);
         }
       } catch (error) {
@@ -177,29 +154,7 @@ export async function fetchPostsByUserID(
       for (const postDoc of postsSnapshot.docs) {
         if (userModel !== null) {
           try {
-            const imageStorageRefs: StorageReference[] = [];
-
-            for (let index = 0; index < postDoc.data().image; index++) {
-              imageStorageRefs[index] = ref(
-                STORAGE,
-                `posts/${postDoc.id}/${index}`,
-              );
-            }
-            const post: PostModel = {
-              id: postDoc.id,
-              bookid: postDoc.data().bookid,
-              booktitle: postDoc.data().booktitle,
-              created: postDoc.data().created,
-              text: postDoc.data().text,
-              user: userModel,
-              // images,
-              imageStorageRefs,
-              oldBookmark: postDoc.data().oldBookmark,
-              newBookmark: postDoc.data().newBookmark,
-              likes: postDoc.data().likes ?? [],
-              comments: (postDoc.data().comments as CommentModel[]) ?? [],
-              totalPages: postDoc.data().totalPages,
-            };
+            const post = makePostModelFromDoc(postDoc, userModel);
             postsData.push(post);
           } catch (error) {
             console.error("Error fetching user", error);
@@ -241,30 +196,7 @@ export async function fetchPostByPostID(
             last: userSnap.data().last,
             number: userSnap.data().number,
           };
-
-          // TODO: Abstract this into a function
-          const imageStorageRefs: StorageReference[] = [];
-
-          for (let index = 0; index < postSnap.data().image; index++) {
-            imageStorageRefs[index] = ref(
-              STORAGE,
-              `posts/${postSnap.id}/${index}`,
-            );
-          }
-          post = {
-            id: postSnap.id,
-            bookid: postSnap.data().bookid,
-            booktitle: postSnap.data().booktitle,
-            created: postSnap.data().created,
-            text: postSnap.data().text,
-            user,
-            imageStorageRefs,
-            likes: postSnap.data().likes ?? [],
-            comments: (postSnap.data().comments as CommentModel[]) ?? [],
-            oldBookmark: postSnap.data().oldBookmark,
-            newBookmark: postSnap.data().newBookmark,
-            totalPages: postSnap.data().totalPages,
-          };
+          post = makePostModelFromDoc(postSnap, user);
         }
       }
     });
