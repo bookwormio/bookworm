@@ -73,7 +73,7 @@ export const NotificationMessageMap: StringMap = {
   [ServerNotificationType.COMMENT]: "commented on your post:",
   [ServerNotificationType.RECOMMENDATION]: "thinks you should read",
   [ServerNotificationType.BOOK_REQUEST]: "requested to borrow",
-  [ServerNotificationType.BADGE]: "You earned a badge: ",
+  [ServerNotificationType.BADGE]: "You earned a badge:",
 };
 
 export enum BookRequestNotificationStatus {

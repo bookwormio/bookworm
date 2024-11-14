@@ -4,6 +4,7 @@ import { ServerNotificationType } from "../../enums/Enums";
 import { type FullNotificationModel } from "../../types";
 import { useAuth } from "../auth/context";
 import {
+  useNavigateToBadgePage,
   useNavigateToBook,
   useNavigateToPost,
   useNavigateToUser,
@@ -26,6 +27,8 @@ const NotificationItem = ({ notif }: NotifProp) => {
 
   const navigateToUser = useNavigateToUser(user?.uid, notif.sender);
 
+  const navigateToBadgePage = useNavigateToBadgePage();
+
   return (
     <TouchableOpacity
       style={styles.notif_container}
@@ -43,6 +46,8 @@ const NotificationItem = ({ notif }: NotifProp) => {
           notif.type === ServerNotificationType.BOOK_REQUEST_RESPONSE
         ) {
           navigateToBook();
+        } else if (notif.type === ServerNotificationType.BADGE) {
+          navigateToBadgePage(notif.receiver);
         }
       }}
     >

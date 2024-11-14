@@ -92,6 +92,10 @@ export async function createNotification(
         custom_message: notif.custom_message ?? "",
         bookRequestStatus: notif.bookRequestStatus,
       }),
+      ...(notif.type === ServerNotificationType.BADGE && {
+        badgeID: notif.badgeID,
+        ...(notif.postID != null && { postID: notif.postID }),
+      }),
     };
 
     await addDoc(notificationsRef, fullNotif);
@@ -164,6 +168,7 @@ export async function getAllFullNotifications(
         read_at: notifDoc.data().read_at,
         postID: notifDoc.data().postID,
         bookID: notifDoc.data().bookID,
+        badgeID: notifDoc.data().badgeID,
         bookTitle: notifDoc.data().bookTitle,
         custom_message: notifDoc.data().custom_message,
         bookRequestStatus: notifDoc.data().bookRequestStatus,
