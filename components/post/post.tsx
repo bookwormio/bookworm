@@ -140,23 +140,17 @@ const Post = ({
               showsHorizontalScrollIndicator={true}
               horizontal
               keyExtractor={(_, index) => index.toString()}
-              renderItem={({ item, index }) => {
-                if (index === 0) {
-                  return (
-                    <PostImage
-                      key={index}
-                      storageRef={item}
-                      index={index}
-                      onPress={() => {
-                        navigateToBook();
-                      }}
-                    />
-                  );
-                }
-                return (
-                  <PostImage key={index} storageRef={item} index={index} />
-                );
-              }}
+              renderItem={({ item, index }) => (
+                // This allows side scrolling anywhere in the image list
+                <View onStartShouldSetResponder={() => true}>
+                  <PostImage
+                    key={index}
+                    storageRef={item}
+                    index={index}
+                    onPress={index === 0 ? navigateToBook : undefined}
+                  />
+                </View>
+              )}
             />
           </View>
         )}

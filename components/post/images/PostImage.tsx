@@ -23,9 +23,20 @@ const PostImage = ({ storageRef, index, onPress }: PostImageProps) => {
   const isFirstImage = index === 0;
 
   if (isLoadingImageURL) {
-    <View style={[isFirstImage ? FIRST_IMG_STYLE : IMG_STYLE]}>
-      <WormLoader />
-    </View>;
+    return (
+      <TouchableOpacity>
+        <View style={[isFirstImage ? FIRST_IMG_STYLE : IMG_STYLE]}>
+          <View style={styles.loading}>
+            <WormLoader />
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
+  // Don't render the image if the download URL is null
+  if (imageDownloadURL == null) {
+    return null;
   }
 
   return (
@@ -54,5 +65,15 @@ export default PostImage;
 const styles = StyleSheet.create({
   imageContainer: {
     marginRight: 10,
+  },
+  loading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });
