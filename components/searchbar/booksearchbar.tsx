@@ -1,6 +1,6 @@
 import { Entypo, Feather } from "@expo/vector-icons";
 import { useCameraPermissions } from "expo-camera";
-import { router } from "expo-router";
+import { router, useSegments } from "expo-router";
 import React from "react";
 import {
   Button,
@@ -28,12 +28,18 @@ const BookSearchBar = ({
   placeholderText,
 }: SearchBarProps) => {
   const [permission, requestPermission] = useCameraPermissions();
+  const segments = useSegments();
+  const isRecommendationSearch = segments[2].endsWith("recommendation");
 
   return (
     <View style={styles.container}>
       <View
         style={
-          clicked ? styles.searchBar__clicked : styles.searchBar__unclicked
+          clicked
+            ? styles.searchBar__clicked
+            : isRecommendationSearch
+              ? styles.searchBar__unclicked
+              : styles.searchBar__unclicked__barcode
         }
       >
         {/* search Icon */}
@@ -83,17 +89,21 @@ const BookSearchBar = ({
           ></Button>
         </View>
       )}
-      {!clicked && (
+      {!clicked && !isRecommendationSearch && (
         <TouchableOpacity
           onPress={() => {
             if (permission?.granted === false) {
-              requestPermission().then((response) => {
-                if (response.granted) {
-                  router.push({
-                    pathname: "/BarcodeScanner",
-                  });
-                }
-              });
+              requestPermission()
+                .then((response) => {
+                  if (response.granted) {
+                    router.push({
+                      pathname: "/BarcodeScanner",
+                    });
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error with camera permissions", error);
+                });
             } else {
               router.push({
                 pathname: "/BarcodeScanner",
@@ -122,6 +132,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   searchBar__unclicked: {
+    padding: 10,
+    flexDirection: "row",
+    width: "95%",
+    backgroundColor: "#d9dbda",
+    borderRadius: 15,
+    alignItems: "center",
+  },
+  searchBar__unclicked__barcode: {
     padding: 10,
     flexDirection: "row",
     width: "80%",

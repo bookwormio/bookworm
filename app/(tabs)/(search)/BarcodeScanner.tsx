@@ -1,29 +1,39 @@
-import { useMutation } from "@tanstack/react-query";
 import { CameraView } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { fetchBookVolumeIDByISBN } from "../../../services/books-services/BookQueries";
 import { isValidISBN } from "../../../services/util/bookQueryUtils";
+import { useVolumeIDMutation } from "./hooks/useBarcodeQueries";
 
 const BarcodeScanner = () => {
   const router = useRouter();
   const [showScanError, setShowScanError] = useState(false);
   const [lastScannedISBN, setLastScannedISBN] = useState("");
-  const getVolumeIDMutation = useMutation({
-    mutationFn: async (isbn: string) => await fetchBookVolumeIDByISBN(isbn),
-  });
+  const getVolumeIDMutation = useVolumeIDMutation();
 
   const handleFetchVolumeID = (isbn: string) => {
-    getVolumeIDMutation.mutate(isbn, {
-      onSuccess: (scannedVolumeID) => {
-        if (scannedVolumeID !== null) {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          router.replace(`/searchbook/${scannedVolumeID}`);
-        }
-      },
-    });
+    if (!getVolumeIDMutation.isPending) {
+      getVolumeIDMutation.mutate(isbn, {
+        onSuccess: (scannedVolumeID) => {
+          if (scannedVolumeID !== null) {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+              .then(() => {
+                router.replace(`/searchbook/${scannedVolumeID}`);
+              })
+              .catch((error) => {
+                console.error("Error creating haptic", error);
+              });
+          } else {
+            setShowScanError(true);
+          }
+        },
+        onError: (error) => {
+          setShowScanError(true);
+          console.error("Error fetching book information", error);
+        },
+      });
+    }
   };
 
   const handleBarcodeScanned = ({ data }: { data: string }) => {
@@ -53,7 +63,7 @@ const BarcodeScanner = () => {
         <View style={styles.cutout} />
         {showScanError && (
           <Text style={styles.overlayText}>
-            Couldn't read book's ISBN. Please try again.
+            {"Couldn't read book's ISBN. Please try again."}
           </Text>
         )}
       </View>
@@ -81,7 +91,7 @@ const styles = StyleSheet.create({
     height: 180,
     backgroundColor: "transparent",
     borderRadius: 10,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: "#FFF",
   },
   overlayText: {
