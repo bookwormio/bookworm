@@ -36,13 +36,6 @@ return dataset;
 };
 
 const ViewBookBarChart = ({ aggregatedData }: ViewBarChartProps) => {
-  const [tooltipPos, setTooltipPos] = useState({
-    x: 0,
-    y: 0,
-    visible: false,
-    value: 0,
-  });
-
   const dataset = matchDataToMonths(aggregatedData);
   const labelset = dataset.map((_, index) => {
     const date = subMonths(new Date(), index);
@@ -60,36 +53,10 @@ const ViewBookBarChart = ({ aggregatedData }: ViewBarChartProps) => {
     ],
   };
 
-  const handleChartPress = () => {
-    setTooltipPos((previousState) => ({
-      ...previousState,
-      visible: false,
-    }));
-  };
-
   return (
-    <TouchableOpacity activeOpacity={1} onPress={handleChartPress}>
+    <TouchableOpacity activeOpacity={1}>
       <View style={styles.chartContainer}>
         <BarChart
-        //   onDataPointClick={(data) => {
-        //     const isSamePoint =
-        //       tooltipPos.x === data.x && tooltipPos.y === data.y;
-
-        //     isSamePoint
-        //       ? setTooltipPos((previousState) => {
-        //           return {
-        //             ...previousState,
-        //             value: data.value,
-        //             visible: !previousState.visible,
-        //           };
-        //         })
-        //       : setTooltipPos({
-        //           x: data.x,
-        //           y: data.y,
-        //           value: data.value,
-        //           visible: true,
-        //         });
-        //   }}
           data={chartData}
           width={Dimensions.get("window").width + 40} // from react-native
           height={220}
@@ -121,20 +88,6 @@ const ViewBookBarChart = ({ aggregatedData }: ViewBarChartProps) => {
           style={styles.barChart}
         />
       </View>
-      {tooltipPos.visible && (
-        <View
-          style={{
-            position: 'absolute',
-            left: tooltipPos.x,
-            top: tooltipPos.y - 30,
-            backgroundColor: 'white',
-            padding: 5,
-            borderRadius: 5,
-          }}
-        >
-          <Text>{tooltipPos.value} books</Text>
-        </View>
-      )}
     </TouchableOpacity>
   );
 };
