@@ -63,10 +63,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
             <BadgeIcon
               badgeID={notif.badgeID}
               size={50}
-              stylesOverride={{
-                borderRadius: 50,
-                alignSelf: "flex-start",
-              }}
+              stylesOverride={styles.badgeStyleOverride}
               sizeAddOverride={15}
             />
           ) : null}
@@ -115,5 +112,9 @@ const styles = StyleSheet.create({
     height: "100%", // Adjust the size of the image as needed
     width: "100%", // Adjust the size of the image as needed
     borderRadius: 30, // Make the image circular
+  },
+  badgeStyleOverride: {
+    borderRadius: 50,
+    alignSelf: "flex-start",
   },
 });

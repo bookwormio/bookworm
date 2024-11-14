@@ -306,6 +306,12 @@ export const denyOtherBorrowRequests = async (
   }
 };
 
+/**
+ * Formats and calls createNotification for Badge Notifications
+ * @param userID ID of user notification is getting sent to
+ * @param badgeID badge type
+ * @param postID postID the badge could be associated with
+ */
 export async function sendBadgeNotification(
   userID: string,
   badgeID: ServerBadgeName,
