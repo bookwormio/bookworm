@@ -18,6 +18,7 @@ import {
 } from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import { usePageValidation } from "./hooks/usePageValidation";
+import PostImage from "./images/PostImage";
 import LikeComment from "./LikeComment";
 import { usePostsContext } from "./PostsContext";
 import PagesProgressBar from "./ProgressBar/PagesProgressBar";
@@ -129,37 +130,31 @@ const Post = ({
             />
           )}
         <Text style={styles.body}>{post.text}</Text>
-        {post.images.length > 0 && (
+        {post.imageStorageRefs.length > 0 && (
           <View style={{ marginTop: 10, height: 270 }}>
             <FlatList
               nestedScrollEnabled={true}
               scrollEnabled={true}
-              data={post.images}
+              data={post.imageStorageRefs}
               contentContainerStyle={styles.flatListContainer}
               showsHorizontalScrollIndicator={true}
               horizontal
-              keyExtractor={(item, index) => index.toString()}
+              keyExtractor={(_, index) => index.toString()}
               renderItem={({ item, index }) => {
                 if (index === 0) {
                   return (
-                    <TouchableOpacity
+                    <PostImage
                       key={index}
+                      storageRef={item}
+                      index={index}
                       onPress={() => {
                         navigateToBook();
                       }}
-                      style={styles.imageContainer}
-                    >
-                      <View style={styles.firstImageStyle}>{item}</View>
-                    </TouchableOpacity>
+                    />
                   );
                 }
-
                 return (
-                  <TouchableOpacity>
-                    <View key={index} style={styles.imageContainer}>
-                      <View style={styles.defaultImageStyle}>{item}</View>
-                    </View>
-                  </TouchableOpacity>
+                  <PostImage key={index} storageRef={item} index={index} />
                 );
               }}
             />
@@ -210,16 +205,7 @@ const styles = StyleSheet.create({
   profilePicContainer: {
     marginRight: 10,
   },
-  firstImageStyle: {
-    width: 180, // custom width
-    height: 250, // custom height
-    borderRadius: 2,
-  },
-  defaultImageStyle: {
-    width: 250,
-    height: 250,
-    borderRadius: 0,
-  },
+
   imageContainer: {
     marginRight: 10,
   },
