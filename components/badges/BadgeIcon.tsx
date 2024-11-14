@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, type ViewStyle } from "react-native";
 import {
   ServerBookshelfBadge,
   ServerCompletionBadge,
@@ -12,12 +12,13 @@ import {
 interface BadgePictureProps {
   badgeID: ServerBadgeName;
   size: number;
+  stylesOverride?: ViewStyle;
 }
 
-const BadgeIcon = ({ badgeID, size }: BadgePictureProps) => {
+const BadgeIcon = ({ badgeID, size, stylesOverride }: BadgePictureProps) => {
   const dynamicStyles = {
     container: {
-      height: size + 20,
+      height: size,
       width: size,
     },
     image: {
@@ -43,7 +44,7 @@ const BadgeIcon = ({ badgeID, size }: BadgePictureProps) => {
   };
 
   return (
-    <View style={[styles.container, dynamicStyles.container]}>
+    <View style={[styles.container, dynamicStyles.container, stylesOverride]}>
       {badgeID !== null && (
         <Image
           style={[styles.image, dynamicStyles.image]}

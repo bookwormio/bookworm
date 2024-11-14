@@ -317,7 +317,7 @@ export async function sendBadgeNotification(
     sender_name: "",
     type: ServerNotificationType.BADGE,
     badgeID,
-    postID,
+    ...(postID != null && { postID }),
   };
   await createNotification(notification);
 }

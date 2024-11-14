@@ -243,10 +243,11 @@ const NotificationItemContent = ({
       <Text style={styles.notifTitle}>{notificationTitle}</Text>
       <Text style={styles.notifMessage}>
         {notification.type !== ServerNotificationType.BADGE && (
-          <Text style={{ fontWeight: "bold" }}>{notification.sender_name}</Text>
+          <Text style={{ fontWeight: "bold" }}>
+            {notification.sender_name}{" "}
+          </Text>
         )}
         <Text>
-          {" "}
           {notificationMessage}
           {notification.type === ServerNotificationType.COMMENT
             ? " " + notification.comment

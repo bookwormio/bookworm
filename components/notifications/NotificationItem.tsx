@@ -60,7 +60,11 @@ const NotificationItem = ({ notif }: NotifProp) => {
           {notif.type !== ServerNotificationType.BADGE ? (
             <ProfilePicture userID={notif.sender} size={50} />
           ) : notif.badgeID != null ? (
-            <BadgeIcon badgeID={notif.badgeID} size={50} />
+            <BadgeIcon
+              badgeID={notif.badgeID}
+              size={50}
+              stylesOverride={{ borderRadius: 50, alignSelf: "flex-start" }}
+            />
           ) : null}
         </TouchableOpacity>
         <NotificationItemContent
