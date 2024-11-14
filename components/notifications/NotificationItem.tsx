@@ -27,7 +27,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
 
   const navigateToUser = useNavigateToUser(user?.uid, notif.sender);
 
-  const navigateToBadgePage = useNavigateToBadgePage();
+  const navigateToBadgePage = useNavigateToBadgePage(notif.receiver);
 
   return (
     <TouchableOpacity
@@ -47,7 +47,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
         ) {
           navigateToBook();
         } else if (notif.type === ServerNotificationType.BADGE) {
-          navigateToBadgePage(notif.receiver);
+          navigateToBadgePage();
         }
       }}
     >

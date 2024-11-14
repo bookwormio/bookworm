@@ -312,11 +312,11 @@ export const useBadgePageRouteInfo = (): BadgeRouteInfo => {
  * @param {string} [userID] - The ID of the user whose badge page is being navigated to.
  * @returns {Function} - Function to navigate to the badge page.
  */
-export const useNavigateToBadgePage = () => {
+export const useNavigateToBadgePage = (userID: string) => {
   const router = useRouter();
   const { prefix } = useBadgePageRouteInfo();
 
-  function navigateToBadgePage(userID: string) {
+  function navigateToBadgePage() {
     if (userID != null && userID !== "") {
       const badgeRoute = generateBadgePageRoute(userID, prefix);
       if (badgeRoute != null) {
