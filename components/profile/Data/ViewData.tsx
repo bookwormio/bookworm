@@ -148,7 +148,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
           style={{
             paddingLeft: 40,
             paddingRight: 40,
-            paddingTop: 20,
+            paddingTop: 15,
             paddingBottom: 10,
           }}
         >
@@ -156,8 +156,8 @@ const ViewData = ({ userID }: ViewDataProps) => {
         </View>
       )}
       <View>
-        <View style={styles.titleBar}>
-          <Text style={styles.dataType}>Pages Read</Text>
+        <View style={styles.titleBarFirst}>
+          <Text style={styles.dataTypeFirst}>Pages Read</Text>
         </View>
         <View style={styles.chartContainer}>
           {aggregatedPagesData.length > 0 ? (
@@ -198,6 +198,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
+  titleBarFirst: {
+    backgroundColor: "white", // Orange color
+    padding: 10,
+    alignItems: "center",
+    marginTop: 5,
+    borderTopWidth: 1,
+    borderTopColor: "#FB6D0B",
+  },
   chartContainer: {
     overflow: "hidden",
     paddingRight: 40,
@@ -217,6 +225,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
     marginBottom: -10,
+  },
+  dataTypeFirst: {
+    fontSize: 17,
+    fontWeight: "bold",
+    color: "black",
+    marginTop: 10,
   },
   loading: {
     flex: 1,

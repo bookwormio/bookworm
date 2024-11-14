@@ -64,10 +64,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: APP_BACKGROUND_COLOR,
     flexDirection: "row",
-    borderBottomColor: "#FB6D0B",
-    borderBottomWidth: 1,
+    // borderBottomColor: "#FB6D0B",
+    // borderBottomWidth: 1,
     paddingTop: 10,
-    paddingBottom: 10,
+    paddingBottom: 0,
   },
   statsWrap: {
     flexDirection: "column",
