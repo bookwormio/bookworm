@@ -54,6 +54,41 @@ export function mapAndSortPreloadedBooks(
 }
 
 /**
+ * Maps and sorts preloaded books from various shelves into a single, prioritized list with duplicates.
+ *
+ * @param {UserBookShelvesModel} preloadedShelfBooks - An object containing books organized by shelf.
+ * @returns {BookVolumeItem[]} A sorted array of books, prioritized by shelf order.
+ */
+export function mapAndSortPreloadedBooksWithDuplicates(
+  preloadedShelfBooks: UserBookShelvesModel,
+): BookVolumeItem[] {
+  const bookVolumeItems: BookVolumeItem[] = [];
+
+  // Iterate through shelves in priority order
+  for (const shelf of SEARCH_SHELF_PRIORITY) {
+    if (shelf in preloadedShelfBooks) {
+      const booksInShelf = preloadedShelfBooks[shelf];
+
+      for (const book of booksInShelf) {
+        // Only add the book if it's not already present
+        bookVolumeItems.push({
+          id: book.id,
+          bookShelf: shelf,
+          volumeInfo: {
+            ...book.volumeInfo,
+            imageLinks: {
+              smallThumbnail: book?.volumeInfo?.thumbnail ?? "",
+            },
+          },
+        });
+      }
+    }
+  }
+
+  return bookVolumeItems;
+}
+
+/**
  * Filters an array of BookVolumeItems based on a search phrase in the book title.
  *
  * @param {BookVolumeItem[]} preSortedBookShelves - The array of books to filter.

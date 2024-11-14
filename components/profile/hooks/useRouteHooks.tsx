@@ -1,17 +1,20 @@
 import { useRouter, useSegments } from "expo-router";
 import {
   POSTS_BOOK_PREFIX,
+  POSTS_BOOKLIST_PREFIX,
   POSTS_FOLLOWLIST_PREFIX,
   POSTS_POST_PREFIX,
   POSTS_RECOMMENDATION_PREFIX,
   POSTS_ROUTE_PREFIX,
   PROFILE_BADGE_PREFIX,
   PROFILE_BOOK_PREFIX,
+  PROFILE_BOOKLIST_PREFIX,
   PROFILE_FOLLOWLIST_PREFIX,
   PROFILE_POST_PREFIX,
   PROFILE_RECOMMENDATION_PREFIX,
   PROFILE_ROUTE_PREFIX,
   SEARCH_BOOK_PREFIX,
+  SEARCH_BOOKLIST_PREFIX,
   SEARCH_FOLLOWLIST_PREFIX,
   SEARCH_POST_PREFIX,
   SEARCH_RECOMMENDATION_PREFIX,
@@ -19,6 +22,7 @@ import {
 } from "../../../constants/constants";
 import {
   generateBadgePageRoute,
+  generateBookListRoute,
   generateBookRoute,
   generateFollowListRoute,
   generatePostRoute,
@@ -321,4 +325,53 @@ export const useNavigateToBadgePage = (userID: string) => {
     }
   }
   return navigateToBadgePage;
+};
+
+const BOOKLIST_ROUTE_PREFIXES = {
+  SEARCH: SEARCH_BOOKLIST_PREFIX,
+  POSTS: POSTS_BOOKLIST_PREFIX,
+  PROFILE: PROFILE_BOOKLIST_PREFIX,
+} as const;
+
+type BookListRouteType = keyof typeof BOOKLIST_ROUTE_PREFIXES;
+
+interface FollowListRouteInfo {
+  type: BookListRouteType | null;
+  prefix: string;
+}
+
+/**
+ * Hook to get the current book list route info based on URL segments.
+ * @returns {FollowListRouteInfo} - Object containing the route type and prefix for book lists.
+ */
+export const useBookListRouteInfo = (): FollowListRouteInfo => {
+  const segments = useSegments();
+
+  if (segments.includes(SEARCH_ROUTE_PREFIX))
+    return { type: "SEARCH", prefix: BOOKLIST_ROUTE_PREFIXES.SEARCH };
+  if (segments.includes(POSTS_ROUTE_PREFIX))
+    return { type: "POSTS", prefix: BOOKLIST_ROUTE_PREFIXES.POSTS };
+  if (segments.includes(PROFILE_ROUTE_PREFIX))
+    return { type: "PROFILE", prefix: BOOKLIST_ROUTE_PREFIXES.PROFILE };
+
+  return { type: null, prefix: "" };
+};
+
+/**
+ * Hook to navigate to a book list page for a given user.
+ * @param {string} [userID] - The ID of the user whose book list is being navigated to.
+ * @returns {Function} - Function to navigate to the book list page.
+ */
+export const useNavigateToBookList = (userID: string) => {
+  const router = useRouter();
+  const { prefix } = useBookListRouteInfo();
+
+  function navigateToBookList(bookshelf: string) {
+    const bookListRoute = generateBookListRoute(userID, bookshelf, prefix);
+    if (bookListRoute != null) {
+      router.push(bookListRoute);
+    }
+  }
+
+  return navigateToBookList;
 };

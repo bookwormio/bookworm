@@ -52,6 +52,10 @@ export const PROFILE_FOLLOWLIST_PREFIX: string = "profilefollow";
 export const SEARCH_FOLLOWLIST_PREFIX: string = "searchfollow";
 export const POSTS_FOLLOWLIST_PREFIX: string = "postsfollow";
 
+export const PROFILE_BOOKLIST_PREFIX: string = "profilebooklist";
+export const SEARCH_BOOKLIST_PREFIX: string = "searchbooklist";
+export const POSTS_BOOKLIST_PREFIX: string = "postsbooklist";
+
 export const NEW_POST_BOOK_FOLDER = "createbook";
 export const NEW_POST_BOOK_SEARCH = "createbooksearch";
 

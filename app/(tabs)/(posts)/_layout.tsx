@@ -81,6 +81,14 @@ const PostsLayout = () => {
             headerTitle: "Leave a Recommendation",
           }}
         />
+        <Stack.Screen
+          name="postsbooklist/[userID]"
+          options={{
+            headerShown: true,
+            headerTitle: "Book List",
+            headerLeft: () => <BackButton />,
+          }}
+        />
       </Stack>
     </KeyboardAvoidingView>
   );

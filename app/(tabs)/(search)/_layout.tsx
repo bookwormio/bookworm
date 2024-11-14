@@ -60,6 +60,14 @@ const SearchLayout = () => {
             title: "Scan a Book's Barcode",
           }}
         />
+        <Stack.Screen
+          name="searchbooklist/[userID]"
+          options={{
+            headerShown: true,
+            headerTitle: "Book List",
+            headerLeft: () => <BackButton />,
+          }}
+        />
       </Stack>
     </KeyboardAvoidingView>
   );
