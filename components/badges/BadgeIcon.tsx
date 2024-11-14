@@ -13,17 +13,23 @@ interface BadgePictureProps {
   badgeID: ServerBadgeName;
   size: number;
   stylesOverride?: ViewStyle;
+  sizeAddOverride?: number;
 }
 
-const BadgeIcon = ({ badgeID, size, stylesOverride }: BadgePictureProps) => {
+const BadgeIcon = ({
+  badgeID,
+  size,
+  stylesOverride,
+  sizeAddOverride = 0,
+}: BadgePictureProps) => {
   const dynamicStyles = {
     container: {
       height: size,
       width: size,
     },
     image: {
-      height: size,
-      width: size,
+      height: size + sizeAddOverride,
+      width: size + sizeAddOverride,
     },
   };
 

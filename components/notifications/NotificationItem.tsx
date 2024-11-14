@@ -63,7 +63,11 @@ const NotificationItem = ({ notif }: NotifProp) => {
             <BadgeIcon
               badgeID={notif.badgeID}
               size={50}
-              stylesOverride={{ borderRadius: 50, alignSelf: "flex-start" }}
+              stylesOverride={{
+                borderRadius: 50,
+                alignSelf: "flex-start",
+              }}
+              sizeAddOverride={15}
             />
           ) : null}
         </TouchableOpacity>
