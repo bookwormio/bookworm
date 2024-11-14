@@ -63,10 +63,6 @@ const ViewDataChart = ({ aggregatedData }: ViewDataChartProps) => {
   const maxY = getMaxY(dataset);
   const increment = getIncrement(maxY);
 
-  console.log("aggdata", aggregatedData);
-  console.log("weekKeys", weekKeys);
-  console.log("dataset", dataset);
-
   const chartData = {
     labels: weekKeys,
     datasets: [

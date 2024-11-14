@@ -2,13 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { fetchPagesReadData } from "../../../services/firebase-services/DataQueries";
+import {
+  fetchBooksFinishedData,
+  fetchPagesReadData,
+} from "../../../services/firebase-services/DataQueries";
 import {
   type LineDataPointModel,
+  type MonthDataPointModel,
   type WeekDataPointModel,
 } from "../../../types";
 import { useAuth } from "../../auth/context";
 import BookWormButton from "../../button/BookWormButton";
+import ViewBookBarChart from "../../chart/ViewBookBarChart";
 import ViewDataChart from "../../chart/ViewDataChart";
 import DataSnapShot from "../../datasnapshot/DataSnapShot";
 import WormLoader from "../../wormloader/WormLoader";
@@ -50,6 +55,37 @@ function aggregatePagesDataByWeek(
   return aggregatedArray;
 }
 
+function AggregateBooksFinishedByMonth(
+  data: LineDataPointModel[],
+): MonthDataPointModel[] {
+  const aggregatedBooksData: Record<string, number> = {};
+  data.forEach(({ x }) => {
+    const date = new Date(x * 1000); // multiply by 1000 for milliseconds
+
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+
+    const monthKey = startOfMonth.toISOString();
+
+    if (aggregatedBooksData[monthKey] === undefined) {
+      aggregatedBooksData[monthKey] = 0;
+    }
+
+    aggregatedBooksData[monthKey] += 1;
+  });
+
+  const aggregatedArray: MonthDataPointModel[] = Object.entries(
+    aggregatedBooksData,
+  ).map(([monthKey, sum]) => ({
+    x: new Date(monthKey),
+    y: sum,
+  }));
+
+  // Sort the aggregated data by month in ascending order
+  aggregatedArray.sort((a, b) => a.x.getTime() - b.x.getTime());
+
+  return aggregatedArray;
+}
+
 interface ViewDataProps {
   userID: string;
 }
@@ -70,7 +106,19 @@ const ViewData = ({ userID }: ViewDataProps) => {
   const { user } = useAuth();
   const navigateToBadgePage = useNavigateToBadgePage(userID);
 
-  if (isLoadingPagesData) {
+  const {
+    data: bookData,
+    isLoading: isLoadingBookData,
+    isError: isErrorWithBooks,
+  } = useQuery({
+    queryKey: ["bookData", userID],
+    queryFn: async () => {
+      const booksReadData = await fetchBooksFinishedData(userID);
+      return booksReadData;
+    },
+  });
+
+  if (isLoadingPagesData || isLoadingBookData) {
     return (
       <View style={styles.container}>
         <WormLoader style={{ width: 50, height: 50 }} />
@@ -78,7 +126,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
     );
   }
 
-  if (isErrorPages) {
+  if (isErrorPages || isErrorWithBooks) {
     return (
       <View style={styles.container}>
         <Text>Error loading data</Text>
@@ -88,6 +136,9 @@ const ViewData = ({ userID }: ViewDataProps) => {
 
   const aggregatedPagesData =
     pagesData !== undefined ? aggregatePagesDataByWeek(pagesData) : [];
+
+  const aggregatedBooksData =
+    bookData !== undefined ? AggregateBooksFinishedByMonth(bookData) : [];
 
   return (
     <ScrollView style={{ flex: 1 }}>
@@ -105,7 +156,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
         </View>
       )}
       <View>
-        <View style={styles.orangeBar}>
+        <View style={styles.titleBar}>
           <Text style={styles.dataType}>Pages Read</Text>
         </View>
         <View style={styles.chartContainer}>
@@ -115,8 +166,17 @@ const ViewData = ({ userID }: ViewDataProps) => {
             <Text>No data to display</Text>
           )}
         </View>
-        <View style={styles.orangeBar}>
+        <View style={styles.titleBar}>
           <Text style={styles.dataType}>Books Completed</Text>
+        </View>
+        <View style={styles.chartContainer}>
+          {aggregatedBooksData.length > 0 ? (
+            <ViewBookBarChart
+              aggregatedData={aggregatedBooksData}
+            ></ViewBookBarChart>
+          ) : (
+            <Text>No data to display</Text>
+          )}
         </View>
       </View>
     </ScrollView>
@@ -132,16 +192,18 @@ const styles = StyleSheet.create({
     maxWidth: 960,
     marginHorizontal: "auto",
   },
-  orangeBar: {
-    backgroundColor: '#FB6D0B', // Orange color
+  titleBar: {
+    backgroundColor: "white", // Orange color
     padding: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
   },
   chartContainer: {
-    overflow: 'hidden',
+    overflow: "hidden",
     paddingRight: 40,
-    marginRight: -40, // Adjust this value to control the cropping
+    marginRight: -40,
+    borderBottomWidth: 1, // Add this line to create a top border
+    borderBottomColor: "#FB6D0B",
   },
   input: {
     borderColor: "gray",
@@ -151,8 +213,10 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   dataType: {
-    fontSize: 20,
-    color: "white",
+    fontSize: 17,
+    fontWeight: "bold",
+    color: "black",
+    marginBottom: -10,
   },
   loading: {
     flex: 1,

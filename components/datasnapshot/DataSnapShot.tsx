@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: APP_BACKGROUND_COLOR,
     flexDirection: "row",
-    borderBottomColor: "#F2F2F2",
+    borderBottomColor: "#FB6D0B",
     borderBottomWidth: 1,
     paddingTop: 10,
     paddingBottom: 10,

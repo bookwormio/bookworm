@@ -21,6 +21,12 @@ interface WeekDataPointModel {
   x: Date; // time as week
   y: number;
 }
+
+interface MonthDataPointModel {
+  x: Date; // time as month
+  y: number;
+}
+
 interface UserSearchDisplayModel {
   id: string;
   firstName: string;
