@@ -53,6 +53,14 @@ const SearchLayout = () => {
             headerLeft: () => <BackButton waitForKeyBoardDismiss={true} />,
           }}
         />
+        <Stack.Screen
+          name="searchbooklist/[userID]"
+          options={{
+            headerShown: true,
+            headerTitle: "Book List",
+            headerLeft: () => <BackButton />,
+          }}
+        />
       </Stack>
     </KeyboardAvoidingView>
   );
