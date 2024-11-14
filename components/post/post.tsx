@@ -199,10 +199,6 @@ const styles = StyleSheet.create({
   profilePicContainer: {
     marginRight: 10,
   },
-
-  imageContainer: {
-    marginRight: 10,
-  },
   headerContainer: {
     flexDirection: "row",
     alignItems: "flex-start",

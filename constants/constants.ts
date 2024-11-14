@@ -94,7 +94,7 @@ export const IMG_STYLE: StyleProp<ImageStyle> = {
 
 export const FIRST_IMAGE_HEIGHT = 250;
 export const FIRST_IMAGE_WIDTH = 180;
-export const FIRST_IMAGE_BORDER_RADIUS = 2;
+export const FIRST_IMAGE_BORDER_RADIUS = 3;
 export const FIRST_IMG_STYLE: StyleProp<ImageStyle> = {
   height: FIRST_IMAGE_HEIGHT,
   width: FIRST_IMAGE_WIDTH,
