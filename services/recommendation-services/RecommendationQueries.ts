@@ -9,14 +9,9 @@ const recomendationAPIUrl = process.env.EXPO_PUBLIC_RECOMMENDATION_API_URL;
 export async function sendPing() {
   try {
     const response = await fetch(`${recomendationAPIUrl}/ping`);
+
     if (!response.ok) {
-      const warningMessage =
-        response.status >= 400 && response.status < 500
-          ? "This may mean the API is not running. See the README for instructions on how to start the API."
-          : "";
-      throw new Error(
-        `HTTP error! Status: ${response.status}. ${warningMessage}`.trim(),
-      );
+      await handleErrorAPI(response);
     }
 
     return await response.json();
@@ -24,6 +19,16 @@ export async function sendPing() {
     console.error("Error sending ping", error);
     return null;
   }
+}
+
+// TODO ensure correct maybe check other handle error
+async function handleErrorAPI(response: Response) {
+  const errorData = (await response.json()) as RecommendationError;
+  const errorMessage =
+    errorData.error.trim() === ""
+      ? `HTTP error! status: ${response.status}`
+      : errorData.error;
+  throw new Error(errorMessage);
 }
 
 /**
@@ -51,12 +56,7 @@ export async function fetchRecommendationsFromAPI(
     });
 
     if (!response.ok) {
-      const errorData = (await response.json()) as RecommendationError;
-      const errorMessage =
-        errorData.error.trim() === ""
-          ? `HTTP error! status: ${response.status}`
-          : errorData.error;
-      throw new Error(errorMessage);
+      await handleErrorAPI(response);
     }
 
     const data = (await response.json()) as RecommendationResponse;
@@ -81,14 +81,20 @@ export async function fetchRecommendationsFromAPI(
 export async function fetchUserBookRecommendations(
   userID: string,
 ): Promise<BookVolumeItem[]> {
-  // Fetch recommendation IDs from API
   const recommendationIDs = await fetchRecommendationsFromAPI([userID]);
 
-  // Fetch book info for each recommendation
+  return await getVolumeItemsByBookIDs(recommendationIDs);
+}
+
+// TODO move to helper maybe?
+async function getVolumeItemsByBookIDs(
+  bookIDs: string[],
+): Promise<BookVolumeItem[]> {
+  // Fetch book info for each book ID
   const volumeResults = await Promise.all(
-    recommendationIDs.map(async (volumeID) => ({
-      id: volumeID,
-      info: await fetchBookByVolumeID(volumeID),
+    bookIDs.map(async (bookID) => ({
+      id: bookID,
+      info: await fetchBookByVolumeID(bookID),
     })),
   );
 
@@ -103,6 +109,36 @@ export async function fetchUserBookRecommendations(
     id: result.id,
     volumeInfo: result.info,
   }));
-
   return recommendationVolumeItems;
+}
+
+// TODO rename
+export async function fetchBooksLikeThisAPI(bookID: string): Promise<string[]> {
+  if (bookID == null || bookID === "") {
+    throw new Error("Invalid Book ID");
+  }
+
+  try {
+    const response = await fetch(`${recomendationAPIUrl}/similar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        book_id: bookID,
+        // TODO: add limit (of 5) to body
+      }),
+    });
+
+    if (!response.ok) {
+      await handleErrorAPI(response);
+    }
+
+    const data = (await response.json()) as SimilarBooksResponse;
+    return data.book_ids;
+  } catch (error) {
+    throw new Error(
+      `Error fetching similar books: ${(error as Error).message}`,
+    );
+  }
 }
