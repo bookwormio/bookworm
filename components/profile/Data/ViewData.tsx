@@ -57,6 +57,11 @@ function aggregatePagesDataByWeek(
   return aggregatedArray;
 }
 
+/**
+ * Aggregates books finished by month to get sum of books per month
+ * @param data dataset of books finished with corresponding dates
+ * @returns data in the form x: timestamp for month, y: books finished
+ */
 function AggregateBooksFinishedByMonth(
   data: LineDataPointModel[],
 ): MonthDataPointModel[] {
@@ -224,6 +229,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center",
     marginTop: 5,
+    marginBottom: -10,
     borderTopWidth: 1,
     borderTopColor: "#FB6D0B",
   },

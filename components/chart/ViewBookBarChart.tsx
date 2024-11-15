@@ -9,6 +9,10 @@ interface ViewBarChartProps {
     aggregatedData: MonthDataPointModel[];
 }
 
+/**
+ * Method for retrieving the last six months to act as x axis labels
+ * @returns the last 6 months in the format 'MMM yyyy'
+ */
 const getLast6MonthsKeys = () => {
     const monthKeys = [];
     const today = new Date();
@@ -19,6 +23,12 @@ const getLast6MonthsKeys = () => {
     return monthKeys.reverse();
 };
   
+/**
+ * Method for matching the data to the last 6 months so that
+ * months that did not have entries have 0 vals
+ * @param data dataset of books finished with corresponding dates
+ * @returns the dataset of the matched data
+ */
 const matchDataToMonths = (data: MonthDataPointModel[]) => {
     const monthKeys = getLast6MonthsKeys();
     const dataset = [];
