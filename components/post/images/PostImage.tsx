@@ -2,11 +2,7 @@ import { Image } from "expo-image";
 import { type StorageReference } from "firebase/storage";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import {
-  BLURHASH,
-  FIRST_IMG_STYLE,
-  IMG_STYLE,
-} from "../../../constants/constants";
+import { FIRST_IMG_STYLE, IMG_STYLE } from "../../../constants/constants";
 import WormLoader from "../../wormloader/WormLoader";
 import { useGetDownloadURL } from "./hooks/usePostImageQueries";
 
@@ -53,7 +49,6 @@ const PostImage = ({ storageRef, index, onPress }: PostImageProps) => {
         key={storageRef.fullPath}
         source={{ uri: imageDownloadURL }}
         cachePolicy={"memory-disk"}
-        placeholder={BLURHASH}
         style={isFirstImage ? FIRST_IMG_STYLE : IMG_STYLE}
       />
     </TouchableOpacity>
