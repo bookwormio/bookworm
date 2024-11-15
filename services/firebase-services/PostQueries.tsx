@@ -1,4 +1,3 @@
-import { Image } from "expo-image";
 import {
   addDoc,
   collection,
@@ -14,13 +13,7 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import React from "react";
-import {
-  BLURHASH,
-  FIRST_IMG_STYLE,
-  IMG_STYLE,
-} from "../../constants/constants";
+import { ref, uploadBytesResumable } from "firebase/storage";
 import { DB, STORAGE } from "../../firebase.config";
 import {
   type CommentModel,
@@ -28,6 +21,7 @@ import {
   type PostModel,
   type UserModel,
 } from "../../types";
+import { makePostModelFromDoc } from "../util/postQueryUtils";
 import { getAllFollowing } from "./FriendQueries";
 import { fetchUser, fetchUsersByIDs } from "./UserQueries";
 
@@ -117,43 +111,7 @@ export async function fetchPostsByUserIDs(
       try {
         const user = userModels.find((user) => user.id === userID);
         if (user != null) {
-          const downloadPromises: Array<Promise<void>> = [];
-          const images: JSX.Element[] = [];
-          for (let index = 0; index < postDoc.data().image; index++) {
-            const storageRef = ref(STORAGE, `posts/${postDoc.id}/${index}`);
-            const promise = getDownloadURL(storageRef)
-              .then((url) => {
-                images[index] = (
-                  <Image
-                    key={index}
-                    source={{ uri: url }}
-                    cachePolicy={"memory-disk"}
-                    placeholder={BLURHASH}
-                    style={index === 0 ? FIRST_IMG_STYLE : IMG_STYLE}
-                    contentFit="fill"
-                  />
-                );
-              })
-              .catch((error) => {
-                console.error("Error fetching image ", error);
-              });
-            downloadPromises.push(promise);
-          }
-          await Promise.all(downloadPromises);
-          const post = {
-            id: postDoc.id,
-            bookid: postDoc.data().bookid,
-            booktitle: postDoc.data().booktitle,
-            created: postDoc.data().created,
-            text: postDoc.data().text,
-            user,
-            images,
-            oldBookmark: postDoc.data().oldBookmark,
-            newBookmark: postDoc.data().newBookmark,
-            likes: postDoc.data().likes ?? [],
-            comments: (postDoc.data().comments as CommentModel[]) ?? [],
-            totalPages: postDoc.data().totalPages,
-          };
+          const post = makePostModelFromDoc(postDoc, user);
           postsData.push(post);
         }
       } catch (error) {
@@ -196,42 +154,7 @@ export async function fetchPostsByUserID(
       for (const postDoc of postsSnapshot.docs) {
         if (userModel !== null) {
           try {
-            const downloadPromises: Array<Promise<void>> = [];
-            const images: JSX.Element[] = [];
-            for (let index = 0; index < postDoc.data().image; index++) {
-              const storageRef = ref(STORAGE, `posts/${postDoc.id}/${index}`);
-              const promise = getDownloadURL(storageRef)
-                .then((url) => {
-                  images[index] = (
-                    <Image
-                      key={index}
-                      source={{ uri: url }}
-                      cachePolicy={"memory-disk"}
-                      placeholder={BLURHASH}
-                      style={index === 0 ? FIRST_IMG_STYLE : IMG_STYLE}
-                    />
-                  );
-                })
-                .catch((error) => {
-                  console.error("Error fetching image ", error);
-                });
-              downloadPromises.push(promise);
-            }
-            await Promise.all(downloadPromises);
-            const post: PostModel = {
-              id: postDoc.id,
-              bookid: postDoc.data().bookid,
-              booktitle: postDoc.data().booktitle,
-              created: postDoc.data().created,
-              text: postDoc.data().text,
-              user: userModel,
-              images,
-              oldBookmark: postDoc.data().oldBookmark,
-              newBookmark: postDoc.data().newBookmark,
-              likes: postDoc.data().likes ?? [],
-              comments: (postDoc.data().comments as CommentModel[]) ?? [],
-              totalPages: postDoc.data().totalPages,
-            };
+            const post = makePostModelFromDoc(postDoc, userModel);
             postsData.push(post);
           } catch (error) {
             console.error("Error fetching user", error);
@@ -273,42 +196,7 @@ export async function fetchPostByPostID(
             last: userSnap.data().last,
             number: userSnap.data().number,
           };
-          const downloadPromises: Array<Promise<void>> = [];
-          const images: JSX.Element[] = [];
-          for (let index = 0; index < postSnap.data().image; index++) {
-            const storageRef = ref(STORAGE, `posts/${postSnap.id}/${index}`);
-            const promise = getDownloadURL(storageRef)
-              .then((url) => {
-                images[index] = (
-                  <Image
-                    key={index}
-                    source={{ uri: url }}
-                    cachePolicy={"memory-disk"}
-                    placeholder={BLURHASH}
-                    style={index === 0 ? FIRST_IMG_STYLE : IMG_STYLE}
-                  />
-                );
-              })
-              .catch((error) => {
-                console.error("Error fetching image by postId ", error);
-              });
-            downloadPromises.push(promise);
-          }
-          await Promise.all(downloadPromises);
-          post = {
-            id: postSnap.id,
-            bookid: postSnap.data().bookid,
-            booktitle: postSnap.data().booktitle,
-            created: postSnap.data().created,
-            text: postSnap.data().text,
-            user,
-            images,
-            likes: postSnap.data().likes ?? [],
-            comments: (postSnap.data().comments as CommentModel[]) ?? [],
-            oldBookmark: postSnap.data().oldBookmark,
-            newBookmark: postSnap.data().newBookmark,
-            totalPages: postSnap.data().totalPages,
-          };
+          post = makePostModelFromDoc(postSnap, user);
         }
       }
     });

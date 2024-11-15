@@ -1,6 +1,7 @@
 import {
   type DocumentData,
   type QueryDocumentSnapshot,
+  type StorageReference,
   type Timestamp,
 } from "firebase/firestore";
 
@@ -108,7 +109,7 @@ interface PostModel {
   created: Timestamp;
   text: string;
   user: UserModel;
-  images: JSX.Element[];
+  imageStorageRefs: StorageReference[];
   likes: string[];
   comments: CommentModel[];
   oldBookmark?: number;
