@@ -12,6 +12,7 @@ import { type PostModel } from "../../types";
 
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { useAuth } from "../auth/context";
+import { useGetBadgesForPost } from "../badges/useBadgeQueries";
 import {
   useNavigateToBook,
   useNavigateToUser,
@@ -66,6 +67,11 @@ const Post = ({
   const navigateToBook = useNavigateToBook(post.bookid);
 
   const isCurrentUsersPost = user?.uid === post.user.id;
+
+  const { data: badges, isLoading: isLoadingBadges } = useGetBadgesForPost(
+    post.user.id,
+    post.id,
+  );
 
   return (
     <ScrollView>
@@ -160,6 +166,15 @@ const Post = ({
           individualPage={individualPage}
           presentComments={presentComments}
         />
+        {badges?.map((badge) => {
+          return (
+            <View key={badge.badgeID}>
+              <Text>
+                {badge.badgeID} {badge.postID}
+              </Text>
+            </View>
+          );
+        })}
       </View>
     </ScrollView>
   );

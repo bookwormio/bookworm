@@ -101,6 +101,43 @@ export async function getExistingEarnedBadges(
 }
 
 /**
+ * Retrieves existing earned badges for a user.
+ *
+ * @param {string} userID - The ID of the user whose badges are to be retrieved.
+ * @returns {Promise<ServerBadgeName[]>} - A promise that resolves to an array of earned badge IDs.
+ * @throws {Error} If the badges cannot be fetched.
+ */
+export async function getBadgesForPost(
+  userID: string,
+  postID: string,
+): Promise<BadgeModel[]> {
+  try {
+    const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
+    const badgesCollectionRef = collection(userBadgeCollectDocRef, "badges");
+
+    const badgesQuery = query(
+      badgesCollectionRef,
+      where("postID", "==", postID),
+    );
+
+    const badgeDocs = await getDocs(badgesQuery);
+    const badges: BadgeModel[] = [];
+    badgeDocs.forEach((doc) => {
+      badges.push({
+        badgeID: doc.id as ServerBadgeName,
+        received_at: doc.data().received_at ?? null,
+        postID: doc.data().postID ?? null,
+      });
+    });
+    return badges;
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch badges for user ${userID}: ${(error as Error).message}`,
+    );
+  }
+}
+
+/**
  * Checks for completion badges based on the user's finished books.
  *
  * @param {string} userID - The ID of the user.
