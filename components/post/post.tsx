@@ -69,10 +69,7 @@ const Post = ({
 
   const isCurrentUsersPost = user?.uid === post.user.id;
 
-  const { data: badges, isLoading: isLoadingBadges } = useGetBadgesForPost(
-    post.user.id,
-    post.id,
-  );
+  const { data: badges } = useGetBadgesForPost(post.user.id, post.id);
 
   return (
     <ScrollView>
@@ -137,6 +134,13 @@ const Post = ({
             />
           )}
         <Text style={styles.body}>{post.text}</Text>
+        {badges
+          ?.filter((badge) => badge.postID === post.id)
+          .map((badge) => (
+            <View key={badge.badgeID}>
+              <BadgeOnPost size={50} badge={badge} userInfo={post.user} />
+            </View>
+          ))}
         {post.imageStorageRefs.length > 0 && (
           <View style={{ marginTop: 10, height: 270 }}>
             <FlatList
@@ -167,13 +171,6 @@ const Post = ({
           individualPage={individualPage}
           presentComments={presentComments}
         />
-        {badges?.map((badge) => {
-          return (
-            <View key={badge.badgeID}>
-              <BadgeOnPost size={25} badge={badge} />
-            </View>
-          );
-        })}
       </View>
     </ScrollView>
   );
