@@ -50,3 +50,35 @@ export async function fetchPagesReadData(
     throw error;
   }
 }
+
+/**
+ * Method to retrieve the dates books were added to the 'finished' shelf.
+ * Keeps a running tally of the number of books added to 'finished' per month.
+ * @param userID - uid of whoever is logged in
+ * @returns {Promise<LineDataPointModel[]>} - x: timestamp, y: books finished
+ */
+export async function fetchBooksFinishedData(
+  userID: string,
+): Promise<LineDataPointModel[]> {
+  const dataPoints: LineDataPointModel[] = [];
+  try {
+    const finishedRef = collection(
+      DB,
+      `bookshelf_collection/${userID}/finished`,
+    );
+    const finishedQuery = query(finishedRef);
+    const finishedSnap = await getDocs(finishedQuery);
+
+    for (const finishedDoc of finishedSnap.docs) {
+      dataPoints.push({
+        x: finishedDoc.data().created.seconds,
+        y: 1,
+      });
+    }
+
+    return dataPoints;
+  } catch (error) {
+    console.error("Error fetching bookshelf data:", error);
+    throw error;
+  }
+}

@@ -1,14 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { fetchPagesReadData } from "../../../services/firebase-services/DataQueries";
+import { useRouter } from "expo-router";
+import { CREATE_ROUTE_PREFIX } from "../../../constants/constants";
+import {
+  fetchBooksFinishedData,
+  fetchPagesReadData,
+} from "../../../services/firebase-services/DataQueries";
 import {
   type LineDataPointModel,
+  type MonthDataPointModel,
   type WeekDataPointModel,
 } from "../../../types";
 import { useAuth } from "../../auth/context";
 import BookWormButton from "../../button/BookWormButton";
+import ViewBookBarChart from "../../chart/ViewBookBarChart";
 import ViewDataChart from "../../chart/ViewDataChart";
 import DataSnapShot from "../../datasnapshot/DataSnapShot";
 import WormLoader from "../../wormloader/WormLoader";
@@ -50,6 +63,42 @@ function aggregatePagesDataByWeek(
   return aggregatedArray;
 }
 
+/**
+ * Aggregates books finished by month to get sum of books per month
+ * @param data dataset of books finished with corresponding dates
+ * @returns data in the form x: timestamp for month, y: books finished
+ */
+function AggregateBooksFinishedByMonth(
+  data: LineDataPointModel[],
+): MonthDataPointModel[] {
+  const aggregatedBooksData: Record<string, number> = {};
+  data.forEach(({ x }) => {
+    const date = new Date(x * 1000); // multiply by 1000 for milliseconds
+
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+
+    const monthKey = startOfMonth.toISOString();
+
+    if (aggregatedBooksData[monthKey] === undefined) {
+      aggregatedBooksData[monthKey] = 0;
+    }
+
+    aggregatedBooksData[monthKey] += 1;
+  });
+
+  const aggregatedArray: MonthDataPointModel[] = Object.entries(
+    aggregatedBooksData,
+  ).map(([monthKey, sum]) => ({
+    x: new Date(monthKey),
+    y: sum,
+  }));
+
+  // Sort the aggregated data by month in ascending order
+  aggregatedArray.sort((a, b) => a.x.getTime() - b.x.getTime());
+
+  return aggregatedArray;
+}
+
 interface ViewDataProps {
   userID: string;
 }
@@ -67,10 +116,27 @@ const ViewData = ({ userID }: ViewDataProps) => {
     },
   });
 
+  const router = useRouter();
+  const navigateToMakePostPage = () => {
+    router.push({ pathname: CREATE_ROUTE_PREFIX });
+  };
+
   const { user } = useAuth();
   const navigateToBadgePage = useNavigateToBadgePage(userID);
 
-  if (isLoadingPagesData) {
+  const {
+    data: bookData,
+    isLoading: isLoadingBookData,
+    isError: isErrorWithBooks,
+  } = useQuery({
+    queryKey: ["bookData", userID],
+    queryFn: async () => {
+      const booksReadData = await fetchBooksFinishedData(userID);
+      return booksReadData;
+    },
+  });
+
+  if (isLoadingPagesData || isLoadingBookData) {
     return (
       <View style={styles.container}>
         <WormLoader style={{ width: 50, height: 50 }} />
@@ -78,7 +144,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
     );
   }
 
-  if (isErrorPages) {
+  if (isErrorPages || isErrorWithBooks) {
     return (
       <View style={styles.container}>
         <Text>Error loading data</Text>
@@ -89,6 +155,9 @@ const ViewData = ({ userID }: ViewDataProps) => {
   const aggregatedPagesData =
     pagesData !== undefined ? aggregatePagesDataByWeek(pagesData) : [];
 
+  const aggregatedBooksData =
+    bookData !== undefined ? AggregateBooksFinishedByMonth(bookData) : [];
+
   return (
     <ScrollView style={{ flex: 1 }}>
       <DataSnapShot userID={userID} isLoadingOther={isLoadingPagesData} />
@@ -97,7 +166,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
           style={{
             paddingLeft: 40,
             paddingRight: 40,
-            paddingTop: 20,
+            paddingTop: 15,
             paddingBottom: 10,
           }}
         >
@@ -105,12 +174,42 @@ const ViewData = ({ userID }: ViewDataProps) => {
         </View>
       )}
       <View>
-        <Text style={styles.dataType}>Pages Read:</Text>
-        {aggregatedPagesData.length > 0 ? (
-          <ViewDataChart aggregatedData={aggregatedPagesData}></ViewDataChart>
-        ) : (
-          <Text>No data to display</Text>
-        )}
+        <View style={styles.titleBarFirst}>
+          <Text style={styles.dataTypeFirst}>Pages Read</Text>
+        </View>
+        <View style={styles.chartContainer}>
+          {aggregatedPagesData.length > 0 ? (
+            <ViewDataChart aggregatedData={aggregatedPagesData}></ViewDataChart>
+          ) : (
+            <View style={styles.noDataContainer}>
+              <Text style={styles.noData}>No data to display.</Text>
+              {userID === user?.uid && (
+                <TouchableOpacity onPress={navigateToMakePostPage}>
+                  <Text style={styles.makePost}> Make a post</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </View>
+        <View style={styles.titleBar}>
+          <Text style={styles.dataType}>Books Completed</Text>
+        </View>
+        <View style={styles.chartContainer}>
+          {aggregatedBooksData.length > 0 ? (
+            <ViewBookBarChart
+              aggregatedData={aggregatedBooksData}
+            ></ViewBookBarChart>
+          ) : (
+            <View style={styles.noDataContainer}>
+              <Text style={styles.noData}>No data to display.</Text>
+              {userID === user?.uid && (
+                <TouchableOpacity onPress={navigateToMakePostPage}>
+                  <Text style={styles.makePost}> Make a post</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </View>
       </View>
     </ScrollView>
   );
@@ -125,6 +224,28 @@ const styles = StyleSheet.create({
     maxWidth: 960,
     marginHorizontal: "auto",
   },
+  titleBar: {
+    backgroundColor: "white", // Orange color
+    padding: 10,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  titleBarFirst: {
+    backgroundColor: "white", // Orange color
+    padding: 10,
+    alignItems: "center",
+    marginTop: 5,
+    marginBottom: -10,
+    borderTopWidth: 1,
+    borderTopColor: "#FB6D0B",
+  },
+  chartContainer: {
+    overflow: "hidden",
+    paddingRight: 40,
+    marginRight: -40,
+    borderBottomWidth: 1, // Add this line to create a top border
+    borderBottomColor: "#FB6D0B",
+  },
   input: {
     borderColor: "gray",
     width: "100%",
@@ -133,9 +254,16 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   dataType: {
-    fontSize: 36,
-    color: "#FB6D0B",
-    marginLeft: 10,
+    fontSize: 17,
+    fontWeight: "bold",
+    color: "black",
+    marginBottom: -10,
+  },
+  dataTypeFirst: {
+    fontSize: 17,
+    fontWeight: "bold",
+    color: "black",
+    marginTop: 10,
   },
   loading: {
     flex: 1,
@@ -170,5 +298,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+  },
+  noData: {
+    fontSize: 17,
+    color: "black",
+    textAlign: "center",
+    paddingTop: 10,
+  },
+  makePost: {
+    fontSize: 17,
+    color: "#FB6D0B",
+    paddingTop: 10,
+  },
+  noDataContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
   },
 });
