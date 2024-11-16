@@ -12,6 +12,7 @@ import { type PostModel } from "../../types";
 
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { useAuth } from "../auth/context";
+import BadgeOnPost from "../badges/BadgeOnPost";
 import { useGetBadgesForPost } from "../badges/useBadgeQueries";
 import {
   useNavigateToBook,
@@ -169,9 +170,7 @@ const Post = ({
         {badges?.map((badge) => {
           return (
             <View key={badge.badgeID}>
-              <Text>
-                {badge.badgeID} {badge.postID}
-              </Text>
+              <BadgeOnPost size={25} badge={badge} />
             </View>
           );
         })}
