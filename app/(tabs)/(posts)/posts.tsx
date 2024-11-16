@@ -288,10 +288,10 @@ const Posts = () => {
               <View style={styles.noDataContainer}>
                 <Text style={styles.noData}>No posts to display.</Text>
                 <TouchableOpacity onPress={navigateToMakePostPage}>
-                  <Text style={styles.makePost}> Make a post</Text>
+                  <Text style={styles.makePost}>Make a post</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={navigateToSearchPage}>
-                  <Text style={styles.makePost}> Add friends</Text>
+                  <Text style={styles.makePost}>Add friends</Text>
                 </TouchableOpacity>
               </View>
             )}
