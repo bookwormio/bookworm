@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+import { useProfilePicQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { TabNames } from "../../enums/Enums";
 import { fetchFriendData } from "../../services/firebase-services/UserQueries";
 import BookWormButton from "../button/BookWormButton";
@@ -14,6 +15,7 @@ import ViewData from "../profile/Data/ViewData";
 import FriendProfilePosts from "../profile/FriendProfilePosts";
 import {
   useNavigateToFollowList,
+  useNavigateToImageBlowup,
   useNavigateToRecommendation,
 } from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
@@ -48,11 +50,16 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   const { data: numFollowingData, isLoading: isLoadingNumFollowingData } =
     useGetNumberOfFollowingByUserID(friendUserID ?? "");
 
+  const { data: profilePic, isPending: profilePicPending } =
+    useProfilePicQuery(friendUserID);
+  const navigateToImageBlowup = useNavigateToImageBlowup();
+
   if (
     friendIsLoading ||
     friendData == null ||
     isLoadingNumFollowersData ||
-    isLoadingNumFollowingData
+    isLoadingNumFollowingData ||
+    profilePicPending
   ) {
     return (
       <View style={sharedProfileStyles.loading}>
@@ -67,9 +74,16 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       style={sharedProfileStyles.scrollContainer}
     >
       <View style={sharedProfileStyles.imageTextContainer}>
-        <View style={sharedProfileStyles.defaultImageContainer}>
+        <TouchableOpacity
+          style={sharedProfileStyles.defaultImageContainer}
+          onPress={() => {
+            if (profilePic != null && profilePic !== "") {
+              navigateToImageBlowup(encodeURIComponent(profilePic));
+            }
+          }}
+        >
           <ProfilePicture userID={friendUserID} size={60} />
-        </View>
+        </TouchableOpacity>
         <View>
           <Text style={sharedProfileStyles.nameText}>
             {friendData.first} {friendData.last}
