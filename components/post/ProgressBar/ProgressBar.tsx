@@ -8,10 +8,10 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { Animated, Easing, View } from "react-native";
+import { Animated, Easing, Text, View } from "react-native";
 
 interface ProgressBarProps {
-  data: Array<{ progress: number; color: string }>;
+  data: Array<{ progress: number; color: string; page: number }>;
   barHeight?: number;
   shouldAnimate?: boolean;
   animateDuration?: number;
@@ -20,6 +20,7 @@ interface ProgressBarProps {
 interface IPProps {
   progress: number;
   color: string;
+  page: number;
 }
 
 const ProgressBar = ({
@@ -48,6 +49,7 @@ const ProgressBar = ({
         return {
           progress: value,
           color: d.color,
+          page: d.page,
         };
       })
       .reverse();
@@ -71,18 +73,54 @@ const ProgressBar = ({
         width: "100%",
       }}
     >
-      {progressData.map((d, i) => (
-        <Animated.View
-          key={i}
-          style={{
-            position: "absolute",
-            height: barHeight,
-            width: shouldAnimate ? animatedValues[i] : `${d.progress}%`,
-            backgroundColor: d.color,
-            borderRadius: 5,
-          }}
-        />
-      ))}
+      <View
+        style={{
+          borderRadius: 5, // Adjust radius to match the bar height for a rounded effect
+          overflow: "hidden", // Ensures child elements respect the radius
+          height: barHeight, // Set the height explicitly for the container
+          backgroundColor: "#e0e0e0", // Optional: Add a background color for the track
+        }}
+      >
+        {progressData.map((d, i) => (
+          <Animated.View
+            key={i}
+            style={{
+              position: "absolute",
+              height: barHeight,
+              width: shouldAnimate ? animatedValues[i] : `${d.progress}%`,
+              backgroundColor: d.color,
+              borderRadius: 3,
+            }}
+          />
+        ))}
+      </View>
+      {/* Text below progress bar */}
+      <View
+        style={{
+          position: "absolute",
+          top: barHeight + 5, // Place the text slightly below the progress bar
+          flexDirection: "row",
+          justifyContent: "space-between",
+          width: "100%",
+          paddingRight: 7,
+        }}
+      >
+        {progressData.map((d, i) => (
+          <Text
+            key={`text-${i}`}
+            style={{
+              position: "absolute",
+              left: `${d.progress}%`,
+              transform: [{ translateX: -17 }], // Adjust to center text slightly
+              fontSize: 12,
+              fontWeight: "bold",
+              textAlign: "right",
+            }}
+          >
+            {d.page !== 0 ? d.page : ""}
+          </Text>
+        ))}
+      </View>
     </View>
   );
 };
