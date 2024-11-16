@@ -7,6 +7,7 @@ import {
   type TouchableOpacityProps,
   type ViewStyle,
 } from "react-native";
+import { BOOKWORM_ORANGE } from "../../constants/constants";
 
 /*
 title - Title of Button
@@ -62,7 +63,7 @@ const BookWormButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#FB6D0B",
+    backgroundColor: BOOKWORM_ORANGE,
     padding: 10,
     borderRadius: 5,
     alignItems: "center",

@@ -1,7 +1,9 @@
-import { Stack } from "expo-router";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { router, Stack } from "expo-router";
 import React from "react";
-import { KeyboardAvoidingView, Platform } from "react-native";
+import { KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import BackButton from "../../../components/backbutton/BackButton";
+import { BOOKWORM_ORANGE } from "../../../constants/constants";
 
 const ProfileLayout = () => {
   return (
@@ -12,13 +14,34 @@ const ProfileLayout = () => {
       <Stack>
         <Stack.Screen
           name="profile"
-          options={{ headerShown: true, headerTitle: "Profile" }}
+          options={{
+            headerShown: true,
+            headerTitle: "Profile",
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => {
+                  router.push({ pathname: "settings" });
+                }}
+                disabled={false}
+              >
+                <AntDesign name={"setting"} size={25} color={BOOKWORM_ORANGE} />
+              </TouchableOpacity>
+            ),
+          }}
         />
         <Stack.Screen
           name="EditProfile"
           options={{
             presentation: "modal",
             headerTitle: "Edit Profile",
+          }}
+        />
+        <Stack.Screen
+          name="settings"
+          options={{
+            headerShown: true,
+            headerTitle: "Settings",
+            headerLeft: () => <BackButton />,
           }}
         />
         <Stack.Screen

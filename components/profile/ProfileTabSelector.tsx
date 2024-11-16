@@ -6,7 +6,10 @@ import {
   TouchableHighlight,
   View,
 } from "react-native";
-import { APP_BACKGROUND_COLOR } from "../../constants/constants";
+import {
+  APP_BACKGROUND_COLOR,
+  BOOKWORM_ORANGE,
+} from "../../constants/constants";
 import { TabsTitleMap } from "../../enums/Enums";
 
 interface ProfileTabSelectorProps {
@@ -106,6 +109,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: 2,
     width: "33.33%",
-    backgroundColor: "#FB6D0B",
+    backgroundColor: BOOKWORM_ORANGE,
   },
 });

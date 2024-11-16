@@ -75,6 +75,7 @@ export const BLURHASH = "LBN-4dMwIUWC~WRj%M^+-;4n4nWC";
 
 export const FIRST_PROGRESS_COLOR = "rgb(88, 166, 92)";
 export const BOOKWORM_LIGHT_GREEN = "#A9CF60";
+export const BOOKWORM_ORANGE = "#FB6D0B";
 export const BACKWARDS_PROGRESS_COLOR = "rgb(255, 99, 71)";
 export const REMAINING_PROGRESS_COLOR = "rgb(229, 232, 249)";
 export const VIOLET = "#7CA4E9";

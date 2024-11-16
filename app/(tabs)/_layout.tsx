@@ -5,6 +5,7 @@ import { StyleSheet, View } from "react-native";
 import { useAuth } from "../../components/auth/context";
 import { PostsProvider } from "../../components/post/PostsContext";
 import WormLoader from "../../components/wormloader/WormLoader";
+import { BOOKWORM_ORANGE } from "../../constants/constants";
 
 const AppLayout = () => {
   const { isLoading } = useAuth();
@@ -33,7 +34,7 @@ const AppLayout = () => {
           options={{
             tabBarLabel: "Posts",
             headerShown: false,
-            tabBarActiveTintColor: "#FB6D0B",
+            tabBarActiveTintColor: BOOKWORM_ORANGE,
             tabBarInactiveTintColor: "grey",
             tabBarIcon: ({ size, color }) => (
               <FontAwesome5 name="stream" size={size} color={color} />
@@ -45,7 +46,7 @@ const AppLayout = () => {
           options={{
             tabBarLabel: "Search",
             headerShown: false,
-            tabBarActiveTintColor: "#FB6D0B",
+            tabBarActiveTintColor: BOOKWORM_ORANGE,
             tabBarInactiveTintColor: "grey",
             tabBarIcon: ({ size, color }) => (
               <FontAwesome5 name="search" size={size} color={color} />
@@ -57,7 +58,7 @@ const AppLayout = () => {
           options={{
             tabBarLabel: "Create",
             headerTitle: "Create",
-            tabBarActiveTintColor: "#FB6D0B",
+            tabBarActiveTintColor: BOOKWORM_ORANGE,
             tabBarInactiveTintColor: "grey",
             tabBarIcon: ({ size, focused, color }) => (
               <FontAwesome5 name="book-medical" size={size} color={color} />
@@ -69,7 +70,7 @@ const AppLayout = () => {
           options={{
             tabBarLabel: "Profile",
             headerShown: false,
-            tabBarActiveTintColor: "#FB6D0B",
+            tabBarActiveTintColor: BOOKWORM_ORANGE,
             tabBarInactiveTintColor: "grey",
             tabBarIcon: ({ size, color }) => (
               <FontAwesome5 name="id-card" size={size} color={color} />

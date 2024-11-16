@@ -124,21 +124,6 @@ const Profile = () => {
           </Text>
         </TouchableOpacity>
       </View>
-      <View style={sharedProfileStyles.outerButtonsContainer}>
-        <BookWormButton
-          title="Edit Profile"
-          onPress={() => {
-            if (user != null) {
-              router.push({
-                pathname: "EditProfile",
-              });
-            } else {
-              console.error("User DNE");
-            }
-          }}
-        />
-        <BookWormButton title="Log Out" onPress={signOut} />
-      </View>
       <ProfileTabSelector
         profileTab={profileTab}
         setProfileTab={setProfileTab}

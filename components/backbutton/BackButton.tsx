@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import React from "react";
 import { Keyboard, TouchableOpacity, View } from "react-native";
 import { closeKeyboardThen } from "../../app/util/keyboardHelpers";
+import { BOOKWORM_ORANGE } from "../../constants/constants";
 
 interface BackButtonProps {
   waitForKeyBoardDismiss?: boolean;
@@ -26,7 +27,7 @@ const BackButton = ({ waitForKeyBoardDismiss }: BackButtonProps) => {
             }
           }}
         >
-          <FontAwesome5 name="arrow-left" size={20} color="#FB6D0B" />
+          <FontAwesome5 name="arrow-left" size={20} color={BOOKWORM_ORANGE} />
         </TouchableOpacity>
       )}
     </View>

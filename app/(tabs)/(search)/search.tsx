@@ -10,6 +10,7 @@ import BookSearch from "../../../components/searchbar/booksearch";
 import UserSearch from "../../../components/searchbar/usersearch";
 import {
   APP_BACKGROUND_COLOR,
+  BOOKWORM_ORANGE,
   SEARCH_ROUTE_PREFIX,
 } from "../../../constants/constants";
 
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: 2,
     width: "50%",
-    backgroundColor: "#FB6D0B",
+    backgroundColor: BOOKWORM_ORANGE,
   },
 });
 

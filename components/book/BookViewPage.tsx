@@ -22,7 +22,10 @@ import {
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
-import { APP_BACKGROUND_COLOR } from "../../constants/constants";
+import {
+  APP_BACKGROUND_COLOR,
+  BOOKWORM_ORANGE,
+} from "../../constants/constants";
 import {
   BOOKSHELF_BADGES,
   COMPLETION_BADGES,
@@ -408,7 +411,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   addButton: {
-    backgroundColor: "#FB6D0B",
+    backgroundColor: BOOKWORM_ORANGE,
     padding: 10,
     borderRadius: 5,
     alignItems: "center",

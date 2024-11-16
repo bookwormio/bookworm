@@ -1,6 +1,7 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { BOOKWORM_ORANGE } from "../../../constants/constants";
 import {
   BOOKSHELF_DISPLAY_NAMES,
   type ServerBookShelfName,
@@ -48,7 +49,9 @@ const BookshelfAddButtons = ({
                   : "pluscircleo"
               }
               size={20}
-              color={selectedShelves.includes(item.value) ? "#FB6D0B" : "black"}
+              color={
+                selectedShelves.includes(item.value) ? BOOKWORM_ORANGE : "black"
+              }
             />
           )}
         </TouchableOpacity>

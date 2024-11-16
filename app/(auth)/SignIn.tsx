@@ -11,7 +11,10 @@ import {
 } from "react-native";
 import { useAuth } from "../../components/auth/context";
 import BookWormButton from "../../components/button/BookWormButton";
-import { APP_BACKGROUND_COLOR } from "../../constants/constants";
+import {
+  APP_BACKGROUND_COLOR,
+  BOOKWORM_ORANGE,
+} from "../../constants/constants";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -124,7 +127,7 @@ const styles = StyleSheet.create({
     backgroundColor: APP_BACKGROUND_COLOR,
   },
   createButtonText: {
-    color: "#FB6D0B",
+    color: BOOKWORM_ORANGE,
     fontSize: 15,
     fontWeight: "bold",
   },

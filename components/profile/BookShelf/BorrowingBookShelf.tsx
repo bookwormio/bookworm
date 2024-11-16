@@ -9,6 +9,7 @@ import {
 } from "../../../enums/Enums";
 
 import { FontAwesome5 } from "@expo/vector-icons";
+import { BOOKWORM_ORANGE } from "../../../constants/constants";
 import { type BorrowingBookshelfModel } from "../../../types";
 import { useNavigateToBookList } from "../hooks/useRouteHooks";
 import BookBorrowButton from "./BookBorrowButton";
@@ -39,7 +40,7 @@ const BorrowingBookShelf = ({ books, userID }: BorrowingBookShelfProps) => {
               style={{ paddingLeft: 5 }}
               name="chevron-right"
               size={16}
-              color="#FB6D0B"
+              color={BOOKWORM_ORANGE}
             />
           </View>
           <Text style={sharedBookshelfStyles.subtitle}>{shelfSubtitle}</Text>
