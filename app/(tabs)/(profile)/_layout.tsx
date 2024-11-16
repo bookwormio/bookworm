@@ -84,6 +84,15 @@ const ProfileLayout = () => {
             headerLeft: () => <BackButton />,
           }}
         />
+        <Stack.Screen
+          name="profileimageblowup/[imageURL]"
+          options={{
+            presentation: "modal",
+            headerShown: false,
+            gestureEnabled: true,
+            headerLeft: () => <BackButton />,
+          }}
+        />
       </Stack>
     </KeyboardAvoidingView>
   );

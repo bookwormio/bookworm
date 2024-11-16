@@ -65,6 +65,10 @@ export const PROFILE_RECOMMENDATION_PREFIX = "profilerecommendation";
 
 export const PROFILE_BADGE_PREFIX = "profilebadge";
 
+export const POSTS_IMAGEBLOWUP_PREFIX = "postsimageblowup";
+export const SEARCH_IMAGEBLOWUP_PREFIX = "searchimageblowup";
+export const PROFILE_IMAGEBLOWUP_PREFIX = "profileimageblowup";
+
 export const BLURHASH = "LBN-4dMwIUWC~WRj%M^+-;4n4nWC";
 
 export const FIRST_PROGRESS_COLOR = "rgb(88, 166, 92)";
