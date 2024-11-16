@@ -5,7 +5,6 @@ import { ScrollView } from "react-native-gesture-handler";
 import { useProfilePicQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { TabNames } from "../../enums/Enums";
 import { fetchFriendData } from "../../services/firebase-services/UserQueries";
-import BookWormButton from "../button/BookWormButton";
 import {
   useGetNumberOfFollowersByUserID,
   useGetNumberOfFollowingByUserID,
@@ -16,7 +15,6 @@ import FriendProfilePosts from "../profile/FriendProfilePosts";
 import {
   useNavigateToFollowList,
   useNavigateToImageBlowup,
-  useNavigateToRecommendation,
 } from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import ProfileTabSelector from "../profile/ProfileTabSelector";
@@ -32,8 +30,6 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
   const [profileTab, setProfileTab] = useState("shelf");
 
   const navigateToFollowList = useNavigateToFollowList(friendUserID);
-
-  const navigateToRecommendation = useNavigateToRecommendation(friendUserID);
 
   const { data: friendData, isLoading: friendIsLoading } = useQuery({
     queryKey: ["frienddata", friendUserID],
@@ -98,9 +94,9 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       <View>
         <Text style={sharedProfileStyles.bioWrap}>{friendData.bio}</Text>
       </View>
-      <View style={sharedProfileStyles.imageTextContainer}>
+      <View style={[sharedProfileStyles.imageTextContainer]}>
         <TouchableOpacity
-          style={sharedProfileStyles.textWrap}
+          style={[sharedProfileStyles.textWrap]}
           onPress={() => {
             navigateToFollowList(true);
           }}
@@ -111,7 +107,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={sharedProfileStyles.textWrap}
+          style={[sharedProfileStyles.textWrap]}
           onPress={() => {
             navigateToFollowList(false);
           }}
@@ -121,15 +117,17 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
             {numFollowingData ?? "-"}
           </Text>
         </TouchableOpacity>
-      </View>
-      <View style={sharedProfileStyles.outerButtonsContainer}>
-        <FollowButon friendUserID={friendData.id} />
-        <BookWormButton
-          title={"Recommend"}
-          onPress={() => {
-            navigateToRecommendation();
+        <View
+          style={{
+            paddingLeft: 80,
+            paddingRight: 10,
+            marginBottom: 15,
+            alignSelf: "flex-end",
+            flex: 1,
           }}
-        />
+        >
+          <FollowButon friendUserID={friendData.id} />
+        </View>
       </View>
       <ProfileTabSelector
         profileTab={profileTab}

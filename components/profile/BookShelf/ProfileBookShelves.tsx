@@ -3,9 +3,11 @@ import { StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { type ServerBookShelfName } from "../../../enums/Enums";
 import { useAuth } from "../../auth/context";
+import BookWormButton from "../../button/BookWormButton";
 import WormLoader from "../../wormloader/WormLoader";
 import { useGetAllBorrowingBooksForUser } from "../hooks/useBookBorrowQueries";
 import { useGetBooksForBookshelves } from "../hooks/useBookshelfQueries";
+import { useNavigateToRecommendation } from "../hooks/useRouteHooks";
 import BookShelf from "./BookShelf";
 import BorrowingBookShelf from "./BorrowingBookShelf";
 
@@ -28,6 +30,8 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
     isError: isErrorBorrowingBooks,
   } = useGetAllBorrowingBooksForUser(userID);
 
+  const navigateToRecommendation = useNavigateToRecommendation(userID);
+
   if (isErrorBorrowingBooks || isErrorShelfBooks) {
     Toast.show({
       type: "error",
@@ -46,6 +50,16 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
 
   return (
     <View style={styles.scrollContent}>
+      {userID !== user?.uid && (
+        <View style={styles.recommendButton}>
+          <BookWormButton
+            title={"Recommend A Book"}
+            onPress={() => {
+              navigateToRecommendation();
+            }}
+          />
+        </View>
+      )}
       {Object.entries(bookShelves ?? {}).map(([shelfName, books]) => (
         <BookShelf
           key={shelfName}
@@ -78,4 +92,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
+  recommendButton: { paddingLeft: 40, paddingRight: 40, marginTop: 20 },
 });
