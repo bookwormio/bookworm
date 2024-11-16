@@ -68,6 +68,15 @@ const SearchLayout = () => {
             headerLeft: () => <BackButton />,
           }}
         />
+        <Stack.Screen
+          name="searchimageblowup/[imageURL]"
+          options={{
+            presentation: "modal",
+            headerShown: false,
+            gestureEnabled: true,
+            headerLeft: () => <BackButton />,
+          }}
+        />
       </Stack>
     </KeyboardAvoidingView>
   );

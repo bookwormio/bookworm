@@ -97,6 +97,15 @@ const PostsLayout = () => {
             headerLeft: () => <BackButton />,
           }}
         />
+        <Stack.Screen
+          name="postsimageblowup/[imageURL]"
+          options={{
+            presentation: "modal",
+            headerShown: false,
+            gestureEnabled: true,
+            headerLeft: () => <BackButton />,
+          }}
+        />
       </Stack>
     </KeyboardAvoidingView>
   );
