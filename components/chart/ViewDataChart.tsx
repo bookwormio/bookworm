@@ -1,4 +1,4 @@
-import { format, subWeeks } from 'date-fns';
+import { format, subWeeks } from "date-fns";
 import React, { useState } from "react";
 import { Dimensions, TouchableOpacity, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
@@ -9,26 +9,26 @@ interface ViewDataChartProps {
   aggregatedData: WeekDataPointModel[];
 }
 
-const date = new Date(); 
+const date = new Date();
 
 const startOfWeek = new Date(
   date.getFullYear(),
   date.getMonth(),
-  date.getDate() - date.getDay()
+  date.getDate() - date.getDay(),
 );
 
 const weekKeys: string[] = [];
 for (let i = 0; i < 8; i++) {
   const weekStart = subWeeks(startOfWeek, i);
-  weekKeys.push(format(weekStart, 'MMM dd'));
-};
+  weekKeys.push(format(weekStart, "MMM dd"));
+}
 weekKeys.reverse();
 
 const matchDataToWeeks = (data: WeekDataPointModel[]) => {
   const dataset = [];
 
   for (const weekKey of weekKeys) {
-    const weekData = data.find(({ x }) => format(x, 'MMM dd') === weekKey);
+    const weekData = data.find(({ x }) => format(x, "MMM dd") === weekKey);
     if (weekData != null) {
       dataset.push(weekData.y);
     } else {
@@ -125,7 +125,7 @@ const ViewDataChart = ({ aggregatedData }: ViewDataChartProps) => {
         }}
         formatXLabel={(x) => {
           const day = parseInt(x.slice(4, 6), 10);
-          return day > 7 ? '' : x.slice(0, 3);
+          return day > 7 ? "" : x.slice(0, 3);
         }}
         decorator={() => {
           // TODO FIX THIS DECORATOR TO HANDLE CLICK OFF

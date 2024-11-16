@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-import { BarChart } from 'react-native-chart-kit';
-import { Rect, Svg, Text as TextSVG } from "react-native-svg";
-import { format, subMonths, startOfMonth } from 'date-fns';
+import { format, startOfMonth, subMonths } from "date-fns";
+import React from "react";
+import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import { BarChart } from "react-native-chart-kit";
 import { type MonthDataPointModel } from "../../types";
 
 interface ViewBarChartProps {
-    aggregatedData: MonthDataPointModel[];
+  aggregatedData: MonthDataPointModel[];
 }
 
 /**
@@ -14,15 +13,15 @@ interface ViewBarChartProps {
  * @returns the last 6 months in the format 'MMM yyyy'
  */
 const getLast6MonthsKeys = () => {
-    const monthKeys = [];
-    const today = new Date();
-    for (let i = 0; i < 6; i++) {
-      const startOfMonthDate = startOfMonth(subMonths(today, i));
-      monthKeys.push(format(startOfMonthDate, 'MMM yyyy'));
-    }
-    return monthKeys.reverse();
+  const monthKeys = [];
+  const today = new Date();
+  for (let i = 0; i < 6; i++) {
+    const startOfMonthDate = startOfMonth(subMonths(today, i));
+    monthKeys.push(format(startOfMonthDate, "MMM yyyy"));
+  }
+  return monthKeys.reverse();
 };
-  
+
 /**
  * Method for matching the data to the last 6 months so that
  * months that did not have entries have 0 vals
@@ -30,29 +29,31 @@ const getLast6MonthsKeys = () => {
  * @returns the dataset of the matched data
  */
 const matchDataToMonths = (data: MonthDataPointModel[]) => {
-    const monthKeys = getLast6MonthsKeys();
-    const dataset = [];
+  const monthKeys = getLast6MonthsKeys();
+  const dataset = [];
 
-    for (const monthKey of monthKeys) {
-    const monthData = data.find(({ x }) => format(new Date(x), 'MMM yyyy') === monthKey);
-    if (monthData) {
-    dataset.push(monthData.y);
+  for (const monthKey of monthKeys) {
+    const monthData = data.find(
+      ({ x }) => format(new Date(x), "MMM yyyy") === monthKey,
+    );
+    if (monthData != null) {
+      dataset.push(monthData.y);
     } else {
-    dataset.push(0);
+      dataset.push(0);
     }
-}
+  }
 
-return dataset;
+  return dataset;
 };
 
 const ViewBookBarChart = ({ aggregatedData }: ViewBarChartProps) => {
   const dataset = matchDataToMonths(aggregatedData);
+
   const labelset = dataset.map((_, index) => {
     const date = subMonths(new Date(), index);
-    return format(startOfMonth(date), 'MMM');
+    return format(startOfMonth(date), "MMM");
   });
   const dataValues = dataset;
-  const maxY = Math.max(...dataValues);
 
   const chartData = {
     labels: labelset.reverse(),
@@ -83,13 +84,13 @@ const ViewBookBarChart = ({ aggregatedData }: ViewBarChartProps) => {
               borderRadius: 0,
             },
             propsForDots: {
-              r: '6',
-              strokeWidth: '2',
-              stroke: '#ffa726',
+              r: "6",
+              strokeWidth: "2",
+              stroke: "#ffa726",
             },
             propsForLabels: {
-                fontSize: "12",
-                fill: "#FB6D0B",
+              fontSize: "12",
+              fill: "#FB6D0B",
             },
           }}
           withHorizontalLabels={false}
@@ -104,7 +105,7 @@ const ViewBookBarChart = ({ aggregatedData }: ViewBarChartProps) => {
 
 const styles = StyleSheet.create({
   chartContainer: {
-    overflow: 'hidden',
+    overflow: "hidden",
     paddingRight: 20,
   },
   barChart: {

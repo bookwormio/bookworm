@@ -58,7 +58,7 @@ export async function fetchPagesReadData(
  * @returns {Promise<LineDataPointModel[]>} - x: timestamp, y: books finished
  */
 export async function fetchBooksFinishedData(
-  userID: string, 
+  userID: string,
 ): Promise<LineDataPointModel[]> {
   const dataPoints: LineDataPointModel[] = [];
   try {
@@ -75,7 +75,7 @@ export async function fetchBooksFinishedData(
         y: 1,
       });
     }
-    
+
     return dataPoints;
   } catch (error) {
     console.error("Error fetching bookshelf data:", error);
