@@ -38,18 +38,15 @@ import Post from "../../../components/post/post";
 import { usePostsContext } from "../../../components/post/PostsContext";
 import { useNavigateToPost } from "../../../components/profile/hooks/useRouteHooks";
 import WormLoader from "../../../components/wormloader/WormLoader";
-import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
+import {
+  APP_BACKGROUND_COLOR,
+  MAX_PULLDOWN_DISTANCE,
+  PULLDOWN_ANIMATION_DURATION,
+  PULLDOWN_REFRESHING_MAX_HEIGHT,
+  PULLDOWN_REFRESHING_MIN_HEIGHT,
+} from "../../../constants/constants";
 import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
-
-// limits the height when refreshing
-const MAX_PULLDOWN_DISTANCE = 150;
-// duration when decreasing the height from the users pull down distance to the refresh container height and closure
-const PULLDOWN_ANIMATION_DURATION = 180;
-// height of the pull down container when refreshing
-const PULLDOWN_REFRESHING_MAX_HEIGHT = 75;
-// height of the pull down container when closed
-const PULLDOWN_REFRESHING_MIN_HEIGHT = 0;
 
 const Posts = () => {
   const { user } = useAuth();
