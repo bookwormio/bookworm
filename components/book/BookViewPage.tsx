@@ -6,6 +6,7 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import React, {
   useCallback,
@@ -131,6 +132,11 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
         ),
       }));
     } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
+        (error) => {
+          console.error("Error creating haptic", error);
+        },
+      );
       setSelectedShelves((prev) => [...prev, shelfName]);
       setPendingChanges((prev) => ({
         add: [...prev.add, shelfName].filter((s) => !prev.remove.includes(s)),

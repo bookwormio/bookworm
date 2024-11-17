@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import React from "react";
 import { PanResponder, StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -106,6 +107,11 @@ const NotificationsScreen = () => {
 
   const onRefresh = (closeRefreshAnimation: () => void) => {
     setRefreshing(true);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
+      (error) => {
+        console.error("Error creating haptic", error);
+      },
+    );
     refetch()
       .then(() => {
         setRefreshing(false);

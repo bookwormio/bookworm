@@ -4,6 +4,7 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import {
   type DocumentData,
   type QueryDocumentSnapshot,
@@ -157,6 +158,11 @@ const Posts = () => {
   // refreshes posts feed and triggers refresh container closure
   const onRefresh = (closeRefreshAnimation: () => void) => {
     setRefreshing(true);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
+      (error) => {
+        console.error("Error creating haptic", error);
+      },
+    );
     // Reset the query data to only the first page
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     queryClient
