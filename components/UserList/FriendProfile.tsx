@@ -94,9 +94,9 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       <View>
         <Text style={sharedProfileStyles.bioWrap}>{friendData.bio}</Text>
       </View>
-      <View style={[sharedProfileStyles.imageTextContainer]}>
+      <View style={sharedProfileStyles.imageTextContainer}>
         <TouchableOpacity
-          style={[sharedProfileStyles.textWrap]}
+          style={sharedProfileStyles.textWrap}
           onPress={() => {
             navigateToFollowList(true);
           }}
