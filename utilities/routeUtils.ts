@@ -122,3 +122,18 @@ export function generateBookListRoute(
   const pathName = `${prefix}/${userID}?bookshelf=${bookshelf}`;
   return pathName;
 }
+
+/**
+ * Generates a new book list route.
+ * @returns The generated new book list route.
+ */
+export function generateImageBlowupRoute(
+  imageURL: string,
+  prefix?: string,
+): string {
+  if (imageURL == null) {
+    throw new Error("imageURL is null or undefined");
+  }
+  const pathName = `${prefix}/${imageURL}`;
+  return pathName;
+}

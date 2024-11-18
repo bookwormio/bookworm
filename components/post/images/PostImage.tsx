@@ -3,6 +3,7 @@ import { type StorageReference } from "firebase/storage";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { FIRST_IMG_STYLE, IMG_STYLE } from "../../../constants/constants";
+import { useNavigateToImageBlowup } from "../../profile/hooks/useRouteHooks";
 import WormLoader from "../../wormloader/WormLoader";
 import { useGetDownloadURL } from "./hooks/usePostImageQueries";
 
@@ -17,6 +18,8 @@ const PostImage = ({ storageRef, index, onPress }: PostImageProps) => {
     useGetDownloadURL(storageRef);
 
   const isFirstImage = index === 0;
+
+  const navigateToImageBlowup = useNavigateToImageBlowup();
 
   if (isLoadingImageURL) {
     return (
@@ -41,6 +44,8 @@ const PostImage = ({ storageRef, index, onPress }: PostImageProps) => {
       onPress={() => {
         if (onPress != null) {
           onPress();
+        } else {
+          navigateToImageBlowup(imageDownloadURL);
         }
       }}
       style={styles.imageContainer}

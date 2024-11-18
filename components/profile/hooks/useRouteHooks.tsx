@@ -4,6 +4,7 @@ import {
   POSTS_BOOK_PREFIX,
   POSTS_BOOKLIST_PREFIX,
   POSTS_FOLLOWLIST_PREFIX,
+  POSTS_IMAGEBLOWUP_PREFIX,
   POSTS_POST_PREFIX,
   POSTS_RECOMMENDATION_PREFIX,
   POSTS_ROUTE_PREFIX,
@@ -11,12 +12,14 @@ import {
   PROFILE_BOOK_PREFIX,
   PROFILE_BOOKLIST_PREFIX,
   PROFILE_FOLLOWLIST_PREFIX,
+  PROFILE_IMAGEBLOWUP_PREFIX,
   PROFILE_POST_PREFIX,
   PROFILE_RECOMMENDATION_PREFIX,
   PROFILE_ROUTE_PREFIX,
   SEARCH_BOOK_PREFIX,
   SEARCH_BOOKLIST_PREFIX,
   SEARCH_FOLLOWLIST_PREFIX,
+  SEARCH_IMAGEBLOWUP_PREFIX,
   SEARCH_POST_PREFIX,
   SEARCH_RECOMMENDATION_PREFIX,
   SEARCH_ROUTE_PREFIX,
@@ -26,6 +29,7 @@ import {
   generateBookListRoute,
   generateBookRoute,
   generateFollowListRoute,
+  generateImageBlowupRoute,
   generatePostRoute,
   generateRecommendationRoute,
   generateUserRoute,
@@ -378,4 +382,56 @@ export const useNavigateToBookList = (userID: string) => {
   }
 
   return navigateToBookList;
+};
+
+const IMAGE_BLOWUP_ROUTE_PREFIXES = {
+  POSTS: POSTS_IMAGEBLOWUP_PREFIX,
+  PROFILE: PROFILE_IMAGEBLOWUP_PREFIX,
+  SEARCH: SEARCH_IMAGEBLOWUP_PREFIX,
+} as const;
+
+type ImageBlowupRouteType = keyof typeof IMAGE_BLOWUP_ROUTE_PREFIXES;
+
+interface ImageBlowupRouteInfo {
+  type: ImageBlowupRouteType | null;
+  prefix: string;
+}
+
+/**
+ * Hook to get the image blowup route info based on URL segments.
+ * @returns {ImageBlowupRouteInfo} - Object containing the route type and prefix for image blowup.
+ */
+export const useImageBlowupRouteInfo = (): ImageBlowupRouteInfo => {
+  const segments = useSegments();
+
+  if (segments.includes(SEARCH_ROUTE_PREFIX))
+    return { type: "SEARCH", prefix: IMAGE_BLOWUP_ROUTE_PREFIXES.SEARCH };
+  if (segments.includes(POSTS_ROUTE_PREFIX))
+    return { type: "POSTS", prefix: IMAGE_BLOWUP_ROUTE_PREFIXES.POSTS };
+  if (segments.includes(PROFILE_ROUTE_PREFIX))
+    return { type: "PROFILE", prefix: IMAGE_BLOWUP_ROUTE_PREFIXES.PROFILE };
+
+  return { type: null, prefix: "" };
+};
+
+/**
+ * Hook to navigate to a image blowup for a given image.
+ * @param {string} [imageURL] - The url of the image.
+ * @returns {Function} - Function to navigate to the image blowup.
+ */
+export const useNavigateToImageBlowup = () => {
+  const router = useRouter();
+  const { prefix } = useImageBlowupRouteInfo();
+
+  function navigateToImageBlowup(imageURL: string) {
+    const imageBlowupRoute = generateImageBlowupRoute(
+      encodeURIComponent(imageURL),
+      prefix,
+    );
+    if (imageBlowupRoute != null) {
+      router.push(imageBlowupRoute);
+    }
+  }
+
+  return navigateToImageBlowup;
 };

@@ -18,7 +18,10 @@ import { hasAnyBooks } from "../../../components/newpost/util/bookShelfUtils";
 import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBookShelves";
 import ViewData from "../../../components/profile/Data/ViewData";
 import { useGetBooksForBookshelves } from "../../../components/profile/hooks/useBookshelfQueries";
-import { useNavigateToFollowList } from "../../../components/profile/hooks/useRouteHooks";
+import {
+  useNavigateToFollowList,
+  useNavigateToImageBlowup,
+} from "../../../components/profile/hooks/useRouteHooks";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
 import ProfilePosts from "../../../components/profile/ProfilePosts";
 import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
@@ -26,6 +29,7 @@ import { sharedProfileStyles } from "../../../components/profile/styles/SharedPr
 import WormLoader from "../../../components/wormloader/WormLoader";
 import { TabNames } from "../../../enums/Enums";
 import { newFetchUserInfo } from "../../../services/firebase-services/UserQueries";
+import { useProfilePicQuery } from "./hooks/useProfileQueries";
 
 const Profile = () => {
   const { signOut, user } = useAuth();
@@ -47,11 +51,17 @@ const Profile = () => {
   const { data: followingCount, isLoading: isLoadingFollowingCount } =
     useGetNumberOfFollowingByUserID(user?.uid ?? "");
 
+  const { data: profilePic, isPending: profilePicPending } = useProfilePicQuery(
+    user?.uid,
+  );
+  const navigateToImageBlowup = useNavigateToImageBlowup();
+
   if (
     isLoadingUserData ||
     userData == null ||
     isLoadingFollowersCount ||
-    isLoadingFollowingCount
+    isLoadingFollowingCount ||
+    profilePicPending
   ) {
     return (
       <View style={sharedProfileStyles.loading}>
@@ -66,9 +76,16 @@ const Profile = () => {
       style={sharedProfileStyles.scrollContainer}
     >
       <View style={sharedProfileStyles.imageTextContainer}>
-        <View style={sharedProfileStyles.defaultImageContainer}>
+        <TouchableOpacity
+          style={sharedProfileStyles.defaultImageContainer}
+          onPress={() => {
+            if (profilePic != null && profilePic !== "") {
+              navigateToImageBlowup(profilePic);
+            }
+          }}
+        >
           <ProfilePicture userID={user?.uid ?? ""} size={60} />
-        </View>
+        </TouchableOpacity>
         <View>
           <Text style={sharedProfileStyles.nameText}>
             {userData.first} {userData.last}
