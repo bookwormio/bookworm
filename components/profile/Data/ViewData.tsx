@@ -158,16 +158,6 @@ const ViewData = ({ userID }: ViewDataProps) => {
   return (
     <ScrollView style={{ flex: 1 }}>
       <DataSnapShot userID={userID} isLoadingOther={isLoadingPagesData} />
-      {userID === user?.uid && (
-        <View
-          style={{
-            paddingLeft: 40,
-            paddingRight: 40,
-            paddingTop: 15,
-            paddingBottom: 10,
-          }}
-        ></View>
-      )}
       <View>
         <View style={styles.titleBarFirst}>
           <Text style={styles.dataTypeFirst}>Pages Read</Text>
