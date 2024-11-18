@@ -321,3 +321,9 @@ interface BadgeModel {
   postID?: string;
   received_at: Timestamp;
 }
+
+interface ProgressBarData {
+  progress: number;
+  color: string;
+  page: number;
+}
