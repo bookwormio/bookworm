@@ -27,6 +27,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
   const navigateToPost = useNavigateToPost();
 
   const navigateToUser = useNavigateToUser(user?.uid, notif.sender);
+
   const navigateToBadgePage = useNavigateToBadgePage(notif.receiver);
 
   return (
@@ -52,22 +53,28 @@ const NotificationItem = ({ notif }: NotifProp) => {
       }}
     >
       <View style={styles.imageTextContainer}>
-        <TouchableOpacity
-          onPress={() => {
-            navigateToUser();
-          }}
-        >
-          {notif.type !== ServerNotificationType.BADGE ? (
+        {notif.type !== ServerNotificationType.BADGE ? (
+          <TouchableOpacity
+            onPress={() => {
+              navigateToUser();
+            }}
+          >
             <ProfilePicture userID={notif.sender} size={50} />
-          ) : notif.badgeID != null ? (
+          </TouchableOpacity>
+        ) : notif.badgeID != null ? (
+          <TouchableOpacity
+            onPress={() => {
+              navigateToBadgePage();
+            }}
+          >
             <BadgeIcon
               badgeID={notif.badgeID}
               size={50}
               stylesOverride={styles.badgeStyleOverride}
               sizeAddOverride={15}
             />
-          ) : null}
-        </TouchableOpacity>
+          </TouchableOpacity>
+        ) : null}
         <NotificationItemContent
           notification={notif}
           time={time}

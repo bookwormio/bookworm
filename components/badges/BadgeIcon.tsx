@@ -22,14 +22,15 @@ const BadgeIcon = ({
   stylesOverride,
   sizeAddOverride = 0,
 }: BadgePictureProps) => {
+  const imageSize = size + sizeAddOverride;
   const dynamicStyles = {
     container: {
       height: size,
       width: size,
     },
     image: {
-      height: size + sizeAddOverride,
-      width: size + sizeAddOverride,
+      height: imageSize,
+      width: imageSize,
     },
   };
 
