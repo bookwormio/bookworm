@@ -20,12 +20,10 @@ import {
   type WeekDataPointModel,
 } from "../../../types";
 import { useAuth } from "../../auth/context";
-import BookWormButton from "../../button/BookWormButton";
 import ViewBookBarChart from "../../chart/ViewBookBarChart";
 import ViewDataChart from "../../chart/ViewDataChart";
 import DataSnapShot from "../../datasnapshot/DataSnapShot";
 import WormLoader from "../../wormloader/WormLoader";
-import { useNavigateToBadgePage } from "../hooks/useRouteHooks";
 
 // TODO: Combine these functions into a single generic
 function aggregatePagesDataByWeek(
@@ -122,7 +120,6 @@ const ViewData = ({ userID }: ViewDataProps) => {
   };
 
   const { user } = useAuth();
-  const navigateToBadgePage = useNavigateToBadgePage(userID);
 
   const {
     data: bookData,
@@ -169,9 +166,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
             paddingTop: 15,
             paddingBottom: 10,
           }}
-        >
-          <BookWormButton title="Badges" onPress={navigateToBadgePage} />
-        </View>
+        ></View>
       )}
       <View>
         <View style={styles.titleBarFirst}>
