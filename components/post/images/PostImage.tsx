@@ -45,7 +45,7 @@ const PostImage = ({ storageRef, index, onPress }: PostImageProps) => {
         if (onPress != null) {
           onPress();
         } else {
-          navigateToImageBlowup(encodeURIComponent(imageDownloadURL));
+          navigateToImageBlowup(imageDownloadURL);
         }
       }}
       style={styles.imageContainer}

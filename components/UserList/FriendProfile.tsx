@@ -78,7 +78,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           style={sharedProfileStyles.defaultImageContainer}
           onPress={() => {
             if (profilePic != null && profilePic !== "") {
-              navigateToImageBlowup(encodeURIComponent(profilePic));
+              navigateToImageBlowup(profilePic);
             }
           }}
         >

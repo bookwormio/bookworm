@@ -384,13 +384,13 @@ export const useNavigateToBookList = (userID: string) => {
   return navigateToBookList;
 };
 
-const IMAGEBLOWUP_ROUTE_PREFIXES = {
+const IMAGE_BLOWUP_ROUTE_PREFIXES = {
   POSTS: POSTS_IMAGEBLOWUP_PREFIX,
   PROFILE: PROFILE_IMAGEBLOWUP_PREFIX,
   SEARCH: SEARCH_IMAGEBLOWUP_PREFIX,
 } as const;
 
-type ImageBlowupRouteType = keyof typeof IMAGEBLOWUP_ROUTE_PREFIXES;
+type ImageBlowupRouteType = keyof typeof IMAGE_BLOWUP_ROUTE_PREFIXES;
 
 interface ImageBlowupRouteInfo {
   type: ImageBlowupRouteType | null;
@@ -405,11 +405,11 @@ export const useImageBlowupRouteInfo = (): ImageBlowupRouteInfo => {
   const segments = useSegments();
 
   if (segments.includes(SEARCH_ROUTE_PREFIX))
-    return { type: "SEARCH", prefix: IMAGEBLOWUP_ROUTE_PREFIXES.SEARCH };
+    return { type: "SEARCH", prefix: IMAGE_BLOWUP_ROUTE_PREFIXES.SEARCH };
   if (segments.includes(POSTS_ROUTE_PREFIX))
-    return { type: "POSTS", prefix: IMAGEBLOWUP_ROUTE_PREFIXES.POSTS };
+    return { type: "POSTS", prefix: IMAGE_BLOWUP_ROUTE_PREFIXES.POSTS };
   if (segments.includes(PROFILE_ROUTE_PREFIX))
-    return { type: "PROFILE", prefix: IMAGEBLOWUP_ROUTE_PREFIXES.PROFILE };
+    return { type: "PROFILE", prefix: IMAGE_BLOWUP_ROUTE_PREFIXES.PROFILE };
 
   return { type: null, prefix: "" };
 };
@@ -424,7 +424,10 @@ export const useNavigateToImageBlowup = () => {
   const { prefix } = useImageBlowupRouteInfo();
 
   function navigateToImageBlowup(imageURL: string) {
-    const imageBlowupRoute = generateImageBlowupRoute(imageURL, prefix);
+    const imageBlowupRoute = generateImageBlowupRoute(
+      encodeURIComponent(imageURL),
+      prefix,
+    );
     if (imageBlowupRoute != null) {
       router.push(imageBlowupRoute);
     }
