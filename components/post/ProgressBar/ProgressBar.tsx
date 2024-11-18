@@ -9,9 +9,10 @@
 
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, Text, View } from "react-native";
+import { type ProgressBarData } from "../../../types";
 
 interface ProgressBarProps {
-  data: Array<{ progress: number; color: string; page: number }>;
+  data: ProgressBarData[];
   barHeight?: number;
   shouldAnimate?: boolean;
   animateDuration?: number;
