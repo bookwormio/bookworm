@@ -1,5 +1,6 @@
+import { Image } from "expo-image";
 import React from "react";
-import { Dimensions, Image, StyleSheet, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 
 interface ImageBlowupProps {
@@ -10,7 +11,11 @@ const { width } = Dimensions.get("window");
 const ImageBlowup = ({ imageURL }: ImageBlowupProps) => {
   return (
     <View style={styles.container}>
-      <Image style={styles.image} source={{ uri: imageURL }} />
+      <Image
+        style={styles.image}
+        source={{ uri: imageURL }}
+        cachePolicy={"memory-disk"}
+      />
     </View>
   );
 };
