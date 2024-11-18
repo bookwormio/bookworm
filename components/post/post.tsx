@@ -137,7 +137,7 @@ const Post = ({
         {badges
           ?.filter((badge) => badge.postID === post.id)
           .map((badge) => (
-            <View key={badge.badgeID}>
+            <View key={badge.badgeID} style={{ paddingRight: 40 }}>
               <BadgeOnPost size={50} badge={badge} userInfo={post.user} />
             </View>
           ))}

@@ -55,8 +55,10 @@ export async function addBadgeToUser(
         received_at: serverTimestamp(),
         ...(postID != null && { postID }), // Only add postID if it exists
       };
-      await setDoc(badgeDocRef, badgeData, { merge: true });
-      await sendBadgeNotification(userID, badgeID, postID);
+      await Promise.all([
+        setDoc(badgeDocRef, badgeData, { merge: true }),
+        sendBadgeNotification(userID, badgeID, "", postID),
+      ]);
     }
   } catch (error) {
     console.error("Error adding badge: ", error);
@@ -132,7 +134,7 @@ export async function getBadgesForPost(
     return badges;
   } catch (error) {
     throw new Error(
-      `Failed to fetch badges for user ${userID}: ${(error as Error).message}`,
+      `Failed to fetch badges for user ${userID} on post ${postID}: ${(error as Error).message}`,
     );
   }
 }
