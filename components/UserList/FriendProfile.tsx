@@ -107,7 +107,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[sharedProfileStyles.textWrap]}
+          style={sharedProfileStyles.textWrap}
           onPress={() => {
             navigateToFollowList(false);
           }}
