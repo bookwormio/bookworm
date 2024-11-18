@@ -33,6 +33,9 @@ const ProgressBar = ({
   const [progressData, setProgressData] = useState<IPProps[]>([]);
   const [animatedValue] = useState(new Animated.Value(0));
 
+  function addToBarHeight(padding: number) {
+    return barHeight + padding;
+  }
   // this is like componentDidMount
   useEffect(() => {
     Animated.timing(animatedValue, {
@@ -70,16 +73,16 @@ const ProgressBar = ({
       style={{
         position: "relative",
         marginTop: 16,
-        marginBottom: 16 + barHeight,
+        marginBottom: addToBarHeight(16),
         width: "100%",
       }}
     >
       <View
         style={{
-          borderRadius: 5, // Adjust radius to match the bar height for a rounded effect
-          overflow: "hidden", // Ensures child elements respect the radius
-          height: barHeight, // Set the height explicitly for the container
-          backgroundColor: "#e0e0e0", // Optional: Add a background color for the track
+          borderRadius: 5,
+          overflow: "hidden",
+          height: barHeight,
+          backgroundColor: "#e0e0e0",
         }}
       >
         {progressData.map((d, i) => (
@@ -99,7 +102,7 @@ const ProgressBar = ({
       <View
         style={{
           position: "absolute",
-          top: barHeight + 5, // Place the text slightly below the progress bar
+          top: addToBarHeight(5),
           flexDirection: "row",
           justifyContent: "space-between",
           width: "100%",
@@ -112,7 +115,7 @@ const ProgressBar = ({
             style={{
               position: "absolute",
               left: `${d.progress}%`,
-              transform: [{ translateX: -17 }], // Adjust to center text slightly
+              transform: [{ translateX: -17 }],
               fontSize: 12,
               fontWeight: "bold",
               textAlign: "right",
