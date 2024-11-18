@@ -15,10 +15,12 @@ import { createBookResponseNotification } from "../../components/notifications/u
 import { BOOK_AUTO_DENIAL_NOTIFICATION_MESSAGE } from "../../constants/constants";
 import {
   BookRequestNotificationStatus,
+  type ServerBadgeName,
   ServerNotificationType,
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
 import {
+  type BadgeNotification,
   type FullNotificationModel,
   type NotificationModel,
 } from "../../types";
@@ -92,6 +94,10 @@ export async function createNotification(
         custom_message: notif.custom_message ?? "",
         bookRequestStatus: notif.bookRequestStatus,
       }),
+      ...(notif.type === ServerNotificationType.BADGE && {
+        badgeID: notif.badgeID,
+        ...(notif.postID != null && { postID: notif.postID }),
+      }),
     };
 
     await addDoc(notificationsRef, fullNotif);
@@ -164,6 +170,7 @@ export async function getAllFullNotifications(
         read_at: notifDoc.data().read_at,
         postID: notifDoc.data().postID,
         bookID: notifDoc.data().bookID,
+        badgeID: notifDoc.data().badgeID,
         bookTitle: notifDoc.data().bookTitle,
         custom_message: notifDoc.data().custom_message,
         bookRequestStatus: notifDoc.data().bookRequestStatus,
@@ -298,3 +305,25 @@ export const denyOtherBorrowRequests = async (
     );
   }
 };
+
+/**
+ * Formats and calls createNotification for Badge Notifications
+ * @param userID ID of user notification is getting sent to
+ * @param badgeID badge type
+ * @param postID postID the badge could be associated with
+ */
+export async function sendBadgeNotification(
+  userID: string,
+  badgeID: ServerBadgeName,
+  postID?: string,
+) {
+  const notification: BadgeNotification = {
+    receiver: userID,
+    sender: userID,
+    sender_name: "",
+    type: ServerNotificationType.BADGE,
+    badgeID,
+    ...(postID != null && { postID }),
+  };
+  await createNotification(notification);
+}

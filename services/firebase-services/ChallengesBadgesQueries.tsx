@@ -22,6 +22,7 @@ import {
 } from "../../enums/Enums";
 import { DB } from "../../firebase.config";
 import { type BadgeModel } from "../../types";
+import { sendBadgeNotification } from "./NotificationQueries";
 
 /**
  * Adds a badge to a user in the Firestore database.
@@ -55,6 +56,7 @@ export async function addBadgeToUser(
         ...(postID != null && { postID }), // Only add postID if it exists
       };
       await setDoc(badgeDocRef, badgeData, { merge: true });
+      await sendBadgeNotification(userID, badgeID, postID);
     }
   } catch (error) {
     console.error("Error adding badge: ", error);

@@ -3,7 +3,9 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { ServerNotificationType } from "../../enums/Enums";
 import { type FullNotificationModel } from "../../types";
 import { useAuth } from "../auth/context";
+import BadgeIcon from "../badges/BadgeIcon";
 import {
+  useNavigateToBadgePage,
   useNavigateToBook,
   useNavigateToPost,
   useNavigateToUser,
@@ -26,6 +28,8 @@ const NotificationItem = ({ notif }: NotifProp) => {
 
   const navigateToUser = useNavigateToUser(user?.uid, notif.sender);
 
+  const navigateToBadgePage = useNavigateToBadgePage(notif.receiver);
+
   return (
     <TouchableOpacity
       style={styles.notif_container}
@@ -43,17 +47,34 @@ const NotificationItem = ({ notif }: NotifProp) => {
           notif.type === ServerNotificationType.BOOK_REQUEST_RESPONSE
         ) {
           navigateToBook();
+        } else if (notif.type === ServerNotificationType.BADGE) {
+          navigateToBadgePage();
         }
       }}
     >
       <View style={styles.imageTextContainer}>
-        <TouchableOpacity
-          onPress={() => {
-            navigateToUser();
-          }}
-        >
-          <ProfilePicture userID={notif.sender} size={50} />
-        </TouchableOpacity>
+        {notif.type !== ServerNotificationType.BADGE ? (
+          <TouchableOpacity
+            onPress={() => {
+              navigateToUser();
+            }}
+          >
+            <ProfilePicture userID={notif.sender} size={50} />
+          </TouchableOpacity>
+        ) : notif.badgeID != null ? (
+          <TouchableOpacity
+            onPress={() => {
+              navigateToBadgePage();
+            }}
+          >
+            <BadgeIcon
+              badgeID={notif.badgeID}
+              size={50}
+              stylesOverride={styles.badgeStyleOverride}
+              sizeAddOverride={15}
+            />
+          </TouchableOpacity>
+        ) : null}
         <NotificationItemContent
           notification={notif}
           time={time}
@@ -98,5 +119,9 @@ const styles = StyleSheet.create({
     height: "100%", // Adjust the size of the image as needed
     width: "100%", // Adjust the size of the image as needed
     borderRadius: 30, // Make the image circular
+  },
+  badgeStyleOverride: {
+    borderRadius: 50,
+    alignSelf: "flex-start",
   },
 });
