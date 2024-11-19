@@ -146,15 +146,15 @@ const NotificationsScreen = () => {
         }}
         pointerEvents={refreshing ? "none" : "auto"}
       >
-        <Animated.View style={[refreshContainerStyles]}>
+        <Animated.View style={refreshContainerStyles}>
           {refreshing && (
             <View style={styles.topRefresh}>
-              <WormLoader style={{ width: 50, height: 50 }} />
+              <WormLoader style={styles.wormLoader} />
             </View>
           )}
         </Animated.View>
         <Animated.View
-          style={[styles.container]}
+          style={styles.container}
           {...panResponderRef.current.panHandlers}
         >
           <Animated.FlatList
@@ -227,6 +227,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
+  },
+  wormLoader: {
+    width: 50,
+    height: 50,
   },
 });
 

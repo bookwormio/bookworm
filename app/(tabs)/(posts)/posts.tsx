@@ -233,7 +233,7 @@ const Posts = () => {
         }}
         pointerEvents={refreshing ? "none" : "auto"}
       >
-        <Animated.View style={[refreshContainerStyles]}>
+        <Animated.View style={refreshContainerStyles}>
           {refreshing && (
             <View style={styles.topRefresh}>
               <WormLoader style={{ width: 50, height: 50 }} />
@@ -241,7 +241,7 @@ const Posts = () => {
           )}
         </Animated.View>
         <Animated.View
-          style={[styles.container]}
+          style={styles.container}
           {...panResponderRef.current.panHandlers}
         >
           {isLoadingFeedPosts && !refreshing && (
