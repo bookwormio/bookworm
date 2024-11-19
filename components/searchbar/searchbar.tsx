@@ -1,6 +1,7 @@
 import { Entypo, Feather } from "@expo/vector-icons";
 import React from "react";
 import { Button, Keyboard, StyleSheet, TextInput, View } from "react-native";
+import { BOOKWORM_ORANGE } from "../../constants/constants";
 
 interface SearchBarProps {
   clicked: boolean;
@@ -62,7 +63,7 @@ const SearchBar = ({
       {clicked && (
         <View>
           <Button
-            color={"#FB6D0B"}
+            color={BOOKWORM_ORANGE}
             title="Cancel"
             onPress={() => {
               Keyboard.dismiss();

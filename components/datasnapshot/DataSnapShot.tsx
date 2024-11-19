@@ -1,6 +1,9 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { APP_BACKGROUND_COLOR } from "../../constants/constants";
+import {
+  APP_BACKGROUND_COLOR,
+  BOOKWORM_ORANGE,
+} from "../../constants/constants";
 import { useGetBooksForBookshelves } from "../profile/hooks/useBookshelfQueries";
 import { useGetPagesData } from "./hooks/useDataQueries";
 import {
@@ -90,7 +93,7 @@ const styles = StyleSheet.create({
   },
   leftBorder: {
     borderLeftWidth: 1,
-    borderLeftColor: "#FB6D0B",
+    borderLeftColor: BOOKWORM_ORANGE,
   },
 });
 

@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { BOOKWORM_ORANGE } from "../../constants/constants";
 
 interface SearchBarProps {
   clicked: boolean;
@@ -80,7 +81,7 @@ const BookSearchBar = ({
       {clicked && (
         <View>
           <Button
-            color={"#FB6D0B"}
+            color={BOOKWORM_ORANGE}
             title="Cancel"
             onPress={() => {
               Keyboard.dismiss();

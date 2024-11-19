@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -19,6 +20,7 @@ import ProfileBookShelves from "../../../components/profile/BookShelf/ProfileBoo
 import ViewData from "../../../components/profile/Data/ViewData";
 import { useGetBooksForBookshelves } from "../../../components/profile/hooks/useBookshelfQueries";
 import {
+  useNavigateToBadgePage,
   useNavigateToFollowList,
   useNavigateToImageBlowup,
 } from "../../../components/profile/hooks/useRouteHooks";
@@ -32,7 +34,7 @@ import { newFetchUserInfo } from "../../../services/firebase-services/UserQuerie
 import { useProfilePicQuery } from "./hooks/useProfileQueries";
 
 const Profile = () => {
-  const { signOut, user } = useAuth();
+  const { user } = useAuth();
   const [profileTab, setProfileTab] = useState("shelf"); // Default to bookshelf
 
   const navigateToFollowList = useNavigateToFollowList(user?.uid);
@@ -56,6 +58,7 @@ const Profile = () => {
   );
   const navigateToImageBlowup = useNavigateToImageBlowup();
 
+  const navigateToBadgePage = useNavigateToBadgePage(user?.uid ?? "");
   if (
     isLoadingUserData ||
     userData == null ||
@@ -100,44 +103,40 @@ const Profile = () => {
       <View>
         <Text style={sharedProfileStyles.bioWrap}>{userData.bio}</Text>
       </View>
-      <View style={sharedProfileStyles.imageTextContainer}>
+      <View style={{ flexDirection: "row", width: "100%", flex: 1 }}>
+        <View style={sharedProfileStyles.imageTextContainer}>
+          <TouchableOpacity
+            style={sharedProfileStyles.textWrap}
+            onPress={() => {
+              navigateToFollowList(true);
+            }}
+          >
+            <Text style={sharedProfileStyles.followTitle}>Followers</Text>
+            <Text style={sharedProfileStyles.followAmount}>
+              {followersCount ?? "-"}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={sharedProfileStyles.textWrap}
+            onPress={() => {
+              navigateToFollowList(false);
+            }}
+          >
+            <Text style={sharedProfileStyles.followTitle}>Following</Text>
+            <Text style={sharedProfileStyles.followAmount}>
+              {followingCount ?? "-"}
+            </Text>
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity
-          style={sharedProfileStyles.textWrap}
-          onPress={() => {
-            navigateToFollowList(true);
-          }}
+          style={styles.badgeContainer}
+          onPress={navigateToBadgePage}
         >
-          <Text style={sharedProfileStyles.followTitle}>Followers</Text>
-          <Text style={sharedProfileStyles.followAmount}>
-            {followersCount ?? "-"}
-          </Text>
+          <Image
+            style={styles.badgeImage}
+            source={require("../../../assets/badges/bookworm_badges.png")}
+          />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={sharedProfileStyles.textWrap}
-          onPress={() => {
-            navigateToFollowList(false);
-          }}
-        >
-          <Text style={sharedProfileStyles.followTitle}>Following</Text>
-          <Text style={sharedProfileStyles.followAmount}>
-            {followingCount ?? "-"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <View style={sharedProfileStyles.outerButtonsContainer}>
-        <BookWormButton
-          title="Edit Profile"
-          onPress={() => {
-            if (user != null) {
-              router.push({
-                pathname: "EditProfile",
-              });
-            } else {
-              console.error("User DNE");
-            }
-          }}
-        />
-        <BookWormButton title="Log Out" onPress={signOut} />
       </View>
       <ProfileTabSelector
         profileTab={profileTab}
@@ -181,5 +180,17 @@ export default Profile;
 const styles = StyleSheet.create({
   shelves: {
     marginTop: 20,
+  },
+  badgeImage: {
+    width: 37,
+    height: 37,
+    resizeMode: "contain",
+  },
+  badgeContainer: {
+    alignItems: "flex-end",
+    flex: 1,
+    width: "100%",
+    paddingTop: 20,
+    paddingRight: 14,
   },
 });

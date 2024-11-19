@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import BackButton from "../../../components/backbutton/BackButton";
+import { BOOKWORM_ORANGE } from "../../../constants/constants";
 
 const PostsLayout = () => {
   return (
@@ -29,7 +30,7 @@ const PostsLayout = () => {
                 }}
                 disabled={false}
               >
-                <FontAwesome5 name="bell" size={20} color="#FB6D0B" />
+                <FontAwesome5 name="bell" size={20} color={BOOKWORM_ORANGE} />
               </TouchableOpacity>
             ),
           }}

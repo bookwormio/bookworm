@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Dimensions, TouchableOpacity, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Rect, Svg, Text as TextSVG } from "react-native-svg";
+import { BOOKWORM_ORANGE } from "../../constants/constants";
 import { type WeekDataPointModel } from "../../types";
 
 interface ViewDataChartProps {
@@ -110,12 +111,12 @@ const ViewDataChart = ({ aggregatedData }: ViewDataChartProps) => {
           },
           propsForDots: {
             r: "6",
-            fill: "#FB6D0B",
+            fill: BOOKWORM_ORANGE,
             strokeWidth: "2",
           },
           propsForLabels: {
             fontSize: "12",
-            fill: "#FB6D0B",
+            fill: BOOKWORM_ORANGE,
           },
         }}
         style={{
@@ -137,7 +138,7 @@ const ViewDataChart = ({ aggregatedData }: ViewDataChartProps) => {
                   y={tooltipPos.y + 10}
                   width="40"
                   height="30"
-                  fill="#FB6D0B"
+                  fill={BOOKWORM_ORANGE}
                   rx={5} // Horizontal border radius
                   ry={5} // Vertical border radius
                 />

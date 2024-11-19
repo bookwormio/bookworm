@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import React from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { closeKeyboardThen } from "../../app/util/keyboardHelpers";
+import { BOOKWORM_ORANGE } from "../../constants/constants";
 import {
   BookRequestNotificationStatus,
   BOOKSHELF_DISPLAY_NAMES,
@@ -181,7 +182,11 @@ const BookListItem = ({
             disabled={removeBookPending}
             style={styles.removeButtonContainer}
           >
-            <AntDesign name={"minuscircleo"} size={20} color={"#FB6D0B"} />
+            <AntDesign
+              name={"minuscircleo"}
+              size={20}
+              color={BOOKWORM_ORANGE}
+            />
           </TouchableOpacity>
         )}
     </View>

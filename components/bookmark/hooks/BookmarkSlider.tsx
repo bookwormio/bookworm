@@ -3,6 +3,7 @@ import { Slider } from "@miblanchard/react-native-slider";
 
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { BOOKWORM_ORANGE } from "../../../constants/constants";
 
 interface BookmarkSliderProps {
   oldBookmark: number | null;
@@ -47,7 +48,7 @@ const BookmarkSlider = ({
               <BookmarkSliderThumb currentBookmark={currentBookmark} />
             )}
             step={1}
-            minimumTrackTintColor="#FB6D0B"
+            minimumTrackTintColor={BOOKWORM_ORANGE}
           />
         </View>
       </View>
