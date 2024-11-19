@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+import { Image } from "expo-image";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -134,7 +134,8 @@ const Profile = () => {
         >
           <Image
             style={styles.badgeImage}
-            source={require("../../../assets/badges/bookworm_badges.png")}
+            source={require("../../../assets/badges/badge_icon.png")}
+            cachePolicy={"memory-disk"}
           />
         </TouchableOpacity>
       </View>

@@ -59,4 +59,11 @@ export const sharedProfileStyles = StyleSheet.create({
     right: 0,
     backgroundColor: APP_BACKGROUND_COLOR,
   },
+  followButton: {
+    paddingLeft: 80,
+    paddingRight: 10,
+    marginBottom: 15,
+    alignSelf: "flex-end",
+    flex: 1,
+  },
 });

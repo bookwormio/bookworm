@@ -32,7 +32,7 @@ const Settings = () => {
           name={"edit"}
           size={25}
           color="black"
-          style={{ paddingRight: 10 }}
+          style={styles.iconPadding}
         />
         <Text style={styles.text}>Edit Profile</Text>
       </TouchableOpacity>
@@ -44,7 +44,7 @@ const Settings = () => {
           name={"logout"}
           size={25}
           color="black"
-          style={{ paddingRight: 10 }}
+          style={styles.iconPadding}
         />
         <Text style={styles.text}>Logout</Text>
       </TouchableOpacity>
@@ -70,6 +70,9 @@ const styles = StyleSheet.create({
     borderLeftWidth: 1,
     borderRightWidth: 1,
     borderColor: BOOKWORM_ORANGE,
+  },
+  iconPadding: {
+    paddingRight: 10,
   },
 });
 
