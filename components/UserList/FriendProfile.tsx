@@ -117,15 +117,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
             {numFollowingData ?? "-"}
           </Text>
         </TouchableOpacity>
-        <View
-          style={{
-            paddingLeft: 80,
-            paddingRight: 10,
-            marginBottom: 15,
-            alignSelf: "flex-end",
-            flex: 1,
-          }}
-        >
+        <View style={sharedProfileStyles.followButton}>
           <FollowButon friendUserID={friendData.id} />
         </View>
       </View>
