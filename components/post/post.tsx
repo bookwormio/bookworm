@@ -12,6 +12,8 @@ import { type PostModel } from "../../types";
 
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { useAuth } from "../auth/context";
+import BadgeOnPost from "../badges/BadgeOnPost";
+import { useGetBadgesForPost } from "../badges/useBadgeQueries";
 import {
   useNavigateToBook,
   useNavigateToUser,
@@ -66,6 +68,8 @@ const Post = ({
   const navigateToBook = useNavigateToBook(post.bookid);
 
   const isCurrentUsersPost = user?.uid === post.user.id;
+
+  const { data: badges } = useGetBadgesForPost(post.user.id, post.id);
 
   return (
     <ScrollView>
@@ -130,6 +134,13 @@ const Post = ({
             />
           )}
         <Text style={styles.body}>{post.text}</Text>
+        {badges
+          ?.filter((badge) => badge.postID === post.id)
+          .map((badge) => (
+            <View key={badge.badgeID} style={{ paddingRight: 40 }}>
+              <BadgeOnPost size={50} badge={badge} userInfo={post.user} />
+            </View>
+          ))}
         {post.imageStorageRefs.length > 0 && (
           <View style={{ marginTop: 10, height: 270 }}>
             <FlatList

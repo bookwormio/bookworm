@@ -5,6 +5,7 @@ import {
   checkForLendingBadges,
   checkForPostBadges,
   checkForStreakBadges,
+  getBadgesForPost,
   getExistingEarnedBadges,
 } from "../../services/firebase-services/ChallengesBadgesQueries";
 
@@ -20,6 +21,22 @@ export const useGetExistingEarnedBadges = (userID: string) => {
     enabled: userID != null && userID !== "",
     queryFn: async () => {
       return await getExistingEarnedBadges(userID);
+    },
+  });
+};
+
+/**
+ * Custom hook to retrieve existing earned badges for a user.
+ *
+ * @param {string} userID - The ID of the user whose badges are to be retrieved.
+ * @returns {QueryResult<ServerBadgeName[]>} - The query result containing badges data and loading state.
+ */
+export const useGetBadgesForPost = (userID: string, postID: string) => {
+  return useQuery({
+    queryKey: ["badges", userID],
+    enabled: userID != null && userID !== "",
+    queryFn: async () => {
+      return await getBadgesForPost(userID, postID);
     },
   });
 };

@@ -315,12 +315,13 @@ export const denyOtherBorrowRequests = async (
 export async function sendBadgeNotification(
   userID: string,
   badgeID: ServerBadgeName,
+  senderName: string = "",
   postID?: string,
 ) {
   const notification: BadgeNotification = {
     receiver: userID,
     sender: userID,
-    sender_name: "",
+    sender_name: senderName,
     type: ServerNotificationType.BADGE,
     badgeID,
     ...(postID != null && { postID }),

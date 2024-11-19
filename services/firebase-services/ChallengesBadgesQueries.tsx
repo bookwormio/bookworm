@@ -55,8 +55,10 @@ export async function addBadgeToUser(
         received_at: serverTimestamp(),
         ...(postID != null && { postID }), // Only add postID if it exists
       };
-      await setDoc(badgeDocRef, badgeData, { merge: true });
-      await sendBadgeNotification(userID, badgeID, postID);
+      await Promise.all([
+        setDoc(badgeDocRef, badgeData, { merge: true }),
+        sendBadgeNotification(userID, badgeID, "", postID),
+      ]);
     }
   } catch (error) {
     console.error("Error adding badge: ", error);
@@ -96,6 +98,43 @@ export async function getExistingEarnedBadges(
   } catch (error) {
     throw new Error(
       `Failed to fetch badges for user ${userID}: ${(error as Error).message}`,
+    );
+  }
+}
+
+/**
+ * Retrieves existing earned badges for a user.
+ *
+ * @param {string} userID - The ID of the user whose badges are to be retrieved.
+ * @returns {Promise<ServerBadgeName[]>} - A promise that resolves to an array of earned badge IDs.
+ * @throws {Error} If the badges cannot be fetched.
+ */
+export async function getBadgesForPost(
+  userID: string,
+  postID: string,
+): Promise<BadgeModel[]> {
+  try {
+    const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
+    const badgesCollectionRef = collection(userBadgeCollectDocRef, "badges");
+
+    const badgesQuery = query(
+      badgesCollectionRef,
+      where("postID", "==", postID),
+    );
+
+    const badgeDocs = await getDocs(badgesQuery);
+    const badges: BadgeModel[] = [];
+    badgeDocs.forEach((doc) => {
+      badges.push({
+        badgeID: doc.id as ServerBadgeName,
+        received_at: doc.data().received_at ?? null,
+        postID: doc.data().postID ?? null,
+      });
+    });
+    return badges;
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch badges for user ${userID} on post ${postID}: ${(error as Error).message}`,
     );
   }
 }
