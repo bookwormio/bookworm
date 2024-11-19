@@ -15,12 +15,15 @@ interface BookShelfBookProps {
   bookID: string;
   shelfName?: ServerBookShelfName;
   userID?: string;
+  thumbnailOverride?: string;
 }
+
 const BookShelfBook = ({
   book,
   bookID,
   shelfName,
   userID,
+  thumbnailOverride,
 }: BookShelfBookProps) => {
   const { user } = useAuth();
   const navigateToBook = useNavigateToBook(bookID);
@@ -88,7 +91,11 @@ const BookShelfBook = ({
         <View style={styles.imageBox}>
           <Image
             // Using thumbnail here because the other image links (small / medium) may be different
-            source={{ uri: book?.thumbnail }}
+            source={
+              thumbnailOverride != null
+                ? { uri: thumbnailOverride }
+                : { uri: book?.thumbnail }
+            }
             cachePolicy={"memory-disk"}
             style={styles.bookImage}
           />

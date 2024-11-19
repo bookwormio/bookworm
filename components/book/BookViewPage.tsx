@@ -42,7 +42,6 @@ import {
   useCheckForCompletionBadges,
   useGetExistingEarnedBadges,
 } from "../badges/useBadgeQueries";
-import BookWormButton from "../button/BookWormButton";
 import BookshelfAddButtons from "../profile/BookShelf/BookshelfAddButtons";
 import {
   useAddBookToShelf,
@@ -50,8 +49,7 @@ import {
   useRemoveBookFromShelf,
 } from "../profile/hooks/useBookshelfQueries";
 import WormLoader from "../wormloader/WormLoader";
-import { useFindBooksLikeThis } from "./hooks/useSimilarBookQueries";
-import SimilarBookShelf from "./SimilarBookShelf";
+import SimilarBooksWrapper from "./SimilarBooksWrapper";
 
 interface BookViewProps {
   bookID: string;
@@ -101,7 +99,6 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     useGetShelvesForBook(user?.uid ?? "", bookID ?? "");
   const addBookMutation = useAddBookToShelf();
   const removeBookMutation = useRemoveBookFromShelf();
-  const similarBooksMutation = useFindBooksLikeThis();
 
   useEffect(() => {
     if (queryBookData != null) setBookData(queryBookData);
@@ -244,15 +241,6 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     [applyPendingChanges],
   );
 
-  let SHOW_BOOK_SHELF = false;
-  const handleSimilarBooksPressed = (bookPressedID: string) => {
-    // TODO: make the mutation to get similar books
-    // display the similarbookshelf
-    similarBooksMutation.mutate({ bookID: bookPressedID });
-    // TODO state update to show similarbookshelf
-    SHOW_BOOK_SHELF = true;
-  };
-
   function stripHTMLWithRegex(htmlString: string): string {
     let textWithNewlines = htmlString.replace(/<\/?(br|p)[^>]*>/gi, "\n");
     textWithNewlines = textWithNewlines.replace(/<\/?[^>]+(>|$)/g, "");
@@ -358,13 +346,11 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
               </Text>
             </View>
           )}
-          <BookWormButton
-            title="Find Similar Books"
-            onPress={() => {
-              handleSimilarBooksPressed("FAKE BOOK ID");
-            }}
-          ></BookWormButton>
-          <SimilarBookShelf></SimilarBookShelf>
+          <SimilarBooksWrapper
+            userID={user.uid}
+            bookID={bookID}
+            bookTitle={bookData.title}
+          />
         </ScrollView>
 
         {/* function formatDate(dateString: string): string {

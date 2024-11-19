@@ -112,6 +112,14 @@ async function getVolumeItemsByBookIDs(
   return recommendationVolumeItems;
 }
 
+// TODO add jsdoc
+export async function fetchBooksLikeThis(
+  bookID: string,
+): Promise<BookVolumeItem[]> {
+  const bookIDs = await fetchBooksLikeThisAPI(bookID);
+  return await getVolumeItemsByBookIDs(bookIDs);
+}
+
 // TODO rename
 export async function fetchBooksLikeThisAPI(bookID: string): Promise<string[]> {
   if (bookID == null || bookID === "") {
@@ -134,8 +142,8 @@ export async function fetchBooksLikeThisAPI(bookID: string): Promise<string[]> {
       await handleErrorAPI(response);
     }
 
-    const data = (await response.json()) as SimilarBooksResponse;
-    return data.book_ids;
+    const data = (await response.json()) as RecommendationResponse;
+    return data.volume_ids;
   } catch (error) {
     throw new Error(
       `Error fetching similar books: ${(error as Error).message}`,

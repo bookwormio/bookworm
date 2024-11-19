@@ -75,7 +75,7 @@ const Profile = () => {
 
   return (
     <ScrollView
-      stickyHeaderIndices={[4]}
+      stickyHeaderIndices={[3]}
       style={sharedProfileStyles.scrollContainer}
     >
       <View style={sharedProfileStyles.imageTextContainer}>

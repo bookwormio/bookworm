@@ -1,20 +1,22 @@
-import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
-import { type BookShelfBookModel } from "../../types";
-import BookWormButton from "../button/BookWormButton";
+import { type BookVolumeItem } from "../../types";
 import BookShelfBook from "../profile/BookShelf/BookShelfBook";
 import { sharedBookshelfStyles } from "../profile/BookShelf/styles/SharedBookshelfStyles";
 
 interface SimilarBookShelfProps {
-  books: BookShelfBookModel[];
+  books: BookVolumeItem[];
   userID: string;
+  bookTitle?: string;
 }
 
 // TODO maybe abstract this into BookShelf
-const SimilarBookShelf = ({ books, userID }: SimilarBookShelfProps) => {
+const SimilarBookShelf = ({
+  books,
+  userID,
+  bookTitle,
+}: SimilarBookShelfProps) => {
   const shelfNameDisplay = "Similar Books";
-  const ORIGINAL_BOOK_TITLE = "FAKE TITLE";
 
   return (
     <View style={sharedBookshelfStyles.list}>
@@ -26,20 +28,15 @@ const SimilarBookShelf = ({ books, userID }: SimilarBookShelfProps) => {
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={sharedBookshelfStyles.title}>{shelfNameDisplay}</Text>
-            <FontAwesome5
-              style={{ paddingLeft: 5 }}
-              name="chevron-right"
-              size={16}
-              color="black"
-            />
           </View>
 
-          <Text style={sharedBookshelfStyles.subtitle}>
-            {/* TODO make const */}
-            {"Displaying similar books to " + ORIGINAL_BOOK_TITLE}
-          </Text>
+          {bookTitle != null && (
+            <Text style={sharedBookshelfStyles.subtitle}>
+              {"Similar books to " + bookTitle}
+            </Text>
+          )}
         </TouchableOpacity>
-        TODO maybe remove
+
         <Text style={sharedBookshelfStyles.length}>{books.length}</Text>
       </View>
       <FlatList
@@ -58,18 +55,10 @@ const SimilarBookShelf = ({ books, userID }: SimilarBookShelfProps) => {
                   book={item.volumeInfo}
                   bookID={item.id}
                   userID={userID}
+                  thumbnailOverride={item.volumeInfo.imageLinks?.thumbnail}
                 />
               )}
             </TouchableOpacity>
-
-            <View style={sharedBookshelfStyles.buttonContainer}>
-              <BookWormButton
-                title="add to shelf"
-                onPress={() => {
-                  // TODO fill in with modal logic
-                }}
-              />
-            </View>
           </View>
         )}
         ListEmptyComponent={() => (
