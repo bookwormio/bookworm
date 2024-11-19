@@ -1,6 +1,7 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -170,6 +171,11 @@ const NewPost = () => {
   const handleShareClicked = async () => {
     if (user?.uid == null || selectedBook == null) return;
     if (!fieldsMissing()) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
+        (error) => {
+          console.error("Error creating haptic", error);
+        },
+      );
       await createNewPost();
       router.push("posts");
       setBookmark({
