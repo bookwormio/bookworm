@@ -129,3 +129,12 @@ export const PROFILE_PLACEHOLDERS = {
 } as const;
 
 export const KEYBOARD_CLOSE_DELAY = 20;
+
+// limits the height when refreshing
+export const MAX_PULLDOWN_DISTANCE = 150;
+// duration when decreasing the height from the users pull down distance to the refresh container height and closure
+export const PULLDOWN_ANIMATION_DURATION = 180;
+// height of the pull down container when refreshing
+export const PULLDOWN_REFRESHING_MAX_HEIGHT = 75;
+// height of the pull down container when closed
+export const PULLDOWN_REFRESHING_MIN_HEIGHT = 0;
