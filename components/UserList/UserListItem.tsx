@@ -18,13 +18,15 @@ const UserListItem = ({
 }: UserListItemProps) => {
   const { user } = useAuth();
 
-  const navigateToUser = useNavigateToUser(user?.uid, userInfo.id);
+  const navigateToUser = useNavigateToUser();
 
   return (
     <TouchableOpacity
       style={styles.container}
       onPress={() => {
-        closeKeyboardThen(navigateToUser);
+        closeKeyboardThen(() => {
+          navigateToUser(user?.uid, userInfo.id);
+        });
       }}
     >
       <View style={styles.imageContainer}>

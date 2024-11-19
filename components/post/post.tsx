@@ -63,7 +63,7 @@ const Post = ({
   if (currentPost !== undefined) {
     post = currentPost;
   }
-  const navigateToUser = useNavigateToUser(user?.uid, post.user.id);
+  const navigateToUser = useNavigateToUser();
 
   const navigateToBook = useNavigateToBook(post.bookid);
 
@@ -79,7 +79,7 @@ const Post = ({
             <TouchableOpacity
               disabled={isCurrentUsersPost}
               onPress={() => {
-                navigateToUser();
+                navigateToUser(user?.uid, post.user.id);
               }}
             >
               <ProfilePicture userID={post.user.id} size={40} />
@@ -93,7 +93,7 @@ const Post = ({
                 <Text
                   style={styles.userName}
                   onPress={() => {
-                    navigateToUser();
+                    navigateToUser(user?.uid, post.user.id);
                   }}
                   disabled={isCurrentUsersPost}
                 >
@@ -110,7 +110,7 @@ const Post = ({
                 <Text
                   style={styles.userName}
                   onPress={() => {
-                    navigateToUser();
+                    navigateToUser(user?.uid, post.user.id);
                   }}
                   disabled={isCurrentUsersPost}
                 >

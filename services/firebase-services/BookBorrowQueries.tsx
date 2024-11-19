@@ -21,6 +21,7 @@ import {
   type BookBorrowModel,
   type BookShelfBookModel,
   type BookStatusModel,
+  type UserSearchDisplayModel,
 } from "../../types";
 import {
   convertBorrowDocToModel,
@@ -29,6 +30,7 @@ import {
   validateBorrowParams,
 } from "../util/bookBorrowUtils";
 import { getBookRequestStatusForBooks } from "./NotificationQueries";
+import { getFollowingByID } from "./UserQueries";
 
 /**
  * Lends a book to another user.
@@ -367,5 +369,43 @@ export async function getBorrowedBookShelfBooksForUser(
     throw new Error(
       `Failed to fetch borrowed books for user ${userID}: ${(error as Error).message}`,
     );
+  }
+}
+
+export async function getUsersWithBookInLendingLibrary(
+  userID: string,
+  bookID: string,
+): Promise<UserSearchDisplayModel[]> {
+  try {
+    const usersFollowing = await getFollowingByID(userID);
+
+    console.log("users following", usersFollowing);
+
+    if (usersFollowing.length === 0) {
+      return [];
+    }
+
+    const usersWithBook: UserSearchDisplayModel[] = [];
+
+    for (const followingUser of usersFollowing) {
+      const lendingLibraryRef = collection(
+        DB,
+        "bookshelf_collection",
+        followingUser.id,
+        "lending_library",
+      );
+
+      const bookDocRef = doc(lendingLibraryRef, bookID);
+      const bookDocSnapshot = await getDoc(bookDocRef);
+
+      if (bookDocSnapshot.exists()) {
+        usersWithBook.push(followingUser);
+      }
+    }
+    console.log(usersWithBook);
+    return usersWithBook;
+  } catch (error) {
+    console.error("Error querying users with book in lending library:", error);
+    throw new Error("Failed to get users with book in lending library");
   }
 }

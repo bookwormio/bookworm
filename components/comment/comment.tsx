@@ -10,13 +10,13 @@ interface PostProps {
 
 const Comment = ({ comment }: PostProps) => {
   const { user } = useAuth();
-  const navigateToUser = useNavigateToUser(user?.uid, comment.userID);
+  const navigateToUser = useNavigateToUser();
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
         onPress={() => {
-          navigateToUser();
+          navigateToUser(user?.uid, comment.userID);
         }}
         disabled={comment.userID === user?.uid}
       >

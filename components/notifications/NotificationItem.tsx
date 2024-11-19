@@ -26,7 +26,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
 
   const navigateToPost = useNavigateToPost();
 
-  const navigateToUser = useNavigateToUser(user?.uid, notif.sender);
+  const navigateToUser = useNavigateToUser();
 
   const navigateToBadgePage = useNavigateToBadgePage(notif.receiver);
 
@@ -40,7 +40,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
         ) {
           navigateToPost(notif.postID);
         } else if (notif.type === ServerNotificationType.FRIEND_REQUEST) {
-          navigateToUser();
+          navigateToUser(user?.uid, notif.sender);
         } else if (
           notif.type === ServerNotificationType.RECOMMENDATION ||
           notif.type === ServerNotificationType.BOOK_REQUEST ||
@@ -56,7 +56,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
         {notif.type !== ServerNotificationType.BADGE ? (
           <TouchableOpacity
             onPress={() => {
-              navigateToUser();
+              navigateToUser(user?.uid, notif.sender);
             }}
           >
             <ProfilePicture userID={notif.sender} size={50} />

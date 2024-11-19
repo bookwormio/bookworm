@@ -120,11 +120,11 @@ export const useUserRouteInfo = (): UserRouteInfo => {
  * @param {string} [friendID] - The ID of the user to navigate to.
  * @returns {Function} - Function to navigate to the user page.
  */
-export const useNavigateToUser = (userID?: string, friendID?: string) => {
+export const useNavigateToUser = () => {
   const router = useRouter();
   const { prefix } = useUserRouteInfo();
 
-  function navigateToUser() {
+  function navigateToUser(userID?: string, friendID?: string) {
     const userRoute = generateUserRoute(userID, friendID, prefix);
     if (userRoute != null) {
       router.push(userRoute);

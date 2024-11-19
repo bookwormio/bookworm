@@ -43,11 +43,14 @@ import {
   useGetExistingEarnedBadges,
 } from "../badges/useBadgeQueries";
 import BookshelfAddButtons from "../profile/BookShelf/BookshelfAddButtons";
+import { useGetUsersWithBookInLendingLibrary } from "../profile/hooks/useBookBorrowQueries";
 import {
   useAddBookToShelf,
   useGetShelvesForBook,
   useRemoveBookFromShelf,
 } from "../profile/hooks/useBookshelfQueries";
+import { useNavigateToUser } from "../profile/hooks/useRouteHooks";
+import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import WormLoader from "../wormloader/WormLoader";
 
 interface BookViewProps {
@@ -65,7 +68,6 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     add: ServerBookShelfName[];
     remove: ServerBookShelfName[];
   }>({ add: [], remove: [] });
-
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -73,6 +75,11 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
   const { mutateAsync: checkForBookshelf } = useCheckForBookShelfBadges();
   const { data: badges, isLoading: isLoadingBadges } =
     useGetExistingEarnedBadges(user?.uid ?? "");
+
+  const { data: usersWithBook, isLoading: isLoadingUsersWithBook } =
+    useGetUsersWithBookInLendingLibrary(user?.uid ?? "", bookID);
+
+  const navigateToUser = useNavigateToUser();
   // variables
   const snapPoints = useMemo(() => ["25%", "50%", "100%"], []);
 
@@ -249,7 +256,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
       .replace(/ +/g, " ")
       .trim();
   }
-  if (bookData == null || isLoadingBook) {
+  if (bookData == null || isLoadingBook || isLoadingUsersWithBook) {
     return (
       <View style={styles.container}>
         <WormLoader />
@@ -309,6 +316,30 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
                   </View>
                 </TouchableOpacity>
               </View>
+              {usersWithBook != null && usersWithBook.length > 0 && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingTop: 10,
+                  }}
+                >
+                  <Text style={{ paddingRight: 10, fontWeight: "bold" }}>
+                    Borrow From:
+                  </Text>
+                  {usersWithBook?.map((userWithBook) => (
+                    <TouchableOpacity
+                      key={userWithBook.id}
+                      style={{ flexDirection: "row" }}
+                      onPress={() => {
+                        navigateToUser(user?.uid, userWithBook.id);
+                      }}
+                    >
+                      <ProfilePicture userID={userWithBook.id} size={40} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
             </View>
           </View>
           {bookData.description != null && (

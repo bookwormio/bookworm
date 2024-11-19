@@ -5,6 +5,7 @@ import {
   getBorrowedBookShelfBooksForUser,
   getBorrowingBookModelsForUser,
   getLendingLibraryBookStatuses,
+  getUsersWithBookInLendingLibrary,
   lendBookToUser,
   returnBookToUser,
 } from "../../../services/firebase-services/BookBorrowQueries";
@@ -131,5 +132,16 @@ export const useGetAllBorrowingBooksForUser = (userID: string) => {
     },
     enabled: userID != null && userID !== "",
     staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
+
+export const useGetUsersWithBookInLendingLibrary = (
+  userID: string,
+  bookID: string,
+) => {
+  return useQuery({
+    queryKey: ["availableborrow", bookID],
+    queryFn: async () => await getUsersWithBookInLendingLibrary(userID, bookID),
+    enabled: bookID != null && bookID !== "" && userID != null && userID !== "",
   });
 };
