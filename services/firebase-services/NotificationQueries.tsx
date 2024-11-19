@@ -360,6 +360,15 @@ export async function getUnreadNotificationCount(
   }
 }
 
+/**
+ * Marks all unread notifications as read for a specific user.
+ * Updates all notifications where receiver is the userID and read_at is null,
+ * setting read_at to the current server timestamp.
+ *
+ * @param {string} userID - The ID of the user whose notifications should be marked as read
+ * @returns {Promise<void>} A promise that resolves when all notifications are marked as read
+ * @throws {Error} If userID is null/empty or if there's an error updating the notifications
+ */
 export async function markAllNotificationsRead(userID: string): Promise<void> {
   if (userID == null || userID === "") {
     console.log("User does not exist");

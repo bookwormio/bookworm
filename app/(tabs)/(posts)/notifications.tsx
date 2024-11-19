@@ -41,7 +41,7 @@ const NotificationsScreen = () => {
       // On mount, mark all notifications as read
       notificationReadMutation.mutate({ userID: user?.uid ?? "" });
 
-      // This runs when the screen is unfocused
+      // This cleanup function runs when the screen is unfocused
       return () => {
         void queryClient
           .invalidateQueries({
