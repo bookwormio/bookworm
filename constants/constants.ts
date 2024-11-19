@@ -40,6 +40,8 @@ export const SEARCH_ROUTE_PREFIX: string = "(search)";
 export const PROFILE_ROUTE_PREFIX: string = "(profile)";
 export const CREATE_ROUTE_PREFIX: string = "/(tabs)/(create)/NewPost";
 
+export const ROUTE_TO_SEARCH_PREFIX: string = "/(tabs)/(search)/search";
+
 export const PROFILE_BOOK_PREFIX: string = "profilebook";
 export const POSTS_BOOK_PREFIX: string = "postsbook";
 export const SEARCH_BOOK_PREFIX: string = "searchbook";

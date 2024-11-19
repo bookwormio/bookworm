@@ -47,6 +47,7 @@ import {
   PULLDOWN_ANIMATION_DURATION,
   PULLDOWN_REFRESHING_MAX_HEIGHT,
   PULLDOWN_REFRESHING_MIN_HEIGHT,
+  ROUTE_TO_SEARCH_PREFIX,
 } from "../../../constants/constants";
 import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
@@ -237,7 +238,7 @@ const Posts = () => {
     router.push({ pathname: CREATE_ROUTE_PREFIX });
   };
   const navigateToSearchPage = () => {
-    router.push({ pathname: "/(tabs)/(search)/search" });
+    router.push({ pathname: ROUTE_TO_SEARCH_PREFIX });
   };
 
   return (
