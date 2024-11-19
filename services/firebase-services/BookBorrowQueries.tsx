@@ -21,7 +21,6 @@ import {
   type BookBorrowModel,
   type BookShelfBookModel,
   type BookStatusModel,
-  type UserSearchDisplayModel,
 } from "../../types";
 import {
   convertBorrowDocToModel,
@@ -29,8 +28,8 @@ import {
   mapBookshelfDocToBookShelfBookModel,
   validateBorrowParams,
 } from "../util/bookBorrowUtils";
+import { getAllFollowing } from "./FriendQueries";
 import { getBookRequestStatusForBooks } from "./NotificationQueries";
-import { getFollowingByID } from "./UserQueries";
 
 /**
  * Lends a book to another user.
@@ -375,34 +374,40 @@ export async function getBorrowedBookShelfBooksForUser(
 export async function getUsersWithBookInLendingLibrary(
   userID: string,
   bookID: string,
-): Promise<UserSearchDisplayModel[]> {
+): Promise<string[]> {
   try {
-    const usersFollowing = await getFollowingByID(userID);
-
-    console.log("users following", usersFollowing);
+    const usersFollowing = await getAllFollowing(userID);
 
     if (usersFollowing.length === 0) {
       return [];
     }
 
-    const usersWithBook: UserSearchDisplayModel[] = [];
+    const usersWithBook: string[] = [];
 
-    for (const followingUser of usersFollowing) {
+    for (const followingUserID of usersFollowing) {
       const lendingLibraryRef = collection(
         DB,
         "bookshelf_collection",
-        followingUser.id,
+        followingUserID,
         "lending_library",
       );
-
+      const currentlyReadingLibraryRef = collection(
+        DB,
+        "bookshelf_collection",
+        followingUserID,
+        "currently_reading",
+      );
       const bookDocRef = doc(lendingLibraryRef, bookID);
-      const bookDocSnapshot = await getDoc(bookDocRef);
+      const currReadBookDocRef = doc(currentlyReadingLibraryRef, bookID);
+      const [bookDocSnapshot, currReadBookDocSnapshot] = await Promise.all([
+        getDoc(bookDocRef),
+        getDoc(currReadBookDocRef),
+      ]);
 
-      if (bookDocSnapshot.exists()) {
-        usersWithBook.push(followingUser);
+      if (bookDocSnapshot.exists() && !currReadBookDocSnapshot.exists()) {
+        usersWithBook.push(followingUserID);
       }
     }
-    console.log(usersWithBook);
     return usersWithBook;
   } catch (error) {
     console.error("Error querying users with book in lending library:", error);

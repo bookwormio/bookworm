@@ -231,6 +231,9 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
         });
       }
     }
+    await queryClient.invalidateQueries({
+      queryKey: ["availableborrow", bookID],
+    });
   };
   // callbacks
   const handlePresentModalPress = useCallback(() => {
@@ -320,22 +323,23 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
                 <View
                   style={{
                     flexDirection: "row",
+                    flexWrap: "wrap",
                     alignItems: "center",
-                    paddingTop: 10,
+                    paddingTop: 15,
                   }}
                 >
                   <Text style={{ paddingRight: 10, fontWeight: "bold" }}>
                     Borrow From:
                   </Text>
-                  {usersWithBook?.map((userWithBook) => (
+                  {usersWithBook?.map((userID) => (
                     <TouchableOpacity
-                      key={userWithBook.id}
-                      style={{ flexDirection: "row" }}
+                      key={userID}
+                      style={{ flexDirection: "row", paddingRight: 5 }}
                       onPress={() => {
-                        navigateToUser(user?.uid, userWithBook.id);
+                        navigateToUser(user?.uid, userID);
                       }}
                     >
-                      <ProfilePicture userID={userWithBook.id} size={40} />
+                      <ProfilePicture userID={userID} size={40} />
                     </TouchableOpacity>
                   ))}
                 </View>
