@@ -4,7 +4,7 @@ import {
   denyOtherBorrowRequests,
   getAllFullNotifications,
   getUnreadNotificationCount,
-  markNotificationAsRead,
+  markAllNotificationsRead,
   updateBorrowNotificationStatus,
 } from "../../../services/firebase-services/NotificationQueries";
 import {
@@ -125,7 +125,7 @@ export const useDenyOtherBorrowRequests = () => {
  */
 export const useGetUnreadNotificationCount = (userID: string) => {
   return useQuery({
-    queryKey: ["unreadNotifications"],
+    queryKey: ["unreadNotifications", userID],
     queryFn: async () => {
       return await getUnreadNotificationCount(userID);
     },
@@ -134,72 +134,30 @@ export const useGetUnreadNotificationCount = (userID: string) => {
 };
 
 /**
- * Custom hook to mark a notification as read with optimistic updates.
- * Updates both the notification status and unread count in cache.
+ * Custom hook to mark all notifications as read.
  *
  * @returns Mutation hook for marking notifications as read
  * @example
- * const { mutate } = useMarkNotificationAsRead();
- * mutate({ notificationID: "123" });
+ * const { mutate } = useMarkAllNotificationsRead();
+ * mutate({ userID: "123" });
  */
-export const useMarkNotificationAsRead = () => {
+export const useMarkAllNotificationsRead = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ notificationID }: { notificationID: string }) => {
-      // Call the service function to mark the notification as read
-      await markNotificationAsRead(notificationID);
+    mutationFn: async ({ userID }: { userID: string }) => {
+      if (userID == null || userID === "") {
+        console.log("User ID is required");
+        throw new Error("User ID is required");
+      }
+      await markAllNotificationsRead(userID);
     },
-    onMutate: async ({ notificationID }) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ["notifications"] });
-      await queryClient.cancelQueries({ queryKey: ["unreadNotifications"] });
-
-      // Snapshot the previous values
-      const previousNotifications = queryClient.getQueryData(["notifications"]);
-      const previousUnreadCount = queryClient.getQueryData([
-        "unreadNotifications",
+    onMutate: async ({ userID }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["notifications", userID] }),
+        queryClient.invalidateQueries({
+          queryKey: ["unreadNotifications", userID],
+        }),
       ]);
-
-      // Optimistically update notifications
-      queryClient.setQueryData(["notifications"], (old: any) => {
-        if (old == null) return old;
-        return old.map((notification: any) => {
-          if (notification.id === notificationID) {
-            return {
-              ...notification,
-              read_at: new Date().toISOString(),
-            };
-          }
-          return notification;
-        });
-      });
-
-      // Optimistically update unread count
-      queryClient.setQueryData(["unreadNotifications"], (old: number) => {
-        if (typeof old === "number") {
-          return Math.max(0, old - 1);
-        }
-        return old;
-      });
-
-      // Return context with previous values
-      return { previousNotifications, previousUnreadCount };
-    },
-
-    onError: (_err, _variables, context) => {
-      // If mutation fails, restore previous values
-      if (context?.previousNotifications != null) {
-        queryClient.setQueryData(
-          ["notifications"],
-          context.previousNotifications,
-        );
-      }
-      if (context?.previousUnreadCount != null) {
-        queryClient.setQueryData(
-          ["unreadNotifications"],
-          context.previousUnreadCount,
-        );
-      }
     },
   });
 };

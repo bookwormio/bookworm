@@ -11,7 +11,6 @@ import {
   useNavigateToUser,
 } from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
-import { useMarkNotificationAsRead } from "./hooks/useNotificationQueries";
 import NotificationItemContent from "./NotificationItemContent";
 import { calculateTimeSinceNotification } from "./util/notificationUtils";
 
@@ -31,15 +30,10 @@ const NotificationItem = ({ notif }: NotifProp) => {
 
   const navigateToBadgePage = useNavigateToBadgePage(notif.receiver);
 
-  const markNotificationRead = useMarkNotificationAsRead();
-
   return (
     <TouchableOpacity
       style={styles.notif_container}
       onPress={() => {
-        if (notif.read_at == null) {
-          markNotificationRead.mutate({ notificationID: notif.notifID });
-        }
         if (
           notif.type === ServerNotificationType.LIKE ||
           notif.type === ServerNotificationType.COMMENT

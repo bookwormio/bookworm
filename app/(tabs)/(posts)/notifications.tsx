@@ -1,5 +1,7 @@
+import { useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
-import React from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
 import { PanResponder, StyleSheet, Text, View } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
@@ -9,7 +11,11 @@ import Animated, {
 } from "react-native-reanimated";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
-import { useGetAllFullNotifications } from "../../../components/notifications/hooks/useNotificationQueries";
+import {
+  useGetAllFullNotifications,
+  useGetUnreadNotificationCount,
+  useMarkAllNotificationsRead,
+} from "../../../components/notifications/hooks/useNotificationQueries";
 import NotificationItem from "../../../components/notifications/NotificationItem";
 import WormLoader from "../../../components/wormloader/WormLoader";
 import {
@@ -21,7 +27,32 @@ import {
 
 const NotificationsScreen = () => {
   const { user } = useAuth();
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const { refetch: refetchNotifications } = useGetUnreadNotificationCount(
+    user?.uid ?? "",
+  );
+
+  const notificationReadMutation = useMarkAllNotificationsRead();
+  const queryClient = useQueryClient();
+
+  useFocusEffect(
+    useCallback(() => {
+      // On mount, mark all notifications as read
+      notificationReadMutation.mutate({ userID: user?.uid ?? "" });
+
+      // This runs when the screen is unfocused
+      return () => {
+        void queryClient
+          .invalidateQueries({
+            queryKey: ["unreadNotificationCount", user?.uid ?? ""],
+          })
+          .then(async () => {
+            await refetchNotifications();
+          });
+      };
+    }, [user?.uid]),
+  );
 
   const {
     data: notifdata,

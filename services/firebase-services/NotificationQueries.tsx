@@ -1,6 +1,5 @@
 import {
   addDoc,
-  and,
   collection,
   doc,
   getCountFromServer,
@@ -346,7 +345,8 @@ export async function getUnreadNotificationCount(
 
     const q = query(
       notifCollection,
-      and(where("receiver", "==", userID), where("read_at", "==", null)),
+      where("receiver", "==", userID),
+      where("read_at", "==", null),
     );
 
     const snapshot = await getCountFromServer(q);
@@ -360,24 +360,36 @@ export async function getUnreadNotificationCount(
   }
 }
 
-/**
- * Marks a notification as read in Firestore by updating its read_at timestamp.
- *
- * @param {string} notifID - The ID of the notification to mark as read
- * @returns {Promise<void>}
- * @throws {Error} Logs error if update fails
- */
-export async function markNotificationAsRead(notifID: string): Promise<void> {
+export async function markAllNotificationsRead(userID: string): Promise<void> {
+  if (userID == null || userID === "") {
+    console.log("User does not exist");
+    return;
+  }
+
   try {
-    const notifDocRef = doc(DB, "notifications", notifID);
-    await setDoc(
-      notifDocRef,
-      {
-        read_at: serverTimestamp(),
-      },
-      { merge: true },
+    const notifCollection = collection(DB, "notifications");
+    const q = query(
+      notifCollection,
+      where("receiver", "==", userID),
+      where("read_at", "==", null),
     );
+
+    const querySnapshot = await getDocs(q);
+
+    const batch = writeBatch(DB);
+
+    querySnapshot.forEach((docSnapshot) => {
+      const notifRef = doc(DB, "notifications", docSnapshot.id);
+      batch.update(notifRef, {
+        read_at: serverTimestamp(),
+      });
+    });
+
+    await batch.commit();
   } catch (error) {
-    console.error("Error marking notification as read:", error);
+    console.error("Error marking all notifications as read:", error);
+    throw new Error(
+      `Error marking all notifications as read: ${(error as Error).message}`,
+    );
   }
 }
