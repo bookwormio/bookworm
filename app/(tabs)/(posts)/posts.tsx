@@ -284,23 +284,25 @@ const Posts = () => {
             )}
             removeClippedSubviews={true}
             keyExtractor={(item) => item.id}
-            ListEmptyComponent={() => (
-              <View style={styles.noDataContainer}>
-                <Text style={styles.noData}>No posts to display.</Text>
-                <TouchableOpacity onPress={navigateToMakePostPage}>
-                  <Text style={styles.makePost}>Make a post</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={navigateToSearchPage}>
-                  <Text style={styles.makePost}>Add friends</Text>
-                </TouchableOpacity>
-              </View>
-            )}
             ListHeaderComponent={
               !(user == null) ? (
                 <DataSnapShot
                   userID={user?.uid ?? ""}
                   isLoadingOther={isLoadingFeedPosts}
                 />
+              ) : null
+            }
+            ListEmptyComponent={
+              !isLoadingFeedPosts && !refreshing && !(user == null) ? (
+                <View style={styles.noDataContainer}>
+                  <Text style={styles.noData}>No posts to display.</Text>
+                  <TouchableOpacity onPress={navigateToMakePostPage}>
+                    <Text style={styles.makePost}>Make a post</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={navigateToSearchPage}>
+                    <Text style={styles.makePost}>Add friends</Text>
+                  </TouchableOpacity>
+                </View>
               ) : null
             }
             ListFooterComponent={
