@@ -282,19 +282,14 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
           style={styles.scrollContainer}
           contentContainerStyle={styles.scrollContent}
         >
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-            }}
-          >
+          <View style={styles.rowStyle}>
             <Image
               source={{ uri: bookData.imageLinks?.thumbnail }}
               cachePolicy={"memory-disk"}
               contentFit={"contain"}
               style={styles.image}
             />
-            <View style={{ flex: 1, paddingLeft: 10 }}>
+            <View style={styles.titleText}>
               <Text style={styles.title}>{bookData.title}</Text>
               <Text style={styles.author}>
                 by {bookData.authors?.join(", ")}
@@ -320,21 +315,12 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
                 </TouchableOpacity>
               </View>
               {usersWithBook != null && usersWithBook.length > 0 && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    paddingTop: 15,
-                  }}
-                >
-                  <Text style={{ paddingRight: 10, fontWeight: "bold" }}>
-                    Borrow From:
-                  </Text>
+                <View style={styles.borrowFromContainer}>
+                  <Text style={styles.borrowFromText}>Borrow From:</Text>
                   {usersWithBook?.map((userID) => (
                     <TouchableOpacity
                       key={userID}
-                      style={{ flexDirection: "row", paddingRight: 5 }}
+                      style={styles.borrowFromPics}
                       onPress={() => {
                         navigateToUser(user?.uid, userID);
                       }}
@@ -505,6 +491,19 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontWeight: "bold",
   },
+  borrowFromContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    paddingTop: 15,
+  },
+  borrowFromText: { paddingRight: 10, fontWeight: "bold" },
+  borrowFromPics: { flexDirection: "row", paddingRight: 5 },
+  rowStyle: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  titleText: { flex: 1, paddingLeft: 10 },
 });
 
 export default BookViewPage;

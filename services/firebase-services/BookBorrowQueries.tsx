@@ -371,6 +371,12 @@ export async function getBorrowedBookShelfBooksForUser(
   }
 }
 
+/**
+ * Getting all userIDs where they have the book in their lending item and aren't currently reading it
+ * @param userID ID of curr user
+ * @param bookID bookID to check
+ * @returns {string} list of userIDs that have book available
+ */
 export async function getUsersWithBookInLendingLibrary(
   userID: string,
   bookID: string,

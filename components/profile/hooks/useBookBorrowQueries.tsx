@@ -135,6 +135,12 @@ export const useGetAllBorrowingBooksForUser = (userID: string) => {
   });
 };
 
+/**
+ * use Query for available books to borrow
+ * @param userID current userID
+ * @param bookID book to check
+ * @returns {UseQueryResult<string[]>} The result of the query with userIDs
+ */
 export const useGetUsersWithBookInLendingLibrary = (
   userID: string,
   bookID: string,
