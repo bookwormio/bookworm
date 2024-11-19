@@ -111,7 +111,7 @@ export async function getExistingEarnedBadges(
  */
 export async function getBadgesForPost(
   userID: string,
-  postID: string,
+  postID?: string,
 ): Promise<BadgeModel[]> {
   try {
     const userBadgeCollectDocRef = doc(DB, "badge_collection", userID);
@@ -194,7 +194,7 @@ export async function checkForCompletionBadges(
  */
 export async function checkForPostBadges(
   userID: string,
-  postID: string,
+  postID?: string,
 ): Promise<void> {
   try {
     const POST_THRESHOLDS = [
@@ -326,7 +326,7 @@ export async function checkForLendingBadges(userID: string): Promise<void> {
  * @returns {Promise<void>} - A promise that resolves when the checks are complete.
  * @throws {Error} If there is an issue checking the existence of the streak badges.
  */
-export async function checkForStreakBadges(userID: string, postID: string) {
+export async function checkForStreakBadges(userID: string, postID?: string) {
   try {
     const STREAK_THRESHOLDS = [
       { count: 7, badge: ServerStreakBadge.SEVEN_DAY_STREAK },
@@ -382,4 +382,23 @@ export async function calculateMaxStreakCount(
   }
 
   return streakCount;
+}
+
+export async function updateAllUsersWithBadges() {
+  try {
+    const userCollectionRef = collection(DB, "user_collection");
+    const userCollectionSnapshot = await getDocs(userCollectionRef);
+    const userIDs = userCollectionSnapshot.docs.map((doc) => doc.id);
+    for (const userID of userIDs) {
+      console.log(userID);
+      await checkForStreakBadges(userID);
+      await checkForBookShelfBadges(userID);
+      await checkForCompletionBadges(userID);
+      await checkForLendingBadges(userID);
+      await checkForPostBadges(userID);
+      console.log("success");
+    }
+  } catch (error) {
+    console.error("Error retrieving user IDs:", error);
+  }
 }

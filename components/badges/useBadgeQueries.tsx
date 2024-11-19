@@ -71,7 +71,7 @@ export const useCheckForPostBadges = () => {
       postID,
     }: {
       userID: string;
-      postID: string;
+      postID?: string;
     }) => {
       await checkForPostBadges(userID, postID);
     },
@@ -122,7 +122,7 @@ export const useCheckForStreakBadges = () => {
       postID,
     }: {
       userID: string;
-      postID: string;
+      postID?: string;
     }) => {
       await checkForStreakBadges(userID, postID);
     },

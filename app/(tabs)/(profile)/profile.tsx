@@ -30,6 +30,7 @@ import ProfileTabSelector from "../../../components/profile/ProfileTabSelector";
 import { sharedProfileStyles } from "../../../components/profile/styles/SharedProfileStyles";
 import WormLoader from "../../../components/wormloader/WormLoader";
 import { TabNames } from "../../../enums/Enums";
+import { updateAllUsersWithBadges } from "../../../services/firebase-services/ChallengesBadgesQueries";
 import { newFetchUserInfo } from "../../../services/firebase-services/UserQueries";
 import { useProfilePicQuery } from "./hooks/useProfileQueries";
 
@@ -59,6 +60,11 @@ const Profile = () => {
   const navigateToImageBlowup = useNavigateToImageBlowup();
 
   const navigateToBadgePage = useNavigateToBadgePage(user?.uid ?? "");
+
+  async function updateAll() {
+    await updateAllUsersWithBadges();
+  }
+
   if (
     isLoadingUserData ||
     userData == null ||
@@ -98,6 +104,15 @@ const Profile = () => {
             {userData.city !== "" && userData.state !== "" ? ", " : ""}
             {userData.state === "" ? "" : userData.state}
           </Text>
+          <TouchableOpacity
+            onPress={() => {
+              updateAll()
+                .then(() => {})
+                .catch(() => {});
+            }}
+          >
+            <Text>Update All</Text>
+          </TouchableOpacity>
         </View>
       </View>
       <View>
