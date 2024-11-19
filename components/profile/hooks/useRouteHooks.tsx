@@ -435,3 +435,15 @@ export const useNavigateToImageBlowup = () => {
 
   return navigateToImageBlowup;
 };
+
+/**
+ * Hook to navigate to the notifications page.
+ * @returns {Function} - Function to navigate to the notifications page.
+ */
+export const useNavigateToNotificationsPage = () => {
+  const router = useRouter();
+  function navigateToNotificationsPage() {
+    router.push("/notifications");
+  }
+  return navigateToNotificationsPage;
+};
