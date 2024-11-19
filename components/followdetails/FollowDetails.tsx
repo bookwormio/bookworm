@@ -47,7 +47,7 @@ const FollowDetails = ({ userID, followersfirst }: UserProp) => {
         >
           {followers?.map((user) => (
             <View style={styles.userContainer} key={user.id}>
-              <UserList users={[user]} />
+              <UserList users={[user]} showFollowStatus={true} />
             </View>
           ))}
           {isLoadingFollowers && (
@@ -63,7 +63,7 @@ const FollowDetails = ({ userID, followersfirst }: UserProp) => {
         >
           {following?.map((user) => (
             <View style={styles.userContainer} key={user.id}>
-              <UserList users={[user]} />
+              <UserList users={[user]} showFollowStatus={true} />
             </View>
           ))}
           {isLoadingFollowing && (
