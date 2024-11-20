@@ -22,8 +22,12 @@ export enum ServerBookShelfName {
 
 // Borrowing books are not stored in user's bookshelves
 export const BORROWING_SHELF_NAME = "borrowing" as const;
+export const SIMILAR_BOOKS_SHELF_NAME = "similar_books" as const;
 
-type BookShelfName = ServerBookShelfName | typeof BORROWING_SHELF_NAME;
+export type BookShelfName =
+  | ServerBookShelfName
+  | typeof BORROWING_SHELF_NAME
+  | typeof SIMILAR_BOOKS_SHELF_NAME;
 
 // Used to display the book status in the UI
 type StringMap = Record<string, string>;
@@ -34,11 +38,13 @@ export const BOOKSHELF_DISPLAY_NAMES: Record<BookShelfName, string> = {
   [ServerBookShelfName.FINISHED]: "Finished",
   [ServerBookShelfName.LENDING_LIBRARY]: "Lending Library",
   [BORROWING_SHELF_NAME]: "Currently Borrowing",
+  [SIMILAR_BOOKS_SHELF_NAME]: "Similar Books",
 };
 
 export const BOOKSHELF_SUBTITLES: Partial<Record<BookShelfName, string>> = {
   [ServerBookShelfName.LENDING_LIBRARY]: "Books you are willing to lend",
   [BORROWING_SHELF_NAME]: "This is only visible to you",
+  [SIMILAR_BOOKS_SHELF_NAME]: "Books similar to this one",
 };
 
 export const SEARCH_SHELF_PRIORITY = [

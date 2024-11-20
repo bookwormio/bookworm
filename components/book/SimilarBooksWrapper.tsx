@@ -1,7 +1,8 @@
 import React from "react";
+import { SIMILAR_BOOKS_SHELF_NAME } from "../../enums/Enums";
 import BookWormButton from "../button/BookWormButton";
+import BookShelf from "../profile/BookShelf/BookShelf";
 import { useFindBooksLikeThis } from "./hooks/useSimilarBookQueries";
-import SimilarBookShelf from "./SimilarBookShelf";
 
 interface SimilarBooksWrapperProps {
   bookID: string;
@@ -33,10 +34,10 @@ const SimilarBooksWrapper = ({
         ></BookWormButton>
       )}
       {showSimilarBooks && (
-        <SimilarBookShelf
-          bookTitle={bookTitle}
+        <BookShelf
           userID={userID}
           books={similarBooksMutation.data}
+          shelfName={SIMILAR_BOOKS_SHELF_NAME}
         />
       )}
     </>

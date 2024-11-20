@@ -353,17 +353,6 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
             bookTitle={bookData.title}
           />
         </ScrollView>
-
-        {/* function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
-}
- */}
-
         <BottomSheetModal
           ref={bottomSheetModalRef}
           index={1}
