@@ -182,9 +182,14 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
         shelfName,
       });
       if (shelfName === ServerBookShelfName.LENDING_LIBRARY) {
-        await queryClient.invalidateQueries({
-          queryKey: ["availableborrow", bookID],
-        });
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: ["availableborrow", bookID],
+          }),
+          queryClient.refetchQueries({
+            queryKey: ["availableborrow", bookID],
+          }),
+        ]);
       }
     });
     const removePromises = pendingChanges.remove.map(async (shelfName) => {
@@ -194,9 +199,14 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
         shelfName,
       });
       if (shelfName === ServerBookShelfName.LENDING_LIBRARY) {
-        await queryClient.invalidateQueries({
-          queryKey: ["availableborrow", bookID],
-        });
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: ["availableborrow", bookID],
+          }),
+          queryClient.refetchQueries({
+            queryKey: ["availableborrow", bookID],
+          }),
+        ]);
       }
     });
 

@@ -71,6 +71,9 @@ export const useLendBookToUser = () => {
         queryClient.invalidateQueries({
           queryKey: ["availableborrow", bookID],
         }),
+        queryClient.refetchQueries({
+          queryKey: ["availableborrow", bookID],
+        }),
       ]);
     },
   });
@@ -109,6 +112,9 @@ export const useReturnBook = () => {
           queryKey: ["borrowingBooks"],
         }),
         queryClient.invalidateQueries({
+          queryKey: ["availableborrow", bookID],
+        }),
+        queryClient.refetchQueries({
           queryKey: ["availableborrow", bookID],
         }),
       ]);

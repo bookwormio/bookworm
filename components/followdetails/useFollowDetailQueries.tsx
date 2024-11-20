@@ -149,11 +149,14 @@ export const useInvalidateFollowQueries = () => {
       ["availableborrow"],
     ];
 
-    await Promise.all(
+    await Promise.all([
       queryKeys.map(async (queryKey) => {
         await queryClient.invalidateQueries({ queryKey });
       }),
-    );
+      queryClient.refetchQueries({
+        queryKey: ["availableborrow"],
+      }),
+    ]);
   };
 };
 
