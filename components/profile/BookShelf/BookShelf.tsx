@@ -38,7 +38,7 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
     );
 
   const shelfNameDisplay = BOOKSHELF_DISPLAY_NAMES[shelfName];
-  const isClickable = shelfName !== SIMILAR_BOOKS_SHELF_NAME;
+  const isShelfClickable = shelfName !== SIMILAR_BOOKS_SHELF_NAME;
 
   return (
     <View style={sharedBookshelfStyles.list}>
@@ -47,11 +47,11 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
           onPress={() => {
             navigateToBookList(shelfName);
           }}
-          disabled={!isClickable}
+          disabled={!isShelfClickable}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={sharedBookshelfStyles.title}>{shelfNameDisplay}</Text>
-            {isClickable && (
+            {isShelfClickable && (
               <FontAwesome5
                 style={{ paddingLeft: 5 }}
                 name="chevron-right"

@@ -9,6 +9,20 @@ import { convertToBookshelfVolumeInfo } from "../util/bookQueryUtils";
 const recommendationAPIUrl = process.env.EXPO_PUBLIC_RECOMMENDATION_API_URL;
 
 /**
+ * Handles API error responses
+ * @param {Response} response - The fetch Response object
+ * @throws {Error} Formatted error message from the API response
+ */
+async function handleErrorAPI(response: Response) {
+  const errorData = (await response.json()) as RecommendationError;
+  const errorMessage =
+    errorData.error.trim() === ""
+      ? `HTTP error! status: ${response.status}`
+      : errorData.error;
+  throw new Error(errorMessage);
+}
+
+/**
  * Send a ping request to the API server
  * @returns {Promise<{ response: string } | null>} - the ping response or null if the request failed
  */
@@ -25,20 +39,6 @@ export async function sendPing() {
     console.error("Error sending ping", error);
     return null;
   }
-}
-
-/**
- * Handles API error responses
- * @param {Response} response - The fetch Response object
- * @throws {Error} Formatted error message from the API response
- */
-async function handleErrorAPI(response: Response) {
-  const errorData = (await response.json()) as RecommendationError;
-  const errorMessage =
-    errorData.error.trim() === ""
-      ? `HTTP error! status: ${response.status}`
-      : errorData.error;
-  throw new Error(errorMessage);
 }
 
 /**
@@ -132,7 +132,7 @@ async function getVolumeItemsByBookIDs(
  * @returns {Promise<string[]>} Array of similar book IDs
  * @throws {Error} If bookID is invalid or request fails
  */
-export async function fetchBooksLikeThisAPI(
+export async function fetchSimilarBooksIDs(
   bookID: string,
   limit = 5,
 ): Promise<string[]> {
@@ -183,9 +183,9 @@ export async function fetchUserBookRecommendations(
  * @param {string} bookID - ID of the book to find similar books for
  * @returns {Promise<BookShelfBookModel[]>} Array of similar books formatted as bookshelf models
  */
-export async function fetchBooksLikeThis(
+export async function fetchSimilarBooks(
   bookID: string,
 ): Promise<BookShelfBookModel[]> {
-  const bookIDs = await fetchBooksLikeThisAPI(bookID);
+  const bookIDs = await fetchSimilarBooksIDs(bookID);
   return await getVolumeItemsByBookIDs(bookIDs, true);
 }
