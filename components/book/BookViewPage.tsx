@@ -346,7 +346,6 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
               </Text>
             </View>
           )}
-          <View style={{ padding: 10 }}></View>
           <SimilarBooksWrapper userID={user.uid} bookID={bookID} />
         </ScrollView>
         <BottomSheetModal
