@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ServerBookShelfName } from "../../../enums/Enums";
+import { type BookShelfName, ServerBookShelfName } from "../../../enums/Enums";
 import {
   addBookToUserBookshelf,
   getBooksFromUserBookShelves,
@@ -185,7 +185,7 @@ export const useRemoveBookFromShelf = () => {
     }: {
       userID: string;
       bookID: string;
-      shelfName: ServerBookShelfName;
+      shelfName: BookShelfName;
     }) => {
       if (userID === null || bookID === undefined) {
         throw new Error("User or book ID is not available");

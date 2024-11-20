@@ -5,6 +5,8 @@ import {
   BOOKSHELF_DISPLAY_NAMES,
   BOOKSHELF_SUBTITLES,
   ServerBookShelfName,
+  SIMILAR_BOOKS_SHELF_NAME,
+  type BookShelfName,
 } from "../../../enums/Enums";
 import { type BookShelfBookModel } from "../../../types";
 import { useAuth } from "../../auth/context";
@@ -15,7 +17,7 @@ import BookShelfBook from "./BookShelfBook";
 import { sharedBookshelfStyles } from "./styles/SharedBookshelfStyles";
 
 interface BookShelfProps {
-  shelfName: ServerBookShelfName;
+  shelfName: BookShelfName;
   books: BookShelfBookModel[];
   userID: string;
 }
@@ -36,6 +38,7 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
     );
 
   const shelfNameDisplay = BOOKSHELF_DISPLAY_NAMES[shelfName];
+  const isShelfClickable = shelfName !== SIMILAR_BOOKS_SHELF_NAME;
 
   return (
     <View style={sharedBookshelfStyles.list}>
@@ -44,22 +47,25 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
           onPress={() => {
             navigateToBookList(shelfName);
           }}
+          disabled={!isShelfClickable}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={sharedBookshelfStyles.title}>{shelfNameDisplay}</Text>
-            <FontAwesome5
-              style={{ paddingLeft: 5 }}
-              name="chevron-right"
-              size={16}
-              color="black"
-            />
+            {isShelfClickable && (
+              <FontAwesome5
+                style={{ paddingLeft: 5 }}
+                name="chevron-right"
+                size={16}
+                color="black"
+              />
+            )}
           </View>
-          {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
-            userID === user?.uid && (
+          {shelfName === ServerBookShelfName.LENDING_LIBRARY ||
+            (shelfName === SIMILAR_BOOKS_SHELF_NAME && userID === user?.uid && (
               <Text style={sharedBookshelfStyles.subtitle}>
                 {BOOKSHELF_SUBTITLES[shelfName]}
               </Text>
-            )}
+            ))}
         </TouchableOpacity>
         <Text style={sharedBookshelfStyles.length}>{books.length}</Text>
       </View>

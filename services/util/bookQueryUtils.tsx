@@ -1,3 +1,5 @@
+import { type BookVolumeInfo, type BookshelfVolumeInfo } from "../../types";
+
 /**
  * Helper function to convert HTTP URLs to HTTPS
  */
@@ -39,3 +41,30 @@ export const isValidISBN = (isbn: string): boolean => {
   // If neither ISBN-10 nor ISBN-13 format
   return false;
 };
+
+/**
+ * Converts a BookVolumeInfo object to a BookshelfVolumeInfo object
+ * @param {BookVolumeInfo} info - The book volume information to convert
+ * @returns {BookshelfVolumeInfo} The converted bookshelf volume information
+ */
+export function convertToBookshelfVolumeInfo(
+  info: BookVolumeInfo,
+): BookshelfVolumeInfo {
+  return {
+    title: info.title,
+    subtitle: info.subtitle,
+    authors: info.authors,
+    publisher: info.publisher,
+    publishedDate: info.publishedDate,
+    description: info.description,
+    pageCount: info.pageCount,
+    categories: info.categories,
+    maturityRating: info.maturityRating,
+    previewLink: info.previewLink,
+    averageRating: info.averageRating,
+    ratingsCount: info.ratingsCount,
+    language: info.language,
+    mainCategory: info.mainCategory,
+    thumbnail: info.imageLinks?.thumbnail,
+  };
+}

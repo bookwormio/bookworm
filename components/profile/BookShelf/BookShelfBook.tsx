@@ -3,7 +3,7 @@ import React from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   BOOKSHELF_DISPLAY_NAMES,
-  type ServerBookShelfName,
+  type BookShelfName,
 } from "../../../enums/Enums";
 import { type BookshelfVolumeInfo } from "../../../types";
 import { useAuth } from "../../auth/context";
@@ -13,9 +13,10 @@ import { useBookRouteInfo, useNavigateToBook } from "../hooks/useRouteHooks";
 interface BookShelfBookProps {
   book: BookshelfVolumeInfo;
   bookID: string;
-  shelfName?: ServerBookShelfName;
+  shelfName?: BookShelfName;
   userID?: string;
 }
+
 const BookShelfBook = ({
   book,
   bookID,
@@ -47,7 +48,7 @@ const BookShelfBook = ({
 
   const handleRemoveClick = (
     bookID: string,
-    bookShelf: ServerBookShelfName,
+    bookShelf: BookShelfName,
     volumeInfo: BookshelfVolumeInfo,
   ) => {
     Alert.alert(

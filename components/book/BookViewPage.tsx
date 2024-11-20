@@ -52,6 +52,7 @@ import {
 import { useNavigateToUser } from "../profile/hooks/useRouteHooks";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import WormLoader from "../wormloader/WormLoader";
+import SimilarBooksWrapper from "./SimilarBooksWrapper";
 
 interface BookViewProps {
   bookID: string;
@@ -366,18 +367,12 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
               </Text>
             </View>
           )}
+          <SimilarBooksWrapper
+            userID={user.uid}
+            bookID={bookID}
+            bookTitle={bookData.title ?? ""}
+          />
         </ScrollView>
-
-        {/* function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
-}
- */}
-
         <BottomSheetModal
           ref={bottomSheetModalRef}
           index={1}

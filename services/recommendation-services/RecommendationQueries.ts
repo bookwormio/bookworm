@@ -1,22 +1,38 @@
-import { type BookVolumeInfo, type BookVolumeItem } from "../../types";
+import {
+  type BookShelfBookModel,
+  type BookVolumeInfo,
+  type BookVolumeItem,
+} from "../../types";
 import { fetchBookByVolumeID } from "../books-services/BookQueries";
+import { convertToBookshelfVolumeInfo } from "../util/bookQueryUtils";
+import { caseFoldNormalize } from "../util/queryUtils";
 
-const recomendationAPIUrl = process.env.EXPO_PUBLIC_RECOMMENDATION_API_URL;
+const recommendationAPIUrl = process.env.EXPO_PUBLIC_RECOMMENDATION_API_URL;
+
+/**
+ * Handles API error responses
+ * @param {Response} response - The fetch Response object
+ * @throws {Error} Formatted error message from the API response
+ */
+async function handleErrorAPI(response: Response) {
+  const errorData = (await response.json()) as RecommendationError;
+  const errorMessage =
+    errorData.error.trim() === ""
+      ? `HTTP error! status: ${response.status}`
+      : errorData.error;
+  throw new Error(errorMessage);
+}
+
 /**
  * Send a ping request to the API server
  * @returns {Promise<{ response: string } | null>} - the ping response or null if the request failed
  */
 export async function sendPing() {
   try {
-    const response = await fetch(`${recomendationAPIUrl}/ping`);
+    const response = await fetch(`${recommendationAPIUrl}/ping`);
+
     if (!response.ok) {
-      const warningMessage =
-        response.status >= 400 && response.status < 500
-          ? "This may mean the API is not running. See the README for instructions on how to start the API."
-          : "";
-      throw new Error(
-        `HTTP error! Status: ${response.status}. ${warningMessage}`.trim(),
-      );
+      await handleErrorAPI(response);
     }
 
     return await response.json();
@@ -27,10 +43,10 @@ export async function sendPing() {
 }
 
 /**
- * Fetches book recommendations for given user IDs
- * @param userIds - Array of user IDs to get recommendations for
- * @returns Promise resolving to an array of recommended volume IDs
- * @throws Error if the request fails or invalid input is provided
+ * Fetches book recommendations for given user IDs from the API
+ * @param {string[]} userIds - Array of user IDs to get recommendations for
+ * @returns {Promise<string[]>} Array of recommended book IDs
+ * @throws {Error} If userIds is invalid or request fails
  */
 export async function fetchRecommendationsFromAPI(
   userIds: string[],
@@ -40,7 +56,7 @@ export async function fetchRecommendationsFromAPI(
   }
 
   try {
-    const response = await fetch(`${recomendationAPIUrl}/recommendation`, {
+    const response = await fetch(`${recommendationAPIUrl}/recommendation`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -51,12 +67,7 @@ export async function fetchRecommendationsFromAPI(
     });
 
     if (!response.ok) {
-      const errorData = (await response.json()) as RecommendationError;
-      const errorMessage =
-        errorData.error.trim() === ""
-          ? `HTTP error! status: ${response.status}`
-          : errorData.error;
-      throw new Error(errorMessage);
+      await handleErrorAPI(response);
     }
 
     const data = (await response.json()) as RecommendationResponse;
@@ -69,26 +80,28 @@ export async function fetchRecommendationsFromAPI(
 }
 
 /**
- * Fetches and processes book recommendations for a given user.
- *
- * @param {string} userID - The ID of the user to fetch recommendations for.
- * @returns {Promise<BookVolumeItem[]>} A promise that resolves to an array of book recommendations.
- *
- * @example
- * const recommendations = await fetchUserBookRecommendations(userID);
- * // recommendations is of type BookVolumeItem[]
+ * Fetches and formats volume items for a list of book IDs
+ * @param {string[]} bookIDs - Array of book IDs to fetch
+ * @param {boolean} [forBookshelf] - Whether to format as BookShelfBookModel
+ * @returns {Promise<BookVolumeItem[] | BookShelfBookModel[]>} Array of formatted book items
  */
-export async function fetchUserBookRecommendations(
-  userID: string,
-): Promise<BookVolumeItem[]> {
-  // Fetch recommendation IDs from API
-  const recommendationIDs = await fetchRecommendationsFromAPI([userID]);
-
-  // Fetch book info for each recommendation
+async function getVolumeItemsByBookIDs(
+  bookIDs: string[],
+  forBookshelf: true,
+): Promise<BookShelfBookModel[]>;
+async function getVolumeItemsByBookIDs(
+  bookIDs: string[],
+  forBookshelf?: false,
+): Promise<BookVolumeItem[]>;
+async function getVolumeItemsByBookIDs(
+  bookIDs: string[],
+  forBookshelf = false,
+): Promise<BookVolumeItem[] | BookShelfBookModel[]> {
+  // Fetch book info for each book ID
   const volumeResults = await Promise.all(
-    recommendationIDs.map(async (volumeID) => ({
-      id: volumeID,
-      info: await fetchBookByVolumeID(volumeID),
+    bookIDs.map(async (bookID) => ({
+      id: bookID,
+      info: await fetchBookByVolumeID(bookID),
     })),
   );
 
@@ -98,11 +111,90 @@ export async function fetchUserBookRecommendations(
       result.info !== null,
   );
 
-  // map to BookVolumeItem type
-  const recommendationVolumeItems = recommendationVolumeInfo.map((result) => ({
-    id: result.id,
-    volumeInfo: result.info,
-  }));
+  if (forBookshelf) {
+    // Convert to BookShelfBookModel[]
+    return recommendationVolumeInfo.map((result) => ({
+      id: result.id,
+      volumeInfo: convertToBookshelfVolumeInfo(result.info),
+    }));
+  } else {
+    // Return BookVolumeItem[]
+    return recommendationVolumeInfo.map((result) => ({
+      id: result.id,
+      volumeInfo: result.info,
+    }));
+  }
+}
 
-  return recommendationVolumeItems;
+/**
+ * Fetches similar book IDs from the recommendation API
+ * @param {string} bookID - ID of the book to find similar books for
+ * @param {number} [limit=5] - Maximum number of similar books to return
+ * @returns {Promise<string[]>} Array of similar book IDs
+ * @throws {Error} If bookID is invalid or request fails
+ */
+export async function fetchSimilarBooksIDs(
+  bookID: string,
+  limit = 5,
+): Promise<string[]> {
+  if (bookID == null || bookID === "") {
+    throw new Error("Invalid Book ID");
+  }
+
+  try {
+    const response = await fetch(`${recommendationAPIUrl}/similar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        book_id: bookID,
+        count: limit,
+      }),
+    });
+
+    if (!response.ok) {
+      await handleErrorAPI(response);
+    }
+
+    const data = (await response.json()) as RecommendationResponse;
+    return data.volume_ids;
+  } catch (error) {
+    throw new Error(
+      `Error fetching similar books: ${(error as Error).message}`,
+    );
+  }
+}
+
+/**
+ * Fetches and formats book recommendations for a user
+ * @param {string} userID - The ID of the user to fetch recommendations for
+ * @returns {Promise<BookVolumeItem[]>} Array of recommended books
+ */
+export async function fetchUserBookRecommendations(
+  userID: string,
+): Promise<BookVolumeItem[]> {
+  const recommendationIDs = await fetchRecommendationsFromAPI([userID]);
+
+  return await getVolumeItemsByBookIDs(recommendationIDs);
+}
+
+/**
+ * Fetches and formats similar books for a given book
+ * @param {string} bookID - ID of the book to find similar books for
+ * @param {string} bookTitle - Title of the book to exclude from results
+ * @returns {Promise<BookShelfBookModel[]>} Array of similar books formatted as bookshelf models
+ */
+export async function fetchSimilarBooks(
+  bookID: string,
+  bookTitle: string,
+): Promise<BookShelfBookModel[]> {
+  const bookIDs = await fetchSimilarBooksIDs(bookID);
+  const books = await getVolumeItemsByBookIDs(bookIDs, true);
+  return books.filter((book) => {
+    if (book?.volumeInfo?.title == null) return true;
+    return (
+      caseFoldNormalize(book.volumeInfo.title) !== caseFoldNormalize(bookTitle)
+    );
+  });
 }
