@@ -107,5 +107,9 @@ export const createBookResponseNotification = (
  * @returns The formatted user name
  */
 export const formatUserFullName = (first: string, last: string) => {
-  return `${first ?? ""} ${last ?? ""}`.trim();
+  const name = `${first ?? ""} ${last ?? ""}`.trim();
+  if (name.length === 0) {
+    return "Unknown User";
+  }
+  return name;
 };

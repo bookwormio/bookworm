@@ -4,6 +4,7 @@ import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import {
   BOOKSHELF_DISPLAY_NAMES,
   BOOKSHELF_SUBTITLES,
+  ServerBookBorrowStatus,
   ServerBookShelfName,
 } from "../../../enums/Enums";
 import { type BookShelfBookModel } from "../../../types";
@@ -12,6 +13,7 @@ import { useGetLendingLibraryBookStatuses } from "../hooks/useBookBorrowQueries"
 import { useNavigateToBookList } from "../hooks/useRouteHooks";
 import BookBorrowButton from "./BookBorrowButton";
 import BookShelfBook from "./BookShelfBook";
+import BookShelfLendingStatus from "./BookShelfLendingStatus";
 import { sharedBookshelfStyles } from "./styles/SharedBookshelfStyles";
 
 interface BookShelfProps {
@@ -24,6 +26,7 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
   const { user } = useAuth();
   const navigateToBookList = useNavigateToBookList(userID);
 
+  const isCurrentUser = user?.uid === userID;
   const bookIds = books.map((book) => book.id);
 
   // Cannot conditionally call hooks, so we need to call it regardless of the shelf
@@ -85,7 +88,8 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
             </TouchableOpacity>
 
             {shelfName === ServerBookShelfName.LENDING_LIBRARY &&
-              userID !== user?.uid && (
+              // Showing book borrow button for other users
+              (!isCurrentUser ? (
                 <View style={sharedBookshelfStyles.buttonContainer}>
                   <BookBorrowButton
                     bookID={item.id}
@@ -96,7 +100,18 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
                     isLoading={isLoadingLendingStatus}
                   />
                 </View>
-              )}
+              ) : (
+                // Showing my lending status for my books
+                lendingStatuses?.[item.id]?.borrowInfo?.borrowStatus ===
+                  ServerBookBorrowStatus.BORROWING && (
+                  <BookShelfLendingStatus
+                    borrowingUserID={
+                      lendingStatuses?.[item.id]?.borrowInfo?.borrowingUserID ??
+                      ""
+                    }
+                  ></BookShelfLendingStatus>
+                )
+              ))}
           </View>
         )}
         ListEmptyComponent={() => (

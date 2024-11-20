@@ -1,10 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useProfilePicQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
 import { TabNames } from "../../enums/Enums";
-import { fetchFriendData } from "../../services/firebase-services/UserQueries";
 import {
   useGetNumberOfFollowersByUserID,
   useGetNumberOfFollowingByUserID,
@@ -21,6 +19,7 @@ import ProfileTabSelector from "../profile/ProfileTabSelector";
 import { sharedProfileStyles } from "../profile/styles/SharedProfileStyles";
 import WormLoader from "../wormloader/WormLoader";
 import FollowButon from "./FollowButton";
+import { useFetchFriendData } from "./hooks/useFriendQueries";
 
 interface FriendProfileProps {
   friendUserID: string;
@@ -31,14 +30,8 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
 
   const navigateToFollowList = useNavigateToFollowList(friendUserID);
 
-  const { data: friendData, isLoading: friendIsLoading } = useQuery({
-    queryKey: ["frienddata", friendUserID],
-    enabled: friendUserID != null,
-    queryFn: async () => {
-      return await fetchFriendData(friendUserID);
-    },
-    staleTime: 60000, // Set stale time to 1 minute
-  });
+  const { data: friendData, isLoading: friendIsLoading } =
+    useFetchFriendData(friendUserID);
 
   const { data: numFollowersData, isLoading: isLoadingNumFollowersData } =
     useGetNumberOfFollowersByUserID(friendUserID ?? "");
