@@ -5,6 +5,7 @@ import {
 } from "../../types";
 import { fetchBookByVolumeID } from "../books-services/BookQueries";
 import { convertToBookshelfVolumeInfo } from "../util/bookQueryUtils";
+import { caseFoldNormalize } from "../util/queryUtils";
 
 const recommendationAPIUrl = process.env.EXPO_PUBLIC_RECOMMENDATION_API_URL;
 
@@ -181,11 +182,19 @@ export async function fetchUserBookRecommendations(
 /**
  * Fetches and formats similar books for a given book
  * @param {string} bookID - ID of the book to find similar books for
+ * @param {string} bookTitle - Title of the book to exclude from results
  * @returns {Promise<BookShelfBookModel[]>} Array of similar books formatted as bookshelf models
  */
 export async function fetchSimilarBooks(
   bookID: string,
+  bookTitle: string,
 ): Promise<BookShelfBookModel[]> {
   const bookIDs = await fetchSimilarBooksIDs(bookID);
-  return await getVolumeItemsByBookIDs(bookIDs, true);
+  const books = await getVolumeItemsByBookIDs(bookIDs, true);
+  return books.filter((book) => {
+    if (book?.volumeInfo?.title == null) return true;
+    return (
+      caseFoldNormalize(book.volumeInfo.title) !== caseFoldNormalize(bookTitle)
+    );
+  });
 }

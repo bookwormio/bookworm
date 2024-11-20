@@ -10,13 +10,24 @@ import { useFetchSimilarBooks } from "./hooks/useSimilarBookQueries";
 interface SimilarBooksWrapperProps {
   bookID: string;
   userID: string;
+  bookTitle: string;
 }
 
-const SimilarBooksWrapper = ({ bookID, userID }: SimilarBooksWrapperProps) => {
+const SimilarBooksWrapper = ({
+  bookID,
+  userID,
+  bookTitle,
+}: SimilarBooksWrapperProps) => {
   const similarBooksMutation = useFetchSimilarBooks();
 
-  const handleSimilarBooksPressed = (bookPressedID: string) => {
-    similarBooksMutation.mutate({ bookID: bookPressedID });
+  const handleSimilarBooksPressed = (
+    bookPressedID: string,
+    bookTitle: string,
+  ) => {
+    similarBooksMutation.mutate({
+      bookID: bookPressedID,
+      bookTitle,
+    });
   };
 
   if (similarBooksMutation.isError) {
@@ -38,7 +49,7 @@ const SimilarBooksWrapper = ({ bookID, userID }: SimilarBooksWrapperProps) => {
           title="Find Similar Books"
           disabled={similarBooksMutation.isPending}
           onPress={() => {
-            handleSimilarBooksPressed(bookID);
+            handleSimilarBooksPressed(bookID, bookTitle);
           }}
         ></BookWormButton>
       )}
