@@ -333,7 +333,13 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
                     </TouchableOpacity>
                   ))}
                 </View>
-              ) : null}
+              ) : (
+                <View style={styles.borrowFromContainer}>
+                  <Text style={styles.borrowFromText}>
+                    No friends own this book
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
           {bookData.description != null && (
