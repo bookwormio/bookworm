@@ -321,7 +321,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
               </View>
               {isLoadingUsersWithBook ? (
                 <View style={styles.borrowFromContainer}>
-                  <WormLoader style={{ width: 50, height: 50 }} />
+                  <WormLoader style={styles.worm} />
                 </View>
               ) : usersWithBook != null && usersWithBook.length > 0 ? (
                 <View style={styles.borrowFromContainer}>
@@ -519,6 +519,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   titleText: { flex: 1, paddingLeft: 10 },
+  worm: { width: 50, height: 50 },
 });
 
 export default BookViewPage;
