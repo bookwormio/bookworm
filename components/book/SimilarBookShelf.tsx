@@ -55,7 +55,6 @@ const SimilarBookShelf = ({
                   book={item.volumeInfo}
                   bookID={item.id}
                   userID={userID}
-                  thumbnailOverride={item.volumeInfo.imageLinks?.thumbnail}
                 />
               )}
             </TouchableOpacity>
