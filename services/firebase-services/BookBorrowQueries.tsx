@@ -403,14 +403,27 @@ export async function getUsersWithBookInLendingLibrary(
         followingUserID,
         "currently_reading",
       );
+      const borrowingRef = collection(DB, "borrowing_collection");
+      const borrowQuery = query(
+        borrowingRef,
+        where("lending_user", "==", followingUserID),
+        where("borrow_status", "==", "borrowing"),
+        where("book_id", "==", bookID),
+      );
       const bookDocRef = doc(lendingLibraryRef, bookID);
       const currReadBookDocRef = doc(currentlyReadingLibraryRef, bookID);
-      const [bookDocSnapshot, currReadBookDocSnapshot] = await Promise.all([
-        getDoc(bookDocRef),
-        getDoc(currReadBookDocRef),
-      ]);
-
-      if (bookDocSnapshot.exists() && !currReadBookDocSnapshot.exists()) {
+      const [bookDocSnapshot, currReadBookDocSnapshot, borrowSnapshot] =
+        await Promise.all([
+          getDoc(bookDocRef),
+          getDoc(currReadBookDocRef),
+          getDocs(borrowQuery),
+        ]);
+      // uighEAAAQBAJ
+      if (
+        bookDocSnapshot.exists() &&
+        !currReadBookDocSnapshot.exists() &&
+        borrowSnapshot.empty
+      ) {
         usersWithBook.push(followingUserID);
       }
     }

@@ -259,7 +259,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
       .replace(/ +/g, " ")
       .trim();
   }
-  if (bookData == null || isLoadingBook || isLoadingUsersWithBook) {
+  if (bookData == null || isLoadingBook) {
     return (
       <View style={styles.container}>
         <WormLoader />
@@ -314,7 +314,11 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
                   </View>
                 </TouchableOpacity>
               </View>
-              {usersWithBook != null && usersWithBook.length > 0 && (
+              {isLoadingUsersWithBook ? (
+                <View style={styles.borrowFromContainer}>
+                  <WormLoader style={{ width: 50, height: 50 }} />
+                </View>
+              ) : usersWithBook != null && usersWithBook.length > 0 ? (
                 <View style={styles.borrowFromContainer}>
                   <Text style={styles.borrowFromText}>Borrow From:</Text>
                   {usersWithBook?.map((userID) => (
@@ -329,7 +333,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
                     </TouchableOpacity>
                   ))}
                 </View>
-              )}
+              ) : null}
             </View>
           </View>
           {bookData.description != null && (

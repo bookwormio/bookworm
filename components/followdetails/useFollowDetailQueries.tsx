@@ -146,6 +146,7 @@ export const useInvalidateFollowQueries = () => {
       ["followers", friendUserID],
       ["following", userID],
       ["followingstatus", friendUserID, userID],
+      ["availableborrow"],
     ];
 
     await Promise.all(
