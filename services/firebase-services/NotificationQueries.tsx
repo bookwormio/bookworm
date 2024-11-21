@@ -233,11 +233,10 @@ export async function getBookRequestStatusForBooks(
       if (
         data?.bookID != null &&
         data?.bookRequestStatus != null &&
-        typeof data.bookID === "string" &&
-        !processedBooks.has(data.bookID)
+        !processedBooks.has(data.bookID as string)
       ) {
         // Only process the first (most recent) notification for each book
-        processedBooks.add(data.bookID);
+        processedBooks.add(data.bookID as string);
         bookRequestStatuses[data.bookID] = {
           notifID: doc.id,
           notifStatus: data.bookRequestStatus as BookRequestNotificationStatus,
@@ -246,7 +245,6 @@ export async function getBookRequestStatusForBooks(
     });
     return bookRequestStatuses;
   } catch (error) {
-    console.log(error);
     throw new Error(
       `Error getting book request statuses: ${(error as Error).message}`,
     );

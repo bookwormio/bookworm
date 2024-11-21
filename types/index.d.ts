@@ -308,6 +308,7 @@ export interface BorrowingBookshelfModel {
 interface UpdateBorrowNotificationParams {
   notifID: string;
   newStatus: BookRequestNotificationStatus;
+  userID: string;
 }
 
 interface DenyOtherBorrowRequestsParams {
