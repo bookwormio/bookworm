@@ -275,6 +275,7 @@ const BookBorrowButton = ({
               updateBorrowNotificationStatus.mutate({
                 notifID,
                 newStatus: BookRequestNotificationStatus.RETURNED,
+                userID: user.uid,
               });
             }
           },
