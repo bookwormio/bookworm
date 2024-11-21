@@ -42,12 +42,10 @@ import { useNavigateToPost } from "../../../components/profile/hooks/useRouteHoo
 import WormLoader from "../../../components/wormloader/WormLoader";
 import {
   APP_BACKGROUND_COLOR,
-  CREATE_ROUTE_PREFIX,
   MAX_PULLDOWN_DISTANCE,
   PULLDOWN_ANIMATION_DURATION,
   PULLDOWN_REFRESHING_MAX_HEIGHT,
   PULLDOWN_REFRESHING_MIN_HEIGHT,
-  ROUTE_TO_SEARCH_PREFIX,
 } from "../../../constants/constants";
 import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQueries";
 import { type PostModel } from "../../../types";
@@ -235,10 +233,10 @@ const Posts = () => {
   const navigateToPost = useNavigateToPost();
   const router = useRouter();
   const navigateToMakePostPage = () => {
-    router.push({ pathname: CREATE_ROUTE_PREFIX });
+    router.replace("/NewPost");
   };
   const navigateToSearchPage = () => {
-    router.push({ pathname: ROUTE_TO_SEARCH_PREFIX });
+    router.replace("/search");
   };
 
   return (
