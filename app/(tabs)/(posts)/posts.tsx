@@ -416,6 +416,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 5,
     paddingHorizontal: 10,
+    marginBottom: 10,
+    marginLeft: 10,
   },
   commentInput: {
     flex: 1,

@@ -45,15 +45,16 @@ export const LikeComment = ({
           }}
         >
           {post.likes.includes(user?.uid ?? "") ? (
-            <FontAwesome5 name="heart" solid size={15} color="red" />
+            <FontAwesome5 name="heart" solid size={21} color="red" />
           ) : (
-            <FontAwesome5 name="heart" size={15} />
+            <FontAwesome5 name="heart" size={21} />
           )}
         </TouchableOpacity>
         <Text
           style={[
             styles.textPadding,
             isThisPostLikePending && styles.pendingOpacity,
+            { fontSize: 14.5 },
           ]}
         >
           {post.likes.length}
@@ -69,8 +70,8 @@ export const LikeComment = ({
             }
           }}
         >
-          <FontAwesome5 name="comment" size={15} />
-          <Text style={{ paddingLeft: 5 }}>
+          <FontAwesome5 name="comment" size={21} />
+          <Text style={{ paddingLeft: 5, fontSize: 14.5 }}>
             {post.comments.length}
             {post.comments.length === 1 ? " Comment" : " Comments"}
           </Text>
@@ -133,6 +134,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 5,
     paddingHorizontal: 10,
+    marginBottom: 10,
+    marginLeft: 10,
   },
   commentInput: {
     flex: 1,

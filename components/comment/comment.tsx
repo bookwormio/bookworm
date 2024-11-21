@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type CommentModel } from "../../types";
 import { useAuth } from "../auth/context";
 import { useNavigateToUser } from "../profile/hooks/useRouteHooks";
+import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 
 interface PostProps {
   comment: CommentModel;
@@ -19,8 +20,10 @@ const Comment = ({ comment }: PostProps) => {
           navigateToUser(user?.uid, comment.userID);
         }}
         disabled={comment.userID === user?.uid}
+        style={{ flexDirection: "row", alignItems: "center" }}
       >
-        <Text style={styles.title}>{comment.first}:</Text>
+        <ProfilePicture userID={comment.userID} size={35} />
+        <Text style={styles.title}>{comment.first}: </Text>
       </TouchableOpacity>
       <Text style={styles.body}>{comment.text}</Text>
     </View>
@@ -32,14 +35,16 @@ export default Comment;
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    padding: 10,
     borderBottomWidth: 0.5,
+    alignItems: "center",
     borderBottomColor: "lightgrey",
+    padding: 10,
+    paddingLeft: 15,
   },
   title: {
-    marginRight: 5,
     fontSize: 15,
     fontWeight: "bold",
+    paddingLeft: 8,
   },
   body: {
     fontSize: 15,
