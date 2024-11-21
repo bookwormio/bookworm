@@ -9,7 +9,6 @@ import {
 } from "react-native";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useRouter } from "expo-router";
-import { CREATE_ROUTE_PREFIX } from "../../../constants/constants";
 import {
   fetchBooksFinishedData,
   fetchPagesReadData,
@@ -116,7 +115,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
 
   const router = useRouter();
   const navigateToMakePostPage = () => {
-    router.push({ pathname: CREATE_ROUTE_PREFIX });
+    router.replace("/NewPost");
   };
 
   const { user } = useAuth();
@@ -136,7 +135,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
   if (isLoadingPagesData || isLoadingBookData) {
     return (
       <View style={styles.container}>
-        <WormLoader style={{ width: 50, height: 50 }} />
+        <WormLoader style={styles.worm} />
       </View>
     );
   }
@@ -150,10 +149,10 @@ const ViewData = ({ userID }: ViewDataProps) => {
   }
 
   const aggregatedPagesData =
-    pagesData !== undefined ? aggregatePagesDataByWeek(pagesData) : [];
+    pagesData != null ? aggregatePagesDataByWeek(pagesData) : [];
 
   const aggregatedBooksData =
-    bookData !== undefined ? AggregateBooksFinishedByMonth(bookData) : [];
+    bookData != null ? AggregateBooksFinishedByMonth(bookData) : [];
 
   return (
     <ScrollView style={{ flex: 1 }}>
@@ -301,4 +300,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 20,
   },
+  worm: { width: 50, height: 50 },
 });

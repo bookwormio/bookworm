@@ -5,6 +5,7 @@ import {
 } from "@gorhom/bottom-sheet";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import {
   type DocumentData,
   type QueryDocumentSnapshot,
@@ -41,6 +42,7 @@ import { useNavigateToPost } from "../../../components/profile/hooks/useRouteHoo
 import WormLoader from "../../../components/wormloader/WormLoader";
 import {
   APP_BACKGROUND_COLOR,
+  BOOKWORM_ORANGE,
   MAX_PULLDOWN_DISTANCE,
   PULLDOWN_ANIMATION_DURATION,
   PULLDOWN_REFRESHING_MAX_HEIGHT,
@@ -230,6 +232,13 @@ const Posts = () => {
   }, []);
 
   const navigateToPost = useNavigateToPost();
+  const router = useRouter();
+  const navigateToMakePostPage = () => {
+    router.replace("/NewPost");
+  };
+  const navigateToSearchPage = () => {
+    router.replace("/search");
+  };
 
   return (
     <BottomSheetModalProvider>
@@ -281,6 +290,19 @@ const Posts = () => {
                   userID={user?.uid ?? ""}
                   isLoadingOther={isLoadingFeedPosts}
                 />
+              ) : null
+            }
+            ListEmptyComponent={
+              !isLoadingFeedPosts && !refreshing && !(user == null) ? (
+                <View style={styles.noDataContainer}>
+                  <Text style={styles.noData}>No posts to display.</Text>
+                  <TouchableOpacity onPress={navigateToMakePostPage}>
+                    <Text style={styles.makePost}>Make a post</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={navigateToSearchPage}>
+                    <Text style={styles.makePost}>Add friends</Text>
+                  </TouchableOpacity>
+                </View>
               ) : null
             }
             ListFooterComponent={
@@ -400,5 +422,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
+  },
+  noData: {
+    fontSize: 17,
+    color: "black",
+    textAlign: "center",
+    paddingTop: 10,
+  },
+  makePost: {
+    fontSize: 17,
+    color: BOOKWORM_ORANGE,
+    paddingTop: 10,
+  },
+  noDataContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    marginTop: 10,
   },
 });

@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { BOOKWORM_ORANGE } from "../../constants/constants";
 import { fetchPostsByUserID } from "../../services/firebase-services/PostQueries";
 import Post from "../post/post";
 import { usePostsContext } from "../post/PostsContext";
@@ -15,6 +17,10 @@ const ProfilePosts = ({ userID }: ProfilePostsProps) => {
   const { setProfilePosts } = usePostsContext();
 
   const navigateToPost = useNavigateToPost();
+  const router = useRouter();
+  const navigateToMakePostPage = () => {
+    router.replace("/NewPost");
+  };
 
   const { data: userProfilePosts, isLoading: isUserProfilePostsLoading } =
     useQuery({
@@ -37,25 +43,34 @@ const ProfilePosts = ({ userID }: ProfilePostsProps) => {
   } else {
     return (
       <View style={styles.container}>
-        {userProfilePosts?.map((post) => (
-          <TouchableOpacity
-            key={post.id}
-            onPress={() => {
-              navigateToPost(post.id);
-            }}
-          >
-            <Post
+        {userProfilePosts != null && userProfilePosts.length > 0 ? (
+          userProfilePosts.map((post) => (
+            <TouchableOpacity
               key={post.id}
-              post={post}
-              created={post.created}
-              currentDate={currentDate}
-              individualPage={false}
-              presentComments={() => {
+              onPress={() => {
                 navigateToPost(post.id);
               }}
-            />
-          </TouchableOpacity>
-        ))}
+            >
+              <Post
+                key={post.id}
+                post={post}
+                created={post.created}
+                currentDate={currentDate}
+                individualPage={false}
+                presentComments={() => {
+                  navigateToPost(post.id);
+                }}
+              />
+            </TouchableOpacity>
+          ))
+        ) : (
+          <View style={styles.noDataContainer}>
+            <Text style={styles.noData}>No posts to display.</Text>
+            <TouchableOpacity onPress={navigateToMakePostPage}>
+              <Text style={styles.makePost}> Make a post</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     );
   }
@@ -74,5 +89,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+  },
+  noData: {
+    fontSize: 17,
+    color: "black",
+    textAlign: "center",
+    paddingTop: 10,
+  },
+  makePost: {
+    fontSize: 17,
+    color: BOOKWORM_ORANGE,
+    paddingTop: 10,
+  },
+  noDataContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    marginTop: 10,
   },
 });
