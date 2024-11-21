@@ -30,7 +30,7 @@ const BookSearchBar = ({
 }: SearchBarProps) => {
   const [permission, requestPermission] = useCameraPermissions();
   const segments = useSegments();
-  const isRecommendationSearch = segments[2].endsWith("recommendation");
+  const hideBarcode = !segments[2].endsWith("search");
 
   return (
     <View style={styles.container}>
@@ -38,7 +38,7 @@ const BookSearchBar = ({
         style={
           clicked
             ? styles.searchBar__clicked
-            : isRecommendationSearch
+            : hideBarcode
               ? styles.searchBar__unclicked
               : styles.searchBar__unclicked__barcode
         }
@@ -90,7 +90,7 @@ const BookSearchBar = ({
           ></Button>
         </View>
       )}
-      {!clicked && !isRecommendationSearch && (
+      {!clicked && !hideBarcode && (
         <TouchableOpacity
           onPress={() => {
             if (permission?.granted === false) {
