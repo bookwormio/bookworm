@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   commentInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 0,
+    marginTop: 10,
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
