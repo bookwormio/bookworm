@@ -97,18 +97,18 @@ function AggregateBooksFinishedByMonth(
 }
 
 interface ViewDataProps {
-  userID: string;
+  viewingUserID: string;
 }
 
-const ViewData = ({ userID }: ViewDataProps) => {
+const ViewData = ({ viewingUserID }: ViewDataProps) => {
   const {
     data: pagesData,
     isLoading: isLoadingPagesData,
     isError: isErrorPages,
   } = useQuery({
-    queryKey: ["pagesData", userID],
+    queryKey: ["pagesData", viewingUserID],
     queryFn: async () => {
-      const pagesReadData = await fetchPagesReadData(userID);
+      const pagesReadData = await fetchPagesReadData(viewingUserID);
       return pagesReadData;
     },
   });
@@ -125,9 +125,9 @@ const ViewData = ({ userID }: ViewDataProps) => {
     isLoading: isLoadingBookData,
     isError: isErrorWithBooks,
   } = useQuery({
-    queryKey: ["bookData", userID],
+    queryKey: ["bookData", viewingUserID],
     queryFn: async () => {
-      const booksReadData = await fetchBooksFinishedData(userID);
+      const booksReadData = await fetchBooksFinishedData(viewingUserID);
       return booksReadData;
     },
   });
@@ -156,7 +156,10 @@ const ViewData = ({ userID }: ViewDataProps) => {
 
   return (
     <ScrollView style={{ flex: 1 }}>
-      <DataSnapShot userID={userID} isLoadingOther={isLoadingPagesData} />
+      <DataSnapShot
+        viewingUserID={viewingUserID}
+        isLoadingOther={isLoadingPagesData}
+      />
       <View>
         <View style={styles.titleBarFirst}>
           <Text style={styles.dataTypeFirst}>Pages Read</Text>
@@ -167,7 +170,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
           ) : (
             <View style={styles.noDataContainer}>
               <Text style={styles.noData}>No data to display.</Text>
-              {userID === user?.uid && (
+              {viewingUserID === user?.uid && (
                 <TouchableOpacity onPress={navigateToMakePostPage}>
                   <Text style={styles.makePost}> Make a post</Text>
                 </TouchableOpacity>
@@ -186,7 +189,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
           ) : (
             <View style={styles.noDataContainer}>
               <Text style={styles.noData}>No data to display.</Text>
-              {userID === user?.uid && (
+              {viewingUserID === user?.uid && (
                 <TouchableOpacity onPress={navigateToMakePostPage}>
                   <Text style={styles.makePost}> Make a post</Text>
                 </TouchableOpacity>

@@ -13,16 +13,16 @@ import {
 } from "./util/datasnapshotUtils";
 
 interface DataSnapShotProps {
-  userID: string;
+  viewingUserID: string;
   isLoadingOther: boolean;
 }
 
-const DataSnapShot = ({ userID, isLoadingOther }: DataSnapShotProps) => {
+const DataSnapShot = ({ viewingUserID, isLoadingOther }: DataSnapShotProps) => {
   const { data: pagesData, isLoading: pagesIsLoading } =
-    useGetPagesData(userID);
+    useGetPagesData(viewingUserID);
 
   const { data: bookshelves, isLoading: bookshelvesLoading } =
-    useGetBooksForBookshelves(userID);
+    useGetBooksForBookshelves(viewingUserID);
 
   let pagesRead = 0;
   if (pagesData != null) {

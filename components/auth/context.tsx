@@ -6,6 +6,7 @@ import {
   type User,
 } from "firebase/auth";
 import React, { useEffect, useState } from "react";
+import Toast from "react-native-toast-message";
 import { FIREBASE_AUTH } from "../../firebase.config";
 import { fetchUserData } from "../../services/firebase-services/UserQueries";
 
@@ -24,6 +25,23 @@ const AuthContext = React.createContext<{
   user: null,
   setNewUser: () => null,
 });
+
+export function useUserID() {
+  const { user, signOut } = useAuth();
+  const userID = user?.uid;
+
+  if (userID == null) {
+    signOut();
+    Toast.show({
+      type: "error",
+      text1: "Error",
+      text2: "User not found: Please sign in again",
+    });
+    return { userID: "SIGNED_OUT" };
+  }
+
+  return { userID };
+}
 
 export function useAuth() {
   return React.useContext(AuthContext);

@@ -32,7 +32,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { useAuth } from "../../../components/auth/context";
+import { useUserID } from "../../../components/auth/context";
 import BookWormButton from "../../../components/buttons/BookWormButton";
 import Comment from "../../../components/comment/comment";
 import DataSnapShot from "../../../components/datasnapshot/DataSnapShot";
@@ -52,22 +52,16 @@ import { fetchPostsForUserFeed } from "../../../services/firebase-services/PostQ
 import { type PostModel } from "../../../types";
 
 const Posts = () => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const fetchPosts = async ({
     pageParam = null, // Accepts an optional parameter for pagination
   }: {
     pageParam?: QueryDocumentSnapshot<DocumentData, DocumentData> | null;
   }) => {
-    if (user != null) {
-      // Fetch posts for the provided user ID with pagination support
-      return await fetchPostsForUserFeed(user.uid, pageParam);
-    } else {
-      console.error("Error: User is null");
-      return { posts: [], newLastVisible: null };
-    }
+    // Fetch posts for the provided user ID with pagination support
+    return await fetchPostsForUserFeed(userID, pageParam);
   };
-  const queryKey =
-    user != null ? ["userfeedposts", user.uid] : ["userfeedposts"];
+  const queryKey = ["userfeedposts", userID];
   const {
     data: feedPostsData,
     isLoading: isLoadingFeedPosts,
@@ -168,12 +162,12 @@ const Posts = () => {
     // Reset the query data to only the first page
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     queryClient
-      .invalidateQueries({ queryKey: ["bookshelves", user?.uid] })
+      .invalidateQueries({ queryKey: ["bookshelves", userID] })
       .catch((error) => {
         console.error("Error invalidating queries:", error);
       });
     queryClient
-      .invalidateQueries({ queryKey: ["pagesData", user?.uid] })
+      .invalidateQueries({ queryKey: ["pagesData", userID] })
       .catch((error) => {
         console.error("Error invalidating queries:", error);
       });
@@ -285,15 +279,13 @@ const Posts = () => {
             removeClippedSubviews={true}
             keyExtractor={(item) => item.id}
             ListHeaderComponent={
-              !(user == null) ? (
-                <DataSnapShot
-                  userID={user?.uid ?? ""}
-                  isLoadingOther={isLoadingFeedPosts}
-                />
-              ) : null
+              <DataSnapShot
+                userID={userID ?? ""}
+                isLoadingOther={isLoadingFeedPosts}
+              />
             }
             ListEmptyComponent={
-              !isLoadingFeedPosts && !refreshing && !(user == null) ? (
+              !isLoadingFeedPosts && !refreshing ? (
                 <View style={styles.noDataContainer}>
                   <Text style={styles.noData}>No posts to display.</Text>
                   <TouchableOpacity onPress={navigateToMakePostPage}>

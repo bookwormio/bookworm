@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { useAuth } from "../../auth/context";
+import { useUserID } from "../../auth/context";
 import { formatUserFullName } from "../../notifications/util/notificationUtils";
 import { useFetchFriendData } from "../../UserList/hooks/useFriendQueries";
 import { useNavigateToUser } from "../hooks/useRouteHooks";
@@ -13,7 +13,7 @@ interface BookShelfLendingStatusProps {
 const BookShelfLendingStatus = ({
   borrowingUserID,
 }: BookShelfLendingStatusProps) => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
 
   const { data: friendData, isLoading: friendIsLoading } =
     useFetchFriendData(borrowingUserID);
@@ -32,7 +32,7 @@ const BookShelfLendingStatus = ({
         Lending to{" "}
         <Text
           onPress={() => {
-            navigateToUser(user?.uid, borrowingUserID);
+            navigateToUser(userID, borrowingUserID);
           }}
           style={[sharedBookshelfStyles.subtitle, styles.bold]}
         >

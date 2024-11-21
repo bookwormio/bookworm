@@ -14,7 +14,7 @@ import {
   type BookVolumeInfo,
   type BorrowingBookshelfModel,
 } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import BookBorrowButton from "../profile/BookShelf/BookBorrowButton";
 import { useRemoveBookFromShelf } from "../profile/hooks/useBookshelfQueries";
 import { useNavigateToBook } from "../profile/hooks/useRouteHooks";
@@ -29,7 +29,7 @@ interface BookListItemProps {
   ) => void;
   bookShelf?: ServerBookShelfName;
   showRemoveButton?: boolean;
-  userID?: string;
+  viewingUserID?: string;
   lendingStatus?: BookStatusModel;
   isLoadingLendingStatus?: boolean;
   borrowingBookShelf?: boolean;
@@ -42,7 +42,7 @@ const BookListItem = ({
   handleBookClickOverride,
   bookShelf,
   showRemoveButton,
-  userID,
+  viewingUserID,
   lendingStatus,
   isLoadingLendingStatus,
   borrowingBookShelf,
@@ -54,17 +54,17 @@ const BookListItem = ({
     navigateToBook();
   };
 
-  const { user } = useAuth();
+  const { userID } = useUserID();
 
   const { mutate: removeBook, isPending: removeBookPending } =
     useRemoveBookFromShelf();
 
   // Function to call the mutation
   const handleRemoveBook = (bookID: string) => {
-    if (user != null && bookID != null && bookShelf != null) {
+    if (bookID != null && bookShelf != null) {
       // Trigger the mutation with error handling
       removeBook(
-        { userID: user.uid, bookID, shelfName: bookShelf },
+        { userID, bookID, shelfName: bookShelf },
         {
           onError: (error) => {
             console.error("Failed to remove book:", error);
@@ -142,14 +142,14 @@ const BookListItem = ({
         {bookShelf != null && <BookshelfListChip bookShelf={bookShelf} />}
       </TouchableOpacity>
       {bookShelf === ServerBookShelfName.LENDING_LIBRARY &&
-        userID !== user?.uid &&
-        userID != null &&
+        viewingUserID !== userID &&
+        viewingUserID != null &&
         volumeInfo.title != null && (
           <View style={styles.lendBorrowButtonContainer}>
             <BookBorrowButton
               bookID={bookID}
               bookTitle={volumeInfo?.title}
-              bookOwnerID={userID}
+              bookOwnerID={viewingUserID}
               borrowInfo={lendingStatus?.borrowInfo}
               requestStatus={lendingStatus?.requestStatus}
               isLoading={isLoadingLendingStatus ?? false}
@@ -172,7 +172,7 @@ const BookListItem = ({
         )}
       {showRemoveButton != null &&
         showRemoveButton &&
-        userID === user?.uid &&
+        viewingUserID === userID &&
         bookID != null &&
         bookShelf != null && (
           <TouchableOpacity

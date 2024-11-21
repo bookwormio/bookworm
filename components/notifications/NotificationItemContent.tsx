@@ -12,7 +12,7 @@ import {
   type BookRequestNotification,
   type FullNotificationModel,
 } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import { useCheckForLendingBadges } from "../badges/useBadgeQueries";
 import { useLendBookToUser } from "../profile/hooks/useBookBorrowQueries";
 import BookRequestNotificationActions from "./BookRequestNotificationActions";
@@ -42,10 +42,9 @@ const NotificationItemContent = ({
   const denyOtherBorrowRequests = useDenyOtherBorrowRequests();
   const { mutateAsync: checkForLendingBadge } = useCheckForLendingBadges();
 
-  const { user } = useAuth();
-  const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
-    user?.uid,
-  );
+  const { userID } = useUserID();
+  const { data: userData, isLoading: isUserDataLoading } =
+    useUserDataQuery(userID);
 
   const queryClient = useQueryClient();
 

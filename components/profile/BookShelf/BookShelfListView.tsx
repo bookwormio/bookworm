@@ -10,15 +10,20 @@ import { useGetAllBorrowingBooksForUser } from "../hooks/useBookBorrowQueries";
 import { useGetBooksForBookshelves } from "../hooks/useBookshelfQueries";
 
 interface BookShelfListViewProps {
-  userID: string;
+  viewingUserID: string;
   bookshelf: string;
 }
 
-const BookShelfListView = ({ userID, bookshelf }: BookShelfListViewProps) => {
+const BookShelfListView = ({
+  viewingUserID,
+  bookshelf,
+}: BookShelfListViewProps) => {
   const { data: bookShelves, isLoading: isLoadingBooks } =
-    useGetBooksForBookshelves(userID ?? "");
+    useGetBooksForBookshelves(viewingUserID ?? "");
 
-  const { data: borrowingBooks } = useGetAllBorrowingBooksForUser(userID) as {
+  const { data: borrowingBooks } = useGetAllBorrowingBooksForUser(
+    viewingUserID,
+  ) as {
     data: BorrowingBookshelfModel[] | null;
     isLoading: boolean;
     isError: boolean;
@@ -52,12 +57,12 @@ const BookShelfListView = ({ userID, bookshelf }: BookShelfListViewProps) => {
         <BookList
           volumes={selectedShelf}
           showRemoveButton={true}
-          userID={userID}
+          viewingUserID={viewingUserID}
           bookShelf={bookshelf}
         />
       ) : bookshelf === BORROWING_SHELF_NAME && borrowingBooks != null ? (
         <BookList
-          userID={userID}
+          viewingUserID={viewingUserID}
           showRemoveButton={false}
           borrowingBookShelf={true}
           borrwingBooks={borrowingBooks}

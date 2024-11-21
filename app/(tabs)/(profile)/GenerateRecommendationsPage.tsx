@@ -1,7 +1,7 @@
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
-import { useAuth } from "../../../components/auth/context";
+import { useUserID } from "../../../components/auth/context";
 import BookList from "../../../components/booklist/BookList";
 import BookWormButton from "../../../components/buttons/BookWormButton";
 import WormLoader from "../../../components/wormloader/WormLoader";
@@ -9,7 +9,7 @@ import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 import { useGenerateRecommendationsQuery } from "./hooks/useProfileQueries";
 
 const GenerateRecommendationsPage = () => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
 
   const {
     data: generatedRecommendations,
@@ -19,7 +19,7 @@ const GenerateRecommendationsPage = () => {
     isSuccess: isSuccessRecommendations,
     refetch: refetchRecommendations,
     isRefetching: isRefetchingRecommendations,
-  } = useGenerateRecommendationsQuery(user?.uid ?? "");
+  } = useGenerateRecommendationsQuery(userID);
 
   const handleRefetchRecommendations = () => {
     refetchRecommendations().catch((error) => {

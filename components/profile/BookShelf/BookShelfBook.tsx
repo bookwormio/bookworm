@@ -6,7 +6,7 @@ import {
   type BookShelfName,
 } from "../../../enums/Enums";
 import { type BookshelfVolumeInfo } from "../../../types";
-import { useAuth } from "../../auth/context";
+import { useUserID } from "../../auth/context";
 import { useRemoveBookFromShelf } from "../hooks/useBookshelfQueries";
 import { useBookRouteInfo, useNavigateToBook } from "../hooks/useRouteHooks";
 
@@ -14,26 +14,26 @@ interface BookShelfBookProps {
   book: BookshelfVolumeInfo;
   bookID: string;
   shelfName?: BookShelfName;
-  userID?: string;
+  viewingUserID?: string;
 }
 
 const BookShelfBook = ({
   book,
   bookID,
   shelfName,
-  userID,
+  viewingUserID,
 }: BookShelfBookProps) => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const navigateToBook = useNavigateToBook(bookID);
   const { type: bookRouteType } = useBookRouteInfo();
   const { mutate: removeBook } = useRemoveBookFromShelf();
 
   // Function to call the mutation
   const handleRemoveBook = (bookID: string) => {
-    if (user != null && bookID != null && shelfName != null) {
+    if (bookID != null && shelfName != null) {
       // Trigger the mutation with error handling
       removeBook(
-        { userID: user.uid, bookID, shelfName },
+        { userID, bookID, shelfName },
         {
           onError: (error) => {
             console.error("Failed to remove book:", error);
@@ -78,7 +78,7 @@ const BookShelfBook = ({
       onLongPress={() => {
         if (
           bookRouteType === "PROFILE" &&
-          userID === user?.uid &&
+          viewingUserID === userID &&
           shelfName != null
         ) {
           handleRemoveClick(bookID, shelfName, book);

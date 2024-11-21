@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { fetchBooksByTitleSearch } from "../../services/books-services/BookQueries";
 import { type BookVolumeInfo, type BookVolumeItem } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import BookList from "../booklist/BookList";
 import { useGetBooksForBookshelves } from "../profile/hooks/useBookshelfQueries";
 import BookSearchBar from "./booksearchbar";
@@ -31,7 +31,7 @@ const BookSearch = ({
   setSearchPhrase,
   handleBookClickOverride,
 }: BookSearchProps) => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const [books, setBooks] = useState<BookVolumeItem[]>([]);
   const [flattenedShelfBooks, setFlattenedShelfBooks] = useState<
     BookVolumeItem[]
@@ -60,9 +60,7 @@ const BookSearch = ({
     staleTime: 60000, // Set stale time to 1 minute
   });
 
-  const { data: preloadedShelfBooks } = useGetBooksForBookshelves(
-    user?.uid ?? "",
-  );
+  const { data: preloadedShelfBooks } = useGetBooksForBookshelves(userID);
 
   useEffect(() => {
     // This useEffect should run ONCE on component mount

@@ -6,7 +6,7 @@ import {
   type BookVolumeItem,
   type BorrowingBookshelfModel,
 } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import { useGetLendingLibraryBookStatuses } from "../profile/hooks/useBookBorrowQueries";
 import BookListItem from "./BookListItem";
 
@@ -17,7 +17,7 @@ interface BookListProps {
     volumeInfo: BookVolumeInfo,
   ) => void;
   showRemoveButton?: boolean;
-  userID?: string;
+  viewingUserID?: string;
   bookShelf?: string;
   borrowingBookShelf?: boolean;
   borrwingBooks?: BorrowingBookshelfModel[];
@@ -27,17 +27,19 @@ const BookList = ({
   volumes,
   handleBookClickOverride,
   showRemoveButton,
-  userID,
+  viewingUserID,
   bookShelf,
   borrowingBookShelf,
   borrwingBooks,
 }: BookListProps) => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const bookIds = volumes?.map((book) => book.id) ?? [];
   const { data: lendingStatuses, isLoading: isLoadingLendingStatus } =
     useGetLendingLibraryBookStatuses(
-      bookShelf === ServerBookShelfName.LENDING_LIBRARY ? userID ?? "" : "",
-      bookShelf === ServerBookShelfName.LENDING_LIBRARY ? user?.uid ?? "" : "",
+      bookShelf === ServerBookShelfName.LENDING_LIBRARY
+        ? viewingUserID ?? ""
+        : "",
+      bookShelf === ServerBookShelfName.LENDING_LIBRARY ? userID : "",
       bookShelf === ServerBookShelfName.LENDING_LIBRARY ? bookIds : [],
     );
   return (
@@ -51,7 +53,7 @@ const BookList = ({
             volumeInfo={value.bookShelfInfo.volumeInfo}
             handleBookClickOverride={handleBookClickOverride}
             showRemoveButton={false}
-            userID={userID}
+            viewingUserID={viewingUserID}
             borrowingBookShelf={true}
             borrwingBook={value}
           ></BookListItem>
@@ -65,7 +67,7 @@ const BookList = ({
               handleBookClickOverride={handleBookClickOverride}
               bookShelf={value.bookShelf}
               showRemoveButton={showRemoveButton}
-              userID={userID}
+              viewingUserID={viewingUserID}
               lendingStatus={lendingStatuses?.[value.id]}
               isLoadingLendingStatus={isLoadingLendingStatus}
             ></BookListItem>
@@ -78,7 +80,7 @@ const BookList = ({
               handleBookClickOverride={handleBookClickOverride}
               bookShelf={value.bookShelf}
               showRemoveButton={showRemoveButton}
-              userID={userID}
+              viewingUserID={viewingUserID}
             ></BookListItem>
           ))}
     </View>

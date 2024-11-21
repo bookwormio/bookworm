@@ -1,7 +1,5 @@
-import { useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
-import { useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React from "react";
 import { PanResponder, StyleSheet, Text, View } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
@@ -10,12 +8,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import Toast from "react-native-toast-message";
-import { useAuth } from "../../../components/auth/context";
-import {
-  useGetAllFullNotifications,
-  useGetUnreadNotificationCount,
-  useMarkAllNotificationsRead,
-} from "../../../components/notifications/hooks/useNotificationQueries";
+import { useUserID } from "../../../components/auth/context";
+import { useGetAllFullNotifications } from "../../../components/notifications/hooks/useNotificationQueries";
 import NotificationItem from "../../../components/notifications/NotificationItem";
 import WormLoader from "../../../components/wormloader/WormLoader";
 import {
@@ -26,33 +20,9 @@ import {
 } from "../../../constants/constants";
 
 const NotificationsScreen = () => {
-  const { user } = useAuth();
-  const [refreshing, setRefreshing] = useState(false);
+  const { userID } = useUserID();
 
-  const { refetch: refetchNotifications } = useGetUnreadNotificationCount(
-    user?.uid ?? "",
-  );
-
-  const notificationReadMutation = useMarkAllNotificationsRead();
-  const queryClient = useQueryClient();
-
-  useFocusEffect(
-    useCallback(() => {
-      // On mount, mark all notifications as read
-      notificationReadMutation.mutate({ userID: user?.uid ?? "" });
-
-      // This cleanup function runs when the screen is unfocused
-      return () => {
-        void queryClient
-          .invalidateQueries({
-            queryKey: ["unreadNotificationCount", user?.uid ?? ""],
-          })
-          .then(async () => {
-            await refetchNotifications();
-          });
-      };
-    }, [user?.uid]),
-  );
+  const [refreshing, setRefreshing] = React.useState(false);
 
   const {
     data: notifdata,
@@ -60,7 +30,7 @@ const NotificationsScreen = () => {
     isError,
     error,
     refetch,
-  } = useGetAllFullNotifications(user?.uid ?? "");
+  } = useGetAllFullNotifications(userID);
 
   // current scroll position throughout the feed
   const scrollPosition = useSharedValue(0);

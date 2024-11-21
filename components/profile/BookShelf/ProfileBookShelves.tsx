@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { type ServerBookShelfName } from "../../../enums/Enums";
-import { useAuth } from "../../auth/context";
+import { useUserID } from "../../auth/context";
 import BookWormButton from "../../buttons/BookWormButton";
 import WormLoader from "../../wormloader/WormLoader";
 import { useGetAllBorrowingBooksForUser } from "../hooks/useBookBorrowQueries";
@@ -12,25 +12,25 @@ import BookShelf from "./BookShelf";
 import BorrowingBookShelf from "./BorrowingBookShelf";
 
 interface BookShelvesProp {
-  userID: string;
+  viewingUserID: string;
 }
 
-const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
-  const { user } = useAuth();
+const ProfileBookShelves = ({ viewingUserID }: BookShelvesProp) => {
+  const { userID } = useUserID();
 
   const {
     data: bookShelves,
     isLoading: isLoadingBooks,
     isError: isErrorShelfBooks,
-  } = useGetBooksForBookshelves(userID ?? "");
+  } = useGetBooksForBookshelves(viewingUserID ?? "");
 
   const {
     data: borrowingBooks,
     isLoading: isLoadingBorrowingBooks,
     isError: isErrorBorrowingBooks,
-  } = useGetAllBorrowingBooksForUser(userID);
+  } = useGetAllBorrowingBooksForUser(viewingUserID);
 
-  const navigateToRecommendation = useNavigateToRecommendation(userID);
+  const navigateToRecommendation = useNavigateToRecommendation(viewingUserID);
 
   if (isErrorBorrowingBooks || isErrorShelfBooks) {
     Toast.show({
@@ -50,7 +50,7 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
 
   return (
     <View style={styles.scrollContent}>
-      {userID !== user?.uid && (
+      {viewingUserID !== userID && (
         <View style={styles.recommendButton}>
           <BookWormButton
             title={"Recommend A Book"}
@@ -65,15 +65,15 @@ const ProfileBookShelves = ({ userID }: BookShelvesProp) => {
           key={shelfName}
           shelfName={shelfName as ServerBookShelfName}
           books={books}
-          userID={userID}
+          viewingUserID={viewingUserID}
         />
       ))}
       {/* Show borrowing shelf only if the user is viewing their own profile */}
-      {user?.uid === userID && !isLoadingBorrowingBooks && (
+      {userID === viewingUserID && !isLoadingBorrowingBooks && (
         <BorrowingBookShelf
           key={"borrowing"}
           books={borrowingBooks ?? []}
-          userID={userID}
+          viewingUserID={viewingUserID}
         />
       )}
     </View>

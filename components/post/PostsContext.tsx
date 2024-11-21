@@ -19,7 +19,7 @@ import {
   type LikeNotification,
   type PostModel,
 } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 
 const PostsContext = createContext<{
   posts: PostModel[];
@@ -57,7 +57,7 @@ interface AddCommentMutationProps {
 }
 
 const PostsProvider = ({ children }: PostsProviderProps) => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   // posts for the main feed
   const [posts, setPosts] = useState<PostModel[]>([]);
   // posts for the profile feed
@@ -65,7 +65,7 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   // list of postIDs with ongoing likes
   const [pendingLikes, setPendingLikes] = useState<Set<string>>(new Set());
   // getting userdata
-  const { data: userData } = useUserDataQuery(user?.uid);
+  const { data: userData } = useUserDataQuery(userID);
   const queryClient = useQueryClient();
 
   /**
@@ -79,11 +79,11 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
     }
     likePostMutation.mutate({ postID });
     const postToUpdate = posts.find((post) => post.id === postID);
-    if (postToUpdate !== undefined && user?.uid !== undefined) {
+    if (postToUpdate !== undefined && userID !== undefined) {
       const BNotify: LikeNotification = {
         receiver: postToUpdate.user.id,
-        sender: user?.uid,
-        sender_name: userData.first + " " + userData.last, // Use an empty string if user?.uid is undefined
+        sender: userID,
+        sender_name: userData.first + " " + userData.last, // Use an empty string if userID is undefined
         postID,
         type: ServerNotificationType.LIKE,
       };
@@ -110,12 +110,10 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
    */
   const likePostMutation = useMutation({
     mutationFn: async ({ postID }: LikePostMutationProps) => {
-      if (user != null) {
-        // Modifies the likes of the post on both the main feed and profile feed if they exist
-        modifyLikes(postID, user.uid, posts, setPosts);
-        modifyLikes(postID, user.uid, profilePosts, setProfilePosts);
-        return await likeUnlikePost(user.uid, postID);
-      }
+      // Modifies the likes of the post on both the main feed and profile feed if they exist
+      modifyLikes(postID, userID, posts, setPosts);
+      modifyLikes(postID, userID, profilePosts, setProfilePosts);
+      return await likeUnlikePost(userID, postID);
     },
     onSuccess: (updatedLikes, variables) => {
       if (updatedLikes != null && updatedLikes !== undefined) {
@@ -195,10 +193,10 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
     }
     addCommentMutation.mutate({ postID, comment });
     const postToUpdate = posts.find((post) => post.id === postID);
-    if (postToUpdate !== undefined && user?.uid !== undefined) {
+    if (postToUpdate !== undefined && userID !== undefined) {
       const BNotify: CommentNotification = {
         receiver: postToUpdate.user.id,
-        sender: user?.uid,
+        sender: userID,
         sender_name: userData.first + " " + userData.last,
         type: ServerNotificationType.COMMENT,
         postID,
@@ -228,29 +226,22 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
    */
   const addCommentMutation = useMutation({
     mutationFn: async ({ postID, comment }: AddCommentMutationProps) => {
-      if (user != null) {
-        fetchUser(user.uid)
-          .then(async (currentUser) => {
-            if (currentUser != null) {
-              const tempComment: CommentModel = {
-                userID: user.uid,
-                first: currentUser.first,
-                text: comment,
-              };
-              modifyComments(postID, tempComment, posts, setPosts);
-              modifyComments(
-                postID,
-                tempComment,
-                profilePosts,
-                setProfilePosts,
-              );
-              return await addCommentToPost(user.uid, postID, comment);
-            }
-          })
-          .catch(() => {
-            console.error("Error fetching user");
-          });
-      }
+      fetchUser(userID)
+        .then(async (currentUser) => {
+          if (currentUser != null) {
+            const tempComment: CommentModel = {
+              userID,
+              first: currentUser.first,
+              text: comment,
+            };
+            modifyComments(postID, tempComment, posts, setPosts);
+            modifyComments(postID, tempComment, profilePosts, setProfilePosts);
+            return await addCommentToPost(userID, postID, comment);
+          }
+        })
+        .catch(() => {
+          console.error("Error fetching user");
+        });
     },
     onSuccess: async (updatedComments, variables) => {
       if (updatedComments != null) {
@@ -314,15 +305,11 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
           setProfilePosts(newPosts);
         },
         likePost: (postID: string) => {
-          if (user != null) {
-            handleLike(postID);
-          }
+          handleLike(postID);
         },
         isLikePending: (postID: string) => pendingLikes.has(postID),
         commentOnPost: (postID: string, comment: string) => {
-          if (user != null) {
-            handleComment(postID, comment);
-          }
+          handleComment(postID, comment);
         },
       }}
     >

@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useAuth } from "../../../components/auth/context";
+import { useUserID } from "../../../components/auth/context";
 import BookWormButton from "../../../components/buttons/BookWormButton";
 import {
   useGetNumberOfFollowersByUserID,
@@ -34,31 +34,29 @@ import { newFetchUserInfo } from "../../../services/firebase-services/UserQuerie
 import { useProfilePicQuery } from "./hooks/useProfileQueries";
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const [profileTab, setProfileTab] = useState("shelf"); // Default to bookshelf
 
-  const navigateToFollowList = useNavigateToFollowList(user?.uid);
-  const { data: bookShelves } = useGetBooksForBookshelves(user?.uid ?? "");
+  const navigateToFollowList = useNavigateToFollowList(userID);
+  const { data: bookShelves } = useGetBooksForBookshelves(userID);
 
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
-    queryKey: ["userdata", user?.uid],
-    enabled: user != null,
+    queryKey: ["userdata", userID],
     queryFn: async () => {
-      return await newFetchUserInfo(user?.uid ?? "");
+      return await newFetchUserInfo(userID);
     },
   });
   const { data: followersCount, isLoading: isLoadingFollowersCount } =
-    useGetNumberOfFollowersByUserID(user?.uid ?? "");
+    useGetNumberOfFollowersByUserID(userID);
 
   const { data: followingCount, isLoading: isLoadingFollowingCount } =
-    useGetNumberOfFollowingByUserID(user?.uid ?? "");
+    useGetNumberOfFollowingByUserID(userID);
 
-  const { data: profilePic, isPending: profilePicPending } = useProfilePicQuery(
-    user?.uid,
-  );
+  const { data: profilePic, isPending: profilePicPending } =
+    useProfilePicQuery(userID);
   const navigateToImageBlowup = useNavigateToImageBlowup();
 
-  const navigateToBadgePage = useNavigateToBadgePage(user?.uid ?? "");
+  const navigateToBadgePage = useNavigateToBadgePage(userID);
   if (
     isLoadingUserData ||
     userData == null ||
@@ -87,7 +85,7 @@ const Profile = () => {
             }
           }}
         >
-          <ProfilePicture userID={user?.uid ?? ""} size={60} />
+          <ProfilePicture userID={userID} size={60} />
         </TouchableOpacity>
         <View>
           <Text style={sharedProfileStyles.nameText}>
@@ -144,7 +142,7 @@ const Profile = () => {
         setProfileTab={setProfileTab}
         tabs={[TabNames.BOOKSHELVES, TabNames.POSTS, TabNames.DATA]}
       />
-      {profileTab === TabNames.BOOKSHELVES && user !== null ? (
+      {profileTab === TabNames.BOOKSHELVES ? (
         <View style={styles.shelves}>
           <View style={{ paddingLeft: 40, paddingRight: 40 }}>
             {hasAnyBooks(bookShelves) ? (
@@ -163,12 +161,12 @@ const Profile = () => {
               />
             )}
           </View>
-          <ProfileBookShelves userID={user?.uid} />
+          <ProfileBookShelves userID={userID} />
         </View>
       ) : profileTab === TabNames.POSTS ? (
-        <ProfilePosts userID={user?.uid ?? ""} />
+        <ProfilePosts userID={userID} />
       ) : profileTab === TabNames.DATA ? (
-        <ViewData userID={user?.uid ?? ""} />
+        <ViewData userID={userID} />
       ) : (
         <Text>Tab DNE</Text>
       )}

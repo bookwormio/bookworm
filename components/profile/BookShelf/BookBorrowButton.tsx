@@ -14,7 +14,7 @@ import {
   type BookRequestNotification,
   type UserDataModel,
 } from "../../../types";
-import { useAuth } from "../../auth/context";
+import { useUserID } from "../../auth/context";
 import BookWormButton from "../../buttons/BookWormButton";
 import { useCreateNotification } from "../../notifications/hooks/useNotificationQueries";
 import { formatUserFullName } from "../../notifications/util/notificationUtils";
@@ -44,10 +44,9 @@ const BookBorrowButton = ({
   requestStatus,
   isLoading,
 }: BookBorrowButtonProps) => {
-  const { user } = useAuth();
-  const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
-    user?.uid,
-  );
+  const { userID } = useUserID();
+  const { data: userData, isLoading: isUserDataLoading } =
+    useUserDataQuery(userID);
   const { data: bookOwnerData, isLoading: isBookOwnerDataLoading } =
     useUserDataQuery(bookOwnerID);
 
@@ -55,7 +54,7 @@ const BookBorrowButton = ({
   const returnMutation = useReturnBook();
   const queryClient = useQueryClient();
 
-  const isCurrentUserBorrowing = borrowInfo?.borrowingUserID === user?.uid;
+  const isCurrentUserBorrowing = borrowInfo?.borrowingUserID === userID;
   const isBookBorrowed =
     borrowInfo?.borrowStatus === ServerBookBorrowStatus.BORROWING;
   const isBookReturned =
@@ -227,7 +226,7 @@ const BookBorrowButton = ({
               message: message ?? "",
               userData,
               bookOwnerID,
-              userID: user?.uid,
+              userID,
             });
           },
         },
@@ -237,7 +236,7 @@ const BookBorrowButton = ({
   };
 
   const handleBookReturnClicked = (bookID: string) => {
-    if (user == null || bookOwnerData == null) {
+    if (bookOwnerData == null) {
       Toast.show({
         type: "error",
         text1: "Error returning book",
@@ -258,7 +257,7 @@ const BookBorrowButton = ({
           text: "Return",
           onPress: () => {
             returnMutation.mutate({
-              borrowerUserID: user.uid,
+              borrowerUserID: userID,
               lenderUserID: bookOwnerID,
               bookID,
             });

@@ -2,14 +2,14 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { BOOKWORM_ORANGE } from "../../constants/constants";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import { useGetUnreadNotificationCount } from "../notifications/hooks/useNotificationQueries";
 import { useNavigateToNotificationsPage } from "../profile/hooks/useRouteHooks";
 
 const NotificationBell = () => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const { data: unreadCount, isSuccess: isSuccessUnreadCount } =
-    useGetUnreadNotificationCount(user?.uid ?? "");
+    useGetUnreadNotificationCount(userID);
 
   const navigateToNotificationsPage = useNavigateToNotificationsPage();
 

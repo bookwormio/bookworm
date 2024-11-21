@@ -10,7 +10,10 @@ const BookListWrapper = () => {
     bookshelf: string;
   }>();
   return (
-    <BookShelfListView userID={userID ?? ""} bookshelf={bookshelf ?? ""} />
+    <BookShelfListView
+      viewingUserID={userID ?? ""}
+      bookshelf={bookshelf ?? ""}
+    />
   );
 };
 export default BookListWrapper;

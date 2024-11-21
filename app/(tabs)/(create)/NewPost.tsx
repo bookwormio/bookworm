@@ -14,7 +14,7 @@ import {
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
-import { useAuth } from "../../../components/auth/context";
+import { useUserID } from "../../../components/auth/context";
 import {
   areAllBadgesEarned,
   getLatestPostInfo,
@@ -60,7 +60,7 @@ import { type CreatePostModel } from "../../../types";
 import { useNewPostContext } from "./NewPostContext";
 
 const NewPost = () => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const queryClient = useQueryClient();
 
   const [text, setText] = useState("");
@@ -72,7 +72,7 @@ const NewPost = () => {
   const { mutateAsync: checkForStreakBadge } = useCheckForStreakBadges();
 
   const { data: badges, isLoading: isLoadingBadges } =
-    useGetExistingEarnedBadges(user?.uid ?? "");
+    useGetExistingEarnedBadges(userID);
 
   const { selectedBook, setSelectedBook } = useNewPostContext();
 
@@ -91,11 +91,11 @@ const NewPost = () => {
     data: oldBookmark,
     isLoading: bookmarkLoading,
     isSuccess: isBookmarkLoadedSuccess,
-  } = useGetBookmarkForBook(user?.uid, selectedBook?.id);
+  } = useGetBookmarkForBook(userID, selectedBook?.id);
 
-  void prefetchBooksForBookshelves(user?.uid ?? "");
+  void prefetchBooksForBookshelves(userID);
 
-  const { data: bookshelves } = useGetBooksForBookshelves(user?.uid ?? "");
+  const { data: bookshelves } = useGetBooksForBookshelves(userID);
 
   const [currentBookmark, setCurrentBookmark] = useState(0);
 
@@ -110,35 +110,26 @@ const NewPost = () => {
   }, [selectedBook, text]);
 
   const createNewPost = async () => {
-    if (user != null) {
-      setLoading(true);
-      const post: CreatePostModel = {
-        userid: user.uid,
-        // TS requires null checks here but they get checked in fieldsMissing
-        bookid: selectedBook !== null ? selectedBook.id : "",
-        booktitle: selectedBook !== null ? selectedBook.title : "",
-        text,
-        images:
-          // Append book image to the images array if it exists
-          selectedBook?.image != null
-            ? [selectedBook.image, ...images]
-            : images,
-        oldBookmark,
-        newBookmark: currentBookmark,
-        totalPages: selectedBook?.pageCount ?? 0,
-      };
-      postMutation.mutate(post);
-      resetForm();
-      Toast.show({
-        type: "success",
-        text1: "Post Created",
-      });
-    } else {
-      Toast.show({
-        type: "error",
-        text1: "Current user is undefined",
-      });
-    }
+    setLoading(true);
+    const post: CreatePostModel = {
+      userid: userID,
+      // TS requires null checks here but they get checked in fieldsMissing
+      bookid: selectedBook !== null ? selectedBook.id : "",
+      booktitle: selectedBook !== null ? selectedBook.title : "",
+      text,
+      images:
+        // Append book image to the images array if it exists
+        selectedBook?.image != null ? [selectedBook.image, ...images] : images,
+      oldBookmark,
+      newBookmark: currentBookmark,
+      totalPages: selectedBook?.pageCount ?? 0,
+    };
+    postMutation.mutate(post);
+    resetForm();
+    Toast.show({
+      type: "success",
+      text1: "Post Created",
+    });
   };
 
   const resetForm = () => {
@@ -169,7 +160,7 @@ const NewPost = () => {
   };
 
   const handleShareClicked = async () => {
-    if (user?.uid == null || selectedBook == null) return;
+    if (userID == null || selectedBook == null) return;
     if (!fieldsMissing()) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
         (error) => {
@@ -179,7 +170,7 @@ const NewPost = () => {
       await createNewPost();
       router.push("posts");
       setBookmark({
-        userID: user?.uid,
+        userID,
         bookID: selectedBook?.id,
         bookmark: currentBookmark,
         oldBookmark,
@@ -190,7 +181,7 @@ const NewPost = () => {
       if (currentBookmark === selectedBook.pageCount) {
         if (!isBookInFinished(selectedBook.id, bookshelves)) {
           await addBookMutation.mutateAsync({
-            userID: user.uid,
+            userID,
             bookID: selectedBook.id,
             volumeInfo: convertFlatBookToBookShelfBook(selectedBook),
             shelfName: ServerBookShelfName.FINISHED,
@@ -198,7 +189,7 @@ const NewPost = () => {
         }
         if (isBookInCurrentlyReading(selectedBook.id, bookshelves)) {
           await removeBookMutation.mutateAsync({
-            userID: user.uid,
+            userID,
             bookID: selectedBook.id,
             shelfName: ServerBookShelfName.CURRENTLY_READING,
           });
@@ -208,7 +199,7 @@ const NewPost = () => {
       else {
         if (!isBookInCurrentlyReading(selectedBook.id, bookshelves)) {
           await addBookMutation.mutateAsync({
-            userID: user.uid,
+            userID,
             bookID: selectedBook.id,
             volumeInfo: convertFlatBookToBookShelfBook(selectedBook),
             shelfName: ServerBookShelfName.CURRENTLY_READING,
@@ -217,12 +208,12 @@ const NewPost = () => {
       }
       if (isBookInWantToRead(selectedBook.id, bookshelves)) {
         await removeBookMutation.mutateAsync({
-          userID: user.uid,
+          userID,
           bookID: selectedBook.id,
           shelfName: ServerBookShelfName.WANT_TO_READ,
         });
       }
-      const post = await getLatestPostInfo(user?.uid);
+      const post = await getLatestPostInfo(userID);
 
       if (!isLoadingBadges && badges != null) {
         const badgesSet = new Set<ServerBadgeName>();
@@ -234,7 +225,7 @@ const NewPost = () => {
         if (!areAllBadgesEarned(badgesSet, BOOKSHELF_BADGES)) {
           checkBadgePromises.push(
             checkForBookshelfBadge({
-              userID: user?.uid ?? "",
+              userID,
               postID: post?.id,
             }),
           );
@@ -242,7 +233,7 @@ const NewPost = () => {
         if (!areAllBadgesEarned(badgesSet, POST_BADGES) && post?.id != null) {
           checkBadgePromises.push(
             checkForPostBadge({
-              userID: user?.uid ?? "",
+              userID,
               postID: post?.id,
             }),
           );
@@ -250,7 +241,7 @@ const NewPost = () => {
         if (!areAllBadgesEarned(badgesSet, COMPLETION_BADGES)) {
           checkBadgePromises.push(
             checkForCompletionBadge({
-              userID: user?.uid ?? "",
+              userID,
               postID: post?.id,
             }),
           );
@@ -258,7 +249,7 @@ const NewPost = () => {
         if (!areAllBadgesEarned(badgesSet, STREAK_BADGES) && post?.id != null) {
           checkBadgePromises.push(
             checkForStreakBadge({
-              userID: user?.uid ?? "",
+              userID,
               postID: post?.id,
             }),
           );
@@ -269,7 +260,7 @@ const NewPost = () => {
         if (checkBadgePromises.length > 0) {
           await Promise.all(checkBadgePromises);
           await queryClient.invalidateQueries({
-            queryKey: ["badges", user?.uid ?? ""],
+            queryKey: ["badges", userID],
           });
         }
       }

@@ -10,7 +10,7 @@ import {
   type BookShelfName,
 } from "../../../enums/Enums";
 import { type BookShelfBookModel } from "../../../types";
-import { useAuth } from "../../auth/context";
+import { useUserID } from "../../auth/context";
 import { useGetLendingLibraryBookStatuses } from "../hooks/useBookBorrowQueries";
 import { useNavigateToBookList } from "../hooks/useRouteHooks";
 import BookBorrowButton from "./BookBorrowButton";
@@ -21,22 +21,22 @@ import { sharedBookshelfStyles } from "./styles/SharedBookshelfStyles";
 interface BookShelfProps {
   shelfName: BookShelfName;
   books: BookShelfBookModel[];
-  userID: string;
+  viewingUserID: string;
 }
 
-const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
-  const { user } = useAuth();
-  const navigateToBookList = useNavigateToBookList(userID);
+const BookShelf = ({ shelfName, books, viewingUserID }: BookShelfProps) => {
+  const { userID } = useUserID();
+  const navigateToBookList = useNavigateToBookList(viewingUserID);
 
-  const isCurrentUser = user?.uid === userID;
+  const isCurrentUser = userID === viewingUserID;
   const bookIds = books.map((book) => book.id);
 
   // Cannot conditionally call hooks, so we need to call it regardless of the shelf
   // Pass in empty data if the shelf is not lending library
   const { data: lendingStatuses, isLoading: isLoadingLendingStatus } =
     useGetLendingLibraryBookStatuses(
-      shelfName === ServerBookShelfName.LENDING_LIBRARY ? userID : "",
-      shelfName === ServerBookShelfName.LENDING_LIBRARY ? user?.uid ?? "" : "",
+      shelfName === ServerBookShelfName.LENDING_LIBRARY ? viewingUserID : "",
+      shelfName === ServerBookShelfName.LENDING_LIBRARY ? userID ?? "" : "",
       shelfName === ServerBookShelfName.LENDING_LIBRARY ? bookIds : [],
     );
 
@@ -64,11 +64,12 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
             )}
           </View>
           {shelfName === ServerBookShelfName.LENDING_LIBRARY ||
-            (shelfName === SIMILAR_BOOKS_SHELF_NAME && userID === user?.uid && (
-              <Text style={sharedBookshelfStyles.subtitle}>
-                {BOOKSHELF_SUBTITLES[shelfName]}
-              </Text>
-            ))}
+            (shelfName === SIMILAR_BOOKS_SHELF_NAME &&
+              viewingUserID === userID && (
+                <Text style={sharedBookshelfStyles.subtitle}>
+                  {BOOKSHELF_SUBTITLES[shelfName]}
+                </Text>
+              ))}
         </TouchableOpacity>
         <Text style={sharedBookshelfStyles.length}>{books.length}</Text>
       </View>
@@ -88,7 +89,7 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
                   book={item.volumeInfo}
                   bookID={item.id}
                   shelfName={shelfName}
-                  userID={userID}
+                  viewingUserID={viewingUserID}
                 />
               )}
             </TouchableOpacity>
@@ -100,7 +101,7 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
                   <BookBorrowButton
                     bookID={item.id}
                     bookTitle={item.volumeInfo?.title ?? ""}
-                    bookOwnerID={userID}
+                    bookOwnerID={viewingUserID}
                     borrowInfo={lendingStatuses?.[item.id]?.borrowInfo}
                     requestStatus={lendingStatuses?.[item.id]?.requestStatus}
                     isLoading={isLoadingLendingStatus}

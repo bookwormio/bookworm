@@ -14,7 +14,7 @@ import {
   type BookVolumeInfo,
   type RecommendationNotification,
 } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import BookSearch from "../searchbar/booksearch";
 
 interface FriendIDProp {
@@ -25,11 +25,12 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
   const setParentSearchPhrase = (search: string) => {
     setSearchPhrase(search);
   };
-  const { user } = useAuth();
+
+  const { userID } = useUserID();
   const queryClient = useQueryClient();
 
   // getting userdata
-  const { data: userData } = useUserDataQuery(user?.uid);
+  const { data: userData } = useUserDataQuery(userID);
 
   const notifyMutation = useMutation({
     mutationFn: createNotification,
@@ -49,22 +50,20 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
     volumeInfo: BookVolumeInfo;
     message?: string;
   }) => {
-    if (user == null || userData == null) {
-      throw new Error("User or userData is null");
+    if (userData == null) {
+      throw new Error("userData is null");
     }
     // send book title and bookID
-    if (user !== undefined && user !== null) {
-      const FRnotify: RecommendationNotification = {
-        receiver: friendUserID,
-        sender: user?.uid,
-        sender_name: userData.first + " " + userData.last, // Use an empty string if user?.uid is undefined
-        bookID,
-        bookTitle: volumeInfo.title ?? "",
-        custom_message: message ?? "",
-        type: ServerNotificationType.RECOMMENDATION,
-      };
-      notifyMutation.mutate(FRnotify);
-    }
+    const FRnotify: RecommendationNotification = {
+      receiver: friendUserID,
+      sender: userID,
+      sender_name: userData.first + " " + userData.last, // Use an empty string if userID is undefined
+      bookID,
+      bookTitle: volumeInfo.title ?? "",
+      custom_message: message ?? "",
+      type: ServerNotificationType.RECOMMENDATION,
+    };
+    notifyMutation.mutate(FRnotify);
     router.back();
   };
 

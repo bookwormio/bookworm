@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { closeKeyboardThen } from "../../app/util/keyboardHelpers";
 import { type UserSearchDisplayModel } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import ProfilePicture from "../profile/ProfilePicture/ProfilePicture";
 import { useNavigateToUser } from "../profile/hooks/useRouteHooks";
 import FollowButton from "./FollowButton";
@@ -16,7 +16,7 @@ const UserListItem = ({
   userToDisplay: userInfo,
   showFollowStatus = false,
 }: UserListItemProps) => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
 
   const navigateToUser = useNavigateToUser();
 
@@ -25,7 +25,7 @@ const UserListItem = ({
       style={styles.container}
       onPress={() => {
         closeKeyboardThen(() => {
-          navigateToUser(user?.uid, userInfo.id);
+          navigateToUser(userID, userInfo.id);
         });
       }}
     >

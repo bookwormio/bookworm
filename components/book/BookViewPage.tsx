@@ -35,7 +35,7 @@ import {
 } from "../../enums/Enums";
 import { fetchBookByVolumeID } from "../../services/books-services/BookQueries";
 import { type BookVolumeInfo } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import { areAllBadgesEarned } from "../badges/badgeUtils";
 import {
   useCheckForBookShelfBadges,
@@ -59,7 +59,7 @@ interface BookViewProps {
 }
 
 const BookViewPage = ({ bookID }: BookViewProps) => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const queryClient = useQueryClient();
   const [bookData, setBookData] = useState<BookVolumeInfo | null>(null);
   const [selectedShelves, setSelectedShelves] = useState<ServerBookShelfName[]>(
@@ -75,10 +75,10 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
   const { mutateAsync: checkForCompletion } = useCheckForCompletionBadges();
   const { mutateAsync: checkForBookshelf } = useCheckForBookShelfBadges();
   const { data: badges, isLoading: isLoadingBadges } =
-    useGetExistingEarnedBadges(user?.uid ?? "");
+    useGetExistingEarnedBadges(userID);
 
   const { data: usersWithBook, isLoading: isLoadingUsersWithBook } =
-    useGetUsersWithBookInLendingLibrary(user?.uid ?? "", bookID);
+    useGetUsersWithBookInLendingLibrary(userID, bookID);
 
   const navigateToUser = useNavigateToUser();
   // variables
@@ -103,7 +103,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
   });
 
   const { data: inBookshelves, isLoading: isLoadingInBookshelves } =
-    useGetShelvesForBook(user?.uid ?? "", bookID ?? "");
+    useGetShelvesForBook(userID, bookID ?? "");
   const addBookMutation = useAddBookToShelf();
   const removeBookMutation = useRemoveBookFromShelf();
 
@@ -157,11 +157,11 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
   };
 
   const applyPendingChanges = async () => {
-    if (user?.uid == null || bookID == null || queryBookData == null) return;
+    if (bookID == null || queryBookData == null) return;
 
     const addPromises = pendingChanges.add.map(async (shelfName) => {
       await addBookMutation.mutateAsync({
-        userID: user.uid,
+        userID,
         bookID,
         volumeInfo: {
           title: queryBookData?.title,
@@ -195,7 +195,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     });
     const removePromises = pendingChanges.remove.map(async (shelfName) => {
       await removeBookMutation.mutateAsync({
-        userID: user.uid,
+        userID,
         bookID,
         shelfName,
       });
@@ -236,17 +236,15 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
       }
       const checkBadgePromises = [];
       if (!areAllBadgesEarned(badgesSet, BOOKSHELF_BADGES)) {
-        checkBadgePromises.push(checkForBookshelf({ userID: user?.uid ?? "" }));
+        checkBadgePromises.push(checkForBookshelf({ userID }));
       }
       if (!areAllBadgesEarned(badgesSet, COMPLETION_BADGES)) {
-        checkBadgePromises.push(
-          checkForCompletion({ userID: user?.uid ?? "" }),
-        );
+        checkBadgePromises.push(checkForCompletion({ userID }));
       }
       if (checkBadgePromises.length > 0) {
         await Promise.all(checkBadgePromises);
         await queryClient.invalidateQueries({
-          queryKey: ["badges", user?.uid ?? ""],
+          queryKey: ["badges", userID],
         });
       }
     }
@@ -283,7 +281,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
     );
   }
 
-  if (bookID == null || user == null) {
+  if (bookID == null) {
     return (
       <View style={styles.container}>
         <Text>Error: Book ID or user is not available</Text>
@@ -342,7 +340,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
                       key={userID}
                       style={styles.borrowFromPics}
                       onPress={() => {
-                        navigateToUser(user?.uid, userID);
+                        navigateToUser(userID, userID);
                       }}
                     >
                       <ProfilePicture userID={userID} size={40} />
@@ -393,7 +391,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
             </View>
           )}
           <SimilarBooksWrapper
-            userID={user.uid}
+            userID={userID}
             bookID={bookID}
             bookTitle={bookData.title ?? ""}
           />

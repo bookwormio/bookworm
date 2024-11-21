@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
-import { useAuth } from "../../../components/auth/context";
+import { useUserID } from "../../../components/auth/context";
 import BookWormButton from "../../../components/buttons/BookWormButton";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
 import WormLoader from "../../../components/wormloader/WormLoader";
@@ -27,7 +27,7 @@ import {
 } from "../../../services/firebase-services/UserQueries";
 
 const EditProfile = () => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const [editPhone, setEditPhone] = useState("");
   const [editFirst, setEditFirst] = useState("");
   const [editLast, setEditLast] = useState("");
@@ -44,16 +44,14 @@ const EditProfile = () => {
     mutationFn: updateUser,
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+        queryKey: ["userdata", userID],
       });
     },
   });
   const { data: userData, isLoading: isLoadingUserData } = useQuery({
-    queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+    queryKey: ["userdata", userID],
     queryFn: async () => {
-      if (user != null) {
-        return await newFetchUserInfo(user.uid);
-      }
+      return await newFetchUserInfo(userID);
     },
   });
 
@@ -75,8 +73,7 @@ const EditProfile = () => {
   }, [newProfilePic]);
 
   const handeSaveClick = async () => {
-    const userId = user?.uid;
-    if (userData !== undefined && userId !== undefined) {
+    if (userData !== undefined) {
       const newUserData = userData;
       newUserData.first = editFirst;
       newUserData.last = editLast;
@@ -87,13 +84,13 @@ const EditProfile = () => {
       if (newProfilePic !== "" && newProfilePic != null) {
         newUserData.profilepic = newProfilePic;
       }
-      newUserData.id = userId;
+      newUserData.id = userID;
       await userMutation.mutateAsync(newUserData);
       await queryClient.invalidateQueries({
-        queryKey: user != null ? ["profilepic", user.uid] : ["profilepic"],
+        queryKey: ["profilepic", userID],
       });
       await queryClient.invalidateQueries({
-        queryKey: user != null ? ["userdata", user.uid] : ["userdata"],
+        queryKey: ["userdata", userID],
       });
       router.back();
     }
@@ -137,7 +134,7 @@ const EditProfile = () => {
             }}
           >
             <ProfilePicture
-              userID={user?.uid ?? ""}
+              userID={userID}
               size={100}
               overrideProfilePic={newProfilePic}
             />

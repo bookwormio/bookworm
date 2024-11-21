@@ -2,7 +2,7 @@ import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { badgeDisplayTitleMap } from "../../enums/Enums";
 import { type BadgeModel, type UserModel } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import { useNavigateToBadgePage } from "../profile/hooks/useRouteHooks";
 import BadgeIcon from "./BadgeIcon";
 
@@ -13,7 +13,7 @@ interface BadgeOnPostProps {
 }
 
 const BadgeOnPost = ({ badge, size, userInfo }: BadgeOnPostProps) => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const navigateToBadgePage = useNavigateToBadgePage(userInfo.id);
 
   return (
@@ -23,7 +23,7 @@ const BadgeOnPost = ({ badge, size, userInfo }: BadgeOnPostProps) => {
         onPress={() => {
           navigateToBadgePage();
         }}
-        disabled={userInfo.id !== user?.uid}
+        disabled={userInfo.id !== userID}
       >
         <BadgeIcon badgeID={badge.badgeID} size={size} />
         <Text
@@ -34,7 +34,7 @@ const BadgeOnPost = ({ badge, size, userInfo }: BadgeOnPostProps) => {
           }}
           ellipsizeMode="tail"
         >
-          {userInfo.id === user?.uid ? "You" : userInfo.first} earned the{" "}
+          {userInfo.id === userID ? "You" : userInfo.first} earned the{" "}
           {badgeDisplayTitleMap[badge.badgeID]} badge!
         </Text>
       </TouchableOpacity>

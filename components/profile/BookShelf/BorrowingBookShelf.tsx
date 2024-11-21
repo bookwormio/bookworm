@@ -18,13 +18,16 @@ import { sharedBookshelfStyles } from "./styles/SharedBookshelfStyles";
 
 interface BorrowingBookShelfProps {
   books: BorrowingBookshelfModel[];
-  userID: string;
+  viewingUserID: string;
 }
 
-const BorrowingBookShelf = ({ books, userID }: BorrowingBookShelfProps) => {
+const BorrowingBookShelf = ({
+  books,
+  viewingUserID,
+}: BorrowingBookShelfProps) => {
   const shelfNameDisplay = BOOKSHELF_DISPLAY_NAMES[BORROWING_SHELF_NAME];
   const shelfSubtitle = BOOKSHELF_SUBTITLES[BORROWING_SHELF_NAME];
-  const navigateToBookList = useNavigateToBookList(userID);
+  const navigateToBookList = useNavigateToBookList(viewingUserID);
 
   return (
     <View style={sharedBookshelfStyles.list}>

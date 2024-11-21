@@ -6,7 +6,7 @@ import {
   type ConnectionModel,
   type FriendRequestNotification,
 } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import BookWormButton from "../buttons/BookWormButton";
 import {
   useFollowMutation,
@@ -21,15 +21,14 @@ interface FollowButtonProps {
 }
 
 const FollowButton = ({ friendUserID, textStyle }: FollowButtonProps) => {
-  const { user } = useAuth();
-  const currentUserID = user?.uid;
+  const { userID } = useUserID();
   const { data: currentUserData, isLoading: currentUserDataLoading } =
-    useUserDataQuery(currentUserID);
+    useUserDataQuery(userID);
 
   const myFullName = currentUserData?.first + " " + currentUserData?.last;
 
   const { data: isFollowing, isLoading: isLoadingFollowStatus } =
-    useGetIsFollowing(user?.uid ?? "", friendUserID);
+    useGetIsFollowing(userID, friendUserID);
 
   const followMutation = useFollowMutation();
   const unfollowMutation = useUnfollowMutation();
@@ -43,13 +42,13 @@ const FollowButton = ({ friendUserID, textStyle }: FollowButtonProps) => {
   };
 
   const handleFollow = async () => {
-    if (currentUserID == null || friendUserID == null || myFullName == null) {
+    if (friendUserID == null || myFullName == null) {
       console.error("Missing required user information");
       return;
     }
 
     const connection: ConnectionModel = {
-      currentUserID,
+      currentUserID: userID,
       friendUserID,
     };
 
@@ -57,7 +56,7 @@ const FollowButton = ({ friendUserID, textStyle }: FollowButtonProps) => {
       followMutation.mutate({ connection });
       const notification: FriendRequestNotification = {
         receiver: friendUserID,
-        sender: currentUserID,
+        sender: userID,
         sender_name: myFullName,
         type: ServerNotificationType.FRIEND_REQUEST,
       };
@@ -68,13 +67,13 @@ const FollowButton = ({ friendUserID, textStyle }: FollowButtonProps) => {
   };
 
   const handleUnfollow = async () => {
-    if (currentUserID == null || friendUserID == null) {
+    if (userID == null || friendUserID == null) {
       console.error("Missing required user information");
       return;
     }
 
     const connection: ConnectionModel = {
-      currentUserID,
+      currentUserID: userID,
       friendUserID,
     };
 

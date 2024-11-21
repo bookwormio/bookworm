@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import { type PostModel } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import BookWormButton from "../buttons/BookWormButton";
 import Comment from "../comment/comment";
 import { usePostsContext } from "./PostsContext";
@@ -25,7 +25,7 @@ export const LikeComment = ({
   individualPage,
   presentComments,
 }: LikeCommentProps) => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const { likePost, isLikePending, commentOnPost } = usePostsContext();
   const [showCommentSection, setShowComments] = useState(individualPage);
   const [newComment, setNewComment] = useState("");
@@ -44,7 +44,7 @@ export const LikeComment = ({
             likePost(post.id);
           }}
         >
-          {post.likes.includes(user?.uid ?? "") ? (
+          {post.likes.includes(userID) ? (
             <FontAwesome5 name="heart" solid size={15} color="red" />
           ) : (
             <FontAwesome5 name="heart" size={15} />

@@ -60,7 +60,7 @@ const SimilarBooksWrapper = ({
       )}
       {showSimilarBooks && (
         <BookShelf
-          userID={userID}
+          viewingUserID={userID}
           books={similarBooksMutation.data}
           shelfName={SIMILAR_BOOKS_SHELF_NAME}
         />

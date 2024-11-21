@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { BOOKWORM_ORANGE } from "../../constants/constants";
 import { ServerNotificationType } from "../../enums/Enums";
 import { type FullNotificationModel } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import BadgeIcon from "../badges/BadgeIcon";
 import {
   useNavigateToBadgePage,
@@ -20,7 +20,8 @@ interface NotifProp {
 }
 
 const NotificationItem = ({ notif }: NotifProp) => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
+
   const time = calculateTimeSinceNotification(notif.created.toDate());
 
   const navigateToBook = useNavigateToBook(notif.bookID);
@@ -41,7 +42,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
         ) {
           navigateToPost(notif.postID);
         } else if (notif.type === ServerNotificationType.FRIEND_REQUEST) {
-          navigateToUser(user?.uid, notif.sender);
+          navigateToUser(userID, notif.sender);
         } else if (
           notif.type === ServerNotificationType.RECOMMENDATION ||
           notif.type === ServerNotificationType.BOOK_REQUEST ||
@@ -57,7 +58,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
         {notif.type !== ServerNotificationType.BADGE ? (
           <TouchableOpacity
             onPress={() => {
-              navigateToUser(user?.uid, notif.sender);
+              navigateToUser(userID, notif.sender);
             }}
           >
             <ProfilePicture userID={notif.sender} size={50} />

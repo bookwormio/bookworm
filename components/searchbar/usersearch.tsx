@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { MAX_PREFETCH_USERS } from "../../constants/constants";
 import { fetchUsersBySearch } from "../../services/firebase-services/UserQueries";
 import { type UserSearchDisplayModel } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import { useGetFollowingByIDStatic } from "../followdetails/useFollowDetailQueries";
 import UserList from "../UserList/UserList";
 import WormLoader from "../wormloader/WormLoader";
@@ -28,14 +28,14 @@ const UserSearch = ({
   setSearchPhrase,
   routePrefix,
 }: UserSearchProps) => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const [users, setUsers] = useState<UserSearchDisplayModel[]>([]);
   const [searchClicked, setSearchClicked] = useState<boolean>(
     searchPhrase !== "",
   );
 
   const { data: followingUsersData } = useGetFollowingByIDStatic(
-    user?.uid ?? "",
+    userID,
     MAX_PREFETCH_USERS,
   );
 
@@ -43,16 +43,12 @@ const UserSearch = ({
     queryKey: ["searchusers", searchPhrase],
     queryFn: async () => {
       if (searchPhrase != null && searchPhrase !== "") {
-        return await fetchUsersBySearch(searchPhrase, user?.uid ?? "");
+        return await fetchUsersBySearch(searchPhrase, userID);
       } else {
         return null;
       }
     },
-    enabled:
-      user?.uid != null &&
-      user.uid !== "" &&
-      searchPhrase != null &&
-      searchPhrase !== "",
+    enabled: searchPhrase != null && searchPhrase !== "",
     staleTime: 60000, // Set stale time to 1 minute
   });
 

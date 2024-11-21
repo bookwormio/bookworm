@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { type CommentModel } from "../../types";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import { useNavigateToUser } from "../profile/hooks/useRouteHooks";
 
 interface PostProps {
@@ -9,16 +9,16 @@ interface PostProps {
 }
 
 const Comment = ({ comment }: PostProps) => {
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const navigateToUser = useNavigateToUser();
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
         onPress={() => {
-          navigateToUser(user?.uid, comment.userID);
+          navigateToUser(userID, comment.userID);
         }}
-        disabled={comment.userID === user?.uid}
+        disabled={comment.userID === userID}
       >
         <Text style={styles.title}>{comment.first}:</Text>
       </TouchableOpacity>

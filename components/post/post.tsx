@@ -11,7 +11,7 @@ import {
 import { type PostModel } from "../../types";
 
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
-import { useAuth } from "../auth/context";
+import { useUserID } from "../auth/context";
 import BadgeOnPost from "../badges/BadgeOnPost";
 import { useGetBadgesForPost } from "../badges/useBadgeQueries";
 import {
@@ -42,7 +42,7 @@ const Post = ({
   presentComments,
 }: PostProps) => {
   const { posts } = usePostsContext();
-  const { user } = useAuth();
+  const { userID } = useUserID();
   const formattedDate = formatDate(created, currentDate);
   const currentPost = posts.find((p) => p.id === post.id);
 
@@ -67,7 +67,7 @@ const Post = ({
 
   const navigateToBook = useNavigateToBook(post.bookid);
 
-  const isCurrentUsersPost = user?.uid === post.user.id;
+  const isCurrentUsersPost = userID === post.user.id;
 
   const { data: badges } = useGetBadgesForPost(post.user.id, post.id);
 
@@ -79,7 +79,7 @@ const Post = ({
             <TouchableOpacity
               disabled={isCurrentUsersPost}
               onPress={() => {
-                navigateToUser(user?.uid, post.user.id);
+                navigateToUser(userID, post.user.id);
               }}
             >
               <ProfilePicture userID={post.user.id} size={40} />
@@ -93,7 +93,7 @@ const Post = ({
                 <Text
                   style={styles.userName}
                   onPress={() => {
-                    navigateToUser(user?.uid, post.user.id);
+                    navigateToUser(userID, post.user.id);
                   }}
                   disabled={isCurrentUsersPost}
                 >
@@ -110,7 +110,7 @@ const Post = ({
                 <Text
                   style={styles.userName}
                   onPress={() => {
-                    navigateToUser(user?.uid, post.user.id);
+                    navigateToUser(userID, post.user.id);
                   }}
                   disabled={isCurrentUsersPost}
                 >
