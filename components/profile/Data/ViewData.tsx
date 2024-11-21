@@ -18,7 +18,7 @@ import {
   type MonthDataPointModel,
   type WeekDataPointModel,
 } from "../../../types";
-import { useAuth } from "../../auth/context";
+import { useUserID } from "../../auth/context";
 import ViewBookBarChart from "../../chart/ViewBookBarChart";
 import ViewDataChart from "../../chart/ViewDataChart";
 import DataSnapShot from "../../datasnapshot/DataSnapShot";
@@ -118,7 +118,7 @@ const ViewData = ({ viewingUserID }: ViewDataProps) => {
     router.replace("/NewPost");
   };
 
-  const { user } = useAuth();
+  const { userID } = useUserID();
 
   const {
     data: bookData,
@@ -170,7 +170,7 @@ const ViewData = ({ viewingUserID }: ViewDataProps) => {
           ) : (
             <View style={styles.noDataContainer}>
               <Text style={styles.noData}>No data to display.</Text>
-              {viewingUserID === user?.uid && (
+              {viewingUserID === userID && (
                 <TouchableOpacity onPress={navigateToMakePostPage}>
                   <Text style={styles.makePost}> Make a post</Text>
                 </TouchableOpacity>
@@ -189,7 +189,7 @@ const ViewData = ({ viewingUserID }: ViewDataProps) => {
           ) : (
             <View style={styles.noDataContainer}>
               <Text style={styles.noData}>No data to display.</Text>
-              {viewingUserID === user?.uid && (
+              {viewingUserID === userID && (
                 <TouchableOpacity onPress={navigateToMakePostPage}>
                   <Text style={styles.makePost}> Make a post</Text>
                 </TouchableOpacity>
