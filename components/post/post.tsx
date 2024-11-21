@@ -192,7 +192,9 @@ export default Post;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 20,
     backgroundColor: APP_BACKGROUND_COLOR,
     width: "100%",
   },
