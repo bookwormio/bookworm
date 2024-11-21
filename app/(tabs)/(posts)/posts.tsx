@@ -252,7 +252,7 @@ const Posts = () => {
         <Animated.View style={refreshContainerStyles}>
           {refreshing && (
             <View style={styles.topRefresh}>
-              <WormLoader style={{ width: 50, height: 50 }} />
+              <WormLoader style={styles.worm} />
             </View>
           )}
         </Animated.View>
@@ -287,13 +287,7 @@ const Posts = () => {
             keyExtractor={(item) => item.id}
             ListHeaderComponent={
               user != null ? (
-                <View
-                  style={{
-                    borderBottomWidth: 5,
-                    paddingBottom: 10,
-                    borderColor: BOOKWORM_LIGHT_GREY,
-                  }}
-                >
+                <View style={styles.dataSnapBorder}>
                   <DataSnapShot
                     userID={user?.uid ?? ""}
                     isLoadingOther={isLoadingFeedPosts}
@@ -451,5 +445,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 20,
     marginTop: 10,
+  },
+  worm: { width: 50, height: 50 },
+  dataSnapBorder: {
+    borderBottomWidth: 5,
+    paddingBottom: 10,
+    borderColor: BOOKWORM_LIGHT_GREY,
   },
 });

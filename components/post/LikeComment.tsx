@@ -54,7 +54,7 @@ export const LikeComment = ({
           style={[
             styles.textPadding,
             isThisPostLikePending && styles.pendingOpacity,
-            { fontSize: 14.5 },
+            styles.textFontSize,
           ]}
         >
           {post.likes.length}
@@ -71,7 +71,7 @@ export const LikeComment = ({
           }}
         >
           <FontAwesome5 name="comment" size={21} />
-          <Text style={{ paddingLeft: 5, fontSize: 14.5 }}>
+          <Text style={styles.commentWrap}>
             {post.comments.length}
             {post.comments.length === 1 ? " Comment" : " Comments"}
           </Text>
@@ -144,4 +144,8 @@ const styles = StyleSheet.create({
   textPadding: {
     paddingRight: 10,
   },
+  textFontSize: {
+    fontSize: 14.5,
+  },
+  commentWrap: { paddingLeft: 5, fontSize: 14.5 },
 });

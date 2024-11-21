@@ -20,7 +20,7 @@ const Comment = ({ comment }: PostProps) => {
           navigateToUser(user?.uid, comment.userID);
         }}
         disabled={comment.userID === user?.uid}
-        style={{ flexDirection: "row", alignItems: "center" }}
+        style={styles.userInfo}
       >
         <ProfilePicture userID={comment.userID} size={35} />
         <Text style={styles.title}>{comment.first}: </Text>
@@ -49,4 +49,5 @@ const styles = StyleSheet.create({
   body: {
     fontSize: 15,
   },
+  userInfo: { flexDirection: "row", alignItems: "center" },
 });
