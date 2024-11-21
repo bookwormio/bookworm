@@ -86,6 +86,7 @@ export enum BookRequestNotificationStatus {
   PENDING = "pending",
   ACCEPTED = "accepted",
   DENIED = "denied",
+  RETURNED = "returned",
 }
 
 export enum BookRequestActionDisplay {

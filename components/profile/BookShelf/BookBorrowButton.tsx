@@ -16,7 +16,10 @@ import {
 } from "../../../types";
 import { useAuth } from "../../auth/context";
 import BookWormButton from "../../button/BookWormButton";
-import { useCreateNotification } from "../../notifications/hooks/useNotificationQueries";
+import {
+  useCreateNotification,
+  useUpdateBorrowNotificationStatus,
+} from "../../notifications/hooks/useNotificationQueries";
 import { formatUserFullName } from "../../notifications/util/notificationUtils";
 import { useReturnBook } from "../hooks/useBookBorrowQueries";
 
@@ -27,6 +30,7 @@ interface BookBorrowButtonProps {
   isLoading: boolean;
   borrowInfo?: BookBorrowModel;
   requestStatus?: BookRequestNotificationStatus;
+  notifID?: string;
 }
 
 interface ButtonState {
@@ -43,6 +47,7 @@ const BookBorrowButton = ({
   borrowInfo,
   requestStatus,
   isLoading,
+  notifID,
 }: BookBorrowButtonProps) => {
   const { user } = useAuth();
   const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
@@ -52,6 +57,7 @@ const BookBorrowButton = ({
     useUserDataQuery(bookOwnerID);
 
   const notifyMutation = useCreateNotification();
+  const updateBorrowNotificationStatus = useUpdateBorrowNotificationStatus();
   const returnMutation = useReturnBook();
   const queryClient = useQueryClient();
 
@@ -59,7 +65,8 @@ const BookBorrowButton = ({
   const isBookBorrowed =
     borrowInfo?.borrowStatus === ServerBookBorrowStatus.BORROWING;
   const isBookReturned =
-    borrowInfo?.borrowStatus === ServerBookBorrowStatus.RETURNED;
+    borrowInfo?.borrowStatus === ServerBookBorrowStatus.RETURNED ||
+    requestStatus === BookRequestNotificationStatus.RETURNED;
 
   const getButtonState = (): ButtonState => {
     if (isLoading || isUserDataLoading || isBookOwnerDataLoading) {
@@ -112,6 +119,7 @@ const BookBorrowButton = ({
           action: () => {},
         };
       case BookRequestNotificationStatus.ACCEPTED:
+      case BookRequestNotificationStatus.RETURNED:
         if (isBookReturned && isCurrentUserBorrowing)
           // Case: Book has been returned, user can request again
           return {
@@ -143,6 +151,7 @@ const BookBorrowButton = ({
         };
       default:
         // Default case: No specific request status, allow user to request
+        console.log("default case");
         return {
           title: BookBorrowButtonDisplay.REQUEST,
           disabled: false,
@@ -262,6 +271,12 @@ const BookBorrowButton = ({
               lenderUserID: bookOwnerID,
               bookID,
             });
+            if (notifID != null) {
+              updateBorrowNotificationStatus.mutate({
+                notifID,
+                newStatus: BookRequestNotificationStatus.RETURNED,
+              });
+            }
           },
         },
       ],

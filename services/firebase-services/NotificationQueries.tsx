@@ -21,6 +21,7 @@ import {
 import { DB } from "../../firebase.config";
 import {
   type BadgeNotification,
+  type BookRequestNotificationModel,
   type FullNotificationModel,
   type NotificationModel,
 } from "../../types";
@@ -197,7 +198,7 @@ export async function getAllFullNotifications(
  * @param {string} friendUserID - The ID of the user who received the book requests.
  * @param {string[]} bookIDs - An array of book IDs to check for request statuses.
  *
- * @returns {Promise<Record<string, BookRequestNotificationStatus>>} A promise that resolves
+ * @returns {Promise<Record<string, BookRequestNotificationModel>>} A promise that resolves
  * to an object where keys are book IDs and values are their request statuses.
  * Only books with existing requests will have entries in the returned object.
  *
@@ -208,8 +209,8 @@ export async function getBookRequestStatusForBooks(
   currentUserID: string,
   friendUserID: string,
   bookIDs: string[],
-): Promise<Record<string, BookRequestNotificationStatus>> {
-  const bookRequestStatuses: Record<string, BookRequestNotificationStatus> = {};
+): Promise<Record<string, BookRequestNotificationModel>> {
+  const bookRequestStatuses: Record<string, BookRequestNotificationModel> = {};
 
   try {
     const notificationsRef = collection(DB, "notifications");
@@ -219,19 +220,33 @@ export async function getBookRequestStatusForBooks(
       where("sender", "==", currentUserID),
       where("type", "==", ServerNotificationType.BOOK_REQUEST),
       where("bookID", "in", bookIDs),
+      orderBy("created", "desc"),
     );
 
     const querySnapshot = await getDocs(q);
 
+    // Keep track of which books we've already processed
+    const processedBooks = new Set<string>();
+
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      if (data?.bookID != null && data?.bookRequestStatus != null) {
-        bookRequestStatuses[data.bookID] =
-          data.bookRequestStatus as BookRequestNotificationStatus;
+      if (
+        data?.bookID != null &&
+        data?.bookRequestStatus != null &&
+        typeof data.bookID === "string" &&
+        !processedBooks.has(data.bookID)
+      ) {
+        // Only process the first (most recent) notification for each book
+        processedBooks.add(data.bookID);
+        bookRequestStatuses[data.bookID] = {
+          notifID: doc.id,
+          notifStatus: data.bookRequestStatus as BookRequestNotificationStatus,
+        };
       }
     });
     return bookRequestStatuses;
   } catch (error) {
+    console.log(error);
     throw new Error(
       `Error getting book request statuses: ${(error as Error).message}`,
     );

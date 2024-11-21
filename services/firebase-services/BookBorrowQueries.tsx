@@ -303,9 +303,12 @@ export async function getLendingLibraryBookStatuses(
     const bookStatuses: Record<string, BookStatusModel> = {};
 
     bookIDs.forEach((bookID) => {
+      const requestStatus = bookRequestStatuses[bookID];
+
       bookStatuses[bookID] = {
         borrowInfo: lendingStatuses.find((status) => status.bookID === bookID),
-        requestStatus: bookRequestStatuses[bookID],
+        requestStatus: requestStatus?.notifStatus ?? null,
+        notifID: requestStatus?.notifID ?? null,
       };
     });
 

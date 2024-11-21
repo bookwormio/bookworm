@@ -71,13 +71,12 @@ export const useUpdateBorrowNotificationStatus = () => {
     mutationFn: async ({
       notifID,
       newStatus,
-      userID,
     }: UpdateBorrowNotificationParams) => {
       return await updateBorrowNotificationStatus(notifID, newStatus);
     },
-    onSuccess: async (data, { userID }) => {
+    onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["notifications", userID],
+        queryKey: ["notifications"],
       });
     },
   });
