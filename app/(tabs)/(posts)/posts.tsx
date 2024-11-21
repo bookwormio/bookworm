@@ -42,6 +42,7 @@ import { useNavigateToPost } from "../../../components/profile/hooks/useRouteHoo
 import WormLoader from "../../../components/wormloader/WormLoader";
 import {
   APP_BACKGROUND_COLOR,
+  BOOKWORM_LIGHT_GREY,
   BOOKWORM_ORANGE,
   MAX_PULLDOWN_DISTANCE,
   PULLDOWN_ANIMATION_DURATION,
@@ -285,11 +286,19 @@ const Posts = () => {
             removeClippedSubviews={true}
             keyExtractor={(item) => item.id}
             ListHeaderComponent={
-              !(user == null) ? (
-                <DataSnapShot
-                  userID={user?.uid ?? ""}
-                  isLoadingOther={isLoadingFeedPosts}
-                />
+              user != null ? (
+                <View
+                  style={{
+                    borderBottomWidth: 5,
+                    paddingBottom: 10,
+                    borderColor: BOOKWORM_LIGHT_GREY,
+                  }}
+                >
+                  <DataSnapShot
+                    userID={user?.uid ?? ""}
+                    isLoadingOther={isLoadingFeedPosts}
+                  />
+                </View>
               ) : null
             }
             ListEmptyComponent={

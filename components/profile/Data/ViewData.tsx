@@ -9,6 +9,7 @@ import {
 } from "react-native";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useRouter } from "expo-router";
+import { BOOKWORM_ORANGE } from "../../../constants/constants";
 import {
   fetchBooksFinishedData,
   fetchPagesReadData,
@@ -157,7 +158,7 @@ const ViewData = ({ userID }: ViewDataProps) => {
   return (
     <ScrollView style={{ flex: 1 }}>
       <DataSnapShot userID={userID} isLoadingOther={isLoadingPagesData} />
-      <View>
+      <View style={{ paddingTop: 5 }}>
         <View style={styles.titleBarFirst}>
           <Text style={styles.dataTypeFirst}>Pages Read</Text>
         </View>
@@ -215,20 +216,20 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   titleBarFirst: {
-    backgroundColor: "white", // Orange color
+    backgroundColor: "white",
     padding: 10,
     alignItems: "center",
     marginTop: 5,
     marginBottom: -10,
-    borderTopWidth: 1,
-    borderTopColor: "#FB6D0B",
+    borderTopWidth: 0.7,
+    borderTopColor: BOOKWORM_ORANGE,
   },
   chartContainer: {
     overflow: "hidden",
     paddingRight: 40,
     marginRight: -40,
-    borderBottomWidth: 1, // Add this line to create a top border
-    borderBottomColor: "#FB6D0B",
+    borderBottomWidth: 0.7,
+    borderBottomColor: BOOKWORM_ORANGE,
   },
   input: {
     borderColor: "gray",
@@ -291,7 +292,7 @@ const styles = StyleSheet.create({
   },
   makePost: {
     fontSize: 17,
-    color: "#FB6D0B",
+    color: BOOKWORM_ORANGE,
     paddingTop: 10,
   },
   noDataContainer: {

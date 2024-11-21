@@ -10,7 +10,10 @@ import {
 } from "react-native";
 import { type PostModel } from "../../types";
 
-import { APP_BACKGROUND_COLOR } from "../../constants/constants";
+import {
+  APP_BACKGROUND_COLOR,
+  BOOKWORM_LIGHT_GREY,
+} from "../../constants/constants";
 import { useAuth } from "../auth/context";
 import BadgeOnPost from "../badges/BadgeOnPost";
 import { useGetBadgesForPost } from "../badges/useBadgeQueries";
@@ -181,8 +184,8 @@ export default Post;
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    borderBottomWidth: 10.0,
-    borderBottomColor: "#F2F2F2",
+    borderBottomWidth: 10,
+    borderBottomColor: BOOKWORM_LIGHT_GREY,
     backgroundColor: APP_BACKGROUND_COLOR,
     width: "100%",
   },
