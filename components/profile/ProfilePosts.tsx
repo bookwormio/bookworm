@@ -1,13 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { fetchPostsByUserID } from "../../services/firebase-services/PostQueries";
 import Post from "../post/post";
 import { usePostsContext } from "../post/PostsContext";
 import WormLoader from "../wormloader/WormLoader";
 import { useNavigateToPost } from "./hooks/useRouteHooks";
-import { useRouter } from "expo-router";
-import { CREATE_ROUTE_PREFIX } from "../../constants/constants";
 
 interface ProfilePostsProps {
   userID: string;
@@ -19,7 +18,7 @@ const ProfilePosts = ({ userID }: ProfilePostsProps) => {
   const navigateToPost = useNavigateToPost();
   const router = useRouter();
   const navigateToMakePostPage = () => {
-    router.push({ pathname: CREATE_ROUTE_PREFIX });
+    router.replace("/NewPost");
   };
 
   const { data: userProfilePosts, isLoading: isUserProfilePostsLoading } =
