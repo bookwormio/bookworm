@@ -1,9 +1,9 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
   BottomSheetBackdrop,
-  type BottomSheetBackdropProps,
   BottomSheetModal,
   BottomSheetModalProvider,
+  type BottomSheetBackdropProps,
 } from "@gorhom/bottom-sheet";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
@@ -30,8 +30,8 @@ import {
 import {
   BOOKSHELF_BADGES,
   COMPLETION_BADGES,
+  ServerBookShelfName,
   type ServerBadgeName,
-  type ServerBookShelfName,
 } from "../../enums/Enums";
 import { fetchBookByVolumeID } from "../../services/books-services/BookQueries";
 import { type BookVolumeInfo } from "../../types";
@@ -159,39 +159,57 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
   const applyPendingChanges = async () => {
     if (user?.uid == null || bookID == null || queryBookData == null) return;
 
-    const addPromises = pendingChanges.add.map(
-      async (shelfName) =>
-        await addBookMutation.mutateAsync({
-          userID: user.uid,
-          bookID,
-          volumeInfo: {
-            title: queryBookData?.title,
-            subtitle: queryBookData?.subtitle,
-            authors: queryBookData?.authors,
-            publisher: queryBookData?.publisher,
-            publishedDate: queryBookData?.publishedDate,
-            description: queryBookData?.description,
-            pageCount: queryBookData?.pageCount,
-            categories: queryBookData?.categories,
-            maturityRating: queryBookData?.maturityRating,
-            previewLink: queryBookData?.previewLink,
-            averageRating: queryBookData?.averageRating,
-            ratingsCount: queryBookData?.ratingsCount,
-            language: queryBookData?.language,
-            mainCategory: queryBookData?.mainCategory,
-            thumbnail: queryBookData?.imageLinks?.thumbnail,
-          },
-          shelfName,
-        }),
-    );
-    const removePromises = pendingChanges.remove.map(
-      async (shelfName) =>
-        await removeBookMutation.mutateAsync({
-          userID: user.uid,
-          bookID,
-          shelfName,
-        }),
-    );
+    const addPromises = pendingChanges.add.map(async (shelfName) => {
+      await addBookMutation.mutateAsync({
+        userID: user.uid,
+        bookID,
+        volumeInfo: {
+          title: queryBookData?.title,
+          subtitle: queryBookData?.subtitle,
+          authors: queryBookData?.authors,
+          publisher: queryBookData?.publisher,
+          publishedDate: queryBookData?.publishedDate,
+          description: queryBookData?.description,
+          pageCount: queryBookData?.pageCount,
+          categories: queryBookData?.categories,
+          maturityRating: queryBookData?.maturityRating,
+          previewLink: queryBookData?.previewLink,
+          averageRating: queryBookData?.averageRating,
+          ratingsCount: queryBookData?.ratingsCount,
+          language: queryBookData?.language,
+          mainCategory: queryBookData?.mainCategory,
+          thumbnail: queryBookData?.imageLinks?.thumbnail,
+        },
+        shelfName,
+      });
+      if (shelfName === ServerBookShelfName.LENDING_LIBRARY) {
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: ["availableborrow", bookID],
+          }),
+          queryClient.refetchQueries({
+            queryKey: ["availableborrow", bookID],
+          }),
+        ]);
+      }
+    });
+    const removePromises = pendingChanges.remove.map(async (shelfName) => {
+      await removeBookMutation.mutateAsync({
+        userID: user.uid,
+        bookID,
+        shelfName,
+      });
+      if (shelfName === ServerBookShelfName.LENDING_LIBRARY) {
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: ["availableborrow", bookID],
+          }),
+          queryClient.refetchQueries({
+            queryKey: ["availableborrow", bookID],
+          }),
+        ]);
+      }
+    });
 
     try {
       await Promise.all([...addPromises, ...removePromises]);
@@ -232,9 +250,6 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
         });
       }
     }
-    await queryClient.invalidateQueries({
-      queryKey: ["availableborrow", bookID],
-    });
   };
   // callbacks
   const handlePresentModalPress = useCallback(() => {
@@ -260,7 +275,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
       .replace(/ +/g, " ")
       .trim();
   }
-  if (bookData == null || isLoadingBook || isLoadingUsersWithBook) {
+  if (bookData == null || isLoadingBook) {
     return (
       <View style={styles.container}>
         <WormLoader />
@@ -315,7 +330,11 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
                   </View>
                 </TouchableOpacity>
               </View>
-              {usersWithBook != null && usersWithBook.length > 0 && (
+              {isLoadingUsersWithBook ? (
+                <View style={styles.borrowFromContainer}>
+                  <WormLoader style={styles.worm} />
+                </View>
+              ) : usersWithBook != null && usersWithBook.length > 0 ? (
                 <View style={styles.borrowFromContainer}>
                   <Text style={styles.borrowFromText}>Borrow From:</Text>
                   {usersWithBook?.map((userID) => (
@@ -329,6 +348,12 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
                       <ProfilePicture userID={userID} size={40} />
                     </TouchableOpacity>
                   ))}
+                </View>
+              ) : (
+                <View style={styles.borrowFromContainer}>
+                  <Text style={styles.borrowFromText}>
+                    No friends have this book available
+                  </Text>
                 </View>
               )}
             </View>
@@ -499,6 +524,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   titleText: { flex: 1, paddingLeft: 10 },
+  worm: { width: 50, height: 50 },
 });
 
 export default BookViewPage;

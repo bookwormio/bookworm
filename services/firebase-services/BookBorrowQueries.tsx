@@ -10,7 +10,10 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import { BORROW_BOOK_COLLECTION_REF } from "../../constants/constants";
+import {
+  BOOK_SHELF_COLLECTION_REF,
+  BORROW_BOOK_COLLECTION_REF,
+} from "../../constants/constants";
 import {
   ServerBookBorrowRole,
   ServerBookBorrowStatus,
@@ -393,24 +396,37 @@ export async function getUsersWithBookInLendingLibrary(
     for (const followingUserID of usersFollowing) {
       const lendingLibraryRef = collection(
         DB,
-        "bookshelf_collection",
+        BOOK_SHELF_COLLECTION_REF,
         followingUserID,
-        "lending_library",
+        ServerBookShelfName.LENDING_LIBRARY,
       );
       const currentlyReadingLibraryRef = collection(
         DB,
-        "bookshelf_collection",
+        BOOK_SHELF_COLLECTION_REF,
         followingUserID,
-        "currently_reading",
+        ServerBookShelfName.CURRENTLY_READING,
+      );
+      const borrowingRef = collection(DB, BORROW_BOOK_COLLECTION_REF);
+      const borrowQuery = query(
+        borrowingRef,
+        where("lending_user", "==", followingUserID),
+        where("borrow_status", "==", ServerBookBorrowStatus.BORROWING),
+        where("book_id", "==", bookID),
       );
       const bookDocRef = doc(lendingLibraryRef, bookID);
       const currReadBookDocRef = doc(currentlyReadingLibraryRef, bookID);
-      const [bookDocSnapshot, currReadBookDocSnapshot] = await Promise.all([
-        getDoc(bookDocRef),
-        getDoc(currReadBookDocRef),
-      ]);
+      const [bookDocSnapshot, currReadBookDocSnapshot, borrowSnapshot] =
+        await Promise.all([
+          getDoc(bookDocRef),
+          getDoc(currReadBookDocRef),
+          getDocs(borrowQuery),
+        ]);
 
-      if (bookDocSnapshot.exists() && !currReadBookDocSnapshot.exists()) {
+      if (
+        bookDocSnapshot.exists() &&
+        !currReadBookDocSnapshot.exists() &&
+        borrowSnapshot.empty
+      ) {
         usersWithBook.push(followingUserID);
       }
     }

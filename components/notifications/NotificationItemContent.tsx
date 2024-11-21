@@ -163,6 +163,12 @@ const NotificationItemContent = ({
             BookRequestNotificationStatus.ACCEPTED,
             notificationTyped.receiver,
           ),
+          queryClient.invalidateQueries({
+            queryKey: ["availableborrow", notificationTyped.bookID],
+          }),
+          queryClient.refetchQueries({
+            queryKey: ["availableborrow", notificationTyped.bookID],
+          }),
         ]);
       } catch (error) {
         Toast.show({

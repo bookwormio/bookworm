@@ -60,13 +60,21 @@ export const useLendBookToUser = () => {
     }) => {
       return await lendBookToUser(lenderUserID, borrowerUserID, bookID);
     },
-    onSuccess: async (data, { lenderUserID }) => {
+    onSuccess: async (data, { lenderUserID, bookID }) => {
       await queryClient.invalidateQueries({
         queryKey: ["lendingStatuses"],
       });
-      await queryClient.invalidateQueries({
-        queryKey: ["notifications"],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["notifications"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["availableborrow", bookID],
+        }),
+        queryClient.refetchQueries({
+          queryKey: ["availableborrow", bookID],
+        }),
+      ]);
     },
   });
 };
@@ -95,13 +103,19 @@ export const useReturnBook = () => {
     }) => {
       return await returnBookToUser(borrowerUserID, lenderUserID, bookID);
     },
-    onSuccess: async (data, { lenderUserID }) => {
+    onSuccess: async (data, { lenderUserID, bookID }) => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["lendingStatuses"],
         }),
         queryClient.invalidateQueries({
           queryKey: ["borrowingBooks"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["availableborrow", bookID],
+        }),
+        queryClient.refetchQueries({
+          queryKey: ["availableborrow", bookID],
         }),
       ]);
     },
