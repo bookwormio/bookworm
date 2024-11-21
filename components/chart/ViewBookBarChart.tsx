@@ -2,6 +2,7 @@ import { format, startOfMonth, subMonths } from "date-fns";
 import React from "react";
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import { BarChart } from "react-native-chart-kit";
+import { BOOKWORM_ORANGE } from "../../constants/constants";
 import { type MonthDataPointModel } from "../../types";
 
 interface ViewBarChartProps {
@@ -90,7 +91,7 @@ const ViewBookBarChart = ({ aggregatedData }: ViewBarChartProps) => {
             },
             propsForLabels: {
               fontSize: "12",
-              fill: "#FB6D0B",
+              fill: BOOKWORM_ORANGE,
             },
           }}
           withHorizontalLabels={false}

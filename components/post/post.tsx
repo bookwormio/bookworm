@@ -10,7 +10,10 @@ import {
 } from "react-native";
 import { type PostModel } from "../../types";
 
-import { APP_BACKGROUND_COLOR } from "../../constants/constants";
+import {
+  APP_BACKGROUND_COLOR,
+  BOOKWORM_LIGHT_GREY,
+} from "../../constants/constants";
 import { useAuth } from "../auth/context";
 import BadgeOnPost from "../badges/BadgeOnPost";
 import { useGetBadgesForPost } from "../badges/useBadgeQueries";
@@ -71,8 +74,13 @@ const Post = ({
 
   const { data: badges } = useGetBadgesForPost(post.user.id, post.id);
 
+  const filteredBadgesForPost =
+    badges != null ? badges?.filter((badge) => badge.postID === post.id) : [];
+
   return (
-    <ScrollView>
+    <ScrollView
+      style={{ borderBottomWidth: 10, borderBottomColor: BOOKWORM_LIGHT_GREY }}
+    >
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <View style={styles.profilePicContainer}>
@@ -134,13 +142,15 @@ const Post = ({
             />
           )}
         <Text style={styles.body}>{post.text}</Text>
-        {badges
-          ?.filter((badge) => badge.postID === post.id)
-          .map((badge) => (
-            <View key={badge.badgeID} style={{ paddingRight: 40 }}>
-              <BadgeOnPost size={50} badge={badge} userInfo={post.user} />
-            </View>
-          ))}
+        {filteredBadgesForPost.length > 0 && (
+          <View style={{ paddingTop: 5 }}>
+            {filteredBadgesForPost.map((badge) => (
+              <View key={badge.badgeID} style={{ paddingRight: 40 }}>
+                <BadgeOnPost size={50} badge={badge} userInfo={post.user} />
+              </View>
+            ))}
+          </View>
+        )}
         {post.imageStorageRefs.length > 0 && (
           <View style={{ marginTop: 10, height: 270 }}>
             <FlatList
@@ -165,6 +175,8 @@ const Post = ({
             />
           </View>
         )}
+      </View>
+      <View style={{ backgroundColor: APP_BACKGROUND_COLOR }}>
         <LikeComment
           post={post}
           key={`${post.id}-${post.comments.length}-${post.likes.length}`}
@@ -180,9 +192,9 @@ export default Post;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    borderBottomWidth: 10.0,
-    borderBottomColor: "#F2F2F2",
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 20,
     backgroundColor: APP_BACKGROUND_COLOR,
     width: "100%",
   },

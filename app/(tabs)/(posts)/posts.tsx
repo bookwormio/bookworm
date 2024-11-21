@@ -42,6 +42,7 @@ import { useNavigateToPost } from "../../../components/profile/hooks/useRouteHoo
 import WormLoader from "../../../components/wormloader/WormLoader";
 import {
   APP_BACKGROUND_COLOR,
+  BOOKWORM_LIGHT_GREY,
   BOOKWORM_ORANGE,
   MAX_PULLDOWN_DISTANCE,
   PULLDOWN_ANIMATION_DURATION,
@@ -251,7 +252,7 @@ const Posts = () => {
         <Animated.View style={refreshContainerStyles}>
           {refreshing && (
             <View style={styles.topRefresh}>
-              <WormLoader style={{ width: 50, height: 50 }} />
+              <WormLoader style={styles.worm} />
             </View>
           )}
         </Animated.View>
@@ -285,11 +286,13 @@ const Posts = () => {
             removeClippedSubviews={true}
             keyExtractor={(item) => item.id}
             ListHeaderComponent={
-              !(user == null) ? (
-                <DataSnapShot
-                  userID={user?.uid ?? ""}
-                  isLoadingOther={isLoadingFeedPosts}
-                />
+              user != null ? (
+                <View style={styles.dataSnapBorder}>
+                  <DataSnapShot
+                    userID={user?.uid ?? ""}
+                    isLoadingOther={isLoadingFeedPosts}
+                  />
+                </View>
               ) : null
             }
             ListEmptyComponent={
@@ -407,6 +410,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 5,
     paddingHorizontal: 10,
+    marginBottom: 10,
+    marginLeft: 10,
   },
   commentInput: {
     flex: 1,
@@ -440,5 +445,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 20,
     marginTop: 10,
+  },
+  worm: { width: 50, height: 50 },
+  dataSnapBorder: {
+    borderBottomWidth: 5,
+    paddingBottom: 10,
+    borderColor: BOOKWORM_LIGHT_GREY,
   },
 });
