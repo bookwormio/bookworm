@@ -159,8 +159,7 @@ export async function getAllFollowing(userID: string): Promise<string[]> {
       relationsData.push(followingUserID);
     });
     relationsData.push(userID); // Feed should show the users own posts
-    const filteredRelations = relationsData.filter((id) => id !== userID);
-    return filteredRelations;
+    return relationsData;
   } catch (error) {
     console.error("Error searching for users you follow: ", error);
     return [];

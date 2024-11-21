@@ -386,14 +386,14 @@ export async function getUsersWithBookInLendingLibrary(
 ): Promise<string[]> {
   try {
     const usersFollowing = await getAllFollowing(userID);
-
-    if (usersFollowing.length === 0) {
+    const usersFollowingFiltered = usersFollowing.filter((id) => id !== userID);
+    if (usersFollowingFiltered.length === 0) {
       return [];
     }
 
     const usersWithBook: string[] = [];
 
-    for (const followingUserID of usersFollowing) {
+    for (const followingUserID of usersFollowingFiltered) {
       const lendingLibraryRef = collection(
         DB,
         BOOK_SHELF_COLLECTION_REF,
