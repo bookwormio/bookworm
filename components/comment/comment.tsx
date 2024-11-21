@@ -25,7 +25,7 @@ const Comment = ({ comment }: PostProps) => {
         <ProfilePicture userID={comment.userID} size={35} />
         <Text style={styles.title}>{comment.first}: </Text>
       </TouchableOpacity>
-      <Text style={styles.body}>{comment.text}</Text>
+      <Text style={styles.body}>{comment.text.replace(/[\r\n]/g, "")}</Text>
     </View>
   );
 };
@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
   },
   body: {
     fontSize: 15,
+    textAlign: "center",
   },
   userInfo: { flexDirection: "row", alignItems: "center" },
 });
