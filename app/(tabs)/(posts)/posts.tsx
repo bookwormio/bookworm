@@ -42,6 +42,7 @@ import { useNavigateToPost } from "../../../components/profile/hooks/useRouteHoo
 import WormLoader from "../../../components/wormloader/WormLoader";
 import {
   APP_BACKGROUND_COLOR,
+  BOOKWORM_ORANGE,
   MAX_PULLDOWN_DISTANCE,
   PULLDOWN_ANIMATION_DURATION,
   PULLDOWN_REFRESHING_MAX_HEIGHT,
@@ -430,7 +431,7 @@ const styles = StyleSheet.create({
   },
   makePost: {
     fontSize: 17,
-    color: "#FB6D0B",
+    color: BOOKWORM_ORANGE,
     paddingTop: 10,
   },
   noDataContainer: {

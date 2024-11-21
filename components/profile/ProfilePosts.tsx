@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { BOOKWORM_ORANGE } from "../../constants/constants";
 import { fetchPostsByUserID } from "../../services/firebase-services/PostQueries";
 import Post from "../post/post";
 import { usePostsContext } from "../post/PostsContext";
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
   },
   makePost: {
     fontSize: 17,
-    color: "#FB6D0B",
+    color: BOOKWORM_ORANGE,
     paddingTop: 10,
   },
   noDataContainer: {
