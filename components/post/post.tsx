@@ -75,7 +75,9 @@ const Post = ({
   const { data: badges } = useGetBadgesForPost(post.user.id, post.id);
 
   return (
-    <ScrollView>
+    <ScrollView
+      style={{ borderBottomWidth: 10, borderBottomColor: BOOKWORM_LIGHT_GREY }}
+    >
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <View style={styles.profilePicContainer}>
@@ -168,6 +170,8 @@ const Post = ({
             />
           </View>
         )}
+      </View>
+      <View style={{ backgroundColor: APP_BACKGROUND_COLOR }}>
         <LikeComment
           post={post}
           key={`${post.id}-${post.comments.length}-${post.likes.length}`}
@@ -184,8 +188,6 @@ export default Post;
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    borderBottomWidth: 10,
-    borderBottomColor: BOOKWORM_LIGHT_GREY,
     backgroundColor: APP_BACKGROUND_COLOR,
     width: "100%",
   },

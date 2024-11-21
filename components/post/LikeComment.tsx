@@ -116,6 +116,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingTop: 10,
+    paddingLeft: 20,
+    paddingBottom: 20,
   },
   likebutton: {
     flexDirection: "row",
