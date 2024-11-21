@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { BOOKWORM_ORANGE } from "../../constants/constants";
 import { ServerNotificationType } from "../../enums/Enums";
 import { type FullNotificationModel } from "../../types";
 import { useAuth } from "../auth/context";
@@ -79,6 +80,7 @@ const NotificationItem = ({ notif }: NotifProp) => {
           notification={notif}
           time={time}
         ></NotificationItemContent>
+        {notif.read_at == null && <View style={styles.unreadDot}></View>}
       </View>
     </TouchableOpacity>
   );
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     paddingBottom: 15,
     paddingTop: 15,
-    paddingRight: 40,
+    paddingRight: 20,
     borderBottomWidth: 2,
     borderBottomColor: "rgba(0, 0, 0, 0.1)",
   },
@@ -123,5 +125,11 @@ const styles = StyleSheet.create({
   badgeStyleOverride: {
     borderRadius: 50,
     alignSelf: "flex-start",
+  },
+  unreadDot: {
+    backgroundColor: BOOKWORM_ORANGE,
+    height: 10,
+    width: 10,
+    borderRadius: 5,
   },
 });

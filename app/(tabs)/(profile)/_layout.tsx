@@ -2,7 +2,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { router, Stack } from "expo-router";
 import React from "react";
 import { KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
-import BackButton from "../../../components/backbutton/BackButton";
+import BackButton from "../../../components/buttons/BackButton";
 import { BOOKWORM_ORANGE } from "../../../constants/constants";
 
 const ProfileLayout = () => {

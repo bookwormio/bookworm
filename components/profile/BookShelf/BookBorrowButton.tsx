@@ -15,7 +15,7 @@ import {
   type UserDataModel,
 } from "../../../types";
 import { useAuth } from "../../auth/context";
-import BookWormButton from "../../button/BookWormButton";
+import BookWormButton from "../../buttons/BookWormButton";
 import { useCreateNotification } from "../../notifications/hooks/useNotificationQueries";
 import { formatUserFullName } from "../../notifications/util/notificationUtils";
 import { useReturnBook } from "../hooks/useBookBorrowQueries";

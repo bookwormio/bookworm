@@ -3,6 +3,8 @@ import {
   createNotification,
   denyOtherBorrowRequests,
   getAllFullNotifications,
+  getUnreadNotificationCount,
+  markAllNotificationsRead,
   updateBorrowNotificationStatus,
 } from "../../../services/firebase-services/NotificationQueries";
 import {
@@ -110,6 +112,52 @@ export const useDenyOtherBorrowRequests = () => {
       await queryClient.invalidateQueries({
         queryKey: ["notifications"],
       });
+    },
+  });
+};
+
+/**
+ * Hook to fetch unread notification count for a user.
+ * @param userID - User's ID
+ * @returns React Query result containing unread notification count
+ * @example
+ * const { data: unreadCount } = useGetUnreadNotificationCount(userID);
+ */
+export const useGetUnreadNotificationCount = (userID: string) => {
+  return useQuery({
+    queryKey: ["unreadNotifications", userID],
+    queryFn: async () => {
+      return await getUnreadNotificationCount(userID);
+    },
+    enabled: userID != null && userID !== "",
+  });
+};
+
+/**
+ * Custom hook to mark all notifications as read.
+ *
+ * @returns Mutation hook for marking notifications as read
+ * @example
+ * const { mutate } = useMarkAllNotificationsRead();
+ * mutate({ userID: "123" });
+ */
+export const useMarkAllNotificationsRead = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userID }: { userID: string }) => {
+      if (userID == null || userID === "") {
+        console.log("User ID is required");
+        throw new Error("User ID is required");
+      }
+      await markAllNotificationsRead(userID);
+    },
+    onMutate: async ({ userID }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["notifications", userID] }),
+        queryClient.invalidateQueries({
+          queryKey: ["unreadNotifications", userID],
+        }),
+      ]);
     },
   });
 };

@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../../components/auth/context";
-import BookWormButton from "../../../components/button/BookWormButton";
+import BookWormButton from "../../../components/buttons/BookWormButton";
 import ProfilePicture from "../../../components/profile/ProfilePicture/ProfilePicture";
 import WormLoader from "../../../components/wormloader/WormLoader";
 import {

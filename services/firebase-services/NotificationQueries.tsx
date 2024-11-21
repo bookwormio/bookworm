@@ -2,6 +2,7 @@ import {
   addDoc,
   collection,
   doc,
+  getCountFromServer,
   getDocs,
   orderBy,
   query,
@@ -327,4 +328,77 @@ export async function sendBadgeNotification(
     ...(postID != null && { postID }),
   };
   await createNotification(notification);
+}
+
+/**
+ * Gets the count of unread notifications for a specific user.
+ * Looks for notifications where receiver is the userID and read_at is null.
+ *
+ * @param {string} userID - The ID of the user to get unread notifications for
+ * @returns {Promise<number>} The count of unread notifications, or 0 if error
+ */
+export async function getUnreadNotificationCount(
+  userID: string,
+): Promise<number> {
+  try {
+    const notifCollection = collection(DB, "notifications");
+
+    const q = query(
+      notifCollection,
+      where("receiver", "==", userID),
+      where("read_at", "==", null),
+    );
+
+    const snapshot = await getCountFromServer(q);
+
+    const count = snapshot.data().count;
+
+    return count;
+  } catch (error) {
+    console.log("Error getting unread notification count:", error);
+    return 0;
+  }
+}
+
+/**
+ * Marks all unread notifications as read for a specific user.
+ * Updates all notifications where receiver is the userID and read_at is null,
+ * setting read_at to the current server timestamp.
+ *
+ * @param {string} userID - The ID of the user whose notifications should be marked as read
+ * @returns {Promise<void>} A promise that resolves when all notifications are marked as read
+ * @throws {Error} If userID is null/empty or if there's an error updating the notifications
+ */
+export async function markAllNotificationsRead(userID: string): Promise<void> {
+  if (userID == null || userID === "") {
+    console.log("User does not exist");
+    return;
+  }
+
+  try {
+    const notifCollection = collection(DB, "notifications");
+    const q = query(
+      notifCollection,
+      where("receiver", "==", userID),
+      where("read_at", "==", null),
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    const batch = writeBatch(DB);
+
+    querySnapshot.forEach((docSnapshot) => {
+      const notifRef = doc(DB, "notifications", docSnapshot.id);
+      batch.update(notifRef, {
+        read_at: serverTimestamp(),
+      });
+    });
+
+    await batch.commit();
+  } catch (error) {
+    console.error("Error marking all notifications as read:", error);
+    throw new Error(
+      `Error marking all notifications as read: ${(error as Error).message}`,
+    );
+  }
 }

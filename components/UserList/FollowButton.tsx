@@ -7,7 +7,7 @@ import {
   type FriendRequestNotification,
 } from "../../types";
 import { useAuth } from "../auth/context";
-import BookWormButton from "../button/BookWormButton";
+import BookWormButton from "../buttons/BookWormButton";
 import {
   useFollowMutation,
   useGetIsFollowing,

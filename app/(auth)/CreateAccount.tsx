@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../components/auth/context";
-import BookWormButton from "../../components/button/BookWormButton";
+import BookWormButton from "../../components/buttons/BookWormButton";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 
 const CreateAccount = () => {

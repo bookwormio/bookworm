@@ -33,7 +33,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useAuth } from "../../../components/auth/context";
-import BookWormButton from "../../../components/button/BookWormButton";
+import BookWormButton from "../../../components/buttons/BookWormButton";
 import Comment from "../../../components/comment/comment";
 import DataSnapShot from "../../../components/datasnapshot/DataSnapShot";
 import Post from "../../../components/post/post";

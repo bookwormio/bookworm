@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { SIMILAR_BOOKS_SHELF_NAME } from "../../enums/Enums";
-import BookWormButton from "../button/BookWormButton";
+import BookWormButton from "../buttons/BookWormButton";
 import BookShelf from "../profile/BookShelf/BookShelf";
 import WormLoader from "../wormloader/WormLoader";
 import { useFetchSimilarBooks } from "./hooks/useSimilarBookQueries";

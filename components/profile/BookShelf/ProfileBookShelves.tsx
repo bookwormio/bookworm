@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { type ServerBookShelfName } from "../../../enums/Enums";
 import { useAuth } from "../../auth/context";
-import BookWormButton from "../../button/BookWormButton";
+import BookWormButton from "../../buttons/BookWormButton";
 import WormLoader from "../../wormloader/WormLoader";
 import { useGetAllBorrowingBooksForUser } from "../hooks/useBookBorrowQueries";
 import { useGetBooksForBookshelves } from "../hooks/useBookshelfQueries";

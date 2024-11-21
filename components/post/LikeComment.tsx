@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { type PostModel } from "../../types";
 import { useAuth } from "../auth/context";
-import BookWormButton from "../button/BookWormButton";
+import BookWormButton from "../buttons/BookWormButton";
 import Comment from "../comment/comment";
 import { usePostsContext } from "./PostsContext";
 
