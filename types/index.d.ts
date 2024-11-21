@@ -293,9 +293,11 @@ interface BookBorrowModel {
   borrowingUserID: string;
   borrowStatus: ServerBookBorrowStatus;
 }
+
 interface BookStatusModel {
   borrowInfo?: BookBorrowModel;
   requestStatus?: BookRequestNotificationStatus;
+  notifID?: string;
 }
 
 export interface BorrowingBookshelfModel {
@@ -326,4 +328,9 @@ interface ProgressBarData {
   progress: number;
   color: string;
   page: number;
+}
+
+interface BookRequestNotificationModel {
+  notifID: string;
+  notifStatus: BookRequestNotificationStatus;
 }
