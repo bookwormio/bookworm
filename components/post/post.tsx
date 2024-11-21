@@ -74,6 +74,9 @@ const Post = ({
 
   const { data: badges } = useGetBadgesForPost(post.user.id, post.id);
 
+  const filteredBadgesForPost =
+    badges != null ? badges?.filter((badge) => badge.postID === post.id) : [];
+
   return (
     <ScrollView
       style={{ borderBottomWidth: 10, borderBottomColor: BOOKWORM_LIGHT_GREY }}
@@ -139,13 +142,15 @@ const Post = ({
             />
           )}
         <Text style={styles.body}>{post.text}</Text>
-        {badges
-          ?.filter((badge) => badge.postID === post.id)
-          .map((badge) => (
-            <View key={badge.badgeID} style={{ paddingRight: 40 }}>
-              <BadgeOnPost size={50} badge={badge} userInfo={post.user} />
-            </View>
-          ))}
+        {filteredBadgesForPost.length > 0 && (
+          <View style={{ paddingTop: 5 }}>
+            {filteredBadgesForPost.map((badge) => (
+              <View key={badge.badgeID} style={{ paddingRight: 40 }}>
+                <BadgeOnPost size={50} badge={badge} userInfo={post.user} />
+              </View>
+            ))}
+          </View>
+        )}
         {post.imageStorageRefs.length > 0 && (
           <View style={{ marginTop: 10, height: 270 }}>
             <FlatList
