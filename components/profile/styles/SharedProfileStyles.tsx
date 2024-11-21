@@ -24,7 +24,7 @@ export const sharedProfileStyles = StyleSheet.create({
   },
   nameText: {
     paddingLeft: 20,
-    fontSize: 30,
+    fontSize: 27,
     marginTop: -10,
   },
   locText: {
