@@ -121,7 +121,6 @@ const NotificationItemContent = ({
     updateBorrowNotificationStatus.mutate({
       notifID,
       newStatus,
-      userID,
     });
   };
 

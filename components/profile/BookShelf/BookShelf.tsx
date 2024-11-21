@@ -104,6 +104,7 @@ const BookShelf = ({ shelfName, books, userID }: BookShelfProps) => {
                     borrowInfo={lendingStatuses?.[item.id]?.borrowInfo}
                     requestStatus={lendingStatuses?.[item.id]?.requestStatus}
                     isLoading={isLoadingLendingStatus}
+                    notifID={lendingStatuses?.[item.id]?.notifID}
                   />
                 </View>
               ) : (
