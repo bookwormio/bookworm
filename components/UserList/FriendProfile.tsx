@@ -80,7 +80,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
         >
           <ProfilePicture userID={friendUserID} size={60} />
         </TouchableOpacity>
-        <View>
+        <View style={sharedProfileStyles.textAndCityMargin}>
           <Text style={sharedProfileStyles.nameText}>
             {friendData.first} {friendData.last}
           </Text>
@@ -94,7 +94,7 @@ const FriendProfile = ({ friendUserID }: FriendProfileProps) => {
       <View>
         <Text style={sharedProfileStyles.bioWrap}>{friendData.bio}</Text>
       </View>
-      <View style={sharedProfileStyles.imageTextContainer}>
+      <View style={sharedProfileStyles.followTextContainer}>
         <TouchableOpacity
           style={sharedProfileStyles.textWrap}
           onPress={() => {

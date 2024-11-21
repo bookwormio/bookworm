@@ -89,7 +89,7 @@ const Profile = () => {
         >
           <ProfilePicture userID={user?.uid ?? ""} size={60} />
         </TouchableOpacity>
-        <View>
+        <View style={sharedProfileStyles.textAndCityMargin}>
           <Text style={sharedProfileStyles.nameText}>
             {userData.first} {userData.last}
           </Text>
@@ -104,7 +104,7 @@ const Profile = () => {
         <Text style={sharedProfileStyles.bioWrap}>{userData.bio}</Text>
       </View>
       <View style={{ flexDirection: "row", width: "100%", flex: 1 }}>
-        <View style={sharedProfileStyles.imageTextContainer}>
+        <View style={sharedProfileStyles.followTextContainer}>
           <TouchableOpacity
             style={sharedProfileStyles.textWrap}
             onPress={() => {
@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     paddingTop: 20,
+    marginBottom: 10,
     paddingRight: 14,
   },
 });

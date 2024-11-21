@@ -4,9 +4,15 @@ import { APP_BACKGROUND_COLOR } from "../../../constants/constants";
 export const sharedProfileStyles = StyleSheet.create({
   imageTextContainer: {
     flexDirection: "row",
-    alignItems: "center",
     marginLeft: 20,
     marginTop: 20,
+    alignItems: "center",
+  },
+  followTextContainer: {
+    flexDirection: "row",
+    marginLeft: 20,
+    marginTop: 15,
+    alignItems: "center",
   },
   defaultImageContainer: {
     borderRadius: 50,
@@ -65,5 +71,8 @@ export const sharedProfileStyles = StyleSheet.create({
     marginBottom: 15,
     alignSelf: "flex-end",
     flex: 1,
+  },
+  textAndCityMargin: {
+    marginBottom: 10,
   },
 });
