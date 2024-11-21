@@ -351,7 +351,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
               ) : (
                 <View style={styles.borrowFromContainer}>
                   <Text style={styles.borrowFromText}>
-                    No friends own this book
+                    No friends have this book available
                   </Text>
                 </View>
               )}

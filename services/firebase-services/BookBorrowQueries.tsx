@@ -10,7 +10,10 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import { BORROW_BOOK_COLLECTION_REF } from "../../constants/constants";
+import {
+  BOOK_SHELF_COLLECTION_REF,
+  BORROW_BOOK_COLLECTION_REF,
+} from "../../constants/constants";
 import {
   ServerBookBorrowRole,
   ServerBookBorrowStatus,
@@ -393,21 +396,21 @@ export async function getUsersWithBookInLendingLibrary(
     for (const followingUserID of usersFollowing) {
       const lendingLibraryRef = collection(
         DB,
-        "bookshelf_collection",
+        BOOK_SHELF_COLLECTION_REF,
         followingUserID,
-        "lending_library",
+        ServerBookShelfName.LENDING_LIBRARY,
       );
       const currentlyReadingLibraryRef = collection(
         DB,
-        "bookshelf_collection",
+        BOOK_SHELF_COLLECTION_REF,
         followingUserID,
-        "currently_reading",
+        ServerBookShelfName.CURRENTLY_READING,
       );
-      const borrowingRef = collection(DB, "borrowing_collection");
+      const borrowingRef = collection(DB, BORROW_BOOK_COLLECTION_REF);
       const borrowQuery = query(
         borrowingRef,
         where("lending_user", "==", followingUserID),
-        where("borrow_status", "==", "borrowing"),
+        where("borrow_status", "==", ServerBookBorrowStatus.BORROWING),
         where("book_id", "==", bookID),
       );
       const bookDocRef = doc(lendingLibraryRef, bookID);
@@ -418,7 +421,7 @@ export async function getUsersWithBookInLendingLibrary(
           getDoc(currReadBookDocRef),
           getDocs(borrowQuery),
         ]);
-      // uighEAAAQBAJ
+
       if (
         bookDocSnapshot.exists() &&
         !currReadBookDocSnapshot.exists() &&
