@@ -151,7 +151,6 @@ const BookBorrowButton = ({
         };
       default:
         // Default case: No specific request status, allow user to request
-        console.log("default case");
         return {
           title: BookBorrowButtonDisplay.REQUEST,
           disabled: false,
@@ -271,6 +270,7 @@ const BookBorrowButton = ({
               lenderUserID: bookOwnerID,
               bookID,
             });
+            // update notification status to returned if notifID exists
             if (notifID != null) {
               updateBorrowNotificationStatus.mutate({
                 notifID,
