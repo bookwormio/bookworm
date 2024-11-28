@@ -88,7 +88,7 @@ const ProfileLayout = () => {
           name="GenerateRecommendationsPage"
           options={{
             headerShown: true,
-            headerTitle: "Generate Recommendations",
+            headerTitle: "Discover Books",
             headerLeft: () => <BackButton />,
           }}
         />
