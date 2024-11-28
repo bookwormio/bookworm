@@ -46,7 +46,7 @@ const SimilarBooksWrapper = ({
     <View style={styles.container}>
       {!showSimilarBooks && (
         <BookWormButton
-          title="Find Similar Books"
+          title="Discover Similar Books"
           disabled={similarBooksMutation.isPending}
           onPress={() => {
             handleSimilarBooksPressed(bookID, bookTitle);
