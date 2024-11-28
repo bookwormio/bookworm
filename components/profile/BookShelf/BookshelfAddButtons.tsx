@@ -4,7 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { BOOKWORM_ORANGE } from "../../../constants/constants";
 import {
   BOOKSHELF_DISPLAY_NAMES,
-  type ServerBookShelfName,
+  ServerBookShelfName,
 } from "../../../enums/Enums";
 import WormLoader from "../../wormloader/WormLoader";
 
@@ -19,12 +19,10 @@ const BookshelfAddButtons = ({
   onToggleShelf,
   isDisabled,
 }: BookshelfAddButtonsProps) => {
-  const shelfItems = Object.entries(BOOKSHELF_DISPLAY_NAMES).map(
-    ([value, label]) => ({
-      label,
-      value: value as ServerBookShelfName,
-    }),
-  );
+  const shelfItems = Object.values(ServerBookShelfName).map((value) => ({
+    label: BOOKSHELF_DISPLAY_NAMES[value],
+    value,
+  }));
 
   return (
     <View style={styles.container}>
