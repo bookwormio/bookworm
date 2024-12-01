@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { POST_INTERACTIONS } from "../../enums/Enums";
 import { type PostModel } from "../../types";
 import { useAuth } from "../auth/context";
 import BookWormButton from "../buttons/BookWormButton";
@@ -26,22 +27,19 @@ export const LikeComment = ({
   presentComments,
 }: LikeCommentProps) => {
   const { user } = useAuth();
-  const { likePost, isLikePending, commentOnPost } = usePostsContext();
+  const { likePost, commentOnPost } = usePostsContext();
   const [showCommentSection, setShowComments] = useState(individualPage);
   const [newComment, setNewComment] = useState("");
-  const isThisPostLikePending = isLikePending(post.id);
 
   return (
     <View>
       <View style={styles.buttonrow}>
         <TouchableOpacity
-          disabled={isThisPostLikePending}
-          style={[
-            styles.likebutton,
-            isThisPostLikePending && styles.pendingOpacity,
-          ]}
+          style={[styles.likebutton]}
           onPress={() => {
-            likePost(post.id);
+            post.likes.includes(user?.uid ?? "")
+              ? likePost(post.id, POST_INTERACTIONS.UNLIKED)
+              : likePost(post.id, POST_INTERACTIONS.LIKED);
           }}
         >
           {post.likes.includes(user?.uid ?? "") ? (
@@ -50,13 +48,7 @@ export const LikeComment = ({
             <FontAwesome5 name="heart" size={21} />
           )}
         </TouchableOpacity>
-        <Text
-          style={[
-            styles.textPadding,
-            isThisPostLikePending && styles.pendingOpacity,
-            styles.textFontSize,
-          ]}
-        >
+        <Text style={[styles.textPadding, styles.textFontSize]}>
           {post.likes.length}
           {post.likes.length === 1 ? " Like" : " Likes"}
         </Text>
@@ -124,9 +116,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingRight: 5,
     alignItems: "center",
-  },
-  pendingOpacity: {
-    opacity: 0.5,
   },
   commentInputContainer: {
     flexDirection: "row",

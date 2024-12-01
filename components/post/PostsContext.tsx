@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { useUserDataQuery } from "../../app/(tabs)/(profile)/hooks/useProfileQueries";
-import { ServerNotificationType } from "../../enums/Enums";
+import { POST_INTERACTIONS, ServerNotificationType } from "../../enums/Enums";
 import { createNotification } from "../../services/firebase-services/NotificationQueries";
 import {
   addCommentToPost,
@@ -26,7 +26,7 @@ const PostsContext = createContext<{
   setPosts: (posts: PostModel[]) => void;
   profilePosts: PostModel[];
   setProfilePosts: (posts: PostModel[]) => void;
-  likePost: (postID: string) => void;
+  likePost: (postID: string, interaction: POST_INTERACTIONS) => void;
   isLikePending: (postID: string) => boolean;
   commentOnPost: (postID: string, comment: string) => void;
 }>({
@@ -64,6 +64,10 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   const [profilePosts, setProfilePosts] = useState<PostModel[]>([]);
   // list of postIDs with ongoing likes
   const [pendingLikes, setPendingLikes] = useState<Set<string>>(new Set());
+  // set of queued likes
+  const [queuedLikes, setQueuedLikes] = useState<
+    Map<string, POST_INTERACTIONS>
+  >(new Map());
   // getting userdata
   const { data: userData } = useUserDataQuery(user?.uid);
   const queryClient = useQueryClient();
@@ -73,21 +77,28 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
    * and sends a request to like/unlike a post
    * @param postID - the postID of the post to like/unlike
    */
-  const handleLike = (postID: string) => {
-    if (userData == null) {
+  const handleLike = (postID: string, interaction: POST_INTERACTIONS) => {
+    if (userData == null || user == null) {
       throw new Error("User data is null");
     }
-    likePostMutation.mutate({ postID });
-    const postToUpdate = posts.find((post) => post.id === postID);
-    if (postToUpdate !== undefined && user?.uid !== undefined) {
-      const BNotify: LikeNotification = {
-        receiver: postToUpdate.user.id,
-        sender: user?.uid,
-        sender_name: userData.first + " " + userData.last, // Use an empty string if user?.uid is undefined
-        postID,
-        type: ServerNotificationType.LIKE,
-      };
-      likeNotifyMutation.mutate(BNotify);
+    // Modifies the likes of the post on both the main feed and profile feed if they exist
+    modifyLikes(postID, user.uid, posts, setPosts);
+    modifyLikes(postID, user.uid, profilePosts, setProfilePosts);
+    if (pendingLikes.has(postID)) {
+      setQueuedLikes((prev) => new Map(prev).set(postID, interaction));
+    } else {
+      likePostMutation.mutate({ postID });
+      const postToUpdate = posts.find((post) => post.id === postID);
+      if (postToUpdate !== undefined && user?.uid !== undefined) {
+        const BNotify: LikeNotification = {
+          receiver: postToUpdate.user.id,
+          sender: user?.uid,
+          sender_name: userData.first + " " + userData.last, // Use an empty string if user?.uid is undefined
+          postID,
+          type: ServerNotificationType.LIKE,
+        };
+        likeNotifyMutation.mutate(BNotify);
+      }
     }
   };
 
@@ -111,17 +122,23 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
   const likePostMutation = useMutation({
     mutationFn: async ({ postID }: LikePostMutationProps) => {
       if (user != null) {
-        // Modifies the likes of the post on both the main feed and profile feed if they exist
-        modifyLikes(postID, user.uid, posts, setPosts);
-        modifyLikes(postID, user.uid, profilePosts, setProfilePosts);
         return await likeUnlikePost(user.uid, postID);
       }
     },
     onSuccess: (updatedLikes, variables) => {
       if (updatedLikes != null && updatedLikes !== undefined) {
-        // Updates the likes of the post on both the main feed and profile feed with the firebase response
-        updateLikes(variables.postID, updatedLikes, setPosts);
-        updateLikes(variables.postID, updatedLikes, setProfilePosts);
+        const interaction = queuedLikes.get(variables.postID);
+        if (interaction !== undefined) {
+          queuedLikes.delete(variables.postID);
+          if (
+            (updatedLikes.includes(variables.postID) &&
+              interaction === POST_INTERACTIONS.UNLIKED) ||
+            (!updatedLikes.includes(variables.postID) &&
+              interaction === POST_INTERACTIONS.LIKED)
+          ) {
+            likePostMutation.mutate({ postID: variables.postID });
+          }
+        }
       }
     },
     onMutate: ({ postID }) => {
@@ -313,9 +330,9 @@ const PostsProvider = ({ children }: PostsProviderProps) => {
         setProfilePosts(newPosts: PostModel[]) {
           setProfilePosts(newPosts);
         },
-        likePost: (postID: string) => {
+        likePost: (postID: string, interaction: POST_INTERACTIONS) => {
           if (user != null) {
-            handleLike(postID);
+            handleLike(postID, interaction);
           }
         },
         isLikePending: (postID: string) => pendingLikes.has(postID),

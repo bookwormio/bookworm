@@ -230,3 +230,8 @@ export const BOOKSHELF_CHIP_DISPLAY: StringMap = {
   [ServerBookShelfName.FINISHED]: "Finished",
   [ServerBookShelfName.LENDING_LIBRARY]: "Library",
 };
+
+export enum POST_INTERACTIONS {
+  LIKED = "LIKED",
+  UNLIKED = "UNLIKED",
+}
