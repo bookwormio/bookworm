@@ -149,7 +149,7 @@ const Profile = () => {
           <View style={{ paddingLeft: 40, paddingRight: 40 }}>
             {hasAnyBooks(bookShelves) ? (
               <BookWormButton
-                title="Generate Recommendations"
+                title="Discover Books"
                 onPress={() => {
                   router.push("/GenerateRecommendationsPage");
                 }}

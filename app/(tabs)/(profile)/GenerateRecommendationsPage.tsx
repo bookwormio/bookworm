@@ -72,7 +72,7 @@ const GenerateRecommendationsPage = () => {
         contentContainerStyle={styles.scrollContent}
       >
         <BookWormButton
-          title="Regenerate Recommendations"
+          title="Refresh Recommendations"
           onPress={() => {
             handleRefetchRecommendations();
           }}

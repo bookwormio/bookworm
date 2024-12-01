@@ -212,38 +212,44 @@ export async function getBookRequestStatusForBooks(
   bookIDs: string[],
 ): Promise<Record<string, BookRequestNotificationModel>> {
   const bookRequestStatuses: Record<string, BookRequestNotificationModel> = {};
+  const BATCH_SIZE = 30;
+  const processedBooks = new Set<string>();
 
   try {
     const notificationsRef = collection(DB, "notifications");
-    const q = query(
-      notificationsRef,
-      where("receiver", "==", friendUserID),
-      where("sender", "==", currentUserID),
-      where("type", "==", ServerNotificationType.BOOK_REQUEST),
-      where("bookID", "in", bookIDs),
-      orderBy("created", "desc"),
-    );
 
-    const querySnapshot = await getDocs(q);
+    for (let i = 0; i < bookIDs.length; i += BATCH_SIZE) {
+      const batchIDs = bookIDs.slice(i, i + BATCH_SIZE);
 
-    // Keep track of which books we've already processed
-    const processedBooks = new Set<string>();
+      const q = query(
+        notificationsRef,
+        where("receiver", "==", friendUserID),
+        where("sender", "==", currentUserID),
+        where("type", "==", ServerNotificationType.BOOK_REQUEST),
+        where("bookID", "in", batchIDs),
+        orderBy("created", "desc"),
+      );
 
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      if (
-        data?.bookID != null &&
-        data?.bookRequestStatus != null &&
-        !processedBooks.has(data.bookID as string)
-      ) {
-        // Only process the first (most recent) notification for each book
-        processedBooks.add(data.bookID as string);
-        bookRequestStatuses[data.bookID] = {
-          notifID: doc.id,
-          notifStatus: data.bookRequestStatus as BookRequestNotificationStatus,
-        };
-      }
-    });
+      const batchSnapshot = await getDocs(q);
+
+      batchSnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (
+          data?.bookID != null &&
+          data?.bookRequestStatus != null &&
+          !processedBooks.has(data.bookID as string)
+        ) {
+          // Only process the first (most recent) notification for each book
+          processedBooks.add(data.bookID as string);
+          bookRequestStatuses[data.bookID] = {
+            notifID: doc.id,
+            notifStatus:
+              data.bookRequestStatus as BookRequestNotificationStatus,
+          };
+        }
+      });
+    }
+
     return bookRequestStatuses;
   } catch (error) {
     throw new Error(

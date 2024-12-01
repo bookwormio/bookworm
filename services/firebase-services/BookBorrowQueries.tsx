@@ -4,7 +4,6 @@ import {
   doc,
   getDoc,
   getDocs,
-  or,
   query,
   serverTimestamp,
   setDoc,
@@ -250,22 +249,49 @@ export async function getLendingStatusesForBooks(
   bookIDs: string[],
 ): Promise<BookBorrowModel[]> {
   try {
+    const BATCH_SIZE = 15; // batch size = 30/2 to account for the OR conditions
     const bookRef = collection(DB, BORROW_BOOK_COLLECTION_REF);
-    // TODO batch this
-    const q = query(
-      bookRef,
-      and(
-        where("lending_user", "==", userID),
-        // Don't get books that are in NONE status
-        or(
+    const results: BookBorrowModel[] = [];
+
+    // Process bookIDs in batches
+    for (let i = 0; i < bookIDs.length; i += BATCH_SIZE) {
+      const batchIDs = bookIDs.slice(i, i + BATCH_SIZE);
+
+      // Run two separate queries - one for BORROWING and one for RETURNED
+      const borrowingQuery = query(
+        bookRef,
+        and(
+          where("lending_user", "==", userID),
           where("borrow_status", "==", ServerBookBorrowStatus.BORROWING),
-          where("borrow_status", "==", ServerBookBorrowStatus.RETURNED),
+          where("book_id", "in", batchIDs),
         ),
-        where("book_id", "in", bookIDs),
-      ),
-    );
-    const bookSnapshot = await getDocs(q);
-    return bookSnapshot.docs.map(convertBorrowDocToModel);
+      );
+
+      const returnedQuery = query(
+        bookRef,
+        and(
+          where("lending_user", "==", userID),
+          where("borrow_status", "==", ServerBookBorrowStatus.RETURNED),
+          where("book_id", "in", batchIDs),
+        ),
+      );
+
+      // Execute both queries
+      const [borrowingSnapshot, returnedSnapshot] = await Promise.all([
+        getDocs(borrowingQuery),
+        getDocs(returnedQuery),
+      ]);
+
+      // Combine results from both queries
+      const batchResults = [
+        ...borrowingSnapshot.docs.map(convertBorrowDocToModel),
+        ...returnedSnapshot.docs.map(convertBorrowDocToModel),
+      ];
+
+      results.push(...batchResults);
+    }
+
+    return results;
   } catch (error) {
     throw new Error(
       `Error getting lending statuses for books: ${(error as Error).message}`,
