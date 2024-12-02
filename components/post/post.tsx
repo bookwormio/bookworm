@@ -1,7 +1,9 @@
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { type Timestamp } from "firebase/firestore";
-import React from "react";
+import React, { useState } from "react";
 import {
   FlatList,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,10 +12,14 @@ import {
 } from "react-native";
 import { type PostModel } from "../../types";
 
+import { useMutation } from "@tanstack/react-query";
+import { router } from "expo-router";
 import {
   APP_BACKGROUND_COLOR,
   BOOKWORM_LIGHT_GREY,
+  BOOKWORM_ORANGE,
 } from "../../constants/constants";
+import { deletePost } from "../../services/firebase-services/PostQueries";
 import { useAuth } from "../auth/context";
 import BadgeOnPost from "../badges/BadgeOnPost";
 import { useGetBadgesForPost } from "../badges/useBadgeQueries";
@@ -35,6 +41,7 @@ interface PostProps {
   currentDate: Date;
   individualPage: boolean;
   presentComments: (postID: string) => void;
+  showElipses?: boolean;
 }
 
 const Post = ({
@@ -43,11 +50,16 @@ const Post = ({
   currentDate,
   individualPage,
   presentComments,
+  showElipses = false,
 }: PostProps) => {
   const { posts } = usePostsContext();
   const { user } = useAuth();
   const formattedDate = formatDate(created, currentDate);
   const currentPost = posts.find((p) => p.id === post.id);
+  const deletePostMutation = useMutation({
+    mutationFn: deletePost,
+  });
+  const [modalVisible, setModalVisible] = useState(false);
 
   const validatePageNumbers = usePageValidation();
 
@@ -69,6 +81,13 @@ const Post = ({
   const navigateToUser = useNavigateToUser();
 
   const navigateToBook = useNavigateToBook(post.bookid);
+
+  const handleDeletePost = () => {
+    deletePostMutation.mutate(post.id);
+    setModalVisible(false);
+
+    router.back();
+  };
 
   const isCurrentUsersPost = user?.uid === post.user.id;
 
@@ -129,6 +148,39 @@ const Post = ({
             )}
             <Text style={styles.time}>{formattedDate}</Text>
           </View>
+          {showElipses && (
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(true);
+              }}
+              style={{ paddingLeft: 5 }}
+            >
+              <AntDesign name="ellipsis1" size={24} />
+            </TouchableOpacity>
+          )}
+          <Modal
+            transparent={true}
+            animationType="fade"
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(false);
+            }}
+          >
+            <View style={styles.modalWrapper}>
+              <View style={styles.modalBox}>
+                <TouchableOpacity onPress={handleDeletePost}>
+                  <Text style={styles.modalTextBold}>Delete Post</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setModalVisible(false);
+                  }}
+                >
+                  <Text style={styles.modalText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </View>
         {pagesObject != null &&
           pagesRead != null &&
@@ -229,5 +281,29 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
+  },
+  modalWrapper: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalBox: {
+    width: 150,
+    height: 100,
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  modalTextBold: {
+    color: BOOKWORM_ORANGE,
+    fontWeight: "bold",
+    fontSize: 20,
+  },
+  modalText: {
+    color: BOOKWORM_ORANGE,
+    fontSize: 20,
   },
 });

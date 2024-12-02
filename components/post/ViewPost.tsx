@@ -5,6 +5,7 @@ import Post from "../../components/post/post";
 import { usePostsContext } from "../../components/post/PostsContext";
 import { APP_BACKGROUND_COLOR } from "../../constants/constants";
 import { fetchPostByPostID } from "../../services/firebase-services/PostQueries";
+import { useAuth } from "../auth/context";
 import WormLoader from "../wormloader/WormLoader";
 
 interface ViewPostProps {
@@ -13,6 +14,7 @@ interface ViewPostProps {
 }
 
 const ViewPost = ({ postID, fromProfile }: ViewPostProps) => {
+  const { user } = useAuth();
   const { posts, profilePosts } = usePostsContext();
 
   const { data: post, isLoading } = useQuery({
@@ -47,6 +49,7 @@ const ViewPost = ({ postID, fromProfile }: ViewPostProps) => {
             currentDate={new Date()}
             individualPage={true}
             presentComments={() => {}}
+            showElipses={user?.uid === post.user.id}
           />
         </View>
       )}

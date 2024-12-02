@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   limit,
@@ -66,6 +67,21 @@ export async function createPost(post: CreatePostModel) {
       .catch((error) => {
         console.error("Error creating post", error);
       });
+  }
+}
+
+/**
+ * delete post by postID
+ * @param postID postID to delete
+ */
+export async function deletePost(postID: string) {
+  try {
+    if (postID != null && postID !== "") {
+      const postRef = doc(DB, "posts", postID);
+      await deleteDoc(postRef);
+    }
+  } catch (error) {
+    console.error("Error deleting post:", postID, error);
   }
 }
 
