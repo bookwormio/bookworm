@@ -731,19 +731,17 @@ export async function setBookmarkForBook(
   oldBookmark: number,
 ): Promise<boolean> {
   try {
-    // no history if the book hasn't been started
+    let pageProgress = newBookmark;
+
     if (oldBookmark > 0) {
-      const pageProgress = newBookmark - oldBookmark;
-      // add new page progress to history
-      await addDoc(
-        collection(DB, `user_collection/${userID}/reading_history`),
-        {
-          bookID,
-          pages: pageProgress,
-          added_at: serverTimestamp(),
-        },
-      );
+      pageProgress = newBookmark - oldBookmark;
     }
+    await addDoc(collection(DB, `user_collection/${userID}/reading_history`), {
+      bookID,
+      pages: pageProgress,
+      added_at: serverTimestamp(),
+    });
+
     const bookmarkRef = doc(
       DB,
       `bookmark_collection/${userID}/bookmarks/${bookID}`,

@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import {
   APP_BACKGROUND_COLOR,
+  BOOKWORM_LIGHT_GREY,
   BOOKWORM_ORANGE,
 } from "../../constants/constants";
 import { useGetBooksForBookshelves } from "../profile/hooks/useBookshelfQueries";
@@ -15,9 +16,14 @@ import {
 interface DataSnapShotProps {
   userID: string;
   isLoadingOther: boolean;
+  optionalBorder?: boolean;
 }
 
-const DataSnapShot = ({ userID, isLoadingOther }: DataSnapShotProps) => {
+const DataSnapShot = ({
+  userID,
+  isLoadingOther,
+  optionalBorder = false,
+}: DataSnapShotProps) => {
   const { data: pagesData, isLoading: pagesIsLoading } =
     useGetPagesData(userID);
 
@@ -40,20 +46,22 @@ const DataSnapShot = ({ userID, isLoadingOther }: DataSnapShotProps) => {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View>
       {!(pagesIsLoading || bookshelvesLoading || isLoadingOther) && (
-        <View style={styles.container}>
-          <View style={styles.statsWrap}>
-            <Text style={styles.statTitle}>PAGES THIS WEEK</Text>
-            <Text style={styles.stat}>{pagesRead}</Text>
-          </View>
-          <View style={[styles.statsWrap, styles.leftBorder]}>
-            <Text style={styles.statTitle}>BOOKS THIS MONTH</Text>
-            <Text style={styles.stat}>{booksFinished}</Text>
-          </View>
-          <View style={[styles.statsWrap, styles.leftBorder]}>
-            <Text style={styles.statTitle}>TOP BOOK GENRE</Text>
-            <Text style={styles.stat}>{topGenre}</Text>
+        <View style={optionalBorder ? styles.dataSnapBorder : { flex: 1 }}>
+          <View style={styles.container}>
+            <View style={styles.statsWrap}>
+              <Text style={styles.statTitle}>PAGES THIS WEEK</Text>
+              <Text style={styles.stat}>{pagesRead}</Text>
+            </View>
+            <View style={[styles.statsWrap, styles.leftBorder]}>
+              <Text style={styles.statTitle}>BOOKS THIS MONTH</Text>
+              <Text style={styles.stat}>{booksFinished}</Text>
+            </View>
+            <View style={[styles.statsWrap, styles.leftBorder]}>
+              <Text style={styles.statTitle}>TOP BOOK GENRE</Text>
+              <Text style={styles.stat}>{topGenre}</Text>
+            </View>
           </View>
         </View>
       )}
@@ -94,6 +102,11 @@ const styles = StyleSheet.create({
   leftBorder: {
     borderLeftWidth: 1,
     borderLeftColor: BOOKWORM_ORANGE,
+  },
+  dataSnapBorder: {
+    borderBottomWidth: 5,
+    paddingBottom: 10,
+    borderColor: BOOKWORM_LIGHT_GREY,
   },
 });
 

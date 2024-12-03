@@ -19,34 +19,17 @@ export async function fetchPagesReadData(
     const historyQuery = query(historyRef, orderBy("added_at", "desc"));
     const historySnap = await getDocs(historyQuery);
 
-    const currentRef = collection(
-      DB,
-      `bookmark_collection/${userID}/bookmarks`,
-    );
-    const currentQuery = query(currentRef);
-    const currentSnap = await getDocs(currentQuery);
-
-    if (!currentSnap.empty) {
-      for (const currentDoc of currentSnap.docs) {
-        const mostRecentHistory = historySnap.docs.find(
-          (historyDoc) => historyDoc.data().bookID === currentDoc.id,
-        );
-        dataPoints.push({
-          x: currentDoc.data().updated.seconds,
-          y:
-            currentDoc.data().bookmark - (mostRecentHistory?.data().pages ?? 0),
-        });
-      }
-      for (const historyDoc of historySnap.docs) {
-        dataPoints.push({
-          x: historyDoc.data().added_at.seconds,
-          y: historyDoc.data().pages,
-        });
-      }
+    for (const historyDoc of historySnap.docs) {
+      const historyData = historyDoc.data();
+      dataPoints.push({
+        x: historyData.added_at.seconds,
+        y: historyData.pages,
+      });
     }
+
     return dataPoints;
   } catch (error) {
-    console.error("Error fetching time data:", error);
+    console.error("Error fetching reading data:", error);
     throw error;
   }
 }
