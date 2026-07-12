@@ -37,7 +37,5 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-eas.json
-
 #other
 *.swp

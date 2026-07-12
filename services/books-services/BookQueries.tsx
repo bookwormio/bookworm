@@ -24,7 +24,7 @@ export async function fetchBooksByTitleSearch(
       {
         params: {
           q: searchValue,
-          key: process.env.GOOGLE_BOOKS_API_KEY,
+          key: process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY,
           limit: 10,
         },
       },
@@ -78,7 +78,7 @@ export async function fetchBookByVolumeID(
       volumeInfo: BookVolumeInfo;
     }>("https://www.googleapis.com/books/v1/volumes/" + volumeID, {
       params: {
-        key: process.env.GOOGLE_BOOKS_API_KEY,
+        key: process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY,
         projection: "full",
       },
     });
@@ -119,7 +119,7 @@ export async function fetchBookVolumeIDByISBN(
       {
         params: {
           q: `isbn:${isbn}`,
-          key: process.env.GOOGLE_BOOKS_API_KEY,
+          key: process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY,
           projection: "full",
           limit: 1,
         },
