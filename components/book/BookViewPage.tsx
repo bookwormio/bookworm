@@ -321,7 +321,7 @@ const BookViewPage = ({ bookID }: BookViewProps) => {
                 >
                   <View style={styles.addButtonContent}>
                     <AntDesign
-                      name="pluscircleo"
+                      name="plus-circle"
                       size={20}
                       color="white"
                       style={styles.addButtonIcon}

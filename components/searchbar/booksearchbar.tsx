@@ -1,4 +1,4 @@
-import { Entypo, Feather } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { useCameraPermissions } from "expo-camera";
 import { router, useSegments } from "expo-router";
 import React from "react";
@@ -29,8 +29,8 @@ const BookSearchBar = ({
   placeholderText,
 }: SearchBarProps) => {
   const [permission, requestPermission] = useCameraPermissions();
-  const segments = useSegments();
-  const hideBarcode = !segments[2].endsWith("search");
+  const segments: string[] = useSegments();
+  const hideBarcode = !(segments[2]?.endsWith("search") ?? false);
 
   return (
     <View style={styles.container}>
@@ -64,18 +64,6 @@ const BookSearchBar = ({
           spellCheck={false}
           textContentType="none"
         />
-        {/* cross Icon, depending on whether the search bar is clicked or not */}
-        {clicked && (
-          <Entypo
-            name="cross"
-            size={20}
-            color="black"
-            style={{ padding: 1 }}
-            onPress={() => {
-              setSearchPhrase("");
-            }}
-          />
-        )}
       </View>
       {/* cancel button, depending on whether the search bar is clicked or not */}
       {clicked && (

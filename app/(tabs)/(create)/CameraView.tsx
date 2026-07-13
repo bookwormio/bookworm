@@ -1,35 +1,39 @@
-import { Camera, CameraType, FlashMode } from "expo-camera";
+import {
+  CameraView as ExpoCamera,
+  useCameraPermissions,
+  type CameraType,
+  type FlashMode,
+} from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Button, Image, StyleSheet, Text, View } from "react-native";
 
 const CameraView = () => {
-  const cameraRef = useRef<Camera | null>(null);
+  const cameraRef = useRef<ExpoCamera | null>(null);
   const [imageURI, setImageURI] = useState("");
-  const [cameraType, setCameraType] = useState(CameraType.back);
-  const [flashMode, setFlashMode] = useState(FlashMode.off);
-  const [hasCameraPermission, setHasCameraPermission] = useState<
-    boolean | null
-  >(null);
+  const [cameraType, setCameraType] = useState<CameraType>("back");
+  const [flashMode, setFlashMode] = useState<FlashMode>("off");
+  const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => {
-    handlePermissions().catch((error: string) => {
+    if (permission == null) {
+      requestPermission().catch((error) => {
+        alert(error);
+      });
+    }
+    MediaLibrary.requestPermissionsAsync().catch((error) => {
       alert(error);
     });
-  }, []);
-
-  const handlePermissions = async () => {
-    const { status } = await Camera.requestCameraPermissionsAsync();
-    setHasCameraPermission(status === "granted");
-    await MediaLibrary.requestPermissionsAsync();
-  };
+  }, [permission, requestPermission]);
 
   const takePicture = async () => {
     if (cameraRef.current != null) {
       try {
         const data = await cameraRef.current.takePictureAsync();
-        setImageURI(data.uri);
+        if (data?.uri != null) {
+          setImageURI(data.uri);
+        }
       } catch (error) {
         alert(error);
       }
@@ -47,18 +51,18 @@ const CameraView = () => {
     }
   };
 
-  if (hasCameraPermission === false) {
+  if (permission?.granted === false) {
     return <Text>No access to camera</Text>;
   }
 
   return (
     <View style={styles.container}>
       {imageURI === "" ? (
-        <Camera
+        <ExpoCamera
           style={styles.camera}
-          type={cameraType}
+          facing={cameraType}
           ref={cameraRef}
-          flashMode={flashMode}
+          flash={flashMode}
         >
           <View
             style={{
@@ -70,24 +74,18 @@ const CameraView = () => {
             <Button
               title="Flip"
               onPress={() => {
-                setCameraType(
-                  cameraType === CameraType.back
-                    ? CameraType.front
-                    : CameraType.back,
-                );
+                setCameraType(cameraType === "back" ? "front" : "back");
               }}
             />
             <Button
               onPress={() => {
-                setFlashMode(
-                  flashMode === FlashMode.off ? FlashMode.on : FlashMode.off,
-                );
+                setFlashMode(flashMode === "off" ? "on" : "off");
               }}
               title="Flash"
-              color={flashMode === FlashMode.off ? "gray" : "#fff"}
+              color={flashMode === "off" ? "gray" : "#fff"}
             />
           </View>
-        </Camera>
+        </ExpoCamera>
       ) : (
         <Image source={{ uri: imageURI }} style={styles.camera} />
       )}

@@ -35,7 +35,7 @@ export default NotificationBell;
 const styles = StyleSheet.create({
   iconContainer: {
     position: "relative",
-    paddingRight: 10,
+    paddingRight: -16,
   },
   badge: {
     position: "absolute",

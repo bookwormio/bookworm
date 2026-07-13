@@ -228,7 +228,7 @@ const BookBorrowButton = ({
         },
         {
           text: "Request",
-          onPress: (message) => {
+          onPress: (message = "") => {
             handleSendBookRequestNotification({
               bookID,
               bookTitle,

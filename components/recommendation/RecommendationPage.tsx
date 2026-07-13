@@ -83,7 +83,7 @@ const RecommendationPage = ({ friendUserID }: FriendIDProp) => {
         },
         {
           text: "Send",
-          onPress: (message) => {
+          onPress: (message = "") => {
             if (message === "") {
               handleRecommendation({ bookID, volumeInfo });
             } else {
