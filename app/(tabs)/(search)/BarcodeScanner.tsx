@@ -1,7 +1,7 @@
-import { CameraView } from "expo-camera";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { isValidISBN } from "../../../services/util/bookQueryUtils";
 import { useVolumeIDMutation } from "./hooks/useBarcodeQueries";
@@ -11,6 +11,15 @@ const BarcodeScanner = () => {
   const [showScanError, setShowScanError] = useState(false);
   const [lastScannedISBN, setLastScannedISBN] = useState("");
   const getVolumeIDMutation = useVolumeIDMutation();
+  const [permission, requestPermission] = useCameraPermissions();
+
+  useEffect(() => {
+    if (permission == null) {
+      requestPermission().catch((error) => {
+        console.error("Error requesting camera permissions", error);
+      });
+    }
+  }, [permission, requestPermission]);
 
   const handleFetchVolumeID = (isbn: string) => {
     if (!getVolumeIDMutation.isPending) {
@@ -47,6 +56,18 @@ const BarcodeScanner = () => {
       }
     }
   };
+
+  if (permission == null || !permission.granted) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.permissionText}>
+          {permission == null
+            ? "Checking camera permission..."
+            : "No access to camera. Please enable camera access in Settings to scan a book."}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -100,5 +121,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: "center",
     zIndex: 3,
+  },
+  permissionText: {
+    fontSize: 16,
+    color: "#000",
+    textAlign: "center",
+    paddingHorizontal: 30,
   },
 });

@@ -21,7 +21,11 @@
         "foregroundImage": "./assets/bookworm-adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.rilescode.BookWorm"
+      "package": "com.rilescode.BookWorm",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -51,7 +55,8 @@
       "bundleIdentifier": "com.rilescode.BookWorm",
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to scan a book's barcode.",
-        "NSPhotoLibraryUsageDescription": "This app uses the photo library to access images the user would like to post."
+        "NSPhotoLibraryUsageDescription": "This app uses the photo library to access images the user would like to post.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     }
   }

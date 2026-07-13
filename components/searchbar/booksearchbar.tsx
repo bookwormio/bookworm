@@ -93,7 +93,7 @@ const BookSearchBar = ({
       {!clicked && !hideBarcode && (
         <TouchableOpacity
           onPress={() => {
-            if (permission?.granted === false) {
+            if (permission?.granted !== true) {
               requestPermission()
                 .then((response) => {
                   if (response.granted) {
