@@ -17,6 +17,13 @@
         "image": "latest"
       }
     },
+    "preview-simulator": {
+      "distribution": "internal",
+      "ios": {
+        "image": "latest",
+        "simulator": true
+      }
+    },
     "production": {
       "autoIncrement": true,
       "ios": {

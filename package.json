@@ -67,5 +67,12 @@
   "overrides": {
     "react-dom": "$react"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "autolinking": {
+      "ios": {
+        "buildFromSource": ["react-native-reanimated", "react-native-worklets"]
+      }
+    }
+  }
 }
