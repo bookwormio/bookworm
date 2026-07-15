@@ -9,13 +9,4 @@
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "explicit",
   },
-  "workbench.colorCustomizations": {
-    "sash.hoverBorder": "#ff45f0",
-    "statusBar.background": "#ff12ec",
-    "statusBar.foreground": "#e7e7e7",
-    "statusBarItem.hoverBackground": "#ff45f0",
-    "statusBarItem.remoteBackground": "#ff12ec",
-    "statusBarItem.remoteForeground": "#e7e7e7"
-  },
-  "peacock.color": "#FF12EC"
 }
