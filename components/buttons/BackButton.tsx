@@ -14,7 +14,7 @@ const BackButton = ({ waitForKeyBoardDismiss }: BackButtonProps) => {
     <View>
       {router.canGoBack() && (
         <TouchableOpacity
-          style={{ paddingLeft: 10, paddingBottom: 2 }}
+          style={{ paddingLeft: -16 }}
           disabled={!router.canGoBack()}
           onPress={() => {
             Keyboard.dismiss();

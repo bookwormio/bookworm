@@ -8,7 +8,9 @@ node_modules/
 dist/
 web-build/
 
-# Native
+# Native (CNG: regenerated from app.json via `expo prebuild`)
+/ios/
+/android/
 *.orig.*
 *.jks
 *.p8

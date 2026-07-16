@@ -4,15 +4,10 @@
     "slug": "bookworm",
     "scheme": "bookworm.io",
     "owner": "bookwormio",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/bookworm-icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/bookworm-splash-screen.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -33,6 +28,14 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/bookworm-splash-screen.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
       [
         "expo-camera",
         {

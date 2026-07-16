@@ -183,7 +183,7 @@ const BookListItem = ({
             style={styles.removeButtonContainer}
           >
             <AntDesign
-              name={"minuscircleo"}
+              name={"minus-circle"}
               size={20}
               color={BOOKWORM_ORANGE}
             />

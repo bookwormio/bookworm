@@ -43,8 +43,8 @@ const BookshelfAddButtons = ({
             <AntDesign
               name={
                 selectedShelves.includes(item.value)
-                  ? "checkcircleo"
-                  : "pluscircleo"
+                  ? "check-circle"
+                  : "plus-circle"
               }
               size={20}
               color={

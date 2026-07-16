@@ -10,7 +10,7 @@ import {
   getNumberOfFollowersByUserID,
   getNumberOfFollowingByUserID,
 } from "../../services/firebase-services/UserQueries";
-import { type ConnectionModel } from "../../types";
+import { type ConnectionModel, type UserSearchDisplayModel } from "../../types";
 
 /**
  * Gets neccessary data to display followers in a list
@@ -62,7 +62,10 @@ export const useGetFollowingByIDStatic = (
     enabled: userID != null && userID !== "",
     queryFn: async () => {
       // First try to get data from the original query's cache
-      const cachedData = queryClient.getQueryData(["following", userID]);
+      const cachedData = queryClient.getQueryData<UserSearchDisplayModel[]>([
+        "following",
+        userID,
+      ]);
       if (cachedData != null) {
         return cachedData;
       }

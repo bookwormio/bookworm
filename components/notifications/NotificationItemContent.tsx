@@ -229,7 +229,7 @@ const NotificationItemContent = ({
         },
         {
           text: "Deny",
-          onPress: (message) => {
+          onPress: (message = "") => {
             void handleDenySent(message);
           },
         },

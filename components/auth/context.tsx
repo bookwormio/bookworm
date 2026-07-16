@@ -66,7 +66,7 @@ interface AuthenticationProviderProps {
 }
 
 const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [currentUser, setUser] = useState(FIREBASE_AUTH.currentUser);
   const [createUser, setCreateUser] = useState<boolean>(false);
 
